@@ -50,7 +50,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let pdfText: string;
       try {
         // Dynamic import for CommonJS module
-        const pdfParse = (await import("pdf-parse")).default;
+        const pdfParseModule = await import("pdf-parse");
+        const pdfParse = (pdfParseModule as any).default || pdfParseModule;
         const pdfData = await pdfParse(req.file.buffer);
         pdfText = pdfData.text;
 
