@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { Summary, LearningStyle, GenerateSummaryResponse } from "@shared/schema";
+import type { ApiSummary, LearningStyle, GenerateSummaryResponse } from "@shared/schema";
 import { 
   Upload, 
   FileText, 
@@ -53,7 +53,7 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<LearningStyle | null>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [generatedSummary, setGeneratedSummary] = useState<Summary | null>(null);
+  const [generatedSummary, setGeneratedSummary] = useState<ApiSummary | null>(null);
   const { toast } = useToast();
 
   const generateMutation = useMutation({

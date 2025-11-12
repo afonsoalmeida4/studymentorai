@@ -2,8 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import { generateSummary } from "./openai";
-import { generateSummaryRequestSchema, type GenerateSummaryResponse, type Summary } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { generateSummaryRequestSchema, type GenerateSummaryResponse } from "@shared/schema";
+import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -21,9 +22,39 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // PDF Upload and Summary Generation Endpoint
-  app.post("/api/generate-summary", upload.single("pdf"), async (req, res) => {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      let user = await storage.getUser(userId);
+      
+      // If user doesn't exist in database, create from claims
+      if (!user) {
+        const claims = req.user.claims;
+        user = await storage.upsertUser({
+          id: claims.sub,
+          email: claims.email,
+          firstName: claims.first_name,
+          lastName: claims.last_name,
+          profileImageUrl: claims.profile_image_url,
+        });
+      }
+      
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // PDF Upload and Summary Generation Endpoint (Protected)
+  app.post("/api/generate-summary", isAuthenticated, upload.single("pdf"), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
       // Validate file upload
       if (!req.file) {
         return res.status(400).json({
@@ -62,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } as GenerateSummaryResponse);
         }
 
-        // Limit text length to avoid token limits (approximately 15000 words ~ 20000 tokens)
+        // Limit text length to avoid token limits
         const words = pdfText.split(/\s+/);
         if (words.length > 15000) {
           pdfText = words.slice(0, 15000).join(" ");
@@ -82,18 +113,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           learningStyle,
         });
 
-        const summaryResult: Summary = {
-          id: randomUUID(),
+        // Save to database
+        const savedSummary = await storage.createSummary({
+          userId,
           fileName: req.file.originalname,
           learningStyle,
           summary,
           motivationalMessage,
-          createdAt: new Date().toISOString(),
-        };
+          isFavorite: false,
+        });
 
         return res.json({
           success: true,
-          summary: summaryResult,
+          summary: {
+            ...savedSummary,
+            createdAt: savedSummary.createdAt?.toISOString() || new Date().toISOString(),
+          },
         } as GenerateSummaryResponse);
       } catch (error) {
         console.error("Error generating summary:", error);
@@ -108,6 +143,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro inesperado no servidor",
       } as GenerateSummaryResponse);
+    }
+  });
+
+  // Get user's summary history
+  app.get("/api/summaries", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaries = await storage.getUserSummaries(userId);
+      res.json(summaries);
+    } catch (error) {
+      console.error("Error fetching summaries:", error);
+      res.status(500).json({ error: "Failed to fetch summaries" });
+    }
+  });
+
+  // Toggle favorite
+  app.patch("/api/summaries/:id/favorite", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.id;
+      
+      const updated = await storage.toggleFavorite(summaryId, userId);
+      if (!updated) {
+        return res.status(404).json({ error: "Summary not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      res.status(500).json({ error: "Failed to toggle favorite" });
+    }
+  });
+
+  // Delete summary
+  app.delete("/api/summaries/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.id;
+      
+      const success = await storage.deleteSummary(summaryId, userId);
+      if (!success) {
+        return res.status(404).json({ error: "Summary not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting summary:", error);
+      res.status(500).json({ error: "Failed to delete summary" });
     }
   });
 
