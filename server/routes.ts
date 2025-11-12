@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
-import pdfParse from "pdf-parse";
 import { generateSummary } from "./openai";
 import { generateSummaryRequestSchema, type GenerateSummaryResponse, type Summary } from "@shared/schema";
 import { randomUUID } from "crypto";
@@ -50,6 +49,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract text from PDF
       let pdfText: string;
       try {
+        // Dynamic import for CommonJS module
+        const pdfParse = (await import("pdf-parse")).default;
         const pdfData = await pdfParse(req.file.buffer);
         pdfText = pdfData.text;
 
