@@ -9,6 +9,30 @@ import { desc } from "drizzle-orm";
 export const learningStyles = ["visual", "auditivo", "logico", "conciso"] as const;
 export type LearningStyle = typeof learningStyles[number];
 
+// XP Actions enum
+export const xpActions = [
+  "upload_pdf",
+  "generate_summary",
+  "create_flashcards",
+  "complete_study_session",
+  "daily_streak_bonus",
+  "daily_chat_interaction",
+  "level_up_bonus",
+] as const;
+export type XpAction = typeof xpActions[number];
+
+// User Levels enum
+export const userLevels = ["iniciante", "explorador", "mentor", "mestre"] as const;
+export type UserLevel = typeof userLevels[number];
+
+// Level configuration
+export const levelConfig = {
+  iniciante: { minXp: 0, maxXp: 299, emoji: "🪶", name: "Iniciante" },
+  explorador: { minXp: 300, maxXp: 899, emoji: "📘", name: "Explorador" },
+  mentor: { minXp: 900, maxXp: 1999, emoji: "🧠", name: "Mentor" },
+  mestre: { minXp: 2000, maxXp: Infinity, emoji: "🚀", name: "Mestre do Foco" },
+};
+
 // Session storage table (mandatory for Replit Auth)
 export const sessions = pgTable(
   "sessions",
@@ -27,6 +51,15 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Gamification fields
+  displayName: varchar("display_name").unique(),
+  totalXp: integer("total_xp").default(0).notNull(),
+  currentLevel: varchar("current_level", { length: 20 }).default("iniciante").notNull(),
+  // Premium fields
+  premiumActive: boolean("premium_active").default(false).notNull(),
+  premiumSince: timestamp("premium_since"),
+  // Daily interaction tracking
+  lastDailyChatXp: timestamp("last_daily_chat_xp"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -185,6 +218,113 @@ export const flashcardAttemptsRelations = relations(flashcardAttempts, ({ one })
     fields: [flashcardAttempts.flashcardId],
     references: [flashcards.id],
   }),
+}));
+
+// XP Events table (for gamification tracking)
+export const xpEvents = pgTable(
+  "xp_events",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    action: varchar("action", { length: 50 }).notNull(),
+    xpAwarded: integer("xp_awarded").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_xp_events_user_id").on(table.userId),
+    index("idx_xp_events_created_at").on(desc(table.createdAt)),
+  ],
+);
+
+export const insertXpEventSchema = createInsertSchema(xpEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertXpEvent = z.infer<typeof insertXpEventSchema>;
+export type XpEvent = typeof xpEvents.$inferSelect;
+
+export const xpEventsRelations = relations(xpEvents, ({ one }) => ({
+  user: one(users, {
+    fields: [xpEvents.userId],
+    references: [users.id],
+  }),
+}));
+
+// Chat Threads table (for mentor chat conversations)
+export const chatThreads = pgTable(
+  "chat_threads",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").default("Nova Conversa").notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_chat_threads_user_id").on(table.userId),
+    index("idx_chat_threads_last_activity").on(desc(table.lastActivityAt)),
+  ],
+);
+
+export const insertChatThreadSchema = createInsertSchema(chatThreads).omit({
+  id: true,
+  createdAt: true,
+  lastActivityAt: true,
+});
+
+export type InsertChatThread = z.infer<typeof insertChatThreadSchema>;
+export type ChatThread = typeof chatThreads.$inferSelect;
+
+export const chatThreadsRelations = relations(chatThreads, ({ one, many }) => ({
+  user: one(users, {
+    fields: [chatThreads.userId],
+    references: [users.id],
+  }),
+  messages: many(chatMessages),
+}));
+
+// Chat Messages table
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    threadId: varchar("thread_id").notNull().references(() => chatThreads.id, { onDelete: "cascade" }),
+    role: varchar("role", { length: 20 }).notNull(), // 'user' or 'assistant'
+    content: text("content").notNull(),
+    xpAwarded: integer("xp_awarded").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_chat_messages_thread_id").on(table.threadId),
+    index("idx_chat_messages_created_at").on(desc(table.createdAt)),
+  ],
+);
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  thread: one(chatThreads, {
+    fields: [chatMessages.threadId],
+    references: [chatThreads.id],
+  }),
+}));
+
+// Update users relations to include XP events and chat threads
+export const usersRelationsUpdated = relations(users, ({ many }) => ({
+  summaries: many(summaries),
+  studySessions: many(studySessions),
+  flashcardAttempts: many(flashcardAttempts),
+  xpEvents: many(xpEvents),
+  chatThreads: many(chatThreads),
 }));
 
 // API request/response types

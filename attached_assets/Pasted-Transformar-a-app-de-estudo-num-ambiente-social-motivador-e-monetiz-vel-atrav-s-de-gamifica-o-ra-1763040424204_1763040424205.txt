@@ -1,0 +1,102 @@
+Transformar a app de estudo num ambiente social, motivador e monetizável, através de gamificação, ranking entre utilizadores e funcionalidades premium exclusivas.
+
+⸻
+
+🪙 1. Sistema de Pontos e Níveis (Gamificação)
+	•	O utilizador ganha pontos (XP) por realizar ações dentro da app:
+	•	Fazer upload de um ficheiro de estudo.
+	•	Gerar resumos.
+	•	Criar flashcards.
+	•	Completar sessões de estudo ou quizzes.
+	•	Cumprir revisões programadas.
+	•	Os pontos acumulam-se e fazem o utilizador subir de nível, com nomes e ícones:
+	•	Iniciante 🪶
+	•	Explorador 📘
+	•	Mentor 🧠
+	•	Mestre do Foco 🚀
+	•	Sempre que o utilizador sobe de nível, a app mostra:
+	•	Uma mensagem de conquista (ex: “Subiste para Mentor! 🧠 Continua com essa energia!”).
+	•	Um efeito visual animado (ex: confetes ou luz dourada).
+	•	Os pontos e níveis aparecem visíveis no topo da interface em todas as páginas.
+
+⸻
+
+🏆 2. Ranking e Comunidade
+	•	Nova página “Ranking” acessível no menu principal.
+	•	Mostra uma tabela com os 10 melhores alunos, com:
+	•	Nome de utilizador, pontos e nível atual.
+	•	Medalhas 🥇🥈🥉 para os três primeiros lugares.
+	•	O utilizador pode ver:
+	•	O seu lugar atual no ranking.
+	•	A diferença de pontos para o próximo nível.
+	•	Ao entrar na app pela primeira vez, o utilizador define o seu nome público (guardado automaticamente).
+	•	A app mostra mensagens motivacionais relacionadas ao ranking:
+	•	“Faltam só 15 XP para ultrapassares o João!”
+	•	“Estás no Top 5! Continua 💪”
+
+⸻
+
+💎 3. Modo Premium (Plano Pago Simulado)
+	•	Nova página “Premium” explicando vantagens exclusivas:
+	•	Resumos e revisões ilimitadas.
+	•	Flashcards com imagens e áudio.
+	•	Acesso ao chat com mentor IA.
+	•	Tema visual exclusivo (cores douradas e ícones especiais).
+	•	O utilizador pode clicar em “Ativar Premium” — nesta fase, o acesso é simulado, sem pagamento real.
+	•	Quando o Premium é ativado:
+	•	O utilizador ganha acesso imediato ao mentor IA.
+	•	O limite de flashcards aumenta (de 5 para 20 por resumo).
+	•	A interface muda para um tema dourado.
+	•	Surge uma mensagem:
+“Bem-vindo ao modo Premium 💎 — agora tens acesso ilimitado e um mentor exclusivo!”
+
+⸻
+
+🧑‍🏫 4. Chat com Mentor IA (Exclusivo Premium)
+	•	Funcionalidade nova e exclusiva para utilizadores Premium.
+	•	O mentor IA:
+	•	Responde de forma curta, empática e motivadora.
+	•	Dá dicas de estudo e reforço positivo.
+	•	Usa emojis e frases curtas.
+	•	Exemplos de respostas:
+“Excelente trabalho hoje! 💪 Estás a crescer como estudante.”
+“Boa, completaste todos os flashcards! 🚀 Continua firme.”
+	•	O chat serve como apoio emocional e motivacional diário para o aluno.
+
+⸻
+
+📈 5. Integração com o Sistema de Pontos
+	•	O mentor IA e o sistema Premium interagem com a gamificação:
+	•	O mentor pode reconhecer conquistas (“Parabéns, subiste de nível!”).
+	•	O utilizador ganha XP extra por conversar com o mentor diariamente.
+	•	As ações Premium também contam para o ranking geral.
+
+⸻
+
+🎮 6. Experiência de Progresso e Recompensas
+	•	Pequenos pop-ups de conquista sempre que o utilizador ganha XP ou sobe de nível.
+	•	Feedback instantâneo, como:
+	•	“+10 XP por gerar flashcards!”
+	•	“Nível conquistado: Explorador 📘!”
+	•	Mensagens de incentivo constantes para manter o ritmo de estudo.
+
+⸻
+
+🌐 7. Navegação e Identidade Visual
+	•	Novo menu com secções claras:
+	•	Dashboard
+	•	Ranking
+	•	Premium
+	•	Chat Mentor (Premium)
+	•	Design atualizado com:
+	•	Cores vibrantes e ícones de gamificação.
+	•	Tema especial dourado para Premium.
+	•	Indicadores visuais de XP e nível sempre visíveis.
+
+⸻
+
+📊 8. Objetivos do MMP4
+	•	Criar motivação constante através de recompensas e progressão.
+	•	Introduzir competição saudável com ranking.
+	•	Lançar o primeiro modelo de monetização (Premium).
+	•	Reforçar ligação emocional com o utilizador (mentor IA).
