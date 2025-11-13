@@ -46,6 +46,9 @@ Preferred communication style: Simple, everyday language.
   - `POST /api/generate-summary` - Generate personalized summary from PDF
   - `POST /api/flashcards` - Generate flashcards from existing summary
   - `GET /api/flashcards/:summaryId` - Retrieve flashcards for a summary
+  - `POST /api/study-sessions` - Record study session progress
+  - `GET /api/dashboard-stats` - Get user study statistics (PDFs, flashcards, streak, accuracy)
+  - `GET /api/review-plan` - Get AI-generated personalized review recommendations
 - File upload handling via **Multer** middleware (in-memory storage, 10MB PDF limit)
 - Request validation using **Zod** schemas shared between client and server
 
@@ -71,28 +74,57 @@ Preferred communication style: Simple, everyday language.
 ### Data Storage Solutions
 
 **Current Implementation:**
-- **In-memory storage** for user accounts (temporary, session-based)
-- No persistent storage for generated summaries (stateless generation)
+- **PostgreSQL database** via Neon for all persistent storage
+- **Drizzle ORM** for type-safe database operations
+- **Database tables:**
+  - `users` - User accounts and authentication
+  - `summaries` - Generated study summaries with learning style metadata
+  - `flashcards` - Interactive question/answer pairs linked to summaries
+  - `study_sessions` - High-level study session tracking (date, flashcard counts, accuracy)
+  - `flashcard_attempts` - Individual flashcard performance for spaced repetition
 
-**Database Configuration (Prepared but Not Active):**
-- **Drizzle ORM** configured with PostgreSQL dialect
-- **Neon Database** serverless driver (`@neondatabase/serverless`)
+**Database Schema:**
 - Schema defined in `shared/schema.ts`
-- Migration strategy via Drizzle Kit (`db:push` script)
-- Session management infrastructure via `connect-pg-simple`
+- Migration strategy via Drizzle Kit (`npm run db:push`)
+- Compound indices for efficient dashboard queries:
+  - `(user_id, study_date DESC)` for streak calculations
+  - `(user_id, summary_id)` for per-summary lookups
+  - `(user_id, flashcard_id)` for attempt tracking
+- Foreign key relationships maintain referential integrity
 
-**Rationale for Current Approach:**
-- Simplifies initial deployment and development
-- Reduces infrastructure dependencies
-- Future-ready with database configuration in place
+### Dashboard & Progress Tracking
+
+**Features:**
+- **Study Statistics Dashboard** (`/dashboard` route)
+  - Total PDFs studied count
+  - Flashcards completed count
+  - Study streak calculation (consecutive days with activity)
+  - Average accuracy percentage
+  - Last 7 days progress visualization using Recharts
+  
+**AI-Powered Review System:**
+- **Spaced Repetition Logic**: Identifies topics needing review based on:
+  - Low accuracy scores (< 70%)
+  - Time since last study session
+  - Number of study sessions completed
+- **GPT-5 Review Plan Generation**: Personalized recommendations with:
+  - Priority topics (high/medium/low)
+  - Specific reasons for review
+  - Motivational study guidance in Portuguese
+- **Robust Error Handling**: Graceful fallbacks for AI parsing failures
+
+**Progress Tracking:**
+- Study sessions record: date, flashcards attempted, correct/incorrect counts
+- Individual flashcard attempts for spaced repetition algorithm
+- Dashboard queries optimized with compound database indices
 
 ### Authentication & Authorization
 
 **Current State:**
-- Basic user schema defined (`User`, `InsertUser` types)
-- User storage interface implemented
-- No active authentication flow in use
-- Prepared for future session-based authentication (express-session infrastructure present)
+- **Replit OIDC Authentication** (javascript_log_in_with_replit integration)
+- Session-based authentication with express-session
+- User data stored in PostgreSQL users table
+- Protected routes require authentication
 
 ### External Dependencies
 
