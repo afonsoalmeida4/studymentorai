@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { GenerateFlashcardsResponse } from "@shared/schema";
-import FlashcardDeck from "./FlashcardDeck";
+import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
 import { Loader2, Brain, Sparkles } from "lucide-react";
 
 interface SummaryStudySectionProps {
@@ -126,7 +126,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
             </div>
           </CardHeader>
           <CardContent>
-            <FlashcardDeck flashcards={flashcardsData.flashcards || []} />
+            <AnkiFlashcardDeck summaryId={summaryId} />
           </CardContent>
         </Card>
       )}
