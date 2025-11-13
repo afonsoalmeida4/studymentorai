@@ -25,8 +25,11 @@ export default function Landing() {
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
             AI Study Mentor
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
-            Transforme os seus documentos PDF em resumos personalizados adaptados ao seu estilo de aprendizagem único
+          <p className="text-xl md:text-2xl text-muted-foreground mb-4 leading-relaxed max-w-3xl mx-auto font-semibold">
+            Organiza o teu conhecimento. Encontra o teu equilíbrio.
+          </p>
+          <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
+            Transforme documentos em conhecimento organizado com IA. Estude de forma personalizada e encontre apoio para a sua jornada de aprendizagem.
           </p>
           <Button
             size="lg"
