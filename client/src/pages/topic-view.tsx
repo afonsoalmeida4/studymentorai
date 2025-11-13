@@ -27,6 +27,21 @@ import {
 } from "@/components/ui/select";
 import type { Topic, ContentItem } from "@shared/schema";
 
+type LearningStyle = "visual" | "auditivo" | "logico" | "conciso";
+
+type TopicSummary = {
+  summary: string;
+  motivationalMessage: string;
+  updatedAt: Date;
+};
+
+type TopicSummariesResponse = {
+  success: boolean;
+  summaries: Partial<Record<LearningStyle, TopicSummary>>;
+  count: number;
+  hasContent: boolean;
+};
+
 export default function TopicView() {
   const params = useParams<{ id: string }>();
   const topicId = params.id;
@@ -60,14 +75,15 @@ export default function TopicView() {
     },
   });
 
-  const { data: topicSummariesData, isLoading: topicSummariesLoading, refetch: refetchTopicSummaries } = useQuery({
+  const { data: topicSummariesData, isLoading: topicSummariesLoading, refetch: refetchTopicSummaries } = useQuery<TopicSummariesResponse>({
     queryKey: ["/api/topics", topicId, "summaries"],
     queryFn: async () => {
-      if (!topicId) return null;
+      if (!topicId) throw new Error("Topic ID required");
       const res = await fetch(`/api/topics/${topicId}/summaries`);
       if (!res.ok) throw new Error("Failed to fetch topic summaries");
       return res.json();
     },
+    enabled: !!topicId,
   });
 
   const generateSummariesMutation = useMutation({
@@ -496,31 +512,45 @@ export default function TopicView() {
               <p className="text-muted-foreground">A carregar resumos...</p>
             </div>
           ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (
-            <Tabs defaultValue={Object.keys(topicSummariesData.summaries)[0]} className="w-full">
-              <TabsList className={`grid w-full grid-cols-${Object.keys(topicSummariesData.summaries).length}`}>
-                {topicSummariesData.summaries.visual && (
+            (() => {
+              const summaries = topicSummariesData.summaries;
+              const visual = summaries.visual;
+              const auditivo = summaries.auditivo;
+              const logico = summaries.logico;
+              const conciso = summaries.conciso;
+              
+              const availableStyles = Object.keys(summaries) as LearningStyle[];
+              const gridClass = availableStyles.length === 1 ? "grid-cols-1" 
+                : availableStyles.length === 2 ? "grid-cols-2"
+                : availableStyles.length === 3 ? "grid-cols-3"
+                : "grid-cols-4";
+              
+              return (
+            <Tabs defaultValue={availableStyles[0]} className="w-full">
+              <TabsList className={`grid w-full ${gridClass}`}>
+                {visual ? (
                   <TabsTrigger value="visual" data-testid="tab-visual">
                     Visual
                   </TabsTrigger>
-                )}
-                {topicSummariesData.summaries.auditivo && (
+                ) : null}
+                {auditivo ? (
                   <TabsTrigger value="auditivo" data-testid="tab-auditivo">
                     Auditivo
                   </TabsTrigger>
-                )}
-                {topicSummariesData.summaries.logico && (
+                ) : null}
+                {logico ? (
                   <TabsTrigger value="logico" data-testid="tab-logico">
                     Lógico
                   </TabsTrigger>
-                )}
-                {topicSummariesData.summaries.conciso && (
+                ) : null}
+                {conciso ? (
                   <TabsTrigger value="conciso" data-testid="tab-conciso">
                     Conciso
                   </TabsTrigger>
-                )}
+                ) : null}
               </TabsList>
 
-              {topicSummariesData.summaries.visual && (
+              {visual ? (
                 <TabsContent value="visual" className="mt-4">
                   <div className="space-y-4">
                     <Card>
@@ -529,24 +559,24 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {topicSummariesData.summaries.visual.summary}
+                          {visual.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {topicSummariesData.summaries.visual.motivationalMessage && (
+                    {visual.motivationalMessage ? (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {topicSummariesData.summaries.visual.motivationalMessage}
+                            {visual.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
-                    )}
+                    ) : null}
                   </div>
                 </TabsContent>
-              )}
+              ) : null}
 
-              {topicSummariesData.summaries.auditivo && (
+              {auditivo ? (
                 <TabsContent value="auditivo" className="mt-4">
                   <div className="space-y-4">
                     <Card>
@@ -555,24 +585,24 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {topicSummariesData.summaries.auditivo.summary}
+                          {auditivo.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {topicSummariesData.summaries.auditivo.motivationalMessage && (
+                    {auditivo.motivationalMessage ? (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {topicSummariesData.summaries.auditivo.motivationalMessage}
+                            {auditivo.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
-                    )}
+                    ) : null}
                   </div>
                 </TabsContent>
-              )}
+              ) : null}
 
-              {topicSummariesData.summaries.logico && (
+              {logico ? (
                 <TabsContent value="logico" className="mt-4">
                   <div className="space-y-4">
                     <Card>
@@ -581,24 +611,24 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {topicSummariesData.summaries.logico.summary}
+                          {logico.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {topicSummariesData.summaries.logico.motivationalMessage && (
+                    {logico.motivationalMessage ? (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {topicSummariesData.summaries.logico.motivationalMessage}
+                            {logico.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
-                    )}
+                    ) : null}
                   </div>
                 </TabsContent>
-              )}
+              ) : null}
 
-              {topicSummariesData.summaries.conciso && (
+              {conciso ? (
                 <TabsContent value="conciso" className="mt-4">
                   <div className="space-y-4">
                     <Card>
@@ -607,23 +637,25 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {topicSummariesData.summaries.conciso.summary}
+                          {conciso.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {topicSummariesData.summaries.conciso.motivationalMessage && (
+                    {conciso.motivationalMessage ? (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {topicSummariesData.summaries.conciso.motivationalMessage}
+                            {conciso.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
-                    )}
+                    ) : null}
                   </div>
                 </TabsContent>
-              )}
+              ) : null}
             </Tabs>
+              );
+            })()
           ) : (
             <div className="py-8 text-center space-y-6">
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
