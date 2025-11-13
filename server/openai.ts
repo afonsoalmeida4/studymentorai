@@ -134,7 +134,6 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
         },
       ],
       max_completion_tokens: 2048,
-      temperature: 0.7,
     });
 
     const content = response.choices[0].message.content || "[]";
