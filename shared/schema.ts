@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, index, jsonb, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, index, jsonb, boolean, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -63,6 +63,8 @@ export type Summary = typeof summaries.$inferSelect;
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   summaries: many(summaries),
+  studySessions: many(studySessions),
+  flashcardAttempts: many(flashcardAttempts),
 }));
 
 export const summariesRelations = relations(summaries, ({ one, many }) => ({
@@ -71,6 +73,7 @@ export const summariesRelations = relations(summaries, ({ one, many }) => ({
     references: [users.id],
   }),
   flashcards: many(flashcards),
+  studySessions: many(studySessions),
 }));
 
 // Flashcards table
@@ -96,10 +99,90 @@ export const insertFlashcardSchema = createInsertSchema(flashcards).omit({
 export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
 export type Flashcard = typeof flashcards.$inferSelect;
 
-export const flashcardsRelations = relations(flashcards, ({ one }) => ({
+export const flashcardsRelations = relations(flashcards, ({ one, many }) => ({
   summary: one(summaries, {
     fields: [flashcards.summaryId],
     references: [summaries.id],
+  }),
+  attempts: many(flashcardAttempts),
+}));
+
+// Study Sessions table (for progress tracking)
+export const studySessions = pgTable(
+  "study_sessions",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    summaryId: varchar("summary_id").notNull().references(() => summaries.id, { onDelete: "cascade" }),
+    totalFlashcards: integer("total_flashcards").notNull(),
+    correctFlashcards: integer("correct_flashcards").notNull().default(0),
+    incorrectFlashcards: integer("incorrect_flashcards").notNull().default(0),
+    studyDate: timestamp("study_date").notNull(),
+    durationSeconds: integer("duration_seconds"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_study_sessions_user_date").on(table.userId, table.studyDate.desc()),
+    index("idx_study_sessions_user_summary").on(table.userId, table.summaryId),
+  ],
+);
+
+export const insertStudySessionSchema = createInsertSchema(studySessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertStudySession = z.infer<typeof insertStudySessionSchema>;
+export type StudySession = typeof studySessions.$inferSelect;
+
+// Flashcard Attempts table (for spaced repetition tracking)
+export const flashcardAttempts = pgTable(
+  "flashcard_attempts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    flashcardId: varchar("flashcard_id").notNull().references(() => flashcards.id, { onDelete: "cascade" }),
+    isCorrect: boolean("is_correct").notNull(),
+    attemptDate: timestamp("attempt_date").defaultNow().notNull(),
+    nextReviewDate: timestamp("next_review_date"),
+    easeFactor: integer("ease_factor").default(250).notNull(),
+    intervalDays: integer("interval_days").default(0).notNull(),
+    repetitions: integer("repetitions").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_flashcard_attempts_user_flashcard").on(table.userId, table.flashcardId),
+    index("idx_flashcard_attempts_next_review").on(table.userId, table.nextReviewDate),
+  ],
+);
+
+export const insertFlashcardAttemptSchema = createInsertSchema(flashcardAttempts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertFlashcardAttempt = z.infer<typeof insertFlashcardAttemptSchema>;
+export type FlashcardAttempt = typeof flashcardAttempts.$inferSelect;
+
+export const studySessionsRelations = relations(studySessions, ({ one }) => ({
+  user: one(users, {
+    fields: [studySessions.userId],
+    references: [users.id],
+  }),
+  summary: one(summaries, {
+    fields: [studySessions.summaryId],
+    references: [summaries.id],
+  }),
+}));
+
+export const flashcardAttemptsRelations = relations(flashcardAttempts, ({ one }) => ({
+  user: one(users, {
+    fields: [flashcardAttempts.userId],
+    references: [users.id],
+  }),
+  flashcard: one(flashcards, {
+    fields: [flashcardAttempts.flashcardId],
+    references: [flashcards.id],
   }),
 }));
 
@@ -156,3 +239,73 @@ export const generateFlashcardsResponseSchema = z.object({
 });
 
 export type GenerateFlashcardsResponse = z.infer<typeof generateFlashcardsResponseSchema>;
+
+// Study Progress API types
+export const recordStudySessionRequestSchema = z.object({
+  summaryId: z.string(),
+  totalFlashcards: z.number().int().positive(),
+  correctFlashcards: z.number().int().min(0),
+  incorrectFlashcards: z.number().int().min(0),
+  studyDate: z.string(),
+  durationSeconds: z.number().int().positive().optional(),
+});
+
+export type RecordStudySessionRequest = z.infer<typeof recordStudySessionRequestSchema>;
+
+export const recordStudySessionResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.string().optional(),
+});
+
+export type RecordStudySessionResponse = z.infer<typeof recordStudySessionResponseSchema>;
+
+// Dashboard Stats API types
+export const dashboardStatsSchema = z.object({
+  totalPDFsStudied: z.number().int(),
+  totalFlashcardsCompleted: z.number().int(),
+  studyStreak: z.number().int(),
+  averageAccuracy: z.number(),
+  totalStudySessions: z.number().int(),
+  recentSessions: z.array(z.object({
+    date: z.string(),
+    flashcardsCompleted: z.number().int(),
+    accuracy: z.number(),
+  })),
+});
+
+export type DashboardStats = z.infer<typeof dashboardStatsSchema>;
+
+export const getDashboardStatsResponseSchema = z.object({
+  success: z.boolean(),
+  stats: dashboardStatsSchema.optional(),
+  error: z.string().optional(),
+});
+
+export type GetDashboardStatsResponse = z.infer<typeof getDashboardStatsResponseSchema>;
+
+// Review Plan API types
+export const getReviewPlanRequestSchema = z.object({
+  limit: z.number().int().positive().optional().default(5),
+});
+
+export type GetReviewPlanRequest = z.infer<typeof getReviewPlanRequestSchema>;
+
+export const reviewPlanItemSchema = z.object({
+  summaryId: z.string(),
+  fileName: z.string(),
+  lastStudied: z.string(),
+  accuracy: z.number(),
+  priority: z.string(),
+  recommendation: z.string(),
+});
+
+export type ReviewPlanItem = z.infer<typeof reviewPlanItemSchema>;
+
+export const getReviewPlanResponseSchema = z.object({
+  success: z.boolean(),
+  reviewPlan: z.array(reviewPlanItemSchema).optional(),
+  aiRecommendation: z.string().optional(),
+  error: z.string().optional(),
+});
+
+export type GetReviewPlanResponse = z.infer<typeof getReviewPlanResponseSchema>;
