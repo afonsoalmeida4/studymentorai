@@ -76,6 +76,12 @@ export async function generateSummary({
       max_completion_tokens: 2048,
     });
 
+    console.log(`[OpenAI] Summary generation for ${learningStyle} style:`, {
+      hasContent: !!summaryResponse.choices[0]?.message?.content,
+      contentLength: summaryResponse.choices[0]?.message?.content?.length || 0,
+      finishReason: summaryResponse.choices[0]?.finish_reason,
+    });
+
     const summary = summaryResponse.choices[0].message.content || "Não foi possível gerar o resumo.";
 
     // Generate motivational message
