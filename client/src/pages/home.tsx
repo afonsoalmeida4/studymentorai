@@ -251,6 +251,73 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Features Section */}
+      <section className="pb-12 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">Funcionalidades</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Summary Generator Feature */}
+            <Card className="hover-elevate" data-testid="card-feature-summaries">
+              <CardHeader>
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">Resumos Personalizados</CardTitle>
+                <CardDescription>
+                  Gere resumos adaptados ao seu estilo de aprendizagem (Visual, Auditivo, Lógico ou Conciso)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Carregue um PDF e obtenha um resumo otimizado para a forma como aprende melhor
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Flashcards Feature */}
+            <Card className="hover-elevate" data-testid="card-feature-flashcards">
+              <CardHeader>
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
+                  <Brain className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">Flashcards Interativos</CardTitle>
+                <CardDescription>
+                  Pratique com flashcards 3D gerados automaticamente a partir dos seus resumos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Teste os seus conhecimentos com perguntas e respostas criadas por IA
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Dashboard Feature */}
+            <Link href="/dashboard">
+              <Card className="hover-elevate h-full" data-testid="card-feature-dashboard">
+                <CardHeader>
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Dashboard de Progresso</CardTitle>
+                  <CardDescription>
+                    Acompanhe o seu progresso e receba recomendações de revisão personalizadas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Visualize estatísticas, PDFs estudados e sessões recentes
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full" data-testid="button-goto-dashboard">
+                    Ver Dashboard
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Main Content */}
       <section className="pb-16 px-4">
         <div className="max-w-2xl mx-auto space-y-8">
