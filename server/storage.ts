@@ -207,6 +207,96 @@ export class DatabaseStorage implements IStorage {
       };
     });
 
+    // Get list of studied PDFs with statistics
+    const studiedPDFsData = await db
+      .select({
+        id: summaries.id,
+        fileName: summaries.fileName,
+        learningStyle: summaries.learningStyle,
+        createdAt: summaries.createdAt,
+        summaryId: studySessions.summaryId,
+        studyDate: studySessions.studyDate,
+        correctFlashcards: studySessions.correctFlashcards,
+        incorrectFlashcards: studySessions.incorrectFlashcards,
+      })
+      .from(summaries)
+      .leftJoin(studySessions, eq(summaries.id, studySessions.summaryId))
+      .where(eq(summaries.userId, userId))
+      .orderBy(desc(summaries.createdAt));
+
+    // Aggregate stats per PDF
+    const pdfStatsMap = new Map();
+    studiedPDFsData.forEach((row) => {
+      if (!pdfStatsMap.has(row.id)) {
+        pdfStatsMap.set(row.id, {
+          id: row.id,
+          fileName: row.fileName,
+          learningStyle: row.learningStyle,
+          createdAt: row.createdAt.toISOString(),
+          lastStudied: row.studyDate?.toISOString() || row.createdAt.toISOString(),
+          totalSessions: 0,
+          totalCorrect: 0,
+          totalIncorrect: 0,
+        });
+      }
+      
+      const stats = pdfStatsMap.get(row.id);
+      if (row.summaryId && row.studyDate) {
+        stats.totalSessions += 1;
+        stats.totalCorrect += row.correctFlashcards || 0;
+        stats.totalIncorrect += row.incorrectFlashcards || 0;
+        
+        // Update last studied if this session is more recent
+        const currentLast = new Date(stats.lastStudied);
+        const thisStudy = new Date(row.studyDate);
+        if (thisStudy > currentLast) {
+          stats.lastStudied = row.studyDate.toISOString();
+        }
+      }
+    });
+
+    const studiedPDFs = Array.from(pdfStatsMap.values()).map((pdf) => {
+      const total = pdf.totalCorrect + pdf.totalIncorrect;
+      return {
+        id: pdf.id,
+        fileName: pdf.fileName,
+        learningStyle: pdf.learningStyle,
+        lastStudied: pdf.lastStudied,
+        totalSessions: pdf.totalSessions,
+        averageAccuracy: total > 0 ? (pdf.totalCorrect / total) * 100 : 0,
+        createdAt: pdf.createdAt,
+      };
+    });
+
+    // Get recent study sessions with details
+    const recentStudySessionsData = await db
+      .select({
+        id: studySessions.id,
+        summaryId: studySessions.summaryId,
+        studyDate: studySessions.studyDate,
+        totalFlashcards: studySessions.totalFlashcards,
+        correctFlashcards: studySessions.correctFlashcards,
+        incorrectFlashcards: studySessions.incorrectFlashcards,
+        fileName: summaries.fileName,
+      })
+      .from(studySessions)
+      .innerJoin(summaries, eq(studySessions.summaryId, summaries.id))
+      .where(eq(studySessions.userId, userId))
+      .orderBy(desc(studySessions.studyDate))
+      .limit(10);
+
+    const recentStudySessions = recentStudySessionsData.map((session) => ({
+      id: session.id,
+      fileName: session.fileName,
+      studyDate: session.studyDate.toISOString(),
+      totalFlashcards: session.totalFlashcards,
+      correctFlashcards: session.correctFlashcards,
+      incorrectFlashcards: session.incorrectFlashcards,
+      accuracy: session.totalFlashcards > 0 
+        ? (session.correctFlashcards / session.totalFlashcards) * 100 
+        : 0,
+    }));
+
     return {
       totalPDFsStudied,
       totalFlashcardsCompleted,
@@ -214,6 +304,8 @@ export class DatabaseStorage implements IStorage {
       averageAccuracy,
       totalStudySessions: totalSessions,
       recentSessions,
+      studiedPDFs,
+      recentStudySessions,
     };
   }
 

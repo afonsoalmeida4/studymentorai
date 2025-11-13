@@ -272,6 +272,24 @@ export const dashboardStatsSchema = z.object({
     flashcardsCompleted: z.number().int(),
     accuracy: z.number(),
   })),
+  studiedPDFs: z.array(z.object({
+    id: z.string(),
+    fileName: z.string(),
+    learningStyle: z.string(),
+    lastStudied: z.string(),
+    totalSessions: z.number().int(),
+    averageAccuracy: z.number(),
+    createdAt: z.string(),
+  })),
+  recentStudySessions: z.array(z.object({
+    id: z.string(),
+    fileName: z.string(),
+    studyDate: z.string(),
+    totalFlashcards: z.number().int(),
+    correctFlashcards: z.number().int(),
+    incorrectFlashcards: z.number().int(),
+    accuracy: z.number(),
+  })),
 });
 
 export type DashboardStats = z.infer<typeof dashboardStatsSchema>;

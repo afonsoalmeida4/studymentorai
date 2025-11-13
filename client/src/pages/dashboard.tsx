@@ -3,10 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Flame, Target, TrendingUp } from "lucide-react";
+import { BookOpen, Flame, Target, TrendingUp, FileText, Clock, CheckCircle2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { GetDashboardStatsResponse, GetReviewPlanResponse } from "@shared/schema";
 import { Link } from "wouter";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
   const { data: statsData, isLoading: statsLoading } = useQuery<GetDashboardStatsResponse>({
@@ -115,6 +117,82 @@ export default function Dashboard() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Studied PDFs Section */}
+            {stats?.studiedPDFs && stats.studiedPDFs.length > 0 && (
+              <div className="grid gap-6 md:grid-cols-2 mb-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      PDFs Estudados
+                    </CardTitle>
+                    <CardDescription>Histórico dos seus documentos</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.studiedPDFs.slice(0, 5).map((pdf) => (
+                        <div key={pdf.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg hover-elevate" data-testid={`pdf-item-${pdf.id}`}>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium truncate" title={pdf.fileName}>{pdf.fileName}</h4>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">
+                                {pdf.learningStyle}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {pdf.totalSessions} {pdf.totalSessions === 1 ? 'sessão' : 'sessões'}
+                              </span>
+                              {pdf.averageAccuracy > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                  {pdf.averageAccuracy.toFixed(0)}% precisão
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Última: {formatDistanceToNow(new Date(pdf.lastStudied), { addSuffix: true, locale: ptBR })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Recent Study Sessions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      Sessões Recentes
+                    </CardTitle>
+                    <CardDescription>Últimas atividades de estudo</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.recentStudySessions && stats.recentStudySessions.slice(0, 5).map((session) => (
+                        <div key={session.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg hover-elevate" data-testid={`session-item-${session.id}`}>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium truncate text-sm" title={session.fileName}>{session.fileName}</h4>
+                            <div className="flex items-center gap-3 mt-1">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                <span>{session.correctFlashcards}/{session.totalFlashcards}</span>
+                              </div>
+                              <Badge variant={session.accuracy >= 70 ? "default" : "secondary"} className="text-xs">
+                                {session.accuracy.toFixed(0)}%
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {formatDistanceToNow(new Date(session.studyDate), { addSuffix: true, locale: ptBR })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </>
         )}

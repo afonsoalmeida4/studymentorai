@@ -138,26 +138,46 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
 
     const content = response.choices[0].message.content || "[]";
     
+    // Try to parse JSON, handling potential markdown code blocks
+    let cleanedContent = content.trim();
+    if (cleanedContent.startsWith("```json")) {
+      cleanedContent = cleanedContent.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (cleanedContent.startsWith("```")) {
+      cleanedContent = cleanedContent.replace(/```\n?/g, "");
+    }
+    
     // Parse the JSON response
-    const flashcards = JSON.parse(content.trim());
+    let flashcards;
+    try {
+      flashcards = JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error("Failed to parse flashcards JSON:", parseError);
+      console.error("Content received:", content.substring(0, 500));
+      throw new Error("Formato de resposta inválido da IA");
+    }
     
     // Validate the structure
     if (!Array.isArray(flashcards)) {
-      throw new Error("Invalid response format");
+      console.error("Response is not an array:", flashcards);
+      throw new Error("A resposta da IA não é um array de flashcards");
     }
     
     // Ensure each flashcard has question and answer
     const validFlashcards = flashcards.filter(
-      (fc) => fc.question && fc.answer && typeof fc.question === "string" && typeof fc.answer === "string"
+      (fc) => fc && fc.question && fc.answer && typeof fc.question === "string" && typeof fc.answer === "string"
     );
     
     if (validFlashcards.length === 0) {
-      throw new Error("No valid flashcards generated");
+      console.error("No valid flashcards after filtering. Total received:", flashcards.length);
+      throw new Error("Nenhum flashcard válido foi gerado. Por favor, tente novamente.");
     }
     
     return validFlashcards;
   } catch (error) {
     console.error("Error generating flashcards with GPT-5:", error);
+    if (error instanceof Error && error.message.includes("IA")) {
+      throw error;
+    }
     throw new Error("Falha ao gerar flashcards. Por favor, tente novamente.");
   }
 }
