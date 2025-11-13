@@ -21,8 +21,10 @@ import {
   Loader2,
   GraduationCap,
   Lightbulb,
-  LogOut
+  LogOut,
+  BarChart3
 } from "lucide-react";
+import { Link } from "wouter";
 
 const learningStylesConfig = [
   {
@@ -198,15 +200,23 @@ export default function Home() {
             <GraduationCap className="w-8 h-8 text-primary" />
             <span className="text-xl font-semibold text-foreground">AI Study Mentor</span>
           </div>
-          <Button
-            variant="ghost"
-            size="default"
-            onClick={() => window.location.href = "/api/logout"}
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard">
+              <Button variant="outline" size="default" data-testid="button-dashboard">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              size="default"
+              onClick={() => window.location.href = "/api/logout"}
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 

@@ -1,12 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
-import { generateSummary, generateFlashcards } from "./openai";
+import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
 import { 
   generateSummaryRequestSchema, 
   generateFlashcardsRequestSchema,
+  recordStudySessionRequestSchema,
   type GenerateSummaryResponse,
   type GenerateFlashcardsResponse,
+  type RecordStudySessionResponse,
+  type GetDashboardStatsResponse,
+  type GetReviewPlanResponse,
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -294,6 +298,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro ao buscar flashcards",
       } as GenerateFlashcardsResponse);
+    }
+  });
+
+  // Record study session (progress tracking)
+  app.post("/api/study-sessions", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Validate request body
+      const parseResult = recordStudySessionRequestSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+        } as RecordStudySessionResponse);
+      }
+
+      const { summaryId, totalFlashcards, correctFlashcards, incorrectFlashcards, studyDate, durationSeconds } = parseResult.data;
+
+      // Verify summary exists and belongs to user
+      const summary = await storage.getSummary(summaryId);
+      if (!summary || summary.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Resumo não encontrado",
+        } as RecordStudySessionResponse);
+      }
+
+      // Create study session
+      await storage.createStudySession({
+        userId,
+        summaryId,
+        totalFlashcards,
+        correctFlashcards,
+        incorrectFlashcards,
+        studyDate: new Date(studyDate),
+        durationSeconds,
+      });
+
+      return res.json({
+        success: true,
+      } as RecordStudySessionResponse);
+    } catch (error) {
+      console.error("Error recording study session:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao registar sessão de estudo",
+      } as RecordStudySessionResponse);
+    }
+  });
+
+  // Get dashboard statistics
+  app.get("/api/dashboard-stats", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const stats = await storage.getDashboardStats(userId);
+
+      return res.json({
+        success: true,
+        stats,
+      } as GetDashboardStatsResponse);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar estatísticas",
+      } as GetDashboardStatsResponse);
+    }
+  });
+
+  // Get AI-powered review plan
+  app.get("/api/review-plan", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get user's study history
+      const sessions = await storage.getUserStudySessions(userId, 100);
+      const summaries = await storage.getUserSummaries(userId);
+
+      // Build study history for AI analysis
+      const studyHistoryMap = new Map<string, StudyHistoryItem>();
+
+      for (const session of sessions) {
+        const summary = summaries.find(s => s.id === session.summaryId);
+        if (!summary) continue;
+
+        const existing = studyHistoryMap.get(session.summaryId);
+        const correct = session.correctFlashcards || 0;
+        const incorrect = session.incorrectFlashcards || 0;
+        const total = correct + incorrect;
+        const sessionAccuracy = total > 0 ? (correct / total) * 100 : 0;
+
+        if (existing) {
+          // Update with latest data
+          existing.studySessions += 1;
+          existing.accuracy = (existing.accuracy + sessionAccuracy) / 2; // Average accuracy
+          if (new Date(session.studyDate) > new Date(existing.lastStudied)) {
+            existing.lastStudied = session.studyDate.toISOString();
+          }
+        } else {
+          studyHistoryMap.set(session.summaryId, {
+            fileName: summary.fileName,
+            summaryId: summary.id,
+            lastStudied: session.studyDate.toISOString(),
+            accuracy: sessionAccuracy,
+            studySessions: 1,
+          });
+        }
+      }
+
+      const studyHistory = Array.from(studyHistoryMap.values());
+
+      // Generate review plan using AI
+      const reviewPlan = await generateReviewPlan(studyHistory);
+
+      // Build a map of summaryIds for easier lookup
+      const summaryMap = new Map(studyHistory.map(h => [h.summaryId, h]));
+
+      return res.json({
+        success: true,
+        reviewPlan: reviewPlan.priorityTopics
+          .map(topic => {
+            const historyItem = summaryMap.get(topic.summaryId);
+            if (!historyItem && topic.summaryId) {
+              // If summaryId is provided but not found in history, skip it
+              return null;
+            }
+            if (!historyItem) {
+              // If no summaryId was matched, try to find by filename
+              const fallbackItem = studyHistory.find(h => 
+                h.fileName.toLowerCase().includes(topic.fileName.toLowerCase()) ||
+                topic.fileName.toLowerCase().includes(h.fileName.toLowerCase())
+              );
+              if (!fallbackItem) return null;
+              
+              return {
+                summaryId: fallbackItem.summaryId,
+                fileName: fallbackItem.fileName,
+                lastStudied: fallbackItem.lastStudied,
+                accuracy: fallbackItem.accuracy,
+                priority: topic.priority,
+                recommendation: topic.reason,
+              };
+            }
+            return {
+              summaryId: historyItem.summaryId,
+              fileName: historyItem.fileName,
+              lastStudied: historyItem.lastStudied,
+              accuracy: historyItem.accuracy,
+              priority: topic.priority,
+              recommendation: topic.reason,
+            };
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null),
+        aiRecommendation: reviewPlan.recommendations,
+      } as GetReviewPlanResponse);
+    } catch (error) {
+      console.error("Error generating review plan:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao gerar plano de revisão",
+      } as GetReviewPlanResponse);
     }
   });
 

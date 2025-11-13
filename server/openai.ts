@@ -161,3 +161,107 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
     throw new Error("Falha ao gerar flashcards. Por favor, tente novamente.");
   }
 }
+
+export interface StudyHistoryItem {
+  fileName: string;
+  summaryId: string;
+  lastStudied: string;
+  accuracy: number;
+  studySessions: number;
+}
+
+export interface ReviewPlanResult {
+  recommendations: string;
+  priorityTopics: Array<{
+    fileName: string;
+    summaryId: string;
+    reason: string;
+    priority: 'high' | 'medium' | 'low';
+  }>;
+}
+
+export async function generateReviewPlan(
+  studyHistory: StudyHistoryItem[]
+): Promise<ReviewPlanResult> {
+  try {
+    const systemPrompt = `Você é um especialista em pedagogia e repetição espaçada. 
+Analise o histórico de estudo do utilizador e crie um plano de revisão personalizado.
+
+Considere:
+- Tópicos com baixa precisão (accuracy) precisam de revisão urgente
+- Tópicos estudados há mais tempo precisam de revisão para retenção
+- Distribua as revisões de forma equilibrada
+- Use princípios de repetição espaçada (spaced repetition)
+
+Forneça recomendações práticas e motivadoras.`;
+
+    const historyText = studyHistory.length > 0
+      ? studyHistory.map((item, index) => 
+          `${index + 1}. ${item.fileName}
+   - Última sessão: ${item.lastStudied}
+   - Precisão: ${item.accuracy.toFixed(1)}%
+   - Número de sessões: ${item.studySessions}`
+        ).join('\n\n')
+      : "Nenhum histórico de estudo disponível.";
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-5",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `Analise este histórico de estudo e crie um plano de revisão personalizado:\n\n${historyText}\n\nRetorne sua resposta em formato JSON com a seguinte estrutura:
+{
+  "recommendations": "Texto com recomendações gerais",
+  "priorityTopics": [
+    {
+      "fileName": "nome do ficheiro",
+      "reason": "razão para revisar",
+      "priority": "high" | "medium" | "low"
+    }
+  ]
+}
+
+Limite a 5 tópicos prioritários. Seja específico e motivador.`,
+        },
+      ],
+      max_completion_tokens: 1500,
+    });
+
+    const content = response.choices[0].message.content || "{}";
+    
+    // Parse the JSON response
+    const result = JSON.parse(content.trim());
+    
+    // Validate and enrich the result
+    if (!result.recommendations || !Array.isArray(result.priorityTopics)) {
+      throw new Error("Invalid response format from AI");
+    }
+
+    // Match priority topics with summaryIds from study history
+    const enrichedTopics = result.priorityTopics.map((topic: any) => {
+      const historyItem = studyHistory.find(h => 
+        h.fileName.toLowerCase().includes(topic.fileName.toLowerCase()) ||
+        topic.fileName.toLowerCase().includes(h.fileName.toLowerCase())
+      );
+      
+      return {
+        fileName: topic.fileName,
+        summaryId: historyItem?.summaryId || '',
+        reason: topic.reason,
+        priority: topic.priority,
+      };
+    }).filter((topic: any) => topic.summaryId); // Only keep topics we can match
+
+    return {
+      recommendations: result.recommendations,
+      priorityTopics: enrichedTopics,
+    };
+  } catch (error) {
+    console.error("Error generating review plan with GPT-5:", error);
+    throw new Error("Falha ao gerar plano de revisão. Por favor, tente novamente.");
+  }
+}

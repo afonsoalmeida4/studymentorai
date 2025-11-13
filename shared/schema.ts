@@ -3,6 +3,7 @@ import { pgTable, text, varchar, timestamp, index, jsonb, boolean, integer } fro
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { desc } from "drizzle-orm";
 
 // Learning style enum
 export const learningStyles = ["visual", "auditivo", "logico", "conciso"] as const;
@@ -121,10 +122,10 @@ export const studySessions = pgTable(
     durationSeconds: integer("duration_seconds"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [
-    index("idx_study_sessions_user_date").on(table.userId, table.studyDate.desc()),
-    index("idx_study_sessions_user_summary").on(table.userId, table.summaryId),
-  ],
+  (table) => ({
+    userDateIdx: index("idx_study_sessions_user_date").on(table.userId, desc(table.studyDate)),
+    userSummaryIdx: index("idx_study_sessions_user_summary").on(table.userId, table.summaryId),
+  }),
 );
 
 export const insertStudySessionSchema = createInsertSchema(studySessions).omit({
@@ -150,10 +151,10 @@ export const flashcardAttempts = pgTable(
     repetitions: integer("repetitions").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [
-    index("idx_flashcard_attempts_user_flashcard").on(table.userId, table.flashcardId),
-    index("idx_flashcard_attempts_next_review").on(table.userId, table.nextReviewDate),
-  ],
+  (table) => ({
+    userFlashcardIdx: index("idx_flashcard_attempts_user_flashcard").on(table.userId, table.flashcardId),
+    nextReviewIdx: index("idx_flashcard_attempts_next_review").on(table.userId, table.nextReviewDate),
+  }),
 );
 
 export const insertFlashcardAttemptSchema = createInsertSchema(flashcardAttempts).omit({

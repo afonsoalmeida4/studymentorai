@@ -230,7 +230,7 @@ export class DatabaseStorage implements IStorage {
       date.setHours(0, 0, 0, 0);
       return date.getTime();
     });
-    const uniqueDates = [...new Set(studyDates)].sort((a, b) => b - a);
+    const uniqueDates = Array.from(new Set(studyDates)).sort((a, b) => b - a);
 
     // Check if today or yesterday is included (streak is active)
     const yesterday = new Date(today);
