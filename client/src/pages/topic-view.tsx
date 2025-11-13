@@ -30,6 +30,8 @@ export default function TopicView() {
   const [generateSummary, setGenerateSummary] = useState(true);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
+  const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
+  const [isSummariesDialogOpen, setIsSummariesDialogOpen] = useState(false);
 
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
@@ -49,6 +51,17 @@ export default function TopicView() {
       const data = await res.json();
       return data.content || [];
     },
+  });
+
+  const { data: summariesData, isLoading: summariesLoading } = useQuery({
+    queryKey: ["/api/content", selectedContentId, "summaries"],
+    queryFn: async () => {
+      if (!selectedContentId) return null;
+      const res = await fetch(`/api/content/${selectedContentId}/summaries`);
+      if (!res.ok) throw new Error("Failed to fetch summaries");
+      return res.json();
+    },
+    enabled: !!selectedContentId && isSummariesDialogOpen,
   });
 
   const uploadMutation = useMutation({
@@ -145,6 +158,11 @@ export default function TopicView() {
       default:
         return <FileText className="w-4 h-4" />;
     }
+  };
+
+  const handleViewSummaries = (contentId: string) => {
+    setSelectedContentId(contentId);
+    setIsSummariesDialogOpen(true);
   };
 
   return (
@@ -244,16 +262,26 @@ export default function TopicView() {
                 {contents
                   .filter((c) => c.contentType !== "link")
                   .map((content) => (
-                    <Card key={content.id} data-testid={`card-file-${content.id}`}>
+                    <Card key={content.id} data-testid={`card-file-${content.id}`} className="hover-elevate cursor-pointer" onClick={() => handleViewSummaries(content.id)}>
                       <CardHeader>
-                        <div className="flex items-start gap-3">
-                          {getContentIcon(content.contentType)}
-                          <div>
-                            <CardTitle className="text-base">{content.title}</CardTitle>
-                            <CardDescription className="mt-1">
-                              {content.contentType.toUpperCase()}
-                            </CardDescription>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-3">
+                            {getContentIcon(content.contentType)}
+                            <div>
+                              <CardTitle className="text-base">{content.title}</CardTitle>
+                              <CardDescription className="mt-1">
+                                {content.contentType.toUpperCase()}
+                              </CardDescription>
+                            </div>
                           </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            data-testid={`button-view-summaries-${content.id}`}
+                          >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Ver Resumos
+                          </Button>
                         </div>
                       </CardHeader>
                     </Card>
@@ -410,6 +438,164 @@ export default function TopicView() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isSummariesDialogOpen} onOpenChange={(open) => {
+        setIsSummariesDialogOpen(open);
+        if (!open) setSelectedContentId(null);
+      }}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-summaries">
+          <DialogHeader>
+            <DialogTitle>Resumos de Aprendizagem</DialogTitle>
+            <DialogDescription>
+              Resumos adaptados aos 4 estilos de aprendizagem
+            </DialogDescription>
+          </DialogHeader>
+          {summariesLoading ? (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">A carregar resumos...</p>
+            </div>
+          ) : summariesData?.summaries && Object.keys(summariesData.summaries).length > 0 ? (
+            <Tabs defaultValue="visual" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="visual" data-testid="tab-visual">
+                  Visual
+                </TabsTrigger>
+                <TabsTrigger value="auditivo" data-testid="tab-auditivo">
+                  Auditivo
+                </TabsTrigger>
+                <TabsTrigger value="logico" data-testid="tab-logico">
+                  Lógico
+                </TabsTrigger>
+                <TabsTrigger value="conciso" data-testid="tab-conciso">
+                  Conciso
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="visual" className="mt-4">
+                {summariesData.summaries.visual ? (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Resumo Visual</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {summariesData.summaries.visual.summary}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    {summariesData.summaries.visual.motivationalMessage && (
+                      <Card className="bg-primary/5 border-primary/20">
+                        <CardContent className="pt-4">
+                          <p className="text-sm italic text-primary">
+                            {summariesData.summaries.visual.motivationalMessage}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">Resumo visual não disponível</p>
+                )}
+              </TabsContent>
+
+              <TabsContent value="auditivo" className="mt-4">
+                {summariesData.summaries.auditivo ? (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Resumo Auditivo</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {summariesData.summaries.auditivo.summary}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    {summariesData.summaries.auditivo.motivationalMessage && (
+                      <Card className="bg-primary/5 border-primary/20">
+                        <CardContent className="pt-4">
+                          <p className="text-sm italic text-primary">
+                            {summariesData.summaries.auditivo.motivationalMessage}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">Resumo auditivo não disponível</p>
+                )}
+              </TabsContent>
+
+              <TabsContent value="logico" className="mt-4">
+                {summariesData.summaries.logico ? (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Resumo Lógico</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {summariesData.summaries.logico.summary}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    {summariesData.summaries.logico.motivationalMessage && (
+                      <Card className="bg-primary/5 border-primary/20">
+                        <CardContent className="pt-4">
+                          <p className="text-sm italic text-primary">
+                            {summariesData.summaries.logico.motivationalMessage}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">Resumo lógico não disponível</p>
+                )}
+              </TabsContent>
+
+              <TabsContent value="conciso" className="mt-4">
+                {summariesData.summaries.conciso ? (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Resumo Conciso</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {summariesData.summaries.conciso.summary}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    {summariesData.summaries.conciso.motivationalMessage && (
+                      <Card className="bg-primary/5 border-primary/20">
+                        <CardContent className="pt-4">
+                          <p className="text-sm italic text-primary">
+                            {summariesData.summaries.conciso.motivationalMessage}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">Resumo conciso não disponível</p>
+                )}
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <div className="py-8 text-center">
+              <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Ainda não há resumos disponíveis para este ficheiro.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Os resumos são gerados automaticamente quando faz upload com a opção "Gerar resumo com IA" ativada.
+              </p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
