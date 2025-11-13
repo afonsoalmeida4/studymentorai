@@ -95,7 +95,7 @@ export default function TopicView() {
 
   const linkMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/content/link", "POST", {
+      return apiRequest("POST", "/api/content/link", {
         topicId,
         url: linkUrl,
         title: linkTitle || linkUrl,

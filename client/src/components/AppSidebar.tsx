@@ -46,7 +46,7 @@ export function AppSidebar() {
   const createSubjectMutation = useMutation({
     mutationFn: async () => {
       console.log("Creating subject:", { name: newSubjectName, description: newSubjectDescription, color: newSubjectColor });
-      const result = await apiRequest("/api/subjects", "POST", {
+      const result = await apiRequest("POST", "/api/subjects", {
         name: newSubjectName,
         description: newSubjectDescription,
         color: newSubjectColor,

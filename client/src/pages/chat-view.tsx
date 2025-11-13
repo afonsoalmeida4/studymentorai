@@ -75,7 +75,7 @@ export default function ChatView() {
 
   const createThreadMutation = useMutation({
     mutationFn: async (mode: ChatMode) => {
-      return apiRequest("/api/chat/threads", "POST", {
+      return apiRequest("POST", "/api/chat/threads", {
         mode,
         topicId: mode === "study" ? selectedTopicId : null,
       });
@@ -101,7 +101,7 @@ export default function ChatView() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      return apiRequest("/api/chat/messages", "POST", {
+      return apiRequest("POST", "/api/chat/messages", {
         threadId: selectedThreadId,
         content,
       });
@@ -121,7 +121,7 @@ export default function ChatView() {
 
   const deleteThreadMutation = useMutation({
     mutationFn: async (threadId: string) => {
-      return apiRequest(`/api/chat/threads/${threadId}`, "DELETE");
+      return apiRequest("DELETE", `/api/chat/threads/${threadId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chat/threads"] });

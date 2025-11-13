@@ -50,7 +50,7 @@ export default function SubjectView() {
 
   const createTopicMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/topics", "POST", {
+      return apiRequest("POST", "/api/topics", {
         subjectId,
         name: newTopicName,
         description: newTopicDescription,
