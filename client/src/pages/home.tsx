@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { ApiSummary, LearningStyle, GenerateSummaryResponse } from "@shared/schema";
+import SummaryStudySection from "@/components/SummaryStudySection";
 import { 
   Upload, 
   FileText, 
@@ -432,6 +433,9 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Flashcards Study Section */}
+              <SummaryStudySection summaryId={generatedSummary.id} />
 
               {/* Action Buttons */}
               <div className="flex justify-center gap-4">

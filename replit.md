@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI Study Mentor is an educational productivity application that transforms PDF documents into personalized study summaries tailored to different learning styles. The application uses AI (OpenAI GPT-5) to analyze uploaded PDF content and generate summaries optimized for visual, auditory, logical, or concise learning preferences. Built with a modern React frontend and Express backend, it emphasizes clarity and user focus, drawing design inspiration from productivity tools like Notion, Linear, and Grammarly.
+AI Study Mentor is an educational productivity application that transforms PDF documents into personalized study summaries tailored to different learning styles. The application uses AI (OpenAI GPT-5) to analyze uploaded PDF content and generate summaries optimized for visual, auditory, logical, or concise learning preferences. Additionally, users can generate interactive flashcards from their summaries to enhance retention through active recall. Built with a modern React frontend and Express backend, it emphasizes clarity and user focus, drawing design inspiration from productivity tools like Notion, Linear, and Grammarly.
 
 ## User Preferences
 
@@ -42,14 +42,19 @@ Preferred communication style: Simple, everyday language.
 - **ESM modules** (type: "module") for modern JavaScript syntax
 
 **API Structure:**
-- RESTful endpoint: `POST /api/generate-summary`
+- RESTful endpoints:
+  - `POST /api/generate-summary` - Generate personalized summary from PDF
+  - `POST /api/flashcards` - Generate flashcards from existing summary
+  - `GET /api/flashcards/:summaryId` - Retrieve flashcards for a summary
 - File upload handling via **Multer** middleware (in-memory storage, 10MB PDF limit)
 - Request validation using **Zod** schemas shared between client and server
 
 **AI Integration:**
-- **OpenAI API** (GPT-5 model) for generating personalized summaries
+- **OpenAI API** (GPT-5 model) for generating personalized summaries and flashcards
 - Four learning style prompts: visual, auditory, logical, and concise
 - Generates both summary content and motivational messages
+- Flashcard generation creates 5-10 question/answer pairs from summary content
+- Caches generated flashcards to avoid duplicate generation and reduce API costs
 
 **Middleware & Utilities:**
 - Request logging with timing and response capture
@@ -58,9 +63,10 @@ Preferred communication style: Simple, everyday language.
 - Development mode integrations: Replit cartographer and dev banner
 
 **Storage Layer:**
-- In-memory storage implementation (`MemStorage`) for user data
-- Interface-based design (`IStorage`) allowing future database integration
-- Currently stateless for summaries (generated on-demand, not persisted)
+- PostgreSQL database for persistent storage
+- Interface-based design (`IStorage`) for database operations
+- Persistent storage for summaries and flashcards linked to user accounts
+- Flashcards are associated with summaries via foreign key relationship
 
 ### Data Storage Solutions
 

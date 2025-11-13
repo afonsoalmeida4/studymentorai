@@ -1,8 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
-import { generateSummary } from "./openai";
-import { generateSummaryRequestSchema, type GenerateSummaryResponse } from "@shared/schema";
+import { generateSummary, generateFlashcards } from "./openai";
+import { 
+  generateSummaryRequestSchema, 
+  generateFlashcardsRequestSchema,
+  type GenerateSummaryResponse,
+  type GenerateFlashcardsResponse,
+} from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
@@ -191,6 +196,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting summary:", error);
       res.status(500).json({ error: "Failed to delete summary" });
+    }
+  });
+
+  // Generate flashcards from a summary
+  app.post("/api/flashcards", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Validate request body
+      const parseResult = generateFlashcardsRequestSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: "ID do resumo inválido",
+        } as GenerateFlashcardsResponse);
+      }
+
+      const { summaryId } = parseResult.data;
+
+      // Check if summary exists and belongs to user
+      const summary = await storage.getSummary(summaryId);
+      if (!summary || summary.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Resumo não encontrado",
+        } as GenerateFlashcardsResponse);
+      }
+
+      // Check if flashcards already exist
+      const existingFlashcards = await storage.getFlashcardsBySummary(summaryId);
+      if (existingFlashcards.length > 0) {
+        return res.json({
+          success: true,
+          flashcards: existingFlashcards.map(fc => ({
+            ...fc,
+            createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+          })),
+        } as GenerateFlashcardsResponse);
+      }
+
+      // Generate flashcards using GPT-5
+      const flashcardsData = await generateFlashcards(summary.summary);
+
+      // Save flashcards to database
+      const savedFlashcards = await storage.createFlashcards(
+        flashcardsData.map(fc => ({
+          summaryId,
+          question: fc.question,
+          answer: fc.answer,
+        }))
+      );
+
+      return res.json({
+        success: true,
+        flashcards: savedFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+      } as GenerateFlashcardsResponse);
+    } catch (error) {
+      console.error("Error generating flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao gerar flashcards. Por favor, tente novamente.",
+      } as GenerateFlashcardsResponse);
+    }
+  });
+
+  // Get flashcards for a summary
+  app.get("/api/flashcards/:summaryId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.summaryId;
+
+      // Verify summary exists and belongs to user
+      const summary = await storage.getSummary(summaryId);
+      if (!summary || summary.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Resumo não encontrado",
+        } as GenerateFlashcardsResponse);
+      }
+
+      const flashcards = await storage.getFlashcardsBySummary(summaryId);
+      
+      return res.json({
+        success: true,
+        flashcards: flashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+      } as GenerateFlashcardsResponse);
+    } catch (error) {
+      console.error("Error fetching flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards",
+      } as GenerateFlashcardsResponse);
     }
   });
 
