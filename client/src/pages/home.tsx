@@ -19,7 +19,9 @@ import {
   CheckCircle2, 
   XCircle,
   Loader2,
-  Lightbulb
+  Lightbulb,
+  GraduationCap,
+  BarChart3
 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 
