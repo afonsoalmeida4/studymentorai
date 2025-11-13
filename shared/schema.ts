@@ -65,10 +65,41 @@ export const usersRelations = relations(users, ({ many }) => ({
   summaries: many(summaries),
 }));
 
-export const summariesRelations = relations(summaries, ({ one }) => ({
+export const summariesRelations = relations(summaries, ({ one, many }) => ({
   user: one(users, {
     fields: [summaries.userId],
     references: [users.id],
+  }),
+  flashcards: many(flashcards),
+}));
+
+// Flashcards table
+export const flashcards = pgTable(
+  "flashcards",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    summaryId: varchar("summary_id").notNull().references(() => summaries.id, { onDelete: "cascade" }),
+    question: text("question").notNull(),
+    answer: text("answer").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_flashcards_summary_id").on(table.summaryId),
+  ],
+);
+
+export const insertFlashcardSchema = createInsertSchema(flashcards).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
+export type Flashcard = typeof flashcards.$inferSelect;
+
+export const flashcardsRelations = relations(flashcards, ({ one }) => ({
+  summary: one(summaries, {
+    fields: [flashcards.summaryId],
+    references: [summaries.id],
   }),
 }));
 
@@ -100,3 +131,28 @@ export const generateSummaryResponseSchema = z.object({
 });
 
 export type GenerateSummaryResponse = z.infer<typeof generateSummaryResponseSchema>;
+
+// Flashcard API types
+export const apiFlashcardSchema = z.object({
+  id: z.string(),
+  summaryId: z.string(),
+  question: z.string(),
+  answer: z.string(),
+  createdAt: z.string(),
+});
+
+export type ApiFlashcard = z.infer<typeof apiFlashcardSchema>;
+
+export const generateFlashcardsRequestSchema = z.object({
+  summaryId: z.string(),
+});
+
+export type GenerateFlashcardsRequest = z.infer<typeof generateFlashcardsRequestSchema>;
+
+export const generateFlashcardsResponseSchema = z.object({
+  success: z.boolean(),
+  flashcards: z.array(apiFlashcardSchema).optional(),
+  error: z.string().optional(),
+});
+
+export type GenerateFlashcardsResponse = z.infer<typeof generateFlashcardsResponseSchema>;

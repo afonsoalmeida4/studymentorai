@@ -1,10 +1,13 @@
 import {
   users,
   summaries,
+  flashcards,
   type User,
   type UpsertUser,
   type Summary,
   type InsertSummary,
+  type Flashcard,
+  type InsertFlashcard,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -21,6 +24,10 @@ export interface IStorage {
   getUserSummaries(userId: string): Promise<Summary[]>;
   toggleFavorite(id: string, userId: string): Promise<Summary | undefined>;
   deleteSummary(id: string, userId: string): Promise<boolean>;
+  
+  // Flashcard operations
+  createFlashcards(flashcardsData: InsertFlashcard[]): Promise<Flashcard[]>;
+  getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -92,6 +99,22 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return result.length > 0;
+  }
+
+  // Flashcard operations
+  async createFlashcards(flashcardsData: InsertFlashcard[]): Promise<Flashcard[]> {
+    const result = await db
+      .insert(flashcards)
+      .values(flashcardsData)
+      .returning();
+    return result;
+  }
+
+  async getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]> {
+    return await db
+      .select()
+      .from(flashcards)
+      .where(eq(flashcards.summaryId, summaryId));
   }
 }
 
