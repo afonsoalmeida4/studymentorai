@@ -14,6 +14,7 @@ import {
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { awardXP, getGamificationProfile, getLeaderboard, activatePremium } from "./gamificationService";
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -136,6 +137,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isFavorite: false,
         });
 
+        // Award XP for generating summary
+        await awardXP(userId, "generate_summary", { 
+          fileName: req.file.originalname,
+          learningStyle,
+        });
+
         return res.json({
           success: true,
           summary: {
@@ -256,6 +263,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }))
       );
 
+      // Award XP for creating flashcards
+      await awardXP(userId, "create_flashcards", { 
+        summaryId,
+        flashcardCount: savedFlashcards.length,
+      });
+
       return res.json({
         success: true,
         flashcards: savedFlashcards.map(fc => ({
@@ -339,6 +352,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         incorrectFlashcards,
         studyDate: new Date(studyDate),
         durationSeconds,
+      });
+
+      // Award XP for completing study session
+      await awardXP(userId, "complete_study_session", { 
+        summaryId,
+        correctCards: correctFlashcards,
+        totalCards: totalFlashcards,
       });
 
       return res.json({
@@ -465,6 +485,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro ao gerar plano de revisão",
       } as GetReviewPlanResponse);
+    }
+  });
+
+  // Gamification endpoints
+  app.get("/api/gamification/profile", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const profile = await getGamificationProfile(userId);
+      
+      return res.json({
+        success: true,
+        profile,
+      });
+    } catch (error) {
+      console.error("Error fetching gamification profile:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar perfil de gamificação",
+      });
+    }
+  });
+
+  app.get("/api/leaderboard", isAuthenticated, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const leaderboard = await getLeaderboard(limit);
+      
+      return res.json({
+        success: true,
+        leaderboard,
+      });
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar ranking",
+      });
+    }
+  });
+
+  app.post("/api/premium/activate", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const updatedUser = await activatePremium(userId);
+      
+      return res.json({
+        success: true,
+        user: updatedUser,
+      });
+    } catch (error) {
+      console.error("Error activating premium:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao ativar premium",
+      });
     }
   });
 
