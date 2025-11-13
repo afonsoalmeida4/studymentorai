@@ -20,7 +20,8 @@ import {
   XCircle,
   Loader2,
   GraduationCap,
-  Lightbulb
+  Lightbulb,
+  LogOut
 } from "lucide-react";
 
 const learningStylesConfig = [
@@ -190,6 +191,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header with Logout */}
+      <header className="border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <GraduationCap className="w-8 h-8 text-primary" />
+            <span className="text-xl font-semibold text-foreground">AI Study Mentor</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="default"
+            onClick={() => window.location.href = "/api/logout"}
+            data-testid="button-logout"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">

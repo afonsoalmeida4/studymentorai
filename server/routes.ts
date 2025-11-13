@@ -85,9 +85,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract text from PDF
       let pdfText: string;
       try {
-        // Import pdf-parse and use the PDFParse named export
+        // Import pdf-parse and use the PDFParse class
         const { PDFParse } = await import("pdf-parse");
-        const pdfData = await PDFParse(req.file.buffer);
+        const parser = new PDFParse();
+        const pdfData = await parser.parse(req.file.buffer);
         pdfText = pdfData.text;
 
         if (!pdfText || pdfText.trim().length === 0) {
