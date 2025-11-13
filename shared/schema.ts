@@ -51,8 +51,8 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  // Gamification fields
-  displayName: varchar("display_name").unique(),
+  // Gamification fields (displayName nullable until user sets it)
+  displayName: varchar("display_name"),
   totalXp: integer("total_xp").default(0).notNull(),
   currentLevel: varchar("current_level", { length: 20 }).default("iniciante").notNull(),
   // Premium fields
