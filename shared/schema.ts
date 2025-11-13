@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, index, jsonb, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, index, uniqueIndex, jsonb, boolean, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -191,6 +191,35 @@ export const insertContentItemSchema = createInsertSchema(contentItems).omit({
 export type InsertContentItem = z.infer<typeof insertContentItemSchema>;
 export type ContentItem = typeof contentItems.$inferSelect;
 
+// Content Summaries table (maps content items to multiple summaries - one per learning style)
+export const contentSummaries = pgTable(
+  "content_summaries",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    contentItemId: varchar("content_item_id").notNull().references(() => contentItems.id, { onDelete: "cascade" }),
+    summaryId: varchar("summary_id").notNull().references(() => summaries.id, { onDelete: "cascade" }),
+    learningStyle: varchar("learning_style", { length: 20 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      contentItemIdx: index("idx_content_summaries_content_item_id").on(table.contentItemId),
+      summaryIdx: index("idx_content_summaries_summary_id").on(table.summaryId),
+      learningStyleIdx: index("idx_content_summaries_learning_style").on(table.learningStyle),
+      // Ensure one summary per learning style per content item
+      uniqueContentStyle: uniqueIndex("idx_content_summaries_unique").on(table.contentItemId, table.learningStyle),
+    };
+  },
+);
+
+export const insertContentSummarySchema = createInsertSchema(contentSummaries).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertContentSummary = z.infer<typeof insertContentSummarySchema>;
+export type ContentSummary = typeof contentSummaries.$inferSelect;
+
 // Content Assets table (file metadata for PDFs, DOCX, PPTX)
 export const contentAssets = pgTable(
   "content_assets",
@@ -298,6 +327,7 @@ export const contentItemsRelations = relations(contentItems, ({ one, many }) => 
   }),
   assets: many(contentAssets),
   links: many(contentLinks),
+  summaries: many(contentSummaries),
 }));
 
 export const contentAssetsRelations = relations(contentAssets, ({ one }) => ({
@@ -311,6 +341,17 @@ export const contentLinksRelations = relations(contentLinks, ({ one }) => ({
   contentItem: one(contentItems, {
     fields: [contentLinks.contentItemId],
     references: [contentItems.id],
+  }),
+}));
+
+export const contentSummariesRelations = relations(contentSummaries, ({ one }) => ({
+  contentItem: one(contentItems, {
+    fields: [contentSummaries.contentItemId],
+    references: [contentItems.id],
+  }),
+  summary: one(summaries, {
+    fields: [contentSummaries.summaryId],
+    references: [summaries.id],
   }),
 }));
 

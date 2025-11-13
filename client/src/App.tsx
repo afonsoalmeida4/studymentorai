@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
-import Dashboard from "@/pages/dashboard";
+import Home from "@/pages/home";
 import SubjectView from "@/pages/subject-view";
 import TopicView from "@/pages/topic-view";
 import ChatView from "@/pages/chat-view";
@@ -23,7 +23,7 @@ function AuthenticatedRouter() {
         </header>
         <main className="flex-1 overflow-auto">
           <Switch>
-            <Route path="/" component={Dashboard} />
+            <Route path="/" component={Home} />
             <Route path="/subjects" component={SubjectView} />
             <Route path="/subject/:id" component={SubjectView} />
             <Route path="/topic/:id" component={TopicView} />

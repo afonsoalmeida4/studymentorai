@@ -295,37 +295,7 @@ export function registerOrganizationRoutes(app: Express) {
 
       const extracted = await extractTextFromFile(req.file.buffer, contentType, req.file.mimetype);
 
-      let summaryId = null;
-      if (generateAISummary === "true" && extracted.text && extracted.text.length > 50) {
-        try {
-          const words = extracted.text.split(/\s+/);
-          const limitedText = words.slice(0, 1500).join(" ");
-          
-          const { summary, motivationalMessage } = await generateSummary({
-            text: limitedText,
-            learningStyle: "conciso",
-          });
-
-          const { storage } = await import("./storage");
-          const savedSummary = await storage.createSummary({
-            userId,
-            fileName: req.file.originalname,
-            learningStyle: "conciso",
-            summary,
-            motivationalMessage,
-            isFavorite: false,
-          });
-
-          summaryId = savedSummary.id;
-
-          await awardXP(userId, "generate_summary", {
-            fileName: req.file.originalname,
-          });
-        } catch (error) {
-          console.error("Error generating AI summary:", error);
-        }
-      }
-
+      // First create the content item (without summaryId)
       const contentItem = await db
         .insert(contentItems)
         .values({
@@ -335,9 +305,66 @@ export function registerOrganizationRoutes(app: Express) {
           title: title || req.file.originalname,
           extractedText: extracted.text,
           metadata: { ...extracted.metadata, originalFilename: req.file.originalname },
-          summaryId,
+          summaryId: null, // We use contentSummaries table now
         })
         .returning();
+
+      // Generate summaries for all 4 learning styles if requested
+      if (generateAISummary === "true" && extracted.text && extracted.text.length > 50) {
+        const words = extracted.text.split(/\s+/);
+        const limitedText = words.slice(0, 1500).join(" ");
+        const { storage } = await import("./storage");
+        const { contentSummaries: contentSummariesTable } = await import("@shared/schema");
+        
+        // Generate all 4 summaries sequentially to avoid rate limits
+        const learningStyles: Array<"visual" | "auditivo" | "logico" | "conciso"> = ["visual", "auditivo", "logico", "conciso"];
+        let successfulSummaries = 0;
+        
+        for (const style of learningStyles) {
+          try {
+            const { summary, motivationalMessage } = await generateSummary({
+              text: limitedText,
+              learningStyle: style,
+            });
+
+            const savedSummary = await storage.createSummary({
+              userId,
+              fileName: req.file.originalname,
+              learningStyle: style,
+              summary,
+              motivationalMessage,
+              isFavorite: false,
+            });
+
+            // Link summary to content item with error handling for unique constraint
+            try {
+              await db.insert(contentSummariesTable).values({
+                contentItemId: contentItem[0].id,
+                summaryId: savedSummary.id,
+                learningStyle: style,
+              });
+              successfulSummaries++;
+            } catch (insertError: any) {
+              if (insertError.code === '23505') {
+                console.warn(`Duplicate summary for style ${style}, skipping`);
+              } else {
+                throw insertError;
+              }
+            }
+          } catch (styleError) {
+            console.error(`Error generating ${style} summary:`, styleError);
+            // Continue with other styles even if one fails
+          }
+        }
+
+        // Only award XP if at least one summary was successfully created
+        if (successfulSummaries > 0) {
+          await awardXP(userId, "generate_summary", {
+            fileName: req.file.originalname,
+            stylesGenerated: successfulSummaries,
+          });
+        }
+      }
 
       await db.insert(contentAssets).values({
         contentItemId: contentItem[0].id,
@@ -417,6 +444,47 @@ export function registerOrganizationRoutes(app: Express) {
     } catch (error) {
       console.error("Error deleting content:", error);
       res.status(500).json({ success: false, error: "Erro ao eliminar conteúdo" });
+    }
+  });
+
+  // Get all summaries for a content item (grouped by learning style)
+  app.get("/api/content/:contentItemId/summaries", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { contentItemId } = req.params;
+
+      // Verify content item belongs to user
+      const content = await db.query.contentItems.findFirst({
+        where: and(eq(contentItems.id, contentItemId), eq(contentItems.userId, userId)),
+      });
+
+      if (!content) {
+        return res.status(404).json({ success: false, error: "Conteúdo não encontrado" });
+      }
+
+      // Fetch all summaries for this content item
+      const { contentSummaries: contentSummariesTable } = await import("@shared/schema");
+      const summariesWithDetails = await db.query.contentSummaries.findMany({
+        where: eq(contentSummariesTable.contentItemId, contentItemId),
+        with: {
+          summary: true,
+        },
+      });
+
+      // Group by learning style for easy frontend consumption
+      const summariesByStyle = summariesWithDetails.reduce((acc, item) => {
+        acc[item.learningStyle] = item.summary;
+        return acc;
+      }, {} as Record<string, any>);
+
+      res.json({ 
+        success: true, 
+        summaries: summariesByStyle,
+        count: summariesWithDetails.length,
+      });
+    } catch (error) {
+      console.error("Error fetching summaries:", error);
+      res.status(500).json({ success: false, error: "Erro ao carregar resumos" });
     }
   });
 }
