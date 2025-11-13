@@ -1,16 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Flame, Target, TrendingUp, FileText, Clock, CheckCircle2 } from "lucide-react";
+import { BookOpen, Flame, Target, TrendingUp, FileText, Clock, CheckCircle2, Crown } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { GetDashboardStatsResponse, GetReviewPlanResponse } from "@shared/schema";
 import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { GamificationHeader } from "@/components/GamificationHeader";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Dashboard() {
+  const { toast } = useToast();
   const { data: statsData, isLoading: statsLoading } = useQuery<GetDashboardStatsResponse>({
     queryKey: ["/api/dashboard-stats"],
   });
@@ -23,12 +27,37 @@ export default function Dashboard() {
   const reviewPlan = reviewData?.reviewPlan || [];
   const aiRecommendation = reviewData?.aiRecommendation;
 
+  const activatePremiumMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/premium/activate");
+    },
+    onSuccess: () => {
+      toast({
+        title: "Premium Ativado!",
+        description: "Agora tens acesso a todos os recursos exclusivos.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gamification/profile"] });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível ativar o Premium.",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" data-testid="title-dashboard">Dashboard de Estudo</h1>
           <p className="text-muted-foreground">Acompanhe o seu progresso e receba recomendações personalizadas</p>
+        </div>
+
+        <div className="mb-6">
+          <GamificationHeader />
         </div>
 
         {statsLoading ? (
@@ -92,6 +121,31 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Premium Upgrade Card */}
+            <Card className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/20 dark:to-amber-900/20 border-amber-200 dark:border-amber-800" data-testid="card-premium-upgrade">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  <CardTitle className="text-amber-900 dark:text-amber-100">
+                    Desbloqueie o Premium
+                  </CardTitle>
+                </div>
+                <CardDescription className="text-amber-800 dark:text-amber-300">
+                  Acesso exclusivo ao Mentor IA, resumos ilimitados, e tema dourado
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => activatePremiumMutation.mutate()}
+                  disabled={activatePremiumMutation.isPending}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                  data-testid="button-activate-premium"
+                >
+                  {activatePremiumMutation.isPending ? "A ativar..." : "Ativar Premium (Simulado)"}
+                </Button>
+              </CardContent>
+            </Card>
 
             {stats?.recentSessions && stats.recentSessions.length > 0 && (
               <Card className="mb-8">
