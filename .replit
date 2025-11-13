@@ -11,44 +11,8 @@ build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
 [[ports]]
-localPort = 5000
+localPort = 33105
 externalPort = 80
-
-[[ports]]
-localPort = 34327
-externalPort = 3002
-
-[[ports]]
-localPort = 34363
-externalPort = 6000
-
-[[ports]]
-localPort = 38583
-externalPort = 4200
-
-[[ports]]
-localPort = 39293
-externalPort = 3001
-
-[[ports]]
-localPort = 39705
-externalPort = 3000
-
-[[ports]]
-localPort = 42109
-externalPort = 5173
-
-[[ports]]
-localPort = 43581
-externalPort = 5000
-
-[[ports]]
-localPort = 43919
-externalPort = 3003
-
-[[ports]]
-localPort = 46067
-externalPort = 6800
 
 [env]
 PORT = "5000"

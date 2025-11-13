@@ -25,12 +25,12 @@ export type XpAction = typeof xpActions[number];
 export const userLevels = ["iniciante", "explorador", "mentor", "mestre"] as const;
 export type UserLevel = typeof userLevels[number];
 
-// Level configuration
+// Level configuration (icons will be rendered using lucide-react in UI)
 export const levelConfig = {
-  iniciante: { minXp: 0, maxXp: 299, emoji: "🪶", name: "Iniciante" },
-  explorador: { minXp: 300, maxXp: 899, emoji: "📘", name: "Explorador" },
-  mentor: { minXp: 900, maxXp: 1999, emoji: "🧠", name: "Mentor" },
-  mestre: { minXp: 2000, maxXp: Infinity, emoji: "🚀", name: "Mestre do Foco" },
+  iniciante: { minXp: 0, maxXp: 299, icon: "feather", name: "Iniciante" },
+  explorador: { minXp: 300, maxXp: 899, icon: "book-open", name: "Explorador" },
+  mentor: { minXp: 900, maxXp: 1999, icon: "brain", name: "Mentor" },
+  mestre: { minXp: 2000, maxXp: Infinity, icon: "rocket", name: "Mestre do Foco" },
 };
 
 // Session storage table (mandatory for Replit Auth)
@@ -99,6 +99,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   summaries: many(summaries),
   studySessions: many(studySessions),
   flashcardAttempts: many(flashcardAttempts),
+  xpEvents: many(xpEvents),
+  chatThreads: many(chatThreads),
 }));
 
 export const summariesRelations = relations(summaries, ({ one, many }) => ({
@@ -316,15 +318,6 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
     fields: [chatMessages.threadId],
     references: [chatThreads.id],
   }),
-}));
-
-// Update users relations to include XP events and chat threads
-export const usersRelationsUpdated = relations(users, ({ many }) => ({
-  summaries: many(summaries),
-  studySessions: many(studySessions),
-  flashcardAttempts: many(flashcardAttempts),
-  xpEvents: many(xpEvents),
-  chatThreads: many(chatThreads),
 }));
 
 // API request/response types

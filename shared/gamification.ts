@@ -18,7 +18,7 @@ export function calculateStudySessionXP(correctCards: number): number {
 // Helper function to get current level from XP
 export function getLevelFromXP(totalXp: number): {
   level: string;
-  emoji: string;
+  icon: string; // lucide-react icon name
   name: string;
   progress: number; // 0-100%
   nextLevelXp: number;
@@ -27,7 +27,7 @@ export function getLevelFromXP(totalXp: number): {
   if (totalXp >= 2000) {
     return {
       level: "mestre",
-      emoji: "🚀",
+      icon: "rocket",
       name: "Mestre do Foco",
       progress: 100,
       nextLevelXp: Infinity,
@@ -37,7 +37,7 @@ export function getLevelFromXP(totalXp: number): {
     const progress = ((totalXp - 900) / (2000 - 900)) * 100;
     return {
       level: "mentor",
-      emoji: "🧠",
+      icon: "brain",
       name: "Mentor",
       progress: Math.min(progress, 100),
       nextLevelXp: 2000,
@@ -47,7 +47,7 @@ export function getLevelFromXP(totalXp: number): {
     const progress = ((totalXp - 300) / (900 - 300)) * 100;
     return {
       level: "explorador",
-      emoji: "📘",
+      icon: "book-open",
       name: "Explorador",
       progress: Math.min(progress, 100),
       nextLevelXp: 900,
@@ -57,7 +57,7 @@ export function getLevelFromXP(totalXp: number): {
     const progress = (totalXp / 300) * 100;
     return {
       level: "iniciante",
-      emoji: "🪶",
+      icon: "feather",
       name: "Iniciante",
       progress: Math.min(progress, 100),
       nextLevelXp: 300,
@@ -69,47 +69,47 @@ export function getLevelFromXP(totalXp: number): {
 // Motivational messages based on ranking position
 export function getMotivationalMessage(position: number, pointsToNext?: number): string {
   if (position === 1) {
-    return "🥇 És o número 1! Incrível trabalho! Continue neste ritmo!";
+    return `És o número 1! Incrível trabalho! Continue neste ritmo!`;
   } else if (position === 2) {
-    return `🥈 Em segundo lugar! ${pointsToNext ? `Faltam apenas ${pointsToNext} XP para o 1º lugar!` : "Continua assim!"}`;
+    return `Em segundo lugar! ${pointsToNext ? `Faltam apenas ${pointsToNext} XP para o 1º lugar!` : "Continua assim!"}`;
   } else if (position === 3) {
-    return `🥉 No pódio! ${pointsToNext ? `Só precisas de mais ${pointsToNext} XP para subir!` : "Excelente!"}`;
+    return `No pódio! ${pointsToNext ? `Só precisas de mais ${pointsToNext} XP para subir!` : "Excelente!"}`;
   } else if (position <= 10) {
-    return `⭐ No Top 10! ${pointsToNext ? `Faltam ${pointsToNext} XP para ultrapassares o próximo!` : "Continua a estudar!"}`;
+    return `No Top 10! ${pointsToNext ? `Faltam ${pointsToNext} XP para ultrapassares o próximo!` : "Continua a estudar!"}`;
   } else {
-    return "💪 Continua a ganhar XP e sobe no ranking! Cada estudo conta!";
+    return "Continua a ganhar XP e sobe no ranking! Cada estudo conta!";
   }
 }
 
-// Premium benefits description
+// Premium benefits description (icons are lucide-react icon names)
 export const PREMIUM_BENEFITS = [
   {
-    icon: "🎓",
+    icon: "graduation-cap",
     title: "Resumos Ilimitados",
     description: "Gere tantos resumos quantos precisares, sem limites",
   },
   {
-    icon: "🧠",
+    icon: "brain",
     title: "Mentor IA Exclusivo",
     description: "Chat com um mentor motivador que te ajuda a estudar melhor",
   },
   {
-    icon: "🎴",
+    icon: "layers",
     title: "Flashcards Premium",
     description: "Até 20 flashcards por resumo (vs. 5-10 no plano gratuito)",
   },
   {
-    icon: "💎",
+    icon: "gem",
     title: "Tema Dourado Exclusivo",
     description: "Interface premium com cores e ícones especiais",
   },
   {
-    icon: "📊",
+    icon: "bar-chart-3",
     title: "Estatísticas Avançadas",
     description: "Análises detalhadas do teu progresso e desempenho",
   },
   {
-    icon: "⚡",
+    icon: "zap",
     title: "XP Bónus Diário",
     description: "Ganha +40 XP por cada conversa diária com o mentor",
   },
