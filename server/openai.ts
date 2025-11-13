@@ -233,28 +233,53 @@ Limite a 5 tópicos prioritários. Seja específico e motivador.`,
 
     const content = response.choices[0].message.content || "{}";
     
+    // Try to parse JSON, handling potential markdown code blocks
+    let cleanedContent = content.trim();
+    if (cleanedContent.startsWith("```json")) {
+      cleanedContent = cleanedContent.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (cleanedContent.startsWith("```")) {
+      cleanedContent = cleanedContent.replace(/```\n?/g, "");
+    }
+    
     // Parse the JSON response
-    const result = JSON.parse(content.trim());
+    let result;
+    try {
+      result = JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", parseError);
+      // Return a safe fallback
+      return {
+        recommendations: "Não foi possível gerar um plano de revisão personalizado. Continue a estudar regularmente!",
+        priorityTopics: [],
+      };
+    }
     
     // Validate and enrich the result
     if (!result.recommendations || !Array.isArray(result.priorityTopics)) {
-      throw new Error("Invalid response format from AI");
+      console.error("Invalid AI response structure:", result);
+      return {
+        recommendations: result.recommendations || "Continue o excelente trabalho nos seus estudos!",
+        priorityTopics: [],
+      };
     }
 
     // Match priority topics with summaryIds from study history
-    const enrichedTopics = result.priorityTopics.map((topic: any) => {
-      const historyItem = studyHistory.find(h => 
-        h.fileName.toLowerCase().includes(topic.fileName.toLowerCase()) ||
-        topic.fileName.toLowerCase().includes(h.fileName.toLowerCase())
-      );
-      
-      return {
-        fileName: topic.fileName,
-        summaryId: historyItem?.summaryId || '',
-        reason: topic.reason,
-        priority: topic.priority,
-      };
-    }).filter((topic: any) => topic.summaryId); // Only keep topics we can match
+    const enrichedTopics = result.priorityTopics
+      .filter((topic: any) => topic && topic.fileName && topic.reason && topic.priority) // Filter out invalid topics
+      .map((topic: any) => {
+        const historyItem = studyHistory.find(h => 
+          h.fileName.toLowerCase().includes(topic.fileName.toLowerCase()) ||
+          topic.fileName.toLowerCase().includes(h.fileName.toLowerCase())
+        );
+        
+        return {
+          fileName: topic.fileName,
+          summaryId: historyItem?.summaryId || '',
+          reason: topic.reason,
+          priority: topic.priority,
+        };
+      })
+      .filter((topic: any) => topic.summaryId); // Only keep topics we can match
 
     return {
       recommendations: result.recommendations,
@@ -262,6 +287,10 @@ Limite a 5 tópicos prioritários. Seja específico e motivador.`,
     };
   } catch (error) {
     console.error("Error generating review plan with GPT-5:", error);
-    throw new Error("Falha ao gerar plano de revisão. Por favor, tente novamente.");
+    // Return a safe fallback instead of throwing
+    return {
+      recommendations: "Não foi possível gerar um plano de revisão neste momento. Continue a estudar regularmente!",
+      priorityTopics: [],
+    };
   }
 }
