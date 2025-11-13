@@ -30,7 +30,6 @@ export default function TopicView() {
   const [generateSummary, setGenerateSummary] = useState(true);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
-  const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [isSummariesDialogOpen, setIsSummariesDialogOpen] = useState(false);
 
   const { data: topic } = useQuery<Topic>({
@@ -53,15 +52,35 @@ export default function TopicView() {
     },
   });
 
-  const { data: summariesData, isLoading: summariesLoading } = useQuery({
-    queryKey: ["/api/content", selectedContentId, "summaries"],
+  const { data: topicSummariesData, isLoading: topicSummariesLoading, refetch: refetchTopicSummaries } = useQuery({
+    queryKey: ["/api/topics", topicId, "summaries"],
     queryFn: async () => {
-      if (!selectedContentId) return null;
-      const res = await fetch(`/api/content/${selectedContentId}/summaries`);
-      if (!res.ok) throw new Error("Failed to fetch summaries");
+      if (!topicId) return null;
+      const res = await fetch(`/api/topics/${topicId}/summaries`);
+      if (!res.ok) throw new Error("Failed to fetch topic summaries");
       return res.json();
     },
-    enabled: !!selectedContentId && isSummariesDialogOpen,
+  });
+
+  const generateSummariesMutation = useMutation({
+    mutationFn: async () => {
+      if (!topicId) throw new Error("Topic ID required");
+      return apiRequest("POST", `/api/topics/${topicId}/summaries`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Resumos gerados com sucesso!",
+        description: "Os resumos do tópico foram criados para os 4 estilos de aprendizagem.",
+      });
+      refetchTopicSummaries();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao gerar resumos",
+        description: error.message || "Não foi possível gerar os resumos. Tente novamente.",
+        variant: "destructive",
+      });
+    },
   });
 
   const uploadMutation = useMutation({
@@ -160,9 +179,18 @@ export default function TopicView() {
     }
   };
 
-  const handleViewSummaries = (contentId: string) => {
-    setSelectedContentId(contentId);
-    setIsSummariesDialogOpen(true);
+  const handleGenerateSummaries = () => {
+    if (topicSummariesData?.hasContent) {
+      // If summaries exist, just open dialog
+      setIsSummariesDialogOpen(true);
+    } else if (contents.length > 0) {
+      // If no summaries but has content, generate then open
+      setIsSummariesDialogOpen(true);
+    }
+  };
+
+  const handleManualGenerate = () => {
+    generateSummariesMutation.mutate();
   };
 
   return (
@@ -191,6 +219,16 @@ export default function TopicView() {
             <Link2 className="w-4 h-4 mr-2" />
             Adicionar Link
           </Button>
+          {contents.length > 0 && (
+            <Button
+              onClick={handleGenerateSummaries}
+              variant="secondary"
+              data-testid="button-generate-summaries"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {topicSummariesData?.hasContent ? "Ver Resumos" : "Gerar Resumos"}
+            </Button>
+          )}
         </div>
 
         {contents.length === 0 ? (
@@ -262,26 +300,16 @@ export default function TopicView() {
                 {contents
                   .filter((c) => c.contentType !== "link")
                   .map((content) => (
-                    <Card key={content.id} data-testid={`card-file-${content.id}`} className="hover-elevate cursor-pointer" onClick={() => handleViewSummaries(content.id)}>
+                    <Card key={content.id} data-testid={`card-file-${content.id}`}>
                       <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            {getContentIcon(content.contentType)}
-                            <div>
-                              <CardTitle className="text-base">{content.title}</CardTitle>
-                              <CardDescription className="mt-1">
-                                {content.contentType.toUpperCase()}
-                              </CardDescription>
-                            </div>
+                        <div className="flex items-start gap-3">
+                          {getContentIcon(content.contentType)}
+                          <div>
+                            <CardTitle className="text-base">{content.title}</CardTitle>
+                            <CardDescription className="mt-1">
+                              {content.contentType.toUpperCase()}
+                            </CardDescription>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            data-testid={`button-view-summaries-${content.id}`}
-                          >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Ver Resumos
-                          </Button>
                         </div>
                       </CardHeader>
                     </Card>
@@ -441,22 +469,25 @@ export default function TopicView() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isSummariesDialogOpen} onOpenChange={(open) => {
-        setIsSummariesDialogOpen(open);
-        if (!open) setSelectedContentId(null);
-      }}>
+      <Dialog open={isSummariesDialogOpen} onOpenChange={setIsSummariesDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-summaries">
           <DialogHeader>
-            <DialogTitle>Resumos de Aprendizagem</DialogTitle>
+            <DialogTitle>Resumos do Tópico</DialogTitle>
             <DialogDescription>
-              Resumos adaptados aos 4 estilos de aprendizagem
+              Resumo agregado de todo o conteúdo deste tópico, adaptado aos 4 estilos de aprendizagem
             </DialogDescription>
           </DialogHeader>
-          {summariesLoading ? (
+          {generateSummariesMutation.isPending ? (
+            <div className="py-8 text-center">
+              <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
+              <p className="text-muted-foreground">A gerar resumos...</p>
+              <p className="text-xs text-muted-foreground mt-2">Isto pode demorar 1-2 minutos.</p>
+            </div>
+          ) : topicSummariesLoading ? (
             <div className="py-8 text-center">
               <p className="text-muted-foreground">A carregar resumos...</p>
             </div>
-          ) : summariesData?.summaries && Object.keys(summariesData.summaries).length > 0 ? (
+          ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (
             <Tabs defaultValue="visual" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="visual" data-testid="tab-visual">
@@ -474,7 +505,7 @@ export default function TopicView() {
               </TabsList>
 
               <TabsContent value="visual" className="mt-4">
-                {summariesData.summaries.visual ? (
+                {topicSummariesData.summaries.visual ? (
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -482,15 +513,15 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {summariesData.summaries.visual.summary}
+                          {topicSummariesData.summaries.visual.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {summariesData.summaries.visual.motivationalMessage && (
+                    {topicSummariesData.summaries.visual.motivationalMessage && (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {summariesData.summaries.visual.motivationalMessage}
+                            {topicSummariesData.summaries.visual.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
@@ -502,7 +533,7 @@ export default function TopicView() {
               </TabsContent>
 
               <TabsContent value="auditivo" className="mt-4">
-                {summariesData.summaries.auditivo ? (
+                {topicSummariesData.summaries.auditivo ? (
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -510,15 +541,15 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {summariesData.summaries.auditivo.summary}
+                          {topicSummariesData.summaries.auditivo.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {summariesData.summaries.auditivo.motivationalMessage && (
+                    {topicSummariesData.summaries.auditivo.motivationalMessage && (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {summariesData.summaries.auditivo.motivationalMessage}
+                            {topicSummariesData.summaries.auditivo.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
@@ -530,7 +561,7 @@ export default function TopicView() {
               </TabsContent>
 
               <TabsContent value="logico" className="mt-4">
-                {summariesData.summaries.logico ? (
+                {topicSummariesData.summaries.logico ? (
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -538,15 +569,15 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {summariesData.summaries.logico.summary}
+                          {topicSummariesData.summaries.logico.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {summariesData.summaries.logico.motivationalMessage && (
+                    {topicSummariesData.summaries.logico.motivationalMessage && (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {summariesData.summaries.logico.motivationalMessage}
+                            {topicSummariesData.summaries.logico.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
@@ -558,7 +589,7 @@ export default function TopicView() {
               </TabsContent>
 
               <TabsContent value="conciso" className="mt-4">
-                {summariesData.summaries.conciso ? (
+                {topicSummariesData.summaries.conciso ? (
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -566,15 +597,15 @@ export default function TopicView() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {summariesData.summaries.conciso.summary}
+                          {topicSummariesData.summaries.conciso.summary}
                         </p>
                       </CardContent>
                     </Card>
-                    {summariesData.summaries.conciso.motivationalMessage && (
+                    {topicSummariesData.summaries.conciso.motivationalMessage && (
                       <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="pt-4">
                           <p className="text-sm italic text-primary">
-                            {summariesData.summaries.conciso.motivationalMessage}
+                            {topicSummariesData.summaries.conciso.motivationalMessage}
                           </p>
                         </CardContent>
                       </Card>
@@ -586,14 +617,21 @@ export default function TopicView() {
               </TabsContent>
             </Tabs>
           ) : (
-            <div className="py-8 text-center">
+            <div className="py-8 text-center space-y-4">
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                Ainda não há resumos disponíveis para este ficheiro.
+                Ainda não há resumos disponíveis para este tópico.
               </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Os resumos são gerados automaticamente quando faz upload com a opção "Gerar resumo com IA" ativada.
+              <p className="text-xs text-muted-foreground">
+                Clique no botão abaixo para criar resumos agregados de todo o conteúdo deste tópico.
               </p>
+              <Button
+                onClick={handleManualGenerate}
+                disabled={generateSummariesMutation.isPending}
+                data-testid="button-manual-generate"
+              >
+                {generateSummariesMutation.isPending ? "A gerar..." : "Gerar Resumos Agora"}
+              </Button>
             </div>
           )}
         </DialogContent>

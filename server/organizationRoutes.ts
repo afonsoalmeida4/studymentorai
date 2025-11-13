@@ -35,18 +35,41 @@ async function aggregateTopicContent(topicId: string): Promise<string> {
   }
 
   let aggregatedText = "";
+  const MAX_CHARS = 500000; // ~125k tokens aproximadamente (4 chars/token)
+  let currentLength = 0;
 
   for (const content of contents) {
-    aggregatedText += `\n\n### Fonte: ${content.title} (${content.contentType.toUpperCase()})\n\n`;
+    const header = `\n\n### Fonte: ${content.title} (${content.contentType.toUpperCase()})\n\n`;
+    
+    if (currentLength + header.length > MAX_CHARS) {
+      aggregatedText += "\n\n[... conteúdo adicional omitido devido ao limite de tamanho ...]";
+      break;
+    }
+
+    aggregatedText += header;
+    currentLength += header.length;
 
     if (content.contentType === "link" && content.metadata) {
       const metadata = content.metadata as any;
-      aggregatedText += `URL: ${metadata.url}\n`;
-      if (metadata.description) {
-        aggregatedText += `Descrição: ${metadata.description}\n`;
+      const linkText = `URL: ${metadata.url}\n${metadata.description ? `Descrição: ${metadata.description}\n` : ''}`;
+      
+      if (currentLength + linkText.length > MAX_CHARS) {
+        aggregatedText += "[... truncado ...]";
+        break;
       }
+      
+      aggregatedText += linkText;
+      currentLength += linkText.length;
     } else if (content.extractedText) {
+      const availableSpace = MAX_CHARS - currentLength;
+      
+      if (content.extractedText.length > availableSpace) {
+        aggregatedText += content.extractedText.substring(0, availableSpace) + "\n[... truncado ...]";
+        break;
+      }
+      
       aggregatedText += content.extractedText;
+      currentLength += content.extractedText.length;
     }
   }
 
@@ -531,43 +554,72 @@ export function registerOrganizationRoutes(app: Express) {
     }
   });
 
-  // Get all summaries for a content item (grouped by learning style)
-  app.get("/api/content/:contentItemId/summaries", isAuthenticated, async (req: any, res) => {
+  // Generate summaries for a topic (manual trigger)
+  app.post("/api/topics/:id/summaries", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { contentItemId } = req.params;
+      const { id } = req.params;
 
-      // Verify content item belongs to user
-      const content = await db.query.contentItems.findFirst({
-        where: and(eq(contentItems.id, contentItemId), eq(contentItems.userId, userId)),
+      // Verify topic belongs to user
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, id), eq(topics.userId, userId)),
       });
 
-      if (!content) {
-        return res.status(404).json({ success: false, error: "Conteúdo não encontrado" });
+      if (!topic) {
+        return res.status(404).json({ success: false, error: "Tópico não encontrado" });
       }
 
-      // Fetch all summaries for this content item
-      const { contentSummaries: contentSummariesTable } = await import("@shared/schema");
-      const summariesWithDetails = await db.query.contentSummaries.findMany({
-        where: eq(contentSummariesTable.contentItemId, contentItemId),
-        with: {
-          summary: true,
-        },
+      const success = await generateTopicSummaries(id, userId);
+
+      if (success) {
+        res.json({ success: true, message: "Resumos gerados com sucesso" });
+      } else {
+        res.status(400).json({ success: false, error: "Não foi possível gerar resumos. Verifique se o tópico tem conteúdo." });
+      }
+    } catch (error) {
+      console.error("Error generating topic summaries:", error);
+      res.status(500).json({ success: false, error: "Erro ao gerar resumos" });
+    }
+  });
+
+  // Get all summaries for a topic (grouped by learning style)
+  app.get("/api/topics/:id/summaries", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      // Verify topic belongs to user
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, id), eq(topics.userId, userId)),
+      });
+
+      if (!topic) {
+        return res.status(404).json({ success: false, error: "Tópico não encontrado" });
+      }
+
+      // Fetch all summaries for this topic
+      const summariesList = await db.query.topicSummaries.findMany({
+        where: eq(topicSummaries.topicId, id),
       });
 
       // Group by learning style for easy frontend consumption
-      const summariesByStyle = summariesWithDetails.reduce((acc, item) => {
-        acc[item.learningStyle] = item.summary;
+      const summariesByStyle = summariesList.reduce((acc, item) => {
+        acc[item.learningStyle] = {
+          summary: item.summary,
+          motivationalMessage: item.motivationalMessage,
+          updatedAt: item.updatedAt,
+        };
         return acc;
       }, {} as Record<string, any>);
 
       res.json({ 
         success: true, 
         summaries: summariesByStyle,
-        count: summariesWithDetails.length,
+        count: summariesList.length,
+        hasContent: summariesList.length > 0,
       });
     } catch (error) {
-      console.error("Error fetching summaries:", error);
+      console.error("Error fetching topic summaries:", error);
       res.status(500).json({ success: false, error: "Erro ao carregar resumos" });
     }
   });
