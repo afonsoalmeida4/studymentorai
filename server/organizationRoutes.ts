@@ -2,7 +2,7 @@ import type { Express } from "express";
 import multer from "multer";
 import { z } from "zod";
 import { db } from "./db";
-import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema } from "@shared/schema";
+import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema, topicSummaries, learningStyles } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { isAuthenticated } from "./replitAuth";
 import { extractTextFromFile, validateFileType, isValidFileSize } from "./textExtractor";
@@ -23,6 +23,90 @@ const upload = multer({
     }
   },
 });
+
+async function aggregateTopicContent(topicId: string): Promise<string> {
+  const contents = await db.query.contentItems.findMany({
+    where: eq(contentItems.topicId, topicId),
+    orderBy: [contentItems.createdAt],
+  });
+
+  if (contents.length === 0) {
+    return "Este tópico ainda não tem conteúdo.";
+  }
+
+  let aggregatedText = "";
+
+  for (const content of contents) {
+    aggregatedText += `\n\n### Fonte: ${content.title} (${content.contentType.toUpperCase()})\n\n`;
+
+    if (content.contentType === "link" && content.metadata) {
+      const metadata = content.metadata as any;
+      aggregatedText += `URL: ${metadata.url}\n`;
+      if (metadata.description) {
+        aggregatedText += `Descrição: ${metadata.description}\n`;
+      }
+    } else if (content.extractedText) {
+      aggregatedText += content.extractedText;
+    }
+  }
+
+  return aggregatedText.trim();
+}
+
+async function generateTopicSummaries(topicId: string, userId: string): Promise<boolean> {
+  try {
+    const aggregatedContent = await aggregateTopicContent(topicId);
+
+    if (aggregatedContent === "Este tópico ainda não tem conteúdo.") {
+      console.log(`[TopicSummary] Topic ${topicId} has no content to summarize`);
+      return false;
+    }
+
+    console.log(`[TopicSummary] Generating summaries for topic ${topicId}, content length: ${aggregatedContent.length}`);
+
+    let successCount = 0;
+
+    for (const style of learningStyles) {
+      try {
+        const result = await generateSummary({
+          text: aggregatedContent,
+          learningStyle: style,
+        });
+
+        await db.insert(topicSummaries)
+          .values({
+            topicId,
+            learningStyle: style,
+            summary: result.summary,
+            motivationalMessage: result.motivationalMessage,
+          })
+          .onConflictDoUpdate({
+            target: [topicSummaries.topicId, topicSummaries.learningStyle],
+            set: {
+              summary: result.summary,
+              motivationalMessage: result.motivationalMessage,
+              updatedAt: new Date(),
+            },
+          });
+
+        successCount++;
+        console.log(`[TopicSummary] Generated ${style} summary for topic ${topicId}`);
+      } catch (styleError) {
+        console.error(`[TopicSummary] Failed to generate ${style} summary:`, styleError);
+      }
+    }
+
+    if (successCount > 0) {
+      await awardXP(userId, "generate_summary");
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("[TopicSummary] Error generating topic summaries:", error);
+    return false;
+  }
+}
 
 export function registerOrganizationRoutes(app: Express) {
   app.get("/api/subjects", isAuthenticated, async (req: any, res) => {

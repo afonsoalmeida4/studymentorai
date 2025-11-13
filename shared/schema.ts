@@ -220,6 +220,37 @@ export const insertContentSummarySchema = createInsertSchema(contentSummaries).o
 export type InsertContentSummary = z.infer<typeof insertContentSummarySchema>;
 export type ContentSummary = typeof contentSummaries.$inferSelect;
 
+// Topic Summaries table (aggregated summaries of all content in a topic)
+export const topicSummaries = pgTable(
+  "topic_summaries",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
+    learningStyle: varchar("learning_style", { length: 20 }).notNull(),
+    summary: text("summary").notNull(),
+    motivationalMessage: text("motivational_message").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      topicIdx: index("idx_topic_summaries_topic_id").on(table.topicId),
+      learningStyleIdx: index("idx_topic_summaries_learning_style").on(table.learningStyle),
+      // Ensure one summary per learning style per topic
+      uniqueTopicStyle: uniqueIndex("idx_topic_summaries_unique").on(table.topicId, table.learningStyle),
+    };
+  },
+);
+
+export const insertTopicSummarySchema = createInsertSchema(topicSummaries).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTopicSummary = z.infer<typeof insertTopicSummarySchema>;
+export type TopicSummary = typeof topicSummaries.$inferSelect;
+
 // Content Assets table (file metadata for PDFs, DOCX, PPTX)
 export const contentAssets = pgTable(
   "content_assets",
