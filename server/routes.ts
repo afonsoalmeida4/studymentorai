@@ -85,11 +85,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract text from PDF
       let pdfText: string;
       try {
-        // pdf-parse is a CommonJS module, import it dynamically
-        const pdfParseModule = await import("pdf-parse");
-        // Handle both CommonJS and ESM exports
-        const pdfParse = (pdfParseModule as any).default || pdfParseModule;
-        const pdfData = await pdfParse(req.file.buffer);
+        // Import pdf-parse and use the PDFParse named export
+        const { PDFParse } = await import("pdf-parse");
+        const pdfData = await PDFParse(req.file.buffer);
         pdfText = pdfData.text;
 
         if (!pdfText || pdfText.trim().length === 0) {
