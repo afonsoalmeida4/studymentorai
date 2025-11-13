@@ -15,6 +15,8 @@ import {
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { awardXP, getGamificationProfile, getLeaderboard, activatePremium } from "./gamificationService";
+import { registerOrganizationRoutes } from "./organizationRoutes";
+import { registerChatRoutes } from "./chatRoutes";
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -542,6 +544,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  registerOrganizationRoutes(app);
+  registerChatRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

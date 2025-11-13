@@ -1,0 +1,422 @@
+import type { Express } from "express";
+import multer from "multer";
+import { z } from "zod";
+import { db } from "./db";
+import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema } from "@shared/schema";
+import { eq, and, desc } from "drizzle-orm";
+import { isAuthenticated } from "./replitAuth";
+import { extractTextFromFile, validateFileType, isValidFileSize } from "./textExtractor";
+import { generateSummary } from "./openai";
+import { awardXP } from "./gamificationService";
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    const validType = validateFileType(file.mimetype);
+    if (validType) {
+      cb(null, true);
+    } else {
+      cb(new Error("Tipo de ficheiro não suportado. Use PDF, DOCX ou PPTX."));
+    }
+  },
+});
+
+export function registerOrganizationRoutes(app: Express) {
+  app.get("/api/subjects", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const userSubjects = await db.query.subjects.findMany({
+        where: eq(subjects.userId, userId),
+        orderBy: [subjects.position],
+        with: {
+          topics: {
+            orderBy: [topics.position],
+          },
+        },
+      });
+
+      res.json({ success: true, subjects: userSubjects });
+    } catch (error) {
+      console.error("Error fetching subjects:", error);
+      res.status(500).json({ success: false, error: "Erro ao carregar disciplinas" });
+    }
+  });
+
+  app.post("/api/subjects", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const validatedData = insertSubjectSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      const subject = await db.insert(subjects).values(validatedData).returning();
+
+      res.json({ success: true, subject: subject[0] });
+    } catch (error) {
+      console.error("Error creating subject:", error);
+      res.status(400).json({ success: false, error: "Erro ao criar disciplina" });
+    }
+  });
+
+  app.put("/api/subjects/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      const existing = await db.query.subjects.findFirst({
+        where: and(eq(subjects.id, id), eq(subjects.userId, userId)),
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, error: "Disciplina não encontrada" });
+      }
+
+      const updateSchema = z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        color: z.string().length(7).optional(),
+        position: z.number().int().optional(),
+      }).strict();
+
+      const validatedData = updateSchema.parse(req.body);
+
+      const updated = await db
+        .update(subjects)
+        .set({
+          ...validatedData,
+          updatedAt: new Date(),
+        })
+        .where(eq(subjects.id, id))
+        .returning();
+
+      res.json({ success: true, subject: updated[0] });
+    } catch (error) {
+      console.error("Error updating subject:", error);
+      res.status(400).json({ success: false, error: "Erro ao atualizar disciplina" });
+    }
+  });
+
+  app.delete("/api/subjects/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      const existing = await db.query.subjects.findFirst({
+        where: and(eq(subjects.id, id), eq(subjects.userId, userId)),
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, error: "Disciplina não encontrada" });
+      }
+
+      await db.delete(subjects).where(eq(subjects.id, id));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting subject:", error);
+      res.status(500).json({ success: false, error: "Erro ao eliminar disciplina" });
+    }
+  });
+
+  app.get("/api/topics", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { subjectId } = req.query;
+
+      const conditions = subjectId
+        ? and(eq(topics.userId, userId), eq(topics.subjectId, subjectId as string))
+        : eq(topics.userId, userId);
+
+      const userTopics = await db.query.topics.findMany({
+        where: conditions,
+        orderBy: [topics.position],
+        with: {
+          subject: true,
+        },
+      });
+
+      res.json({ success: true, topics: userTopics });
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      res.status(500).json({ success: false, error: "Erro ao carregar tópicos" });
+    }
+  });
+
+  app.post("/api/topics", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      const validatedData = insertTopicSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      const subject = await db.query.subjects.findFirst({
+        where: and(eq(subjects.id, validatedData.subjectId), eq(subjects.userId, userId)),
+      });
+
+      if (!subject) {
+        return res.status(403).json({ success: false, error: "Disciplina não encontrada ou sem permissão" });
+      }
+
+      const topic = await db.insert(topics).values(validatedData).returning();
+
+      res.json({ success: true, topic: topic[0] });
+    } catch (error) {
+      console.error("Error creating topic:", error);
+      res.status(400).json({ success: false, error: "Erro ao criar tópico" });
+    }
+  });
+
+  app.put("/api/topics/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      const existing = await db.query.topics.findFirst({
+        where: and(eq(topics.id, id), eq(topics.userId, userId)),
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, error: "Tópico não encontrado" });
+      }
+
+      const updateSchema = z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        position: z.number().int().optional(),
+      }).strict();
+
+      const validatedData = updateSchema.parse(req.body);
+
+      const updated = await db
+        .update(topics)
+        .set({
+          ...validatedData,
+          updatedAt: new Date(),
+        })
+        .where(eq(topics.id, id))
+        .returning();
+
+      res.json({ success: true, topic: updated[0] });
+    } catch (error) {
+      console.error("Error updating topic:", error);
+      res.status(400).json({ success: false, error: "Erro ao atualizar tópico" });
+    }
+  });
+
+  app.delete("/api/topics/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      const existing = await db.query.topics.findFirst({
+        where: and(eq(topics.id, id), eq(topics.userId, userId)),
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, error: "Tópico não encontrado" });
+      }
+
+      await db.delete(topics).where(eq(topics.id, id));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting topic:", error);
+      res.status(500).json({ success: false, error: "Erro ao eliminar tópico" });
+    }
+  });
+
+  app.get("/api/content/:topicId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { topicId } = req.params;
+
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, topicId), eq(topics.userId, userId)),
+      });
+
+      if (!topic) {
+        return res.status(404).json({ success: false, error: "Tópico não encontrado" });
+      }
+
+      const content = await db.query.contentItems.findMany({
+        where: eq(contentItems.topicId, topicId),
+        orderBy: [desc(contentItems.createdAt)],
+        with: {
+          assets: true,
+          links: true,
+          summary: true,
+        },
+      });
+
+      res.json({ success: true, content });
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      res.status(500).json({ success: false, error: "Erro ao carregar conteúdo" });
+    }
+  });
+
+  app.post("/api/content/upload", isAuthenticated, upload.single("file"), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { topicId, title, generateAISummary } = req.body;
+
+      if (!req.file) {
+        return res.status(400).json({ success: false, error: "Nenhum ficheiro foi carregado" });
+      }
+
+      if (!topicId) {
+        return res.status(400).json({ success: false, error: "topicId é obrigatório" });
+      }
+
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, topicId), eq(topics.userId, userId)),
+      });
+
+      if (!topic) {
+        return res.status(403).json({ success: false, error: "Tópico não encontrado ou sem permissão" });
+      }
+
+      const contentType = validateFileType(req.file.mimetype);
+      if (!contentType) {
+        return res.status(400).json({ success: false, error: "Tipo de ficheiro não suportado" });
+      }
+
+      if (!isValidFileSize(req.file.size)) {
+        return res.status(400).json({ success: false, error: "Ficheiro demasiado grande (máx 10MB)" });
+      }
+
+      const extracted = await extractTextFromFile(req.file.buffer, contentType, req.file.mimetype);
+
+      let summaryId = null;
+      if (generateAISummary === "true" && extracted.text && extracted.text.length > 50) {
+        try {
+          const words = extracted.text.split(/\s+/);
+          const limitedText = words.slice(0, 1500).join(" ");
+          
+          const { summary, motivationalMessage } = await generateSummary({
+            text: limitedText,
+            learningStyle: "conciso",
+          });
+
+          const { storage } = await import("./storage");
+          const savedSummary = await storage.createSummary({
+            userId,
+            fileName: req.file.originalname,
+            learningStyle: "conciso",
+            summary,
+            motivationalMessage,
+            isFavorite: false,
+          });
+
+          summaryId = savedSummary.id;
+
+          await awardXP(userId, "generate_summary", {
+            fileName: req.file.originalname,
+          });
+        } catch (error) {
+          console.error("Error generating AI summary:", error);
+        }
+      }
+
+      const contentItem = await db
+        .insert(contentItems)
+        .values({
+          topicId,
+          userId,
+          contentType,
+          title: title || req.file.originalname,
+          extractedText: extracted.text,
+          metadata: { ...extracted.metadata, originalFilename: req.file.originalname },
+          summaryId,
+        })
+        .returning();
+
+      await db.insert(contentAssets).values({
+        contentItemId: contentItem[0].id,
+        storageKey: contentItem[0].id,
+        mimeType: req.file.mimetype,
+        sizeBytes: req.file.size,
+        pageCount: extracted.pageCount,
+      });
+
+      await awardXP(userId, "upload_pdf", { fileName: req.file.originalname });
+
+      res.json({ success: true, contentItem: contentItem[0] });
+    } catch (error) {
+      console.error("Error uploading content:", error);
+      res.status(500).json({ success: false, error: "Erro ao carregar ficheiro" });
+    }
+  });
+
+  app.post("/api/content/link", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { topicId, url, title, description } = req.body;
+
+      if (!topicId || !url) {
+        return res.status(400).json({ success: false, error: "topicId e url são obrigatórios" });
+      }
+
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, topicId), eq(topics.userId, userId)),
+      });
+
+      if (!topic) {
+        return res.status(403).json({ success: false, error: "Tópico não encontrado ou sem permissão" });
+      }
+
+      const contentItem = await db
+        .insert(contentItems)
+        .values({
+          topicId,
+          userId,
+          contentType: "link",
+          title: title || url,
+          metadata: { url },
+        })
+        .returning();
+
+      await db.insert(contentLinks).values({
+        contentItemId: contentItem[0].id,
+        url,
+        title: title || null,
+        description: description || null,
+      });
+
+      res.json({ success: true, contentItem: contentItem[0] });
+    } catch (error) {
+      console.error("Error adding link:", error);
+      res.status(500).json({ success: false, error: "Erro ao adicionar link" });
+    }
+  });
+
+  app.delete("/api/content/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      const existing = await db.query.contentItems.findFirst({
+        where: and(eq(contentItems.id, id), eq(contentItems.userId, userId)),
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, error: "Conteúdo não encontrado" });
+      }
+
+      await db.delete(contentItems).where(eq(contentItems.id, id));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting content:", error);
+      res.status(500).json({ success: false, error: "Erro ao eliminar conteúdo" });
+    }
+  });
+}

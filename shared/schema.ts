@@ -33,6 +33,14 @@ export const levelConfig = {
   mestre: { minXp: 2000, maxXp: Infinity, icon: "rocket", name: "Mestre do Foco" },
 };
 
+// Content Type enum
+export const contentTypes = ["pdf", "docx", "pptx", "link"] as const;
+export type ContentType = typeof contentTypes[number];
+
+// Chat Mode enum
+export const chatModes = ["study", "existential"] as const;
+export type ChatMode = typeof chatModes[number];
+
 // Session storage table (mandatory for Replit Auth)
 export const sessions = pgTable(
   "sessions",
@@ -94,6 +102,144 @@ export const insertSummarySchema = createInsertSchema(summaries).omit({
 export type InsertSummary = z.infer<typeof insertSummarySchema>;
 export type Summary = typeof summaries.$inferSelect;
 
+// Subjects table (Disciplinas)
+export const subjects = pgTable(
+  "subjects",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    color: varchar("color", { length: 7 }),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_subjects_user_id").on(table.userId),
+    index("idx_subjects_user_position").on(table.userId, table.position),
+  ],
+);
+
+export const insertSubjectSchema = createInsertSchema(subjects).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSubject = z.infer<typeof insertSubjectSchema>;
+export type Subject = typeof subjects.$inferSelect;
+
+// Topics table (Tópicos)
+export const topics = pgTable(
+  "topics",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    subjectId: varchar("subject_id").notNull().references(() => subjects.id, { onDelete: "cascade" }),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_topics_subject_id").on(table.subjectId),
+    index("idx_topics_user_id").on(table.userId),
+    index("idx_topics_subject_position").on(table.subjectId, table.position),
+  ],
+);
+
+export const insertTopicSchema = createInsertSchema(topics).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTopic = z.infer<typeof insertTopicSchema>;
+export type Topic = typeof topics.$inferSelect;
+
+// Content Items table (generic container for PDFs, DOCX, PPTX, links)
+export const contentItems = pgTable(
+  "content_items",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    contentType: varchar("content_type", { length: 10 }).notNull(),
+    title: text("title").notNull(),
+    extractedText: text("extracted_text"),
+    metadata: jsonb("metadata"),
+    summaryId: varchar("summary_id").references(() => summaries.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_content_items_topic_id").on(table.topicId),
+    index("idx_content_items_user_id").on(table.userId),
+    index("idx_content_items_content_type").on(table.contentType),
+    index("idx_content_items_summary_id").on(table.summaryId),
+  ],
+);
+
+export const insertContentItemSchema = createInsertSchema(contentItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertContentItem = z.infer<typeof insertContentItemSchema>;
+export type ContentItem = typeof contentItems.$inferSelect;
+
+// Content Assets table (file metadata for PDFs, DOCX, PPTX)
+export const contentAssets = pgTable(
+  "content_assets",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    contentItemId: varchar("content_item_id").notNull().references(() => contentItems.id, { onDelete: "cascade" }),
+    storageKey: text("storage_key").notNull(),
+    mimeType: varchar("mime_type", { length: 100 }).notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    pageCount: integer("page_count"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_content_assets_content_item_id").on(table.contentItemId),
+  ],
+);
+
+export const insertContentAssetSchema = createInsertSchema(contentAssets).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertContentAsset = z.infer<typeof insertContentAssetSchema>;
+export type ContentAsset = typeof contentAssets.$inferSelect;
+
+// Content Links table (web links/articles)
+export const contentLinks = pgTable(
+  "content_links",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    contentItemId: varchar("content_item_id").notNull().references(() => contentItems.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    title: text("title"),
+    description: text("description"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_content_links_content_item_id").on(table.contentItemId),
+  ],
+);
+
+export const insertContentLinkSchema = createInsertSchema(contentLinks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertContentLink = z.infer<typeof insertContentLinkSchema>;
+export type ContentLink = typeof contentLinks.$inferSelect;
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   summaries: many(summaries),
@@ -101,6 +247,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   flashcardAttempts: many(flashcardAttempts),
   xpEvents: many(xpEvents),
   chatThreads: many(chatThreads),
+  subjects: many(subjects),
+  topics: many(topics),
+  contentItems: many(contentItems),
 }));
 
 export const summariesRelations = relations(summaries, ({ one, many }) => ({
@@ -110,6 +259,59 @@ export const summariesRelations = relations(summaries, ({ one, many }) => ({
   }),
   flashcards: many(flashcards),
   studySessions: many(studySessions),
+  contentItems: many(contentItems),
+}));
+
+export const subjectsRelations = relations(subjects, ({ one, many }) => ({
+  user: one(users, {
+    fields: [subjects.userId],
+    references: [users.id],
+  }),
+  topics: many(topics),
+}));
+
+export const topicsRelations = relations(topics, ({ one, many }) => ({
+  user: one(users, {
+    fields: [topics.userId],
+    references: [users.id],
+  }),
+  subject: one(subjects, {
+    fields: [topics.subjectId],
+    references: [subjects.id],
+  }),
+  contentItems: many(contentItems),
+  chatThreads: many(chatThreads),
+}));
+
+export const contentItemsRelations = relations(contentItems, ({ one, many }) => ({
+  user: one(users, {
+    fields: [contentItems.userId],
+    references: [users.id],
+  }),
+  topic: one(topics, {
+    fields: [contentItems.topicId],
+    references: [topics.id],
+  }),
+  summary: one(summaries, {
+    fields: [contentItems.summaryId],
+    references: [summaries.id],
+  }),
+  assets: many(contentAssets),
+  links: many(contentLinks),
+}));
+
+export const contentAssetsRelations = relations(contentAssets, ({ one }) => ({
+  contentItem: one(contentItems, {
+    fields: [contentAssets.contentItemId],
+    references: [contentItems.id],
+  }),
+}));
+
+export const contentLinksRelations = relations(contentLinks, ({ one }) => ({
+  contentItem: one(contentItems, {
+    fields: [contentLinks.contentItemId],
+    references: [contentItems.id],
+  }),
 }));
 
 // Flashcards table
@@ -254,12 +456,14 @@ export const xpEventsRelations = relations(xpEvents, ({ one }) => ({
   }),
 }));
 
-// Chat Threads table (for mentor chat conversations)
+// Chat Threads table (for dual-mode AI assistant conversations)
 export const chatThreads = pgTable(
   "chat_threads",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    mode: varchar("mode", { length: 20 }).notNull().default("study"),
+    topicId: varchar("topic_id").references(() => topics.id, { onDelete: "set null" }),
     title: text("title").default("Nova Conversa").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -267,7 +471,8 @@ export const chatThreads = pgTable(
   },
   (table) => [
     index("idx_chat_threads_user_id").on(table.userId),
-    index("idx_chat_threads_last_activity").on(desc(table.lastActivityAt)),
+    index("idx_chat_threads_user_mode").on(table.userId, table.mode, desc(table.lastActivityAt)),
+    index("idx_chat_threads_topic_id").on(table.topicId, desc(table.lastActivityAt)),
   ],
 );
 
@@ -284,6 +489,10 @@ export const chatThreadsRelations = relations(chatThreads, ({ one, many }) => ({
   user: one(users, {
     fields: [chatThreads.userId],
     references: [users.id],
+  }),
+  topic: one(topics, {
+    fields: [chatThreads.topicId],
+    references: [topics.id],
   }),
   messages: many(chatMessages),
 }));
