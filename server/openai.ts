@@ -14,6 +14,11 @@ export interface SummaryResult {
   motivationalMessage: string;
 }
 
+export interface FlashcardItem {
+  question: string;
+  answer: string;
+}
+
 const learningStylePrompts = {
   visual: `Você é um tutor educacional especializado em aprendizagem visual. Crie um resumo que:
 - Use metáforas visuais e descrições espaciais
@@ -98,5 +103,62 @@ export async function generateSummary({
   } catch (error) {
     console.error("Error generating summary with GPT-5:", error);
     throw new Error("Falha ao gerar resumo. Por favor, tente novamente.");
+  }
+}
+
+export async function generateFlashcards(summaryText: string): Promise<FlashcardItem[]> {
+  try {
+    const systemPrompt = `Você é um especialista em educação que cria flashcards eficazes para estudo.
+Crie flashcards com perguntas claras e respostas concisas baseadas no texto fornecido.
+Cada flashcard deve testar um conceito-chave ou fato importante.
+Gere entre 5 e 10 flashcards.
+
+Retorne a resposta APENAS como um array JSON válido no seguinte formato:
+[
+  {"question": "Pergunta aqui?", "answer": "Resposta concisa aqui"},
+  {"question": "Outra pergunta?", "answer": "Outra resposta"}
+]
+
+NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array JSON.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-5",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `Crie flashcards baseados neste resumo:\n\n${summaryText}`,
+        },
+      ],
+      max_completion_tokens: 2048,
+      temperature: 0.7,
+    });
+
+    const content = response.choices[0].message.content || "[]";
+    
+    // Parse the JSON response
+    const flashcards = JSON.parse(content.trim());
+    
+    // Validate the structure
+    if (!Array.isArray(flashcards)) {
+      throw new Error("Invalid response format");
+    }
+    
+    // Ensure each flashcard has question and answer
+    const validFlashcards = flashcards.filter(
+      (fc) => fc.question && fc.answer && typeof fc.question === "string" && typeof fc.answer === "string"
+    );
+    
+    if (validFlashcards.length === 0) {
+      throw new Error("No valid flashcards generated");
+    }
+    
+    return validFlashcards;
+  } catch (error) {
+    console.error("Error generating flashcards with GPT-5:", error);
+    throw new Error("Falha ao gerar flashcards. Por favor, tente novamente.");
   }
 }
