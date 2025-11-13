@@ -293,27 +293,26 @@ export default function Home() {
             </Card>
 
             {/* Dashboard Feature */}
-            <Link href="/dashboard">
-              <Card className="hover-elevate h-full" data-testid="card-feature-dashboard">
-                <CardHeader>
-                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
-                    <BarChart3 className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-lg">Dashboard de Progresso</CardTitle>
-                  <CardDescription>
-                    Acompanhe o seu progresso e receba recomendações de revisão personalizadas
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Visualize estatísticas, PDFs estudados e sessões recentes
-                  </p>
-                  <Button variant="outline" size="sm" className="w-full" data-testid="button-goto-dashboard">
-                    Ver Dashboard
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
+            <Card className="hover-elevate h-full cursor-pointer" data-testid="card-feature-dashboard" onClick={() => window.location.href = '/dashboard'}>
+              <CardHeader>
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
+                  <BarChart3 className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">Dashboard de Progresso</CardTitle>
+                <CardDescription>
+                  Acompanhe o seu progresso e receba recomendações de revisão personalizadas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Visualize estatísticas, PDFs estudados e sessões recentes
+                </p>
+                <div className="flex items-center justify-center gap-2 text-sm font-medium text-primary">
+                  <span>Ver Dashboard</span>
+                  <BarChart3 className="w-4 h-4" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
