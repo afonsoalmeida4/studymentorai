@@ -45,14 +45,18 @@ export function AppSidebar() {
 
   const createSubjectMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/subjects", "POST", {
+      console.log("Creating subject:", { name: newSubjectName, description: newSubjectDescription, color: newSubjectColor });
+      const result = await apiRequest("/api/subjects", "POST", {
         name: newSubjectName,
         description: newSubjectDescription,
         color: newSubjectColor,
         position: subjects.length,
       });
+      console.log("Subject created successfully:", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("onSuccess called with data:", data);
       queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
       setIsSubjectDialogOpen(false);
       setNewSubjectName("");
@@ -63,11 +67,12 @@ export function AppSidebar() {
         description: "A sua nova disciplina foi adicionada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Error creating subject:", error);
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Não foi possível criar a disciplina.",
+        description: error?.message || "Não foi possível criar a disciplina.",
       });
     },
   });
