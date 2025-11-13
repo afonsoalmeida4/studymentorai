@@ -103,11 +103,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Limit text length to avoid token limits
-        // Reduce to 3000 words (~4000 tokens) to leave room for response
+        // Reduce to 1500 words (~2000 tokens) to leave room for system prompt + response
         const words = pdfText.split(/\s+/);
-        if (words.length > 3000) {
-          pdfText = words.slice(0, 3000).join(" ");
+        console.log(`[PDF Processing] Original word count: ${words.length}`);
+        if (words.length > 1500) {
+          pdfText = words.slice(0, 1500).join(" ");
+          console.log(`[PDF Processing] Truncated to 1500 words`);
         }
+        console.log(`[PDF Processing] Final text length: ${pdfText.length} characters, ~${Math.ceil(pdfText.length / 4)} estimated tokens`);
       } catch (error) {
         console.error("Error extracting PDF text:", error);
         return res.status(400).json({

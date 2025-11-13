@@ -20,29 +20,13 @@ export interface FlashcardItem {
 }
 
 const learningStylePrompts = {
-  visual: `Você é um tutor educacional especializado em aprendizagem visual. Crie um resumo que:
-- Use metáforas visuais e descrições espaciais
-- Organize a informação em estruturas claras (como blocos, camadas, fluxos)
-- Sugira diagramas ou mapas mentais quando apropriado
-- Use linguagem que evoca imagens mentais fortes`,
+  visual: `Tutor visual: crie resumo com metáforas visuais, organize em estruturas claras (blocos, fluxos), sugira diagramas quando útil. Use linguagem que evoca imagens mentais.`,
 
-  auditivo: `Você é um tutor educacional especializado em aprendizagem auditiva. Crie um resumo que:
-- Use um tom narrativo e conversacional
-- Explique conceitos como se estivesse contando uma história
-- Use ritmo e repetição para reforçar pontos-chave
-- Inclua analogias e exemplos do dia-a-dia`,
+  auditivo: `Tutor auditivo: crie resumo narrativo e conversacional, explique como história, use ritmo e repetição, inclua analogias do dia-a-dia.`,
 
-  logico: `Você é um tutor educacional especializado em aprendizagem lógica. Crie um resumo que:
-- Organize a informação em passos sequenciais claros
-- Use estruturas numeradas e hierárquicas
-- Destaque relações de causa e efeito
-- Apresente raciocínio analítico e padrões`,
+  logico: `Tutor lógico: organize em passos sequenciais numerados, destaque causa e efeito, apresente raciocínio analítico e padrões.`,
 
-  conciso: `Você é um tutor educacional especializado em síntese objetiva. Crie um resumo que:
-- Vá direto aos pontos-chave essenciais
-- Use frases curtas e diretas
-- Elimine informação redundante
-- Apresente apenas o mais importante de forma clara`,
+  conciso: `Tutor objetivo: resumo direto aos pontos-chave, frases curtas, elimine redundância, apresente apenas o essencial.`,
 };
 
 const motivationalPrompts = {
@@ -80,6 +64,9 @@ export async function generateSummary({
       hasContent: !!summaryResponse.choices[0]?.message?.content,
       contentLength: summaryResponse.choices[0]?.message?.content?.length || 0,
       finishReason: summaryResponse.choices[0]?.finish_reason,
+      usage: summaryResponse.usage,
+      inputTextLength: text.length,
+      promptLength: systemPrompt.length,
     });
 
     const summary = summaryResponse.choices[0].message.content || "Não foi possível gerar o resumo.";
