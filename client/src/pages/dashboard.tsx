@@ -119,18 +119,18 @@ export default function Dashboard() {
               </Card>
             )}
 
-            {/* Studied PDFs Section */}
-            {stats?.studiedPDFs && stats.studiedPDFs.length > 0 && (
-              <div className="grid gap-6 md:grid-cols-2 mb-8">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
-                      PDFs Estudados
-                    </CardTitle>
-                    <CardDescription>Histórico dos seus documentos</CardDescription>
-                  </CardHeader>
-                  <CardContent>
+            {/* Studied PDFs and Recent Sessions Section */}
+            <div className="grid gap-6 md:grid-cols-2 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    PDFs Estudados
+                  </CardTitle>
+                  <CardDescription>Histórico dos seus documentos</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {stats?.studiedPDFs && stats.studiedPDFs.length > 0 ? (
                     <div className="space-y-3">
                       {stats.studiedPDFs.slice(0, 5).map((pdf) => (
                         <div key={pdf.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg hover-elevate" data-testid={`pdf-item-${pdf.id}`}>
@@ -156,21 +156,33 @@ export default function Dashboard() {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FileText className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                      <p className="text-sm">Nenhum PDF estudado ainda</p>
+                      <Link href="/">
+                        <Button variant="outline" size="sm" className="mt-3" data-testid="button-upload-first-pdf">
+                          Carregar primeiro PDF
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-                {/* Recent Study Sessions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Sessões Recentes
-                    </CardTitle>
-                    <CardDescription>Últimas atividades de estudo</CardDescription>
-                  </CardHeader>
-                  <CardContent>
+              {/* Recent Study Sessions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Sessões Recentes
+                  </CardTitle>
+                  <CardDescription>Últimas atividades de estudo</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {stats?.recentStudySessions && stats.recentStudySessions.length > 0 ? (
                     <div className="space-y-3">
-                      {stats.recentStudySessions && stats.recentStudySessions.slice(0, 5).map((session) => (
+                      {stats.recentStudySessions.slice(0, 5).map((session) => (
                         <div key={session.id} className="flex items-start justify-between gap-3 p-3 border rounded-lg hover-elevate" data-testid={`session-item-${session.id}`}>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium truncate text-sm" title={session.fileName}>{session.fileName}</h4>
@@ -190,10 +202,20 @@ export default function Dashboard() {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Clock className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                      <p className="text-sm">Nenhuma sessão de estudo ainda</p>
+                      <Link href="/">
+                        <Button variant="outline" size="sm" className="mt-3" data-testid="button-start-first-session">
+                          Começar a estudar
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </>
         )}
 
