@@ -3,12 +3,15 @@ import {
   summaries,
   flashcards,
   studySessions,
+  flashcardAttempts,
   type User,
   type UpsertUser,
   type Summary,
   type InsertSummary,
   type Flashcard,
   type InsertFlashcard,
+  type FlashcardAttempt,
+  type InsertFlashcardAttempt,
   type StudySession,
   type InsertStudySession,
   type DashboardStats,
@@ -32,6 +35,12 @@ export interface IStorage {
   // Flashcard operations
   createFlashcards(flashcardsData: InsertFlashcard[]): Promise<Flashcard[]>;
   getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]>;
+  getFlashcard(id: string): Promise<Flashcard | undefined>;
+  getDueFlashcards(userId: string, summaryId: string): Promise<Flashcard[]>;
+  
+  // Flashcard attempt operations (Anki-style)
+  createFlashcardAttempt(attempt: InsertFlashcardAttempt): Promise<FlashcardAttempt>;
+  getLatestAttempt(userId: string, flashcardId: string): Promise<FlashcardAttempt | null>;
   
   // Study session operations
   createStudySession(session: InsertStudySession): Promise<StudySession>;
@@ -126,6 +135,67 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(flashcards)
       .where(eq(flashcards.summaryId, summaryId));
+  }
+
+  async getFlashcard(id: string): Promise<Flashcard | undefined> {
+    const [flashcard] = await db
+      .select()
+      .from(flashcards)
+      .where(eq(flashcards.id, id));
+    return flashcard;
+  }
+
+  async getDueFlashcards(userId: string, summaryId: string): Promise<Flashcard[]> {
+    const now = new Date();
+    
+    const result = await db
+      .select({
+        flashcard: flashcards,
+        attempt: flashcardAttempts,
+      })
+      .from(flashcards)
+      .leftJoin(
+        flashcardAttempts,
+        and(
+          eq(flashcards.id, flashcardAttempts.flashcardId),
+          eq(flashcardAttempts.userId, userId)
+        )
+      )
+      .where(eq(flashcards.summaryId, summaryId))
+      .orderBy(flashcardAttempts.nextReviewDate);
+
+    const dueCards = result.filter(row => {
+      if (!row.attempt) {
+        return true;
+      }
+      return row.attempt.nextReviewDate && row.attempt.nextReviewDate <= now;
+    });
+
+    return dueCards.map(row => row.flashcard);
+  }
+
+  async createFlashcardAttempt(attemptData: InsertFlashcardAttempt): Promise<FlashcardAttempt> {
+    const [attempt] = await db
+      .insert(flashcardAttempts)
+      .values(attemptData)
+      .returning();
+    return attempt;
+  }
+
+  async getLatestAttempt(userId: string, flashcardId: string): Promise<FlashcardAttempt | null> {
+    const [attempt] = await db
+      .select()
+      .from(flashcardAttempts)
+      .where(
+        and(
+          eq(flashcardAttempts.userId, userId),
+          eq(flashcardAttempts.flashcardId, flashcardId)
+        )
+      )
+      .orderBy(desc(flashcardAttempts.attemptDate))
+      .limit(1);
+    
+    return attempt || null;
   }
 
   // Study session operations

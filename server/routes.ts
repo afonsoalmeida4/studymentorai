@@ -6,6 +6,7 @@ import {
   generateSummaryRequestSchema, 
   generateFlashcardsRequestSchema,
   recordStudySessionRequestSchema,
+  recordAttemptSchema,
   type GenerateSummaryResponse,
   type GenerateFlashcardsResponse,
   type RecordStudySessionResponse,
@@ -17,6 +18,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { awardXP, getGamificationProfile, getLeaderboard, activatePremium } from "./gamificationService";
 import { registerOrganizationRoutes } from "./organizationRoutes";
 import { registerChatRoutes } from "./chatRoutes";
+import { calculateNextReview } from "./flashcardScheduler";
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -317,6 +319,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro ao buscar flashcards",
       } as GenerateFlashcardsResponse);
+    }
+  });
+
+  // Get due flashcards for review (Anki-style)
+  app.get("/api/flashcards/:summaryId/due", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.summaryId;
+
+      // Verify summary exists and belongs to user
+      const summary = await storage.getSummary(summaryId);
+      if (!summary || summary.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Resumo não encontrado",
+        });
+      }
+
+      const dueFlashcards = await storage.getDueFlashcards(userId, summaryId);
+      
+      return res.json({
+        success: true,
+        flashcards: dueFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+      });
+    } catch (error) {
+      console.error("Error fetching due flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards para revisão",
+      });
+    }
+  });
+
+  // Record flashcard attempt (Anki-style rating)
+  app.post("/api/flashcards/:flashcardId/attempt", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const flashcardId = req.params.flashcardId;
+
+      // Validate request body
+      const parseResult = recordAttemptSchema.safeParse({ ...req.body, flashcardId });
+      if (!parseResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Rating inválido (deve ser 1-4)",
+        });
+      }
+
+      const { rating } = parseResult.data;
+
+      // Verify flashcard exists
+      const flashcard = await storage.getFlashcard(flashcardId);
+      if (!flashcard) {
+        return res.status(404).json({
+          success: false,
+          error: "Flashcard não encontrado",
+        });
+      }
+
+      // Verify user owns the summary containing this flashcard
+      const summary = await storage.getSummary(flashcard.summaryId);
+      if (!summary || summary.userId !== userId) {
+        return res.status(403).json({
+          success: false,
+          error: "Sem permissão",
+        });
+      }
+
+      // Get latest attempt for this flashcard
+      const latestAttempt = await storage.getLatestAttempt(userId, flashcardId);
+
+      // Calculate next review using SM-2 algorithm
+      const scheduling = calculateNextReview(rating, latestAttempt);
+
+      // Save attempt
+      await storage.createFlashcardAttempt({
+        userId,
+        flashcardId,
+        rating,
+        attemptDate: new Date(),
+        nextReviewDate: scheduling.nextReviewDate,
+        easeFactor: scheduling.easeFactor,
+        intervalDays: scheduling.intervalDays,
+        repetitions: scheduling.repetitions,
+      });
+
+      return res.json({
+        success: true,
+        nextReviewDate: scheduling.nextReviewDate.toISOString(),
+        intervalDays: scheduling.intervalDays,
+      });
+    } catch (error) {
+      console.error("Error recording attempt:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao registar tentativa",
+      });
     }
   });
 

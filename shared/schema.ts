@@ -452,7 +452,7 @@ export const flashcardAttempts = pgTable(
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     flashcardId: varchar("flashcard_id").notNull().references(() => flashcards.id, { onDelete: "cascade" }),
-    isCorrect: boolean("is_correct").notNull(),
+    rating: integer("rating").notNull(),
     attemptDate: timestamp("attempt_date").defaultNow().notNull(),
     nextReviewDate: timestamp("next_review_date"),
     easeFactor: integer("ease_factor").default(250).notNull(),
@@ -469,10 +469,19 @@ export const flashcardAttempts = pgTable(
 export const insertFlashcardAttemptSchema = createInsertSchema(flashcardAttempts).omit({
   id: true,
   createdAt: true,
+}).extend({
+  rating: z.number().int().min(1).max(4),
 });
 
 export type InsertFlashcardAttempt = z.infer<typeof insertFlashcardAttemptSchema>;
 export type FlashcardAttempt = typeof flashcardAttempts.$inferSelect;
+
+export const recordAttemptSchema = z.object({
+  flashcardId: z.string(),
+  rating: z.number().int().min(1).max(4),
+});
+
+export type RecordAttempt = z.infer<typeof recordAttemptSchema>;
 
 export const studySessionsRelations = relations(studySessions, ({ one }) => ({
   user: one(users, {
