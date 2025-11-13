@@ -31,10 +31,10 @@ export default function AnkiFlashcardDeck({ summaryId }: AnkiFlashcardDeckProps)
     mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
+    onSuccess: async () => {
       setIsFlipped(false);
-      setCurrentIndex(prev => prev + 1);
+      await queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
+      setCurrentIndex(0);
     },
     onError: () => {
       toast({

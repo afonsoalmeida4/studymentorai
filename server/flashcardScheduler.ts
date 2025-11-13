@@ -20,8 +20,17 @@ export function calculateNextReview(
   if (rating < 3) {
     repetitions = 0;
     intervalDays = 1;
+    easeFactor = Math.round(
+      easeFactor + (10 - (4 - rating) * (8 + (4 - rating) * 2))
+    );
+    easeFactor = Math.max(130, easeFactor);
   } else {
     repetitions += 1;
+    
+    easeFactor = Math.round(
+      easeFactor + (10 - (4 - rating) * (8 + (4 - rating) * 2))
+    );
+    easeFactor = Math.max(130, easeFactor);
     
     if (repetitions === 1) {
       intervalDays = 1;
@@ -30,11 +39,6 @@ export function calculateNextReview(
     } else {
       intervalDays = Math.round(intervalDays * (easeFactor / 100));
     }
-
-    easeFactor = Math.round(
-      easeFactor + (10 - (4 - rating) * (8 + (4 - rating) * 2))
-    );
-    easeFactor = Math.max(130, easeFactor);
   }
 
   const nextReviewDate = new Date(now);
