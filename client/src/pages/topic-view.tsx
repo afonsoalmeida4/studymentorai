@@ -18,6 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Topic, ContentItem } from "@shared/schema";
 
 export default function TopicView() {
@@ -31,6 +38,7 @@ export default function TopicView() {
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
   const [isSummariesDialogOpen, setIsSummariesDialogOpen] = useState(false);
+  const [selectedLearningStyle, setSelectedLearningStyle] = useState<string>("visual");
 
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
@@ -63,21 +71,21 @@ export default function TopicView() {
   });
 
   const generateSummariesMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (learningStyle: string) => {
       if (!topicId) throw new Error("Topic ID required");
-      return apiRequest("POST", `/api/topics/${topicId}/summaries`, {});
+      return apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle });
     },
     onSuccess: () => {
       toast({
-        title: "Resumos gerados com sucesso!",
-        description: "Os resumos do tópico foram criados para os 4 estilos de aprendizagem.",
+        title: "Resumo gerado com sucesso!",
+        description: "O resumo do tópico foi criado no estilo selecionado.",
       });
       refetchTopicSummaries();
     },
     onError: (error: any) => {
       toast({
-        title: "Erro ao gerar resumos",
-        description: error.message || "Não foi possível gerar os resumos. Tente novamente.",
+        title: "Erro ao gerar resumo",
+        description: error.message || "Não foi possível gerar o resumo. Tente novamente.",
         variant: "destructive",
       });
     },
@@ -190,7 +198,7 @@ export default function TopicView() {
   };
 
   const handleManualGenerate = () => {
-    generateSummariesMutation.mutate();
+    generateSummariesMutation.mutate(selectedLearningStyle);
   };
 
   return (
@@ -488,24 +496,32 @@ export default function TopicView() {
               <p className="text-muted-foreground">A carregar resumos...</p>
             </div>
           ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (
-            <Tabs defaultValue="visual" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="visual" data-testid="tab-visual">
-                  Visual
-                </TabsTrigger>
-                <TabsTrigger value="auditivo" data-testid="tab-auditivo">
-                  Auditivo
-                </TabsTrigger>
-                <TabsTrigger value="logico" data-testid="tab-logico">
-                  Lógico
-                </TabsTrigger>
-                <TabsTrigger value="conciso" data-testid="tab-conciso">
-                  Conciso
-                </TabsTrigger>
+            <Tabs defaultValue={Object.keys(topicSummariesData.summaries)[0]} className="w-full">
+              <TabsList className={`grid w-full grid-cols-${Object.keys(topicSummariesData.summaries).length}`}>
+                {topicSummariesData.summaries.visual && (
+                  <TabsTrigger value="visual" data-testid="tab-visual">
+                    Visual
+                  </TabsTrigger>
+                )}
+                {topicSummariesData.summaries.auditivo && (
+                  <TabsTrigger value="auditivo" data-testid="tab-auditivo">
+                    Auditivo
+                  </TabsTrigger>
+                )}
+                {topicSummariesData.summaries.logico && (
+                  <TabsTrigger value="logico" data-testid="tab-logico">
+                    Lógico
+                  </TabsTrigger>
+                )}
+                {topicSummariesData.summaries.conciso && (
+                  <TabsTrigger value="conciso" data-testid="tab-conciso">
+                    Conciso
+                  </TabsTrigger>
+                )}
               </TabsList>
 
-              <TabsContent value="visual" className="mt-4">
-                {topicSummariesData.summaries.visual ? (
+              {topicSummariesData.summaries.visual && (
+                <TabsContent value="visual" className="mt-4">
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -527,13 +543,11 @@ export default function TopicView() {
                       </Card>
                     )}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">Resumo visual não disponível</p>
-                )}
-              </TabsContent>
+                </TabsContent>
+              )}
 
-              <TabsContent value="auditivo" className="mt-4">
-                {topicSummariesData.summaries.auditivo ? (
+              {topicSummariesData.summaries.auditivo && (
+                <TabsContent value="auditivo" className="mt-4">
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -555,13 +569,11 @@ export default function TopicView() {
                       </Card>
                     )}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">Resumo auditivo não disponível</p>
-                )}
-              </TabsContent>
+                </TabsContent>
+              )}
 
-              <TabsContent value="logico" className="mt-4">
-                {topicSummariesData.summaries.logico ? (
+              {topicSummariesData.summaries.logico && (
+                <TabsContent value="logico" className="mt-4">
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -583,13 +595,11 @@ export default function TopicView() {
                       </Card>
                     )}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">Resumo lógico não disponível</p>
-                )}
-              </TabsContent>
+                </TabsContent>
+              )}
 
-              <TabsContent value="conciso" className="mt-4">
-                {topicSummariesData.summaries.conciso ? (
+              {topicSummariesData.summaries.conciso && (
+                <TabsContent value="conciso" className="mt-4">
                   <div className="space-y-4">
                     <Card>
                       <CardHeader>
@@ -611,27 +621,45 @@ export default function TopicView() {
                       </Card>
                     )}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">Resumo conciso não disponível</p>
-                )}
-              </TabsContent>
+                </TabsContent>
+              )}
             </Tabs>
           ) : (
-            <div className="py-8 text-center space-y-4">
+            <div className="py-8 text-center space-y-6">
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
                 Ainda não há resumos disponíveis para este tópico.
               </p>
               <p className="text-xs text-muted-foreground">
-                Clique no botão abaixo para criar resumos agregados de todo o conteúdo deste tópico.
+                Escolha um estilo de aprendizagem e gere um resumo agregado de todo o conteúdo.
               </p>
-              <Button
-                onClick={handleManualGenerate}
-                disabled={generateSummariesMutation.isPending}
-                data-testid="button-manual-generate"
-              >
-                {generateSummariesMutation.isPending ? "A gerar..." : "Gerar Resumos Agora"}
-              </Button>
+              <div className="max-w-xs mx-auto space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="learning-style-select">Estilo de Aprendizagem</Label>
+                  <Select
+                    value={selectedLearningStyle}
+                    onValueChange={setSelectedLearningStyle}
+                  >
+                    <SelectTrigger id="learning-style-select" data-testid="select-learning-style">
+                      <SelectValue placeholder="Selecione um estilo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="visual">Visual</SelectItem>
+                      <SelectItem value="auditivo">Auditivo</SelectItem>
+                      <SelectItem value="logico">Lógico</SelectItem>
+                      <SelectItem value="conciso">Conciso</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={handleManualGenerate}
+                  disabled={generateSummariesMutation.isPending}
+                  data-testid="button-manual-generate"
+                  className="w-full"
+                >
+                  {generateSummariesMutation.isPending ? "A gerar..." : "Gerar Resumo"}
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
