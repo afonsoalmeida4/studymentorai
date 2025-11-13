@@ -106,7 +106,17 @@ export default function FlashcardDeck({ flashcards }: FlashcardDeckProps) {
     });
   };
 
-  const progress = (reviewedCards.size / flashcards.length) * 100;
+  // Guard against division by zero
+  const progress = flashcards.length > 0 ? (reviewedCards.size / flashcards.length) * 100 : 0;
+
+  // Handle empty flashcards case
+  if (flashcards.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        <p>Nenhum flashcard disponível.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
