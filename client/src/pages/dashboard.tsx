@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { GamificationHeader } from "@/components/GamificationHeader";
+import { AppHeader } from "@/components/AppHeader";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -50,6 +51,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <AppHeader />
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" data-testid="title-dashboard">Dashboard de Estudo</h1>

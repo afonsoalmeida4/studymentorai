@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LevelBadge } from "@/components/LevelBadge";
+import { AppHeader } from "@/components/AppHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trophy, Medal, Award } from "lucide-react";
 import { type UserLevel } from "@shared/schema";
@@ -35,8 +36,9 @@ export default function Ranking() {
   });
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="max-w-4xl mx-auto space-y-6 p-6">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold" data-testid="heading-ranking">
             Classificação Global
