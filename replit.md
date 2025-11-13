@@ -6,6 +6,30 @@ AI Study Mentor is an educational productivity application that transforms PDF d
 
 ## Recent Changes (November 13, 2025)
 
+### Gamification System Foundation (PAUSED - 4 of 17 tasks completed)
+**Database Schema:**
+- Extended `users` table with gamification fields: displayName, totalXp, currentLevel, premiumActive, premiumSince, lastDailyChatXp
+- Created `xp_events` table to track XP awards with action type and metadata
+- Created `chat_threads` and `chat_messages` tables for Premium AI mentor feature
+- Defined 4 user levels: Iniciante (0-299 XP), Explorador (300-899), Mentor (900-1999), Mestre (2000+)
+- All database migrations applied successfully
+
+**Business Logic:**
+- Created `shared/gamification.ts` with XP reward constants and helper functions
+- Defined XP rewards: Upload PDF (+50), Generate Summary (+100), Flashcards (+30), Study Session (+20 + 5 per correct)
+- Built `server/gamificationService.ts` with core gamification engine:
+  - `awardXP()` - awards XP, detects level-ups, gives level-up bonus (+50 XP)
+  - `getGamificationProfile()` - returns user stats, level info, recent XP events, rank
+  - `getLeaderboard()` - top users by XP
+  - `activatePremium()` - enables premium features
+  - Daily chat XP limiting (once per day, +40 XP)
+- Icons configured for lucide-react (feather, book-open, brain, rocket)
+
+**Remaining Work (13 tasks):**
+- Backend: API endpoints, XP integration into existing routes, Chat mentor with OpenAI
+- Frontend: Gamification components, 4 new pages, sidebar navigation, premium theme
+- Testing: End-to-end validation of all features
+
 ### Flashcard Generation Fix
 - **Improved JSON parsing**: Added robust handling for markdown code blocks (```json) in AI responses
 - **Better error handling**: Enhanced error messages and logging for flashcard generation failures
