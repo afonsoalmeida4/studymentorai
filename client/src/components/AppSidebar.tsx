@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -93,6 +93,24 @@ export function AppSidebar() {
         </SidebarHeader>
 
         <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Navegação</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => setLocation("/")}
+                    isActive={location === "/"}
+                    data-testid="button-home"
+                  >
+                    <Home className="w-4 h-4" />
+                    <span>Início</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
           <SidebarGroup>
             <div className="flex items-center justify-between px-2">
               <SidebarGroupLabel>Disciplinas</SidebarGroupLabel>

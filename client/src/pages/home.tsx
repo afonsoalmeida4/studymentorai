@@ -1,526 +1,262 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import type { ApiSummary, LearningStyle, GenerateSummaryResponse } from "@shared/schema";
-import SummaryStudySection from "@/components/SummaryStudySection";
-import { 
-  Upload, 
-  FileText, 
-  Eye, 
-  Volume2, 
-  Brain, 
-  Zap, 
-  Sparkles, 
-  CheckCircle2, 
-  XCircle,
-  Loader2,
-  Lightbulb,
-  GraduationCap,
-  BarChart3
-} from "lucide-react";
-import { AppHeader } from "@/components/AppHeader";
-
-const learningStylesConfig = [
-  {
-    id: "visual" as LearningStyle,
-    title: "Visual",
-    description: "Diagramas, imagens e organização visual",
-    icon: Eye,
-  },
-  {
-    id: "auditivo" as LearningStyle,
-    title: "Auditivo",
-    description: "Explicações narrativas e conversacionais",
-    icon: Volume2,
-  },
-  {
-    id: "logico" as LearningStyle,
-    title: "Lógico",
-    description: "Estruturas, passos e raciocínio analítico",
-    icon: Brain,
-  },
-  {
-    id: "conciso" as LearningStyle,
-    title: "Conciso",
-    description: "Pontos-chave diretos e objetivos",
-    icon: Zap,
-  },
-];
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GraduationCap, BookOpen, Brain, Sparkles, ArrowRight, Plus, FileText } from "lucide-react";
+import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import type { Subject, Topic } from "@shared/schema";
 
 export default function Home() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedStyle, setSelectedStyle] = useState<LearningStyle | null>(null);
-  const [dragActive, setDragActive] = useState(false);
-  const [generatedSummary, setGeneratedSummary] = useState<ApiSummary | null>(null);
-  const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
-  const generateMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedFile || !selectedStyle) {
-        throw new Error("Ficheiro e estilo de aprendizagem são obrigatórios");
-      }
+  const { data: subjects = [] } = useQuery<Subject[]>({
+    queryKey: ["/api/subjects"],
+    select: (data: any) => data.subjects || [],
+  });
 
-      const formData = new FormData();
-      formData.append("pdf", selectedFile);
-      formData.append("learningStyle", selectedStyle);
-
-      const response = await fetch("/api/generate-summary", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao gerar resumo");
-      }
-
-      return response.json() as Promise<GenerateSummaryResponse>;
-    },
-    onSuccess: (data) => {
-      if (data.success && data.summary) {
-        setGeneratedSummary(data.summary);
-        toast({
-          title: "Resumo gerado com sucesso!",
-          description: "O seu resumo personalizado está pronto.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: data.error || "Não foi possível gerar o resumo.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "Erro ao processar PDF",
-        description: error.message,
-      });
+  const { data: allTopics = [] } = useQuery<Topic[]>({
+    queryKey: ["/api/topics"],
+    queryFn: async () => {
+      const res = await fetch("/api/topics");
+      if (!res.ok) throw new Error("Failed to fetch topics");
+      const data = await res.json();
+      return data.topics || [];
     },
   });
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.type === "application/pdf") {
-        setSelectedFile(file);
-        setGeneratedSummary(null);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Tipo de ficheiro inválido",
-          description: "Por favor, selecione apenas ficheiros PDF.",
-        });
-      }
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type === "application/pdf") {
-        setSelectedFile(file);
-        setGeneratedSummary(null);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Tipo de ficheiro inválido",
-          description: "Por favor, selecione apenas ficheiros PDF.",
-        });
-      }
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setSelectedFile(null);
-    setGeneratedSummary(null);
-  };
-
-  const handleGenerate = () => {
-    if (!selectedFile) {
-      toast({
-        variant: "destructive",
-        title: "Ficheiro em falta",
-        description: "Por favor, selecione um ficheiro PDF.",
-      });
-      return;
-    }
-    if (!selectedStyle) {
-      toast({
-        variant: "destructive",
-        title: "Estilo em falta",
-        description: "Por favor, selecione um estilo de aprendizagem.",
-      });
-      return;
-    }
-    generateMutation.mutate();
-  };
-
-  const handleReset = () => {
-    setSelectedFile(null);
-    setSelectedStyle(null);
-    setGeneratedSummary(null);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
-  };
+  const recentTopics = allTopics.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-
-      {/* Hero Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10">
-              <GraduationCap className="w-9 h-9 text-primary" />
+              <GraduationCap className="w-10 h-10 text-primary" />
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-            AI Study Mentor
+            Bem-vindo ao AI Study Mentor
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-6 leading-relaxed">
-            Transforme os seus documentos PDF em resumos personalizados adaptados ao seu estilo de aprendizagem único
+          <p className="text-xl text-muted-foreground mb-2">
+            Organiza o teu conhecimento. Encontra o teu equilíbrio.
           </p>
-          <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span>Adapta-se a si</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-primary" />
-              <span>Powered by GPT-5</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <span>Poupe tempo</span>
-            </div>
-          </div>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Uma plataforma completa para organizar materiais de estudo, processar documentos com IA e encontrar apoio na tua jornada de aprendizagem.
+          </p>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="pb-12 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8">Funcionalidades</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Summary Generator Feature */}
-            <Card className="hover-elevate" data-testid="card-feature-summaries">
-              <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
-                  <FileText className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">Resumos Personalizados</CardTitle>
-                <CardDescription>
-                  Gere resumos adaptados ao seu estilo de aprendizagem (Visual, Auditivo, Lógico ou Conciso)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Carregue um PDF e obtenha um resumo otimizado para a forma como aprende melhor
-                </p>
+        {/* Stats Overview */}
+        {subjects.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-2xl font-bold text-foreground">{subjects.length}</div>
+                <p className="text-sm text-muted-foreground">Disciplinas</p>
               </CardContent>
             </Card>
-
-            {/* Flashcards Feature */}
-            <Card className="hover-elevate" data-testid="card-feature-flashcards">
-              <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
-                  <Brain className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">Flashcards Interativos</CardTitle>
-                <CardDescription>
-                  Pratique com flashcards 3D gerados automaticamente a partir dos seus resumos
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Teste os seus conhecimentos com perguntas e respostas criadas por IA
-                </p>
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-2xl font-bold text-foreground">{allTopics.length}</div>
+                <p className="text-sm text-muted-foreground">Tópicos</p>
               </CardContent>
             </Card>
-
-            {/* Dashboard Feature */}
-            <Card className="hover-elevate h-full cursor-pointer" data-testid="card-feature-dashboard" onClick={() => window.location.href = '/dashboard'}>
-              <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-3">
-                  <BarChart3 className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">Dashboard de Progresso</CardTitle>
-                <CardDescription>
-                  Acompanhe o seu progresso e receba recomendações de revisão personalizadas
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Visualize estatísticas, PDFs estudados e sessões recentes
-                </p>
-                <div className="flex items-center justify-center gap-2 text-sm font-medium text-primary">
-                  <span>Ver Dashboard</span>
-                  <BarChart3 className="w-4 h-4" />
-                </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-2xl font-bold text-foreground">2</div>
+                <p className="text-sm text-muted-foreground">Modos AI</p>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Main Content */}
-      <section className="pb-16 px-4">
-        <div className="max-w-2xl mx-auto space-y-8">
-          {/* Upload Section */}
-          {!generatedSummary && (
-            <>
-              <Card className="border-2">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Carregar Documento</CardTitle>
-                  <CardDescription>
-                    Selecione ou arraste um ficheiro PDF (máx. 10MB)
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {!selectedFile ? (
-                    <div
-                      className={`relative border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-                        dragActive
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover-elevate"
-                      }`}
-                      onDragEnter={handleDrag}
-                      onDragLeave={handleDrag}
-                      onDragOver={handleDrag}
-                      onDrop={handleDrop}
-                      data-testid="dropzone-upload"
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="hover-elevate cursor-pointer" onClick={() => setLocation("/subjects")} data-testid="card-subjects">
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <BookOpen className="w-6 h-6 text-blue-500" />
+                </div>
+                <CardTitle className="text-lg">Disciplinas</CardTitle>
+              </div>
+              <CardDescription>
+                {subjects.length === 0 
+                  ? "Crie a sua primeira disciplina para começar"
+                  : `${subjects.length} disciplina${subjects.length !== 1 ? 's' : ''} criada${subjects.length !== 1 ? 's' : ''}`
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="ghost" size="sm" className="w-full justify-between">
+                {subjects.length === 0 ? "Criar Disciplina" : "Ver Disciplinas"}
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover-elevate cursor-pointer" onClick={() => setLocation("/chat")} data-testid="card-chat">
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-purple-500/10">
+                  <Brain className="w-6 h-6 text-purple-500" />
+                </div>
+                <CardTitle className="text-lg">AI Mentor</CardTitle>
+              </div>
+              <CardDescription>
+                Converse em modo Estudo ou Existencial
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="ghost" size="sm" className="w-full justify-between">
+                Abrir Chat
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover-elevate">
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-amber-500/10">
+                  <Sparkles className="w-6 h-6 text-amber-500" />
+                </div>
+                <CardTitle className="text-lg">Resumos IA</CardTitle>
+              </div>
+              <CardDescription>
+                Gere resumos personalizados automaticamente
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Faça upload de PDF, Word ou PowerPoint nos seus tópicos
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Topics or Getting Started */}
+        {subjects.length === 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Começar</CardTitle>
+              <CardDescription>
+                Siga estes passos para aproveitar ao máximo o AI Study Mentor
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Crie uma Disciplina</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Use a sidebar à esquerda e clique no botão + para criar a sua primeira disciplina
+                    </p>
+                    <Button 
+                      size="sm" 
+                      onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="button-add-subject"]')?.click()}
+                      data-testid="button-cta-create-subject"
                     >
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        data-testid="input-file"
-                      />
-                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-base font-medium mb-2 text-foreground">
-                        Clique para selecionar ou arraste o ficheiro
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Apenas ficheiros PDF até 10MB
-                      </p>
-                    </div>
-                  ) : (
-                    <Card className="border-primary/20 bg-primary/5" data-testid="card-selected-file">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-4">
-                          <div className="flex-shrink-0">
-                            <FileText className="w-8 h-8 text-primary" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-foreground truncate" data-testid="text-filename">
-                              {selectedFile.name}
-                            </p>
-                            <p className="text-sm text-muted-foreground" data-testid="text-filesize">
-                              {formatFileSize(selectedFile.size)}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleRemoveFile}
-                            data-testid="button-remove-file"
-                          >
-                            <XCircle className="w-5 h-5" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Learning Style Selection */}
-              <Card className="border-2">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Estilo de Aprendizagem</CardTitle>
-                  <CardDescription>
-                    Escolha como prefere receber informação
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {learningStylesConfig.map((style) => {
-                      const Icon = style.icon;
-                      const isSelected = selectedStyle === style.id;
-                      return (
-                        <Card
-                          key={style.id}
-                          className={`cursor-pointer transition-all hover-elevate active-elevate-2 ${
-                            isSelected
-                              ? "border-primary border-2 bg-primary/5"
-                              : "border-border"
-                          }`}
-                          onClick={() => setSelectedStyle(style.id)}
-                          data-testid={`card-style-${style.id}`}
-                        >
-                          <CardContent className="p-6 text-center">
-                            <Icon className="w-8 h-8 mx-auto mb-4 text-primary" />
-                            <h3 className="text-xl font-semibold mb-2 text-foreground">
-                              {style.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                              {style.description}
-                            </p>
-                            {isSelected && (
-                              <div className="mt-4">
-                                <Badge variant="default" className="gap-1">
-                                  <CheckCircle2 className="w-3 h-3" />
-                                  Selecionado
-                                </Badge>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                      <Plus className="w-4 h-4 mr-2" />
+                      Criar Disciplina
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              {/* Generate Button */}
-              <div className="flex justify-center">
-                <Button
-                  size="lg"
-                  className="px-8 py-6 text-base font-semibold"
-                  onClick={handleGenerate}
-                  disabled={!selectedFile || !selectedStyle || generateMutation.isPending}
-                  data-testid="button-generate"
-                >
-                  {generateMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      A processar...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5 mr-2" />
-                      Gerar Resumo
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {generateMutation.isPending && (
-                <Card className="border-primary/20 bg-primary/5">
-                  <CardContent className="p-6 text-center">
-                    <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-primary" />
-                    <p className="text-base font-medium mb-2 text-foreground">
-                      A extrair texto do PDF...
-                    </p>
+                <div className="flex gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Adicione Tópicos</h3>
                     <p className="text-sm text-muted-foreground">
-                      A gerar o seu resumo personalizado. Isto pode demorar alguns momentos.
+                      Dentro de cada disciplina, crie tópicos específicos para organizar o conteúdo
                     </p>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          )}
-
-          {/* Summary Display */}
-          {generatedSummary && (
-            <div className="space-y-6">
-              <Card className="border-2">
-                <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-4">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-2xl mb-2">Resumo Personalizado</CardTitle>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="secondary" data-testid="badge-filename">
-                        <FileText className="w-3 h-3 mr-1" />
-                        {generatedSummary.fileName}
-                      </Badge>
-                      <Badge variant="default" data-testid="badge-style">
-                        {learningStylesConfig.find(s => s.id === generatedSummary.learningStyle)?.title}
-                      </Badge>
-                    </div>
                   </div>
-                </CardHeader>
-                <Separator />
-                <CardContent className="pt-6">
-                  <div
-                    className="prose prose-lg max-w-none font-serif leading-loose text-foreground"
-                    data-testid="text-summary"
-                  >
-                    {generatedSummary.summary.split('\n').map((paragraph, index) => (
-                      paragraph.trim() && (
-                        <p key={index} className="mb-4">
-                          {paragraph}
-                        </p>
-                      )
-                    ))}
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
+                    3
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Motivational Message */}
-              <Card className="border-2 border-primary/20 bg-primary/5">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      <Lightbulb className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <p
-                        className="text-xl italic font-light text-foreground leading-relaxed"
-                        data-testid="text-motivation"
-                      >
-                        {generatedSummary.motivationalMessage}
-                      </p>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Faça Upload de Materiais</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Adicione ficheiros (PDF, DOCX, PPTX) ou links externos, com resumo IA opcional
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              {/* Flashcards Study Section */}
-              <SummaryStudySection summaryId={generatedSummary.id} />
-
-              {/* Action Buttons */}
-              <div className="flex justify-center gap-4">
-                <Button
-                  variant="outline"
-                  onClick={handleReset}
-                  data-testid="button-new-summary"
-                >
-                  Novo Resumo
-                </Button>
+                <div className="flex gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
+                    4
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Converse com o AI Mentor</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Use o modo Estudo para ajuda com conteúdo ou Existencial para motivação
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </section>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Tópicos Recentes</CardTitle>
+              <CardDescription>
+                Os seus tópicos mais recentemente criados
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recentTopics.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">Ainda não tem tópicos</p>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => setLocation("/subjects")}
+                  >
+                    Criar Primeiro Tópico
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {recentTopics.map((topic) => {
+                    const subject = subjects.find(s => s.id === topic.subjectId);
+                    return (
+                      <div
+                        key={topic.id}
+                        className="flex items-center gap-3 p-3 rounded-lg hover-elevate cursor-pointer"
+                        onClick={() => setLocation(`/topic/${topic.id}`)}
+                        data-testid={`recent-topic-${topic.id}`}
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: subject?.color ?? "#6366f1" }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{topic.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {subject?.name ?? "Disciplina"}
+                          </p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
