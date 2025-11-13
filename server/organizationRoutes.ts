@@ -76,7 +76,11 @@ async function aggregateTopicContent(topicId: string): Promise<string> {
   return aggregatedText.trim();
 }
 
-async function generateTopicSummaries(topicId: string, userId: string): Promise<boolean> {
+async function generateTopicSummaries(
+  topicId: string, 
+  userId: string,
+  specificStyle?: "visual" | "auditivo" | "logico" | "conciso"
+): Promise<boolean> {
   try {
     const aggregatedContent = await aggregateTopicContent(topicId);
 
@@ -85,11 +89,14 @@ async function generateTopicSummaries(topicId: string, userId: string): Promise<
       return false;
     }
 
-    console.log(`[TopicSummary] Generating summaries for topic ${topicId}, content length: ${aggregatedContent.length}`);
+    console.log(`[TopicSummary] Generating summary for topic ${topicId}, content length: ${aggregatedContent.length}`);
+
+    // If a specific style is requested, generate only that one
+    const stylesToGenerate = specificStyle ? [specificStyle] : learningStyles;
 
     let successCount = 0;
 
-    for (const style of learningStyles) {
+    for (const style of stylesToGenerate) {
       try {
         const result = await generateSummary({
           text: aggregatedContent,
@@ -559,6 +566,7 @@ export function registerOrganizationRoutes(app: Express) {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
+      const { learningStyle } = req.body; // Optional: specific style to generate
 
       // Verify topic belongs to user
       const topic = await db.query.topics.findFirst({
@@ -569,16 +577,16 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(404).json({ success: false, error: "Tópico não encontrado" });
       }
 
-      const success = await generateTopicSummaries(id, userId);
+      const success = await generateTopicSummaries(id, userId, learningStyle);
 
       if (success) {
-        res.json({ success: true, message: "Resumos gerados com sucesso" });
+        res.json({ success: true, message: "Resumo gerado com sucesso" });
       } else {
-        res.status(400).json({ success: false, error: "Não foi possível gerar resumos. Verifique se o tópico tem conteúdo." });
+        res.status(400).json({ success: false, error: "Não foi possível gerar resumo. Verifique se o tópico tem conteúdo." });
       }
     } catch (error) {
       console.error("Error generating topic summaries:", error);
-      res.status(500).json({ success: false, error: "Erro ao gerar resumos" });
+      res.status(500).json({ success: false, error: "Erro ao gerar resumo" });
     }
   });
 
