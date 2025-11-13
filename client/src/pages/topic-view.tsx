@@ -4,6 +4,7 @@ import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink } from "lucide-
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import SummaryStudySection from "@/components/SummaryStudySection";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -30,6 +31,7 @@ import type { Topic, ContentItem } from "@shared/schema";
 type LearningStyle = "visual" | "auditivo" | "logico" | "conciso";
 
 type TopicSummary = {
+  id: string;
   summary: string;
   motivationalMessage: string;
   updatedAt: Date;
@@ -52,7 +54,6 @@ export default function TopicView() {
   const [generateSummary, setGenerateSummary] = useState(true);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
-  const [isSummariesDialogOpen, setIsSummariesDialogOpen] = useState(false);
   const [selectedLearningStyle, setSelectedLearningStyle] = useState<string>("visual");
 
   const { data: topic } = useQuery<Topic>({
@@ -203,16 +204,6 @@ export default function TopicView() {
     }
   };
 
-  const handleGenerateSummaries = () => {
-    if (topicSummariesData?.hasContent) {
-      // If summaries exist, just open dialog
-      setIsSummariesDialogOpen(true);
-    } else if (contents.length > 0) {
-      // If no summaries but has content, generate then open
-      setIsSummariesDialogOpen(true);
-    }
-  };
-
   const handleManualGenerate = () => {
     generateSummariesMutation.mutate(selectedLearningStyle);
   };
@@ -243,16 +234,6 @@ export default function TopicView() {
             <Link2 className="w-4 h-4 mr-2" />
             Adicionar Link
           </Button>
-          {contents.length > 0 && (
-            <Button
-              onClick={handleGenerateSummaries}
-              variant="secondary"
-              data-testid="button-generate-summaries"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {topicSummariesData?.hasContent ? "Ver Resumos" : "Gerar Resumos"}
-            </Button>
-          )}
         </div>
 
         {contents.length === 0 ? (
@@ -378,6 +359,216 @@ export default function TopicView() {
             </TabsContent>
           </Tabs>
         )}
+
+        {/* Secção de Resumos e Estudo - Inline */}
+        {contents.length > 0 && (
+          <div className="mt-12">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold mb-2">Resumo & Estudo</h2>
+              <p className="text-muted-foreground text-sm">
+                Gere resumos adaptados ao teu estilo de aprendizagem e cria flashcards para estudar
+              </p>
+            </div>
+
+            {generateSummariesMutation.isPending ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
+                  <p className="text-muted-foreground">A gerar resumo...</p>
+                  <p className="text-xs text-muted-foreground mt-2">Isto pode demorar 1-2 minutos.</p>
+                </CardContent>
+              </Card>
+            ) : topicSummariesLoading ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">A carregar resumos...</p>
+                </CardContent>
+              </Card>
+            ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (
+              (() => {
+                const summaries = topicSummariesData.summaries;
+                const visual = summaries.visual;
+                const auditivo = summaries.auditivo;
+                const logico = summaries.logico;
+                const conciso = summaries.conciso;
+                
+                const availableStyles = Object.keys(summaries) as LearningStyle[];
+                const gridClass = availableStyles.length === 1 ? "grid-cols-1" 
+                  : availableStyles.length === 2 ? "grid-cols-2"
+                  : availableStyles.length === 3 ? "grid-cols-3"
+                  : "grid-cols-4";
+                
+                return (
+                  <Tabs defaultValue={availableStyles[0]} className="w-full">
+                    <TabsList className={`grid w-full ${gridClass}`}>
+                      {visual ? (
+                        <TabsTrigger value="visual" data-testid="tab-summary-visual">
+                          Visual
+                        </TabsTrigger>
+                      ) : null}
+                      {auditivo ? (
+                        <TabsTrigger value="auditivo" data-testid="tab-summary-auditivo">
+                          Auditivo
+                        </TabsTrigger>
+                      ) : null}
+                      {logico ? (
+                        <TabsTrigger value="logico" data-testid="tab-summary-logico">
+                          Lógico
+                        </TabsTrigger>
+                      ) : null}
+                      {conciso ? (
+                        <TabsTrigger value="conciso" data-testid="tab-summary-conciso">
+                          Conciso
+                        </TabsTrigger>
+                      ) : null}
+                    </TabsList>
+
+                    {visual ? (
+                      <TabsContent value="visual" className="mt-6 space-y-6">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Resumo Visual</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                              {visual.summary}
+                            </p>
+                          </CardContent>
+                        </Card>
+                        {visual.motivationalMessage ? (
+                          <Card className="bg-primary/5 border-primary/20">
+                            <CardContent className="pt-4">
+                              <p className="text-sm italic text-primary">
+                                {visual.motivationalMessage}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        ) : null}
+                        <SummaryStudySection summaryId={visual.id} />
+                      </TabsContent>
+                    ) : null}
+
+                    {auditivo ? (
+                      <TabsContent value="auditivo" className="mt-6 space-y-6">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Resumo Auditivo</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                              {auditivo.summary}
+                            </p>
+                          </CardContent>
+                        </Card>
+                        {auditivo.motivationalMessage ? (
+                          <Card className="bg-primary/5 border-primary/20">
+                            <CardContent className="pt-4">
+                              <p className="text-sm italic text-primary">
+                                {auditivo.motivationalMessage}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        ) : null}
+                        <SummaryStudySection summaryId={auditivo.id} />
+                      </TabsContent>
+                    ) : null}
+
+                    {logico ? (
+                      <TabsContent value="logico" className="mt-6 space-y-6">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Resumo Lógico</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                              {logico.summary}
+                            </p>
+                          </CardContent>
+                        </Card>
+                        {logico.motivationalMessage ? (
+                          <Card className="bg-primary/5 border-primary/20">
+                            <CardContent className="pt-4">
+                              <p className="text-sm italic text-primary">
+                                {logico.motivationalMessage}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        ) : null}
+                        <SummaryStudySection summaryId={logico.id} />
+                      </TabsContent>
+                    ) : null}
+
+                    {conciso ? (
+                      <TabsContent value="conciso" className="mt-6 space-y-6">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Resumo Conciso</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                              {conciso.summary}
+                            </p>
+                          </CardContent>
+                        </Card>
+                        {conciso.motivationalMessage ? (
+                          <Card className="bg-primary/5 border-primary/20">
+                            <CardContent className="pt-4">
+                              <p className="text-sm italic text-primary">
+                                {conciso.motivationalMessage}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        ) : null}
+                        <SummaryStudySection summaryId={conciso.id} />
+                      </TabsContent>
+                    ) : null}
+                  </Tabs>
+                );
+              })()
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center space-y-6">
+                  <Sparkles className="w-12 h-12 mx-auto text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Ainda não há resumos disponíveis para este tópico.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Escolhe um estilo de aprendizagem e gera um resumo agregado de todo o conteúdo.
+                    </p>
+                  </div>
+                  <div className="max-w-xs mx-auto space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="learning-style-select">Estilo de Aprendizagem</Label>
+                      <Select
+                        value={selectedLearningStyle}
+                        onValueChange={setSelectedLearningStyle}
+                      >
+                        <SelectTrigger id="learning-style-select" data-testid="select-learning-style">
+                          <SelectValue placeholder="Selecione um estilo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="visual">Visual</SelectItem>
+                          <SelectItem value="auditivo">Auditivo</SelectItem>
+                          <SelectItem value="logico">Lógico</SelectItem>
+                          <SelectItem value="conciso">Conciso</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      onClick={handleManualGenerate}
+                      disabled={generateSummariesMutation.isPending}
+                      data-testid="button-manual-generate"
+                      className="w-full"
+                    >
+                      {generateSummariesMutation.isPending ? "A gerar..." : "Gerar Resumo"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
       </div>
 
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
@@ -490,210 +681,6 @@ export default function TopicView() {
               </Button>
             </DialogFooter>
           </form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isSummariesDialogOpen} onOpenChange={setIsSummariesDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" data-testid="dialog-summaries">
-          <DialogHeader>
-            <DialogTitle>Resumos do Tópico</DialogTitle>
-            <DialogDescription>
-              Resumo agregado de todo o conteúdo deste tópico, adaptado aos 4 estilos de aprendizagem
-            </DialogDescription>
-          </DialogHeader>
-          {generateSummariesMutation.isPending ? (
-            <div className="py-8 text-center">
-              <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
-              <p className="text-muted-foreground">A gerar resumos...</p>
-              <p className="text-xs text-muted-foreground mt-2">Isto pode demorar 1-2 minutos.</p>
-            </div>
-          ) : topicSummariesLoading ? (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground">A carregar resumos...</p>
-            </div>
-          ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (
-            (() => {
-              const summaries = topicSummariesData.summaries;
-              const visual = summaries.visual;
-              const auditivo = summaries.auditivo;
-              const logico = summaries.logico;
-              const conciso = summaries.conciso;
-              
-              const availableStyles = Object.keys(summaries) as LearningStyle[];
-              const gridClass = availableStyles.length === 1 ? "grid-cols-1" 
-                : availableStyles.length === 2 ? "grid-cols-2"
-                : availableStyles.length === 3 ? "grid-cols-3"
-                : "grid-cols-4";
-              
-              return (
-            <Tabs defaultValue={availableStyles[0]} className="w-full">
-              <TabsList className={`grid w-full ${gridClass}`}>
-                {visual ? (
-                  <TabsTrigger value="visual" data-testid="tab-visual">
-                    Visual
-                  </TabsTrigger>
-                ) : null}
-                {auditivo ? (
-                  <TabsTrigger value="auditivo" data-testid="tab-auditivo">
-                    Auditivo
-                  </TabsTrigger>
-                ) : null}
-                {logico ? (
-                  <TabsTrigger value="logico" data-testid="tab-logico">
-                    Lógico
-                  </TabsTrigger>
-                ) : null}
-                {conciso ? (
-                  <TabsTrigger value="conciso" data-testid="tab-conciso">
-                    Conciso
-                  </TabsTrigger>
-                ) : null}
-              </TabsList>
-
-              {visual ? (
-                <TabsContent value="visual" className="mt-4">
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Resumo Visual</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {visual.summary}
-                        </p>
-                      </CardContent>
-                    </Card>
-                    {visual.motivationalMessage ? (
-                      <Card className="bg-primary/5 border-primary/20">
-                        <CardContent className="pt-4">
-                          <p className="text-sm italic text-primary">
-                            {visual.motivationalMessage}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ) : null}
-                  </div>
-                </TabsContent>
-              ) : null}
-
-              {auditivo ? (
-                <TabsContent value="auditivo" className="mt-4">
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Resumo Auditivo</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {auditivo.summary}
-                        </p>
-                      </CardContent>
-                    </Card>
-                    {auditivo.motivationalMessage ? (
-                      <Card className="bg-primary/5 border-primary/20">
-                        <CardContent className="pt-4">
-                          <p className="text-sm italic text-primary">
-                            {auditivo.motivationalMessage}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ) : null}
-                  </div>
-                </TabsContent>
-              ) : null}
-
-              {logico ? (
-                <TabsContent value="logico" className="mt-4">
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Resumo Lógico</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {logico.summary}
-                        </p>
-                      </CardContent>
-                    </Card>
-                    {logico.motivationalMessage ? (
-                      <Card className="bg-primary/5 border-primary/20">
-                        <CardContent className="pt-4">
-                          <p className="text-sm italic text-primary">
-                            {logico.motivationalMessage}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ) : null}
-                  </div>
-                </TabsContent>
-              ) : null}
-
-              {conciso ? (
-                <TabsContent value="conciso" className="mt-4">
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Resumo Conciso</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {conciso.summary}
-                        </p>
-                      </CardContent>
-                    </Card>
-                    {conciso.motivationalMessage ? (
-                      <Card className="bg-primary/5 border-primary/20">
-                        <CardContent className="pt-4">
-                          <p className="text-sm italic text-primary">
-                            {conciso.motivationalMessage}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ) : null}
-                  </div>
-                </TabsContent>
-              ) : null}
-            </Tabs>
-              );
-            })()
-          ) : (
-            <div className="py-8 text-center space-y-6">
-              <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                Ainda não há resumos disponíveis para este tópico.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Escolha um estilo de aprendizagem e gere um resumo agregado de todo o conteúdo.
-              </p>
-              <div className="max-w-xs mx-auto space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="learning-style-select">Estilo de Aprendizagem</Label>
-                  <Select
-                    value={selectedLearningStyle}
-                    onValueChange={setSelectedLearningStyle}
-                  >
-                    <SelectTrigger id="learning-style-select" data-testid="select-learning-style">
-                      <SelectValue placeholder="Selecione um estilo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="visual">Visual</SelectItem>
-                      <SelectItem value="auditivo">Auditivo</SelectItem>
-                      <SelectItem value="logico">Lógico</SelectItem>
-                      <SelectItem value="conciso">Conciso</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  onClick={handleManualGenerate}
-                  disabled={generateSummariesMutation.isPending}
-                  data-testid="button-manual-generate"
-                  className="w-full"
-                >
-                  {generateSummariesMutation.isPending ? "A gerar..." : "Gerar Resumo"}
-                </Button>
-              </div>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
     </>

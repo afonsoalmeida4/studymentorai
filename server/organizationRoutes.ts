@@ -613,6 +613,7 @@ export function registerOrganizationRoutes(app: Express) {
       // Group by learning style for easy frontend consumption
       const summariesByStyle = summariesList.reduce((acc, item) => {
         acc[item.learningStyle] = {
+          id: item.id,
           summary: item.summary,
           motivationalMessage: item.motivationalMessage,
           updatedAt: item.updatedAt,
