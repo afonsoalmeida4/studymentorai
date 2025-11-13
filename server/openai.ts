@@ -57,7 +57,7 @@ export async function generateSummary({
           content: `Por favor, crie um resumo do seguinte texto adaptado ao estilo de aprendizagem especificado:\n\n${text}`,
         },
       ],
-      max_completion_tokens: 2048,
+      max_completion_tokens: 8192, // Increased to allow for reasoning tokens + actual response
     });
 
     console.log(`[OpenAI] Summary generation for ${learningStyle} style:`, {
