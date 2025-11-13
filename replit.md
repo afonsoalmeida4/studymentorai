@@ -2,7 +2,37 @@
 
 ## Overview
 
-AI Study Mentor is an educational productivity application that transforms PDF documents into personalized study summaries tailored to different learning styles. The application uses AI (OpenAI GPT-5) to analyze uploaded PDF content and generate summaries optimized for visual, auditory, logical, or concise learning preferences. Additionally, users can generate interactive flashcards from their summaries to enhance retention through active recall. Built with a modern React frontend and Express backend, it emphasizes clarity and user focus, drawing design inspiration from productivity tools like Notion, Linear, and Grammarly.
+AI Study Mentor is an educational productivity application that transforms PDF documents into personalized study summaries tailored to different learning styles. The application uses AI (OpenAI GPT-5) to analyze uploaded PDF content and generate summaries optimized for visual, auditory, logical, or concise learning preferences. Additionally, users can generate interactive flashcards from their summaries to enhance retention through active recall. The dashboard provides comprehensive progress tracking with PDFs studied, flashcard performance, study streaks, and AI-powered spaced repetition recommendations. Built with a modern React frontend and Express backend, it emphasizes clarity and user focus, drawing design inspiration from productivity tools like Notion, Linear, and Grammarly.
+
+## Recent Changes (November 13, 2025)
+
+### Flashcard Generation Fix
+- **Improved JSON parsing**: Added robust handling for markdown code blocks (```json) in AI responses
+- **Better error handling**: Enhanced error messages and logging for flashcard generation failures
+- **Validation**: Filter out flashcards missing required fields before returning to client
+- **Resilience**: Gracefully handles malformed AI responses that previously caused generation to fail
+
+### Dashboard Enhancements
+**New Data Sections:**
+- **PDFs Estudados**: Displays list of studied documents with:
+  - Learning style used
+  - Number of study sessions
+  - Average accuracy per PDF
+  - Last study date (relative time format)
+- **Sessões Recentes**: Shows recent study activity with:
+  - Document name
+  - Correct/incorrect flashcard counts
+  - Session accuracy percentage
+  - Study date (relative time format)
+
+**Empty State Handling:**
+- Both new sections always visible, showing friendly empty states when no data exists
+- Call-to-action buttons to encourage first upload or study session
+
+**Backend Improvements:**
+- Expanded `getDashboardStats` to aggregate per-PDF statistics
+- Efficient SQL joins to retrieve recent sessions with full context
+- Limits to 5 most recent items per section for optimal performance
 
 ## User Preferences
 
