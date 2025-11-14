@@ -229,11 +229,14 @@ export class DatabaseStorage implements IStorage {
     
     console.log("[getTopicSummary] Results count:", results.length);
     if (results.length > 0) {
-      console.log("[getTopicSummary] First result:", JSON.stringify(results[0], null, 2));
+      console.log("[getTopicSummary] First result keys:", Object.keys(results[0]));
+      console.log("[getTopicSummary] Has topic_summaries?", !!results[0].topic_summaries);
     }
     
     const [result] = results;
-    return result?.topic_summaries || null;
+    const returnValue = result?.topic_summaries || null;
+    console.log("[getTopicSummary] Returning:", returnValue ? "object" : "null");
+    return returnValue;
   }
 
   // Study session operations
