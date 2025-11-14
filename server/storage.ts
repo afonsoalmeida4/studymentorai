@@ -233,7 +233,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     const [result] = results;
-    return result?.topicSummaries || null;
+    return result?.topic_summaries || null;
   }
 
   // Study session operations
