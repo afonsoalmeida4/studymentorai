@@ -31,7 +31,7 @@ import { useLocation, Link } from "wouter";
 import type { Subject } from "@shared/schema";
 
 export function AppSidebar() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const { toast } = useToast();
   const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState("");
