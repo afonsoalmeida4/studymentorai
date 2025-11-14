@@ -131,6 +131,9 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
 
     const content = response.choices[0].message.content || "[]";
     
+    console.log("[generateFlashcards] Raw content length:", content.length);
+    console.log("[generateFlashcards] Raw content preview:", content.substring(0, 200));
+    
     // Try to parse JSON, handling potential markdown code blocks
     let cleanedContent = content.trim();
     if (cleanedContent.startsWith("```json")) {
@@ -138,6 +141,8 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
     } else if (cleanedContent.startsWith("```")) {
       cleanedContent = cleanedContent.replace(/```\n?/g, "");
     }
+    
+    console.log("[generateFlashcards] Cleaned content preview:", cleanedContent.substring(0, 200));
     
     // Parse the JSON response
     let flashcards;
@@ -147,6 +152,11 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
       console.error("Failed to parse flashcards JSON:", parseError);
       console.error("Content received:", content.substring(0, 500));
       throw new Error("Formato de resposta inválido da IA");
+    }
+    
+    console.log("[generateFlashcards] Parsed flashcards count:", Array.isArray(flashcards) ? flashcards.length : "not an array");
+    if (Array.isArray(flashcards) && flashcards.length > 0) {
+      console.log("[generateFlashcards] First flashcard:", JSON.stringify(flashcards[0]));
     }
     
     // Validate the structure
@@ -160,8 +170,13 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
       (fc) => fc && fc.question && fc.answer && typeof fc.question === "string" && typeof fc.answer === "string"
     );
     
+    console.log("[generateFlashcards] Valid flashcards:", validFlashcards.length, "out of", flashcards.length);
+    
     if (validFlashcards.length === 0) {
       console.error("No valid flashcards after filtering. Total received:", flashcards.length);
+      if (flashcards.length > 0) {
+        console.error("Sample invalid flashcard:", JSON.stringify(flashcards[0]));
+      }
       throw new Error("Nenhum flashcard válido foi gerado. Por favor, tente novamente.");
     }
     
