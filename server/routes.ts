@@ -23,6 +23,8 @@ import { registerChatRoutes } from "./chatRoutes";
 import { calculateNextReview } from "./flashcardScheduler";
 import { db } from "./db";
 import { and, eq, sql, gt, asc } from "drizzle-orm";
+import * as classService from "./classService";
+import { insertClassSchema, insertClassEnrollmentSchema } from "@shared/schema";
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -788,6 +790,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({
         success: false,
         error: "Erro ao ativar premium",
+      });
+    }
+  });
+
+  // Class Management Endpoints
+
+  // Create a new class (teacher only)
+  app.post("/api/classes", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getOrCreateUser(userId, req.user.claims);
+      
+      if (user.role !== "teacher") {
+        return res.status(403).json({
+          success: false,
+          error: "Apenas professores podem criar turmas",
+        });
+      }
+
+      const validatedData = insertClassSchema.parse(req.body);
+      const newClass = await classService.createClass(userId, validatedData.name, validatedData.description || undefined);
+      
+      return res.json({
+        success: true,
+        class: newClass,
+      });
+    } catch (error) {
+      console.error("Error creating class:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao criar turma",
+      });
+    }
+  });
+
+  // Get teacher's classes
+  app.get("/api/classes", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getOrCreateUser(userId, req.user.claims);
+      
+      if (user.role === "teacher") {
+        const classes = await classService.getTeacherClasses(userId);
+        return res.json({
+          success: true,
+          classes,
+        });
+      } else {
+        const classes = await classService.getStudentClasses(userId);
+        return res.json({
+          success: true,
+          classes,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar turmas",
+      });
+    }
+  });
+
+  // Get class details and students
+  app.get("/api/classes/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const classId = req.params.id;
+      
+      const classRecord = await classService.getClassById(classId);
+      if (!classRecord) {
+        return res.status(404).json({
+          success: false,
+          error: "Turma não encontrada",
+        });
+      }
+
+      const students = await classService.getClassStudents(classId);
+      
+      return res.json({
+        success: true,
+        class: classRecord,
+        students,
+      });
+    } catch (error) {
+      console.error("Error fetching class details:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar detalhes da turma",
+      });
+    }
+  });
+
+  // Join class with invite code
+  app.post("/api/classes/join", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { inviteCode } = req.body;
+      
+      if (!inviteCode) {
+        return res.status(400).json({
+          success: false,
+          error: "Código de convite é obrigatório",
+        });
+      }
+
+      const classRecord = await classService.getClassByInviteCode(inviteCode);
+      if (!classRecord) {
+        return res.status(404).json({
+          success: false,
+          error: "Turma não encontrada com este código",
+        });
+      }
+
+      if (!classRecord.isActive) {
+        return res.status(400).json({
+          success: false,
+          error: "Esta turma não está ativa",
+        });
+      }
+
+      const enrollment = await classService.enrollStudent(classRecord.id, userId);
+      
+      return res.json({
+        success: true,
+        enrollment,
+        class: classRecord,
+      });
+    } catch (error: any) {
+      console.error("Error joining class:", error);
+      if (error.message === "Student already enrolled in this class") {
+        return res.status(400).json({
+          success: false,
+          error: "Já estás inscrito nesta turma",
+        });
+      }
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao juntar-se à turma",
+      });
+    }
+  });
+
+  // Remove student from class (teacher only)
+  app.delete("/api/classes/:classId/students/:studentId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { classId, studentId } = req.params;
+      
+      await classService.removeStudent(classId, studentId, userId);
+      
+      return res.json({
+        success: true,
+      });
+    } catch (error: any) {
+      console.error("Error removing student:", error);
+      return res.status(403).json({
+        success: false,
+        error: error.message || "Erro ao remover aluno",
+      });
+    }
+  });
+
+  // Leave class (student)
+  app.post("/api/classes/:classId/leave", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { classId } = req.params;
+      
+      await classService.leaveClass(classId, userId);
+      
+      return res.json({
+        success: true,
+      });
+    } catch (error) {
+      console.error("Error leaving class:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao sair da turma",
+      });
+    }
+  });
+
+  // Delete class (teacher only)
+  app.delete("/api/classes/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const classId = req.params.id;
+      
+      await classService.deleteClass(classId, userId);
+      
+      return res.json({
+        success: true,
+      });
+    } catch (error: any) {
+      console.error("Error deleting class:", error);
+      return res.status(403).json({
+        success: false,
+        error: error.message || "Erro ao eliminar turma",
+      });
+    }
+  });
+
+  // Update user role
+  app.post("/api/user/role", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { role } = req.body;
+      
+      if (!role || (role !== "student" && role !== "teacher")) {
+        return res.status(400).json({
+          success: false,
+          error: "Role inválido",
+        });
+      }
+
+      const updatedUser = await storage.updateUserRole(userId, role);
+      
+      return res.json({
+        success: true,
+        user: updatedUser,
+      });
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao atualizar role",
       });
     }
   });
