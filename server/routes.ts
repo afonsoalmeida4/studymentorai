@@ -414,6 +414,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get ALL flashcards (for practice mode - ignores schedule)
+  app.get("/api/flashcards/:summaryId/all", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.summaryId;
+
+      // Resolve context (supports both summaryId and topicSummaryId)
+      const context = await resolveFlashcardContext(summaryId, userId);
+      if (!context) {
+        return res.status(404).json({
+          success: false,
+          error: "Resumo não encontrado",
+        });
+      }
+
+      // Fetch all flashcards regardless of schedule
+      let allFlashcards;
+      if (context.type === "topicSummary") {
+        allFlashcards = await storage.getFlashcardsByTopicSummary(summaryId);
+      } else {
+        allFlashcards = await storage.getFlashcardsBySummary(summaryId);
+      }
+      
+      return res.json({
+        success: true,
+        flashcards: allFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+      });
+    } catch (error) {
+      console.error("Error fetching all flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards",
+      });
+    }
+  });
+
   // Record flashcard attempt (Anki-style rating)
   app.post("/api/flashcards/:flashcardId/attempt", isAuthenticated, async (req: any, res) => {
     try {

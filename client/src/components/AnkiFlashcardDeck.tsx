@@ -1,27 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import type { ApiFlashcard } from "@shared/schema";
-import { RotateCw, Check } from "lucide-react";
+import { RotateCw, Check, Clock } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface AnkiFlashcardDeckProps {
   summaryId: string;
+  mode?: "spaced" | "practice";
 }
 
-export default function AnkiFlashcardDeck({ summaryId }: AnkiFlashcardDeckProps) {
+export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFlashcardDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [sessionTime, setSessionTime] = useState(0);
   const { toast } = useToast();
 
+  // Timer de sessão
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSessionTime(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const endpoint = mode === "practice" ? "all" : "due";
   const { data: dueFlashcardsData, isLoading } = useQuery<{ success: boolean; flashcards: ApiFlashcard[] }>({
-    queryKey: ["/api/flashcards", summaryId, "due"],
+    queryKey: ["/api/flashcards", summaryId, endpoint],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/${summaryId}/due`);
+      const res = await fetch(`/api/flashcards/${summaryId}/${endpoint}`);
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },
@@ -49,6 +60,13 @@ export default function AnkiFlashcardDeck({ summaryId }: AnkiFlashcardDeckProps)
   const currentFlashcard = flashcards[currentIndex];
   const completed = currentIndex >= flashcards.length;
   const progress = flashcards.length > 0 ? ((currentIndex / flashcards.length) * 100) : 0;
+
+  // Formatar tempo de sessão (MM:SS)
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleRating = (rating: number) => {
     if (!currentFlashcard) return;
@@ -107,7 +125,13 @@ export default function AnkiFlashcardDeck({ summaryId }: AnkiFlashcardDeckProps)
     <div className="space-y-6">
       <div className="space-y-2" data-testid="flashcard-progress">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Progresso</span>
+          <div className="flex items-center gap-3">
+            <span className="text-muted-foreground">Progresso</span>
+            <Badge variant="outline" className="gap-1.5">
+              <Clock className="w-3 h-3" />
+              {formatTime(sessionTime)}
+            </Badge>
+          </div>
           <span className="font-medium">
             {currentIndex} / {flashcards.length}
           </span>
