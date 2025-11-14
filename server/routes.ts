@@ -12,6 +12,8 @@ import {
   type RecordStudySessionResponse,
   type GetDashboardStatsResponse,
   type GetReviewPlanResponse,
+  flashcards,
+  flashcardAttempts,
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -19,6 +21,8 @@ import { awardXP, getGamificationProfile, getLeaderboard, activatePremium } from
 import { registerOrganizationRoutes } from "./organizationRoutes";
 import { registerChatRoutes } from "./chatRoutes";
 import { calculateNextReview } from "./flashcardScheduler";
+import { db } from "./db";
+import { and, eq, sql, gt, asc } from "drizzle-orm";
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -398,22 +402,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const dueFlashcards = await storage.getDueFlashcards(userId, summaryId);
       
-      // Buscar todos os flashcards para encontrar o próximo disponível
-      let allFlashcards;
-      if (context.type === "topicSummary") {
-        allFlashcards = await storage.getFlashcardsByTopicSummary(summaryId);
-      } else {
-        allFlashcards = await storage.getFlashcardsBySummary(summaryId);
-      }
-
-      // Encontrar o próximo flashcard não-due (com nextReviewAt no futuro)
+      // Buscar o próximo flashcard disponível (query customizada)
       const now = new Date();
-      const upcomingFlashcards = allFlashcards
-        .filter(fc => fc.nextReviewAt && new Date(fc.nextReviewAt) > now)
-        .sort((a, b) => new Date(a.nextReviewAt!).getTime() - new Date(b.nextReviewAt!).getTime());
+      const upcomingQuery = await db
+        .select({
+          nextReviewDate: flashcardAttempts.nextReviewDate,
+        })
+        .from(flashcards)
+        .innerJoin(
+          flashcardAttempts,
+          and(
+            eq(flashcards.id, flashcardAttempts.flashcardId),
+            eq(flashcardAttempts.userId, userId)
+          )
+        )
+        .where(
+          and(
+            sql`(${flashcards.summaryId} = ${summaryId} OR ${flashcards.topicSummaryId} = ${summaryId})`,
+            gt(flashcardAttempts.nextReviewDate, now)
+          )
+        )
+        .orderBy(asc(flashcardAttempts.nextReviewDate))
+        .limit(1);
       
-      const nextAvailableAt = upcomingFlashcards.length > 0 
-        ? upcomingFlashcards[0].nextReviewAt 
+      const nextAvailableAt = upcomingQuery.length > 0 
+        ? upcomingQuery[0].nextReviewDate 
         : null;
       
       return res.json({

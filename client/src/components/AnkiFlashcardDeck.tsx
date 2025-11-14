@@ -36,7 +36,11 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   }, []);
 
   const endpoint = mode === "practice" ? "all" : "due";
-  const { data: dueFlashcardsData, isLoading } = useQuery<{ success: boolean; flashcards: ApiFlashcard[] }>({
+  const { data: dueFlashcardsData, isLoading } = useQuery<{ 
+    success: boolean; 
+    flashcards: ApiFlashcard[];
+    nextAvailableAt?: string | null;
+  }>({
     queryKey: ["/api/flashcards", summaryId, endpoint],
     queryFn: async () => {
       const res = await fetch(`/api/flashcards/${summaryId}/${endpoint}`);
@@ -74,6 +78,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const currentFlashcard = flashcards[currentIndex];
   const completed = currentIndex >= flashcards.length;
   const progress = flashcards.length > 0 ? ((currentIndex / flashcards.length) * 100) : 0;
+  const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
 
   // Formatar tempo de sessão (MM:SS)
   const formatTime = (seconds: number) => {
@@ -81,6 +86,41 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Atualizar countdown a cada minuto
+  const [countdown, setCountdown] = useState<string | null>(null);
+  useEffect(() => {
+    const getTimeUntilNext = () => {
+      if (!nextAvailableAt) return null;
+      
+      const now = new Date();
+      const next = new Date(nextAvailableAt);
+      const diffMs = next.getTime() - now.getTime();
+      
+      if (diffMs <= 0) return "Disponível agora";
+      
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+      }
+      return `${minutes}m`;
+    };
+
+    if (mode === "spaced" && nextAvailableAt) {
+      // Atualizar imediatamente
+      setCountdown(getTimeUntilNext());
+      
+      // Atualizar a cada minuto
+      const interval = setInterval(() => {
+        setCountdown(getTimeUntilNext());
+      }, 60000);
+      return () => clearInterval(interval);
+    } else {
+      setCountdown(null);
+    }
+  }, [mode, nextAvailableAt]);
 
   const handleRating = (rating: number) => {
     if (!currentFlashcard) return;
@@ -105,8 +145,16 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
         <div>
           <h3 className="text-xl font-semibold mb-2">Tudo revisto!</h3>
           <p className="text-muted-foreground">
-            Não tens flashcards para rever agora. Volta mais tarde!
+            Não tens flashcards para rever agora.
           </p>
+          {mode === "spaced" && countdown && (
+            <div className="mt-4">
+              <Badge variant="outline" className="gap-1.5 text-base px-3 py-1.5">
+                <Clock className="w-4 h-4" />
+                Próximo disponível em: {countdown}
+              </Badge>
+            </div>
+          )}
         </div>
       </div>
     );
