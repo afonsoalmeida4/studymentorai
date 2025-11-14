@@ -14,6 +14,7 @@ import ChatView from "@/pages/chat-view";
 import Dashboard from "@/pages/dashboard";
 import Ranking from "@/pages/ranking";
 import RoleSelection from "@/pages/role-selection";
+import MyClasses from "@/pages/my-classes";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
 
@@ -37,6 +38,7 @@ function AuthenticatedRouter() {
             <Route path="/" component={Home} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/ranking" component={Ranking} />
+            <Route path="/classes" component={MyClasses} />
             <Route path="/subjects" component={SubjectView} />
             <Route path="/subject/:id" component={SubjectView} />
             <Route path="/topic/:id" component={TopicView} />

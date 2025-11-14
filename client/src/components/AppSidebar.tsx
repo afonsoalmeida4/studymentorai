@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -28,11 +28,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
-import type { Subject } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
+import type { Subject, User } from "@shared/schema";
 
 export function AppSidebar() {
   const [location] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const typedUser = user as User | null;
   const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState("");
   const [newSubjectDescription, setNewSubjectDescription] = useState("");
@@ -138,6 +141,20 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                {typedUser?.role === "teacher" && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location === "/classes"}
+                      data-testid="button-classes"
+                    >
+                      <Link href="/classes">
+                        <Users className="w-4 h-4" />
+                        <span>Minhas Turmas</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
