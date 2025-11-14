@@ -13,9 +13,18 @@ import TopicView from "@/pages/topic-view";
 import ChatView from "@/pages/chat-view";
 import Dashboard from "@/pages/dashboard";
 import Ranking from "@/pages/ranking";
+import RoleSelection from "@/pages/role-selection";
 import NotFound from "@/pages/not-found";
+import type { User } from "@shared/schema";
 
 function AuthenticatedRouter() {
+  const { user } = useAuth();
+  const typedUser = user as User | null;
+
+  if (typedUser && !typedUser.role) {
+    return <RoleSelection />;
+  }
+
   return (
     <div className="flex h-screen w-full">
       <AppSidebar />
