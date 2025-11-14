@@ -20,6 +20,13 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const [sessionTime, setSessionTime] = useState(0);
   const { toast } = useToast();
 
+  // Resetar progresso quando mudar de modo
+  useEffect(() => {
+    setCurrentIndex(0);
+    setSessionTime(0);
+    setIsFlipped(false);
+  }, [mode]);
+
   // Timer de sessão
   useEffect(() => {
     const interval = setInterval(() => {
@@ -44,8 +51,15 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     },
     onSuccess: async () => {
       setIsFlipped(false);
-      await queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
-      setCurrentIndex(0);
+      
+      if (mode === "spaced") {
+        // Modo Anki: invalidar query porque a lista "due" mudou
+        await queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
+        setCurrentIndex(0);
+      } else {
+        // Modo prática: avançar para o próximo flashcard
+        setCurrentIndex(prev => prev + 1);
+      }
     },
     onError: () => {
       toast({
@@ -105,17 +119,21 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
         <div>
           <h3 className="text-xl font-semibold mb-2">Sessão concluída!</h3>
           <p className="text-muted-foreground">
-            Reviste {flashcards.length} flashcard{flashcards.length !== 1 ? 's' : ''}.
+            {mode === "spaced" ? "Reviste" : "Praticaste"} {flashcards.length} flashcard{flashcards.length !== 1 ? 's' : ''}.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Tempo: {formatTime(sessionTime)}
           </p>
         </div>
         <Button
           onClick={() => {
             setCurrentIndex(0);
-            queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
+            setSessionTime(0);
+            queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, endpoint] });
           }}
           data-testid="button-restart-study"
         >
-          Rever novamente
+          {mode === "spaced" ? "Rever novamente" : "Praticar novamente"}
         </Button>
       </div>
     );
