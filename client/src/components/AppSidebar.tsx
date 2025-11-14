@@ -27,7 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import type { Subject } from "@shared/schema";
 
 export function AppSidebar() {
@@ -104,32 +104,38 @@ export function AppSidebar() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => setLocation("/")}
+                    asChild
                     isActive={location === "/"}
                     data-testid="button-home"
                   >
-                    <Home className="w-4 h-4" />
-                    <span>Início</span>
+                    <Link href="/">
+                      <Home className="w-4 h-4" />
+                      <span>Início</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => setLocation("/dashboard")}
+                    asChild
                     isActive={location === "/dashboard"}
                     data-testid="button-dashboard"
                   >
-                    <BarChart3 className="w-4 h-4" />
-                    <span>Dashboard</span>
+                    <Link href="/dashboard">
+                      <BarChart3 className="w-4 h-4" />
+                      <span>Dashboard</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => setLocation("/ranking")}
+                    asChild
                     isActive={location === "/ranking"}
                     data-testid="button-ranking"
                   >
-                    <Trophy className="w-4 h-4" />
-                    <span>Ranking</span>
+                    <Link href="/ranking">
+                      <Trophy className="w-4 h-4" />
+                      <span>Ranking</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -161,15 +167,17 @@ export function AppSidebar() {
                   subjects.map((subject) => (
                     <SidebarMenuItem key={subject.id}>
                       <SidebarMenuButton
-                        onClick={() => setLocation(`/subject/${subject.id}`)}
+                        asChild
                         isActive={location === `/subject/${subject.id}`}
                         data-testid={`button-subject-${subject.id}`}
                       >
-                        <div
-                          className="w-3 h-3 rounded-sm"
-                          style={{ backgroundColor: subject.color ?? "#6366f1" }}
-                        />
-                        <span>{subject.name}</span>
+                        <Link href={`/subject/${subject.id}`}>
+                          <div
+                            className="w-3 h-3 rounded-sm"
+                            style={{ backgroundColor: subject.color ?? "#6366f1" }}
+                          />
+                          <span>{subject.name}</span>
+                        </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))
@@ -184,12 +192,14 @@ export function AppSidebar() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => setLocation("/chat")}
+                    asChild
                     isActive={location === "/chat"}
                     data-testid="button-ai-chat"
                   >
-                    <Brain className="w-4 h-4" />
-                    <span>AI Mentor</span>
+                    <Link href="/chat">
+                      <Brain className="w-4 h-4" />
+                      <span>AI Mentor</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
