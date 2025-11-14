@@ -6,6 +6,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { GraduationCap, UserRound } from "lucide-react";
 import type { User } from "@shared/schema";
+import { useEffect } from "react";
 
 export default function RoleSelection() {
   const { user } = useAuth();
@@ -21,14 +22,19 @@ export default function RoleSelection() {
     },
   });
 
+  const typedUser = user as User | null;
+
+  useEffect(() => {
+    if (typedUser?.role) {
+      setLocation("/dashboard");
+    }
+  }, [typedUser?.role, setLocation]);
+
   if (!user) {
     return null;
   }
 
-  const typedUser = user as User;
-
-  if (typedUser.role) {
-    setLocation("/dashboard");
+  if (typedUser?.role) {
     return null;
   }
 

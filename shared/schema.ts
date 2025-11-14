@@ -63,8 +63,8 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  // Role field (student by default)
-  role: varchar("role", { length: 20 }).default("student").notNull(),
+  // Role field (nullable until user selects during onboarding)
+  role: varchar("role", { length: 20 }),
   // Gamification fields (displayName nullable until user sets it)
   displayName: varchar("display_name"),
   totalXp: integer("total_xp").default(0).notNull(),

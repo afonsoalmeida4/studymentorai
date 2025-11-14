@@ -4,6 +4,8 @@
 
 AI Study Mentor is a Notion-style knowledge organization platform that empowers users to structure, process, and study academic materials with AI support. It allows for the creation of knowledge hierarchies (Subjects → Topics → Content Items), uploading various document types (PDF, Word, PowerPoint), adding external links, generating personalized AI summaries, and interacting with a dual-mode AI assistant for academic and existential support. The platform aims to combine hierarchical knowledge organization with generative AI, offering a calm and clean interface inspired by Notion, Linear, and Grammarly.
 
+**New Feature (November 2025):** Teacher-Student Class System - Teachers can create classes, invite students via unique 8-character codes, and monitor student progress (XP, levels, streaks, accuracy). Students can join classes and track their progress within their enrolled classes.
+
 **Slogan:** "Organiza o teu conhecimento. Encontra o teu equilíbrio."
 
 ## User Preferences
@@ -23,11 +25,24 @@ The backend is built with Express.js and TypeScript, utilizing ESM modules. It p
 
 ### Data Storage
 
-PostgreSQL (Neon) is used as the primary database, with Drizzle ORM for type-safe queries. The schema defines tables for `subjects`, `topics`, `content_items` (polymorphic for files and links), `summaries`, `chat_threads`, `chat_messages`, and `users`, with strict foreign key relationships and `ON DELETE CASCADE` for data integrity. Indices are strategically placed for efficient data retrieval.
+PostgreSQL (Neon) is used as the primary database, with Drizzle ORM for type-safe queries. The schema defines tables for `subjects`, `topics`, `content_items` (polymorphic for files and links), `summaries`, `chat_threads`, `chat_messages`, `users`, `classes`, `classEnrollments`, and `classInvites`, with strict foreign key relationships and `ON DELETE CASCADE` for data integrity. Indices are strategically placed for efficient data retrieval.
+
+**Teacher-Student System Tables:**
+- `users.role`: Nullable varchar field to distinguish between "student" and "teacher" roles (null until user selects during onboarding)
+- `classes`: Teacher-created classes with unique invite codes (8 characters)
+- `classEnrollments`: Many-to-many relationship between students and classes
+- `classInvites`: Historical record of class invitations (optional, for audit trail)
 
 ### Authentication & Authorization
 
 Authentication is handled via Replit OIDC, using session-based authentication with `express-session`. All resources are scoped to the `userId`, with robust authorization rules ensuring parent resource ownership validation and preventing cross-tenant data access.
+
+**Role-Based Access Control:**
+- New users must select a role (student/teacher) on first login via `/role-selection` page
+- Teachers can create and manage classes, view student progress, and remove students
+- Students can join classes via invite codes and leave classes
+- API endpoints verify user roles before granting access to teacher-only features
+- Classes are isolated to teacher's userId; students can only see classes they're enrolled in
 
 ## External Dependencies
 
