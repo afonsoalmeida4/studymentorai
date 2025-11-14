@@ -215,7 +215,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTopicSummary(id: string, userId: string): Promise<TopicSummary | null> {
-    const [result] = await db
+    console.log("[getTopicSummary] Searching for:", { id, userId });
+    const results = await db
       .select()
       .from(topicSummaries)
       .innerJoin(topics, eq(topicSummaries.topicId, topics.id))
@@ -226,6 +227,12 @@ export class DatabaseStorage implements IStorage {
         )
       );
     
+    console.log("[getTopicSummary] Results count:", results.length);
+    if (results.length > 0) {
+      console.log("[getTopicSummary] First result:", JSON.stringify(results[0], null, 2));
+    }
+    
+    const [result] = results;
     return result?.topicSummaries || null;
   }
 
