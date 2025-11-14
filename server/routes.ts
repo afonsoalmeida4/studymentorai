@@ -398,12 +398,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const dueFlashcards = await storage.getDueFlashcards(userId, summaryId);
       
+      // Buscar todos os flashcards para encontrar o próximo disponível
+      let allFlashcards;
+      if (context.type === "topicSummary") {
+        allFlashcards = await storage.getFlashcardsByTopicSummary(summaryId);
+      } else {
+        allFlashcards = await storage.getFlashcardsBySummary(summaryId);
+      }
+
+      // Encontrar o próximo flashcard não-due (com nextReviewAt no futuro)
+      const now = new Date();
+      const upcomingFlashcards = allFlashcards
+        .filter(fc => fc.nextReviewAt && new Date(fc.nextReviewAt) > now)
+        .sort((a, b) => new Date(a.nextReviewAt!).getTime() - new Date(b.nextReviewAt!).getTime());
+      
+      const nextAvailableAt = upcomingFlashcards.length > 0 
+        ? upcomingFlashcards[0].nextReviewAt 
+        : null;
+      
       return res.json({
         success: true,
         flashcards: dueFlashcards.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
         })),
+        nextAvailableAt: nextAvailableAt?.toISOString() || null,
       });
     } catch (error) {
       console.error("Error fetching due flashcards:", error);
