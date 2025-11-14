@@ -225,6 +225,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { summaryId, topicSummaryId } = req.body;
       
+      console.log("[Flashcards] Request body:", { summaryId, topicSummaryId, userId });
+      
       if (!summaryId && !topicSummaryId) {
         return res.status(400).json({
           success: false,
@@ -243,7 +245,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let flashcardsQuery: any;
 
       if (topicSummaryId) {
+        console.log("[Flashcards] Looking for topicSummaryId:", topicSummaryId);
         const topicSummary = await storage.getTopicSummary(topicSummaryId, userId);
+        console.log("[Flashcards] Found topicSummary:", topicSummary ? "yes" : "no");
         if (!topicSummary) {
           return res.status(404).json({
             success: false,
@@ -263,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         summaryText = topicSummary.summary;
-        flashcardsQuery = flashcardsData => flashcardsData.map(fc => ({
+        flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
           topicSummaryId,
           question: fc.question,
           answer: fc.answer,
@@ -289,7 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         summaryText = summary.summary;
-        flashcardsQuery = flashcardsData => flashcardsData.map(fc => ({
+        flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
           summaryId,
           question: fc.question,
           answer: fc.answer,
@@ -413,11 +417,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify user owns the summary containing this flashcard
-      const summary = await storage.getSummary(flashcard.summaryId);
-      if (!summary || summary.userId !== userId) {
-        return res.status(403).json({
+      if (flashcard.summaryId) {
+        const summary = await storage.getSummary(flashcard.summaryId);
+        if (!summary || summary.userId !== userId) {
+          return res.status(403).json({
+            success: false,
+            error: "Sem permissão",
+          });
+        }
+      } else if (flashcard.topicSummaryId) {
+        const topicSummary = await storage.getTopicSummary(flashcard.topicSummaryId, userId);
+        if (!topicSummary) {
+          return res.status(403).json({
+            success: false,
+            error: "Sem permissão",
+          });
+        }
+      } else {
+        return res.status(404).json({
           success: false,
-          error: "Sem permissão",
+          error: "Flashcard sem referência de resumo",
         });
       }
 
