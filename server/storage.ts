@@ -4,6 +4,8 @@ import {
   flashcards,
   studySessions,
   flashcardAttempts,
+  topicSummaries,
+  topics,
   type User,
   type UpsertUser,
   type Summary,
@@ -12,6 +14,7 @@ import {
   type InsertFlashcard,
   type FlashcardAttempt,
   type InsertFlashcardAttempt,
+  type TopicSummary,
   type StudySession,
   type InsertStudySession,
   type DashboardStats,
@@ -35,12 +38,16 @@ export interface IStorage {
   // Flashcard operations
   createFlashcards(flashcardsData: InsertFlashcard[]): Promise<Flashcard[]>;
   getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]>;
+  getFlashcardsByTopicSummary(topicSummaryId: string): Promise<Flashcard[]>;
   getFlashcard(id: string): Promise<Flashcard | undefined>;
   getDueFlashcards(userId: string, summaryId: string): Promise<Flashcard[]>;
   
   // Flashcard attempt operations (Anki-style)
   createFlashcardAttempt(attempt: InsertFlashcardAttempt): Promise<FlashcardAttempt>;
   getLatestAttempt(userId: string, flashcardId: string): Promise<FlashcardAttempt | null>;
+  
+  // Topic summary operations
+  getTopicSummary(id: string, userId: string): Promise<TopicSummary | null>;
   
   // Study session operations
   createStudySession(session: InsertStudySession): Promise<StudySession>;
@@ -137,6 +144,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(flashcards.summaryId, summaryId));
   }
 
+  async getFlashcardsByTopicSummary(topicSummaryId: string): Promise<Flashcard[]> {
+    return await db
+      .select()
+      .from(flashcards)
+      .where(eq(flashcards.topicSummaryId, topicSummaryId));
+  }
+
   async getFlashcard(id: string): Promise<Flashcard | undefined> {
     const [flashcard] = await db
       .select()
@@ -145,7 +159,7 @@ export class DatabaseStorage implements IStorage {
     return flashcard;
   }
 
-  async getDueFlashcards(userId: string, summaryId: string): Promise<Flashcard[]> {
+  async getDueFlashcards(userId: string, summaryOrTopicSummaryId: string): Promise<Flashcard[]> {
     const now = new Date();
     
     const result = await db
@@ -161,7 +175,9 @@ export class DatabaseStorage implements IStorage {
           eq(flashcardAttempts.userId, userId)
         )
       )
-      .where(eq(flashcards.summaryId, summaryId))
+      .where(
+        sql`(${flashcards.summaryId} = ${summaryOrTopicSummaryId} OR ${flashcards.topicSummaryId} = ${summaryOrTopicSummaryId})`
+      )
       .orderBy(flashcardAttempts.nextReviewDate);
 
     const dueCards = result.filter(row => {
@@ -196,6 +212,21 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return attempt || null;
+  }
+
+  async getTopicSummary(id: string, userId: string): Promise<TopicSummary | null> {
+    const [result] = await db
+      .select()
+      .from(topicSummaries)
+      .innerJoin(topics, eq(topicSummaries.topicId, topics.id))
+      .where(
+        and(
+          eq(topicSummaries.id, id),
+          eq(topics.userId, userId)
+        )
+      );
+    
+    return result?.topicSummaries || null;
   }
 
   // Study session operations

@@ -23,7 +23,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
   // Generate flashcards mutation
   const generateMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/flashcards", { summaryId });
+      const response = await apiRequest("POST", "/api/flashcards", { topicSummaryId: summaryId });
       return response.json() as Promise<GenerateFlashcardsResponse>;
     },
     onSuccess: (data: GenerateFlashcardsResponse) => {

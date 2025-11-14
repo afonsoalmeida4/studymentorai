@@ -391,13 +391,15 @@ export const flashcards = pgTable(
   "flashcards",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-    summaryId: varchar("summary_id").notNull().references(() => summaries.id, { onDelete: "cascade" }),
+    summaryId: varchar("summary_id").references(() => summaries.id, { onDelete: "cascade" }),
+    topicSummaryId: varchar("topic_summary_id").references(() => topicSummaries.id, { onDelete: "cascade" }),
     question: text("question").notNull(),
     answer: text("answer").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("idx_flashcards_summary_id").on(table.summaryId),
+    index("idx_flashcards_topic_summary_id").on(table.topicSummaryId),
   ],
 );
 

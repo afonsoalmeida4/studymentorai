@@ -218,58 +218,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate flashcards from a summary
+  // Generate flashcards from a summary (or topic summary)
   app.post("/api/flashcards", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       
-      // Validate request body
-      const parseResult = generateFlashcardsRequestSchema.safeParse(req.body);
-      if (!parseResult.success) {
+      const { summaryId, topicSummaryId } = req.body;
+      
+      if (!summaryId && !topicSummaryId) {
         return res.status(400).json({
           success: false,
-          error: "ID do resumo inválido",
+          error: "summaryId ou topicSummaryId é obrigatório",
         } as GenerateFlashcardsResponse);
       }
 
-      const { summaryId } = parseResult.data;
-
-      // Check if summary exists and belongs to user
-      const summary = await storage.getSummary(summaryId);
-      if (!summary || summary.userId !== userId) {
-        return res.status(404).json({
+      if (summaryId && topicSummaryId) {
+        return res.status(400).json({
           success: false,
-          error: "Resumo não encontrado",
+          error: "Apenas um de summaryId ou topicSummaryId pode ser fornecido",
         } as GenerateFlashcardsResponse);
       }
 
-      // Check if flashcards already exist
-      const existingFlashcards = await storage.getFlashcardsBySummary(summaryId);
-      if (existingFlashcards.length > 0) {
-        return res.json({
-          success: true,
-          flashcards: existingFlashcards.map(fc => ({
-            ...fc,
-            createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
-          })),
-        } as GenerateFlashcardsResponse);
-      }
+      let summaryText: string;
+      let flashcardsQuery: any;
 
-      // Generate flashcards using GPT-5
-      const flashcardsData = await generateFlashcards(summary.summary);
+      if (topicSummaryId) {
+        const topicSummary = await storage.getTopicSummary(topicSummaryId, userId);
+        if (!topicSummary) {
+          return res.status(404).json({
+            success: false,
+            error: "Resumo do tópico não encontrado",
+          } as GenerateFlashcardsResponse);
+        }
 
-      // Save flashcards to database
-      const savedFlashcards = await storage.createFlashcards(
-        flashcardsData.map(fc => ({
+        const existingFlashcards = await storage.getFlashcardsByTopicSummary(topicSummaryId);
+        if (existingFlashcards.length > 0) {
+          return res.json({
+            success: true,
+            flashcards: existingFlashcards.map(fc => ({
+              ...fc,
+              createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+            })),
+          } as GenerateFlashcardsResponse);
+        }
+
+        summaryText = topicSummary.summary;
+        flashcardsQuery = flashcardsData => flashcardsData.map(fc => ({
+          topicSummaryId,
+          question: fc.question,
+          answer: fc.answer,
+        }));
+      } else {
+        const summary = await storage.getSummary(summaryId);
+        if (!summary || summary.userId !== userId) {
+          return res.status(404).json({
+            success: false,
+            error: "Resumo não encontrado",
+          } as GenerateFlashcardsResponse);
+        }
+
+        const existingFlashcards = await storage.getFlashcardsBySummary(summaryId);
+        if (existingFlashcards.length > 0) {
+          return res.json({
+            success: true,
+            flashcards: existingFlashcards.map(fc => ({
+              ...fc,
+              createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+            })),
+          } as GenerateFlashcardsResponse);
+        }
+
+        summaryText = summary.summary;
+        flashcardsQuery = flashcardsData => flashcardsData.map(fc => ({
           summaryId,
           question: fc.question,
           answer: fc.answer,
-        }))
-      );
+        }));
+      }
 
-      // Award XP for creating flashcards
+      const flashcardsData = await generateFlashcards(summaryText);
+      const savedFlashcards = await storage.createFlashcards(flashcardsQuery(flashcardsData));
+
       await awardXP(userId, "create_flashcards", { 
-        summaryId,
+        summaryId: summaryId || topicSummaryId,
         flashcardCount: savedFlashcards.length,
       });
 
