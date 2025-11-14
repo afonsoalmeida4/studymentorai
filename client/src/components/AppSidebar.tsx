@@ -141,7 +141,7 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                {typedUser?.role === "teacher" && (
+                {typedUser?.role && (
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
@@ -150,7 +150,7 @@ export function AppSidebar() {
                     >
                       <Link href="/classes">
                         <Users className="w-4 h-4" />
-                        <span>Minhas Turmas</span>
+                        <span>{typedUser.role === "teacher" ? "Minhas Turmas" : "As Minhas Turmas"}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
