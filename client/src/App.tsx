@@ -11,6 +11,8 @@ import Home from "@/pages/home";
 import SubjectView from "@/pages/subject-view";
 import TopicView from "@/pages/topic-view";
 import ChatView from "@/pages/chat-view";
+import Dashboard from "@/pages/dashboard";
+import Ranking from "@/pages/ranking";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedRouter() {
@@ -24,6 +26,8 @@ function AuthenticatedRouter() {
         <main className="flex-1 overflow-auto">
           <Switch>
             <Route path="/" component={Home} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/ranking" component={Ranking} />
             <Route path="/subjects" component={SubjectView} />
             <Route path="/subject/:id" component={SubjectView} />
             <Route path="/topic/:id" component={TopicView} />

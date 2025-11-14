@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -110,6 +110,26 @@ export function AppSidebar() {
                   >
                     <Home className="w-4 h-4" />
                     <span>Início</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => setLocation("/dashboard")}
+                    isActive={location === "/dashboard"}
+                    data-testid="button-dashboard"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => setLocation("/ranking")}
+                    isActive={location === "/ranking"}
+                    data-testid="button-ranking"
+                  >
+                    <Trophy className="w-4 h-4" />
+                    <span>Ranking</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
