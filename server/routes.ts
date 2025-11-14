@@ -35,6 +35,30 @@ const upload = multer({
   },
 });
 
+// Helper to resolve flashcard context (summaryId OR topicSummaryId)
+type FlashcardContext = 
+  | { type: "summary"; id: string }
+  | { type: "topicSummary"; id: string };
+
+async function resolveFlashcardContext(
+  id: string,
+  userId: string
+): Promise<FlashcardContext | null> {
+  // Try topic summary first (newer system)
+  const topicSummary = await storage.getTopicSummary(id, userId);
+  if (topicSummary) {
+    return { type: "topicSummary", id };
+  }
+
+  // Try legacy summary
+  const summary = await storage.getSummary(id);
+  if (summary && summary.userId === userId) {
+    return { type: "summary", id };
+  }
+
+  return null;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
@@ -363,9 +387,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const summaryId = req.params.summaryId;
 
-      // Verify summary exists and belongs to user
-      const summary = await storage.getSummary(summaryId);
-      if (!summary || summary.userId !== userId) {
+      // Resolve context (supports both summaryId and topicSummaryId)
+      const context = await resolveFlashcardContext(summaryId, userId);
+      if (!context) {
         return res.status(404).json({
           success: false,
           error: "Resumo não encontrado",
