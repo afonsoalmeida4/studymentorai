@@ -162,6 +162,8 @@ export class DatabaseStorage implements IStorage {
   async getDueFlashcards(userId: string, summaryOrTopicSummaryId: string): Promise<Flashcard[]> {
     const now = new Date();
     
+    console.log("[getDueFlashcards] Looking for summaryId:", summaryOrTopicSummaryId, "userId:", userId);
+    
     const result = await db
       .select({
         flashcard: flashcards,
@@ -180,13 +182,26 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(flashcardAttempts.nextReviewDate);
 
+    console.log("[getDueFlashcards] Total flashcards found:", result.length);
+    if (result.length > 0) {
+      console.log("[getDueFlashcards] First row:", {
+        flashcardId: result[0].flashcard.id,
+        hasAttempt: !!result[0].attempt,
+        attemptId: result[0].attempt?.id,
+      });
+    }
+
     const dueCards = result.filter(row => {
-      if (!row.attempt) {
+      if (!row.attempt || !row.attempt.id) {
+        console.log("[getDueFlashcards] Flashcard without attempt (NEW):", row.flashcard.id);
         return true;
       }
-      return row.attempt.nextReviewDate && row.attempt.nextReviewDate <= now;
+      const isDue = row.attempt.nextReviewDate && row.attempt.nextReviewDate <= now;
+      console.log("[getDueFlashcards] Flashcard with attempt:", row.flashcard.id, "isDue:", isDue, "nextReview:", row.attempt.nextReviewDate);
+      return isDue;
     });
 
+    console.log("[getDueFlashcards] Due flashcards:", dueCards.length);
     return dueCards.map(row => row.flashcard);
   }
 
