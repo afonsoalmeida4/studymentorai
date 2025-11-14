@@ -54,7 +54,8 @@ export default function TopicView() {
   const [generateSummary, setGenerateSummary] = useState(true);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
-  const [selectedLearningStyle, setSelectedLearningStyle] = useState<string>("visual");
+  const [selectedLearningStyles, setSelectedLearningStyles] = useState<LearningStyle[]>(["visual"]);
+  const [isGenerateStylesDialogOpen, setIsGenerateStylesDialogOpen] = useState(false);
 
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
@@ -88,21 +89,31 @@ export default function TopicView() {
   });
 
   const generateSummariesMutation = useMutation({
-    mutationFn: async (learningStyle: string) => {
+    mutationFn: async (learningStyles: LearningStyle[]) => {
       if (!topicId) throw new Error("Topic ID required");
-      return apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle });
+      const results = [];
+      for (const style of learningStyles) {
+        const result = await apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle: style });
+        results.push(result);
+      }
+      return results;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      const count = variables.length;
       toast({
-        title: "Resumo gerado com sucesso!",
-        description: "O resumo do tópico foi criado no estilo selecionado.",
+        title: count === 1 ? "Resumo gerado!" : `${count} resumos gerados!`,
+        description: count === 1 
+          ? "O resumo do tópico foi criado no estilo selecionado."
+          : "Os resumos foram criados nos estilos selecionados.",
       });
       refetchTopicSummaries();
+      setIsGenerateStylesDialogOpen(false);
+      setSelectedLearningStyles([]);
     },
     onError: (error: any) => {
       toast({
-        title: "Erro ao gerar resumo",
-        description: error.message || "Não foi possível gerar o resumo. Tente novamente.",
+        title: "Erro ao gerar resumos",
+        description: error.message || "Não foi possível gerar os resumos. Tente novamente.",
         variant: "destructive",
       });
     },
@@ -191,7 +202,7 @@ export default function TopicView() {
     }
   };
 
-  const getContentIcon = (type: string) => {
+  const getContentIcon = (type: string): React.ReactElement => {
     switch (type) {
       case "pdf":
       case "docx":
@@ -205,7 +216,23 @@ export default function TopicView() {
   };
 
   const handleManualGenerate = () => {
-    generateSummariesMutation.mutate(selectedLearningStyle);
+    if (selectedLearningStyles.length > 0) {
+      generateSummariesMutation.mutate(selectedLearningStyles);
+    }
+  };
+
+  const toggleLearningStyle = (style: LearningStyle) => {
+    setSelectedLearningStyles(prev =>
+      prev.includes(style)
+        ? prev.filter(s => s !== style)
+        : [...prev, style]
+    );
+  };
+
+  const getMissingStyles = (): LearningStyle[] => {
+    const existing = new Set(Object.keys(topicSummariesData?.summaries || {}) as LearningStyle[]);
+    const allStyles: LearningStyle[] = ["visual", "auditivo", "logico", "conciso"];
+    return allStyles.filter(style => !existing.has(style));
   };
 
   return (
@@ -283,7 +310,7 @@ export default function TopicView() {
                             </CardDescription>
                           </div>
                         </div>
-                        {content.contentType === "link" && content.metadata && (
+                        {content.contentType === "link" && content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
                           <Button
                             size="sm"
                             variant="ghost"
@@ -292,7 +319,7 @@ export default function TopicView() {
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
-                        )}
+                        ) : null}
                       </div>
                     </CardHeader>
                   </Card>
@@ -334,14 +361,14 @@ export default function TopicView() {
                             <Link2 className="w-4 h-4" />
                             <div>
                               <CardTitle className="text-base">{content.title}</CardTitle>
-                              {content.metadata && (
+                              {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
                                 <CardDescription className="mt-1">
                                   {(content.metadata as any)?.url}
                                 </CardDescription>
-                              )}
+                              ) : null}
                             </div>
                           </div>
-                          {content.metadata && (
+                          {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
                             <Button
                               size="sm"
                               variant="ghost"
@@ -350,7 +377,7 @@ export default function TopicView() {
                             >
                               <ExternalLink className="w-4 h-4" />
                             </Button>
-                          )}
+                          ) : null}
                         </div>
                       </CardHeader>
                     </Card>
@@ -393,12 +420,30 @@ export default function TopicView() {
                 const conciso = summaries.conciso;
                 
                 const availableStyles = Object.keys(summaries) as LearningStyle[];
+                const missingStyles = getMissingStyles();
                 const gridClass = availableStyles.length === 1 ? "grid-cols-1" 
                   : availableStyles.length === 2 ? "grid-cols-2"
                   : availableStyles.length === 3 ? "grid-cols-3"
                   : "grid-cols-4";
                 
                 return (
+                  <div className="space-y-4">
+                    {missingStyles.length > 0 && (
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={() => {
+                            setSelectedLearningStyles(missingStyles);
+                            setIsGenerateStylesDialogOpen(true);
+                          }}
+                          variant="outline"
+                          size="sm"
+                          data-testid="button-generate-more-styles"
+                        >
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Gerar Mais Estilos ({missingStyles.length})
+                        </Button>
+                      </div>
+                    )}
                   <Tabs defaultValue={availableStyles[0]} className="w-full">
                     <TabsList className={`grid w-full ${gridClass}`}>
                       {visual ? (
@@ -523,6 +568,7 @@ export default function TopicView() {
                       </TabsContent>
                     ) : null}
                   </Tabs>
+                  </div>
                 );
               })()
             ) : (
@@ -534,34 +580,41 @@ export default function TopicView() {
                       Ainda não há resumos disponíveis para este tópico.
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Escolhe um estilo de aprendizagem e gera um resumo agregado de todo o conteúdo.
+                      Escolhe um ou mais estilos de aprendizagem para gerar resumos.
                     </p>
                   </div>
-                  <div className="max-w-xs mx-auto space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="learning-style-select">Estilo de Aprendizagem</Label>
-                      <Select
-                        value={selectedLearningStyle}
-                        onValueChange={setSelectedLearningStyle}
-                      >
-                        <SelectTrigger id="learning-style-select" data-testid="select-learning-style">
-                          <SelectValue placeholder="Selecione um estilo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="visual">Visual</SelectItem>
-                          <SelectItem value="auditivo">Auditivo</SelectItem>
-                          <SelectItem value="logico">Lógico</SelectItem>
-                          <SelectItem value="conciso">Conciso</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="max-w-sm mx-auto space-y-4">
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Estilos de Aprendizagem</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {(["visual", "auditivo", "logico", "conciso"] as LearningStyle[]).map(style => (
+                          <div key={style} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`style-${style}`}
+                              checked={selectedLearningStyles.includes(style)}
+                              onCheckedChange={() => toggleLearningStyle(style)}
+                              data-testid={`checkbox-style-${style}`}
+                            />
+                            <Label
+                              htmlFor={`style-${style}`}
+                              className="text-sm cursor-pointer capitalize"
+                            >
+                              {style}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     <Button
                       onClick={handleManualGenerate}
-                      disabled={generateSummariesMutation.isPending}
+                      disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
                       data-testid="button-manual-generate"
                       className="w-full"
                     >
-                      {generateSummariesMutation.isPending ? "A gerar..." : "Gerar Resumo"}
+                      {generateSummariesMutation.isPending 
+                        ? "A gerar..." 
+                        : `Gerar ${selectedLearningStyles.length} Resumo${selectedLearningStyles.length !== 1 ? 's' : ''}`
+                      }
                     </Button>
                   </div>
                 </CardContent>
@@ -570,6 +623,67 @@ export default function TopicView() {
           </div>
         )}
       </div>
+
+      <Dialog open={isGenerateStylesDialogOpen} onOpenChange={(open) => {
+        setIsGenerateStylesDialogOpen(open);
+        if (!open) {
+          setSelectedLearningStyles([]);
+        }
+      }}>
+        <DialogContent data-testid="dialog-generate-styles">
+          <DialogHeader>
+            <DialogTitle>Gerar Estilos de Aprendizagem</DialogTitle>
+            <DialogDescription>
+              Seleciona os estilos de aprendizagem que queres gerar para este tópico.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-3">
+              {getMissingStyles().map(style => (
+                <div key={style} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`dialog-style-${style}`}
+                    checked={selectedLearningStyles.includes(style)}
+                    onCheckedChange={() => toggleLearningStyle(style)}
+                    data-testid={`dialog-checkbox-style-${style}`}
+                  />
+                  <Label
+                    htmlFor={`dialog-style-${style}`}
+                    className="text-sm cursor-pointer capitalize"
+                  >
+                    {style}
+                  </Label>
+                </div>
+              ))}
+            </div>
+            {getMissingStyles().length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Todos os estilos de aprendizagem já foram gerados!
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsGenerateStylesDialogOpen(false)}
+              data-testid="button-cancel-generate-styles"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleManualGenerate}
+              disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
+              data-testid="button-submit-generate-styles"
+            >
+              {generateSummariesMutation.isPending
+                ? "A gerar..."
+                : `Gerar ${selectedLearningStyles.length} Estilo${selectedLearningStyles.length !== 1 ? 's' : ''}`
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
         <DialogContent data-testid="dialog-upload-file">
