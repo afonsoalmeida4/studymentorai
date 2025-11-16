@@ -25,8 +25,7 @@ export default function SubscriptionPage() {
 
   const createCheckoutMutation = useMutation({
     mutationFn: async (plan: string) => {
-      const res = await apiRequest("POST", "/api/subscription/create-checkout", { plan });
-      return await res.json();
+      return await apiRequest("POST", "/api/subscription/create-checkout", { plan });
     },
     onSuccess: (data) => {
       if (data.url) {
