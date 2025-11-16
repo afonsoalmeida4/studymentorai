@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { subscriptions, usageTracking, users, type Subscription, type UsageTracking, type SubscriptionPlan, planLimits, type ChatMode } from "@shared/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export class SubscriptionService {
   /**
@@ -109,7 +109,7 @@ export class SubscriptionService {
       .onConflictDoUpdate({
         target: [usageTracking.userId, usageTracking.month],
         set: {
-          uploadsCount: db.raw(`${usageTracking.uploadsCount.name} + 1`),
+          uploadsCount: sql`${usageTracking.uploadsCount} + 1`,
           updatedAt: new Date(),
         },
       });
@@ -164,7 +164,7 @@ export class SubscriptionService {
       .onConflictDoUpdate({
         target: [usageTracking.userId, usageTracking.month],
         set: {
-          chatMessagesCount: db.raw(`${usageTracking.chatMessagesCount.name} + 1`),
+          chatMessagesCount: sql`${usageTracking.chatMessagesCount} + 1`,
           updatedAt: new Date(),
         },
       });
@@ -209,7 +209,7 @@ export class SubscriptionService {
       .onConflictDoUpdate({
         target: [usageTracking.userId, usageTracking.month],
         set: {
-          summariesGenerated: db.raw(`${usageTracking.summariesGenerated.name} + 1`),
+          summariesGenerated: sql`${usageTracking.summariesGenerated} + 1`,
           updatedAt: new Date(),
         },
       });
