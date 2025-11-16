@@ -16,6 +16,7 @@ import Ranking from "@/pages/ranking";
 import RoleSelection from "@/pages/role-selection";
 import MyClasses from "@/pages/my-classes";
 import StudentClasses from "@/pages/student-classes";
+import SubscriptionPage from "@/pages/subscription";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
 
@@ -39,6 +40,7 @@ function AuthenticatedRouter() {
             <Route path="/" component={Home} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/ranking" component={Ranking} />
+            <Route path="/subscription" component={SubscriptionPage} />
             <Route path="/classes" component={typedUser?.role === "teacher" ? MyClasses : StudentClasses} />
             <Route path="/subjects" component={SubjectView} />
             <Route path="/subject/:id" component={SubjectView} />

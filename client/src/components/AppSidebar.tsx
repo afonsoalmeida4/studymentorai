@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Users } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Users, Crown } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -29,7 +29,15 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import type { Subject, User } from "@shared/schema";
+import type { Subject, User, Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
+import { planLimits } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
+
+type SubscriptionDetails = {
+  subscription: Subscription;
+  usage: UsageTracking;
+  limits: typeof planLimits[SubscriptionPlan];
+};
 
 export function AppSidebar() {
   const [location] = useLocation();
@@ -44,6 +52,10 @@ export function AppSidebar() {
   const { data: subjects = [] } = useQuery<Subject[]>({
     queryKey: ["/api/subjects"],
     select: (data: any) => data.subjects || [],
+  });
+
+  const { data: subscriptionData } = useQuery<SubscriptionDetails>({
+    queryKey: ["/api/subscription"],
   });
 
   const createSubjectMutation = useMutation({
@@ -155,6 +167,29 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )}
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location === "/subscription"}
+                    data-testid="button-subscription"
+                  >
+                    <Link href="/subscription">
+                      <Crown className="w-4 h-4" />
+                      <div className="flex items-center justify-between w-full gap-2">
+                        <span>Plano</span>
+                        {subscriptionData && (
+                          <Badge 
+                            variant={subscriptionData.subscription.plan === "free" ? "outline" : "default"}
+                            className="text-xs"
+                            data-testid={`badge-plan-${subscriptionData.subscription.plan}`}
+                          >
+                            {subscriptionData.limits.name.split(" ")[0]}
+                          </Badge>
+                        )}
+                      </div>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
