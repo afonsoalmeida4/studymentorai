@@ -1,0 +1,70 @@
+Quero que reformules e melhorem a minha app de estudo com IA.
+A app deve ter 4 planos: Free, Pro, Premium e Educacional.
+Quero que a app reconheça automaticamente qual o plano do utilizador e liberte ou bloqueie funcionalidades conforme o plano escolhido.
+A interface deve ser simples, fluida, organizada e inspirada no estilo do Notion.
+🎯 Planos e Preços Oficiais
+1) Plano Free — 0€
+Nome: Começa a Estudar
+O utilizador pode:
+Criar disciplinas e tópicos
+Criar pastas básicas estilo Notion
+Fazer upload de até 3 ficheiros por mês (PDF, Word, PPT ou links)
+Gerar resumos IA até 1.000 palavras
+Criar flashcards simples
+Usar o Assistente IA apenas em Modo Estudo (limite diário de mensagens)
+Ter apenas 1 workspace
+Este plano serve para testar a app mas deve ser limitado para incentivar o upgrade.
+2) Plano Pro — 7,99€/mês
+Nome: Estuda Sem Limites
+O utilizador desbloqueia:
+Uploads ilimitados de PDF, Word, PPT e links
+Pastas e subpastas ilimitadas
+Resumos IA avançados, com estilo de aprendizagem personalizado
+Flashcards inteligentes com repetição espaçada
+Assistente IA ilimitado nos modos:
+Modo Estudo
+Modo Existencial (motiva, explica, guia emocionalmente)
+Dashboard de progresso
+Revisões automáticas
+Sincronização de dados entre dispositivos
+Backup automático na cloud
+Este é o plano ideal para qualquer estudante sério.
+3) Plano Premium — 18,99€/mês
+Nome: Alta Performance
+Inclui tudo do Pro, e ainda:
+Tutor IA pessoal com histórico de estudo
+Criação automática de planos de estudo completos
+Geração de mapas mentais automáticos
+Estatísticas avançadas:
+tempo por disciplina
+nível de memorização
+evolução semanal
+“Modo Zen”: foco, respiração, dicas de produtividade
+Espaços partilhados para study groups
+Templates avançados estilo Notion
+Exportação de materiais em PDF
+Acesso antecipado a novas funcionalidades
+Este plano serve para estudantes de alta performance e para quem quer uma experiência completa.
+4) Plano Educacional — Professores e Centros de Estudos
+Nome: AI Classroom Pro
+Preços:
+Professor Individual: 14,99€ / mês
+Centro de Estudos / Escola: 3€ por aluno / mês (mínimo 10 alunos)
+Funcionalidades:
+Criar e gerir turmas (9.º B, 10.º A, Exames 2026, Matemática Avançada, etc.)
+Adicionar alunos por link
+Biblioteca partilhada: PDFs, Word, PPT e links para todos os alunos
+Resumos e flashcards criados pelo professor e distribuídos automaticamente
+Dashboard completo da turma:
+desempenho individual
+evolução semanal
+flashcards concluídos
+dificuldades detectadas pela IA
+alertas de alunos em risco
+“AI Teacher Assistant”:
+cria fichas de exercícios
+cria mini-testes
+cria planos de aula
+recomenda estratégias de ensino
+Os alunos da turma têm acesso ao material que o professor organiza por disciplina e tópico
+Este plano deve parecer sólido, útil e profissional.
