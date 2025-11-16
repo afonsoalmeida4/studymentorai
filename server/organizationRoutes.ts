@@ -8,6 +8,7 @@ import { isAuthenticated } from "./replitAuth";
 import { extractTextFromFile, validateFileType, isValidFileSize } from "./textExtractor";
 import { generateSummary } from "./openai";
 import { awardXP } from "./gamificationService";
+import { subscriptionService } from "./subscriptionService";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -568,8 +569,8 @@ export function registerOrganizationRoutes(app: Express) {
       const { id } = req.params;
       const { learningStyle } = req.body; // Optional: specific style to generate
 
-      // Check if user can generate summaries
-      const summaryCheck = await subscriptionService.canGenerateSummary(userId);
+      // Check if user can generate summaries (wordCount check happens at generation time)
+      const summaryCheck = await subscriptionService.canGenerateSummary(userId, 0);
       if (!summaryCheck.allowed) {
         return res.status(403).json({
           success: false,

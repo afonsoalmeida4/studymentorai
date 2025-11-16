@@ -120,11 +120,17 @@ export default function TopicView() {
       setSelectedLearningStyles([]);
     },
     onError: (error: any) => {
-      toast({
-        title: "Erro ao gerar resumos",
-        description: error.message || "Não foi possível gerar os resumos. Tente novamente.",
-        variant: "destructive",
-      });
+      if (error.status === 403) {
+        setUpgradeReason("summaries");
+        setShowUpgradeDialog(true);
+        setIsGenerateStylesDialogOpen(false);
+      } else {
+        toast({
+          title: "Erro ao gerar resumos",
+          description: error.message || "Não foi possível gerar os resumos. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
