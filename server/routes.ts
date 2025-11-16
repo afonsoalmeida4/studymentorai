@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
+import Stripe from "stripe";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
 import { 
   generateSummaryRequestSchema, 
@@ -25,6 +26,14 @@ import { db } from "./db";
 import { and, eq, sql, gt, asc } from "drizzle-orm";
 import * as classService from "./classService";
 import { insertClassSchema, insertClassEnrollmentSchema } from "@shared/schema";
+import { subscriptionService } from "./subscriptionService";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-11-20.acacia",
+});
 
 // Configure multer for file upload (in-memory storage)
 const upload = multer({
@@ -1018,6 +1027,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro ao atualizar role",
       });
+    }
+  });
+
+  // Subscription management endpoints
+  
+  // Get current subscription details
+  app.get("/api/subscription", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const details = await subscriptionService.getSubscriptionDetails(userId);
+      
+      return res.json(details);
+    } catch (error) {
+      console.error("Error fetching subscription:", error);
+      return res.status(500).json({
+        error: "Erro ao carregar subscrição",
+      });
+    }
+  });
+
+  // Create Stripe checkout session for subscription upgrade
+  app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { plan } = req.body;
+
+      if (!plan || !["pro", "premium", "educational"].includes(plan)) {
+        return res.status(400).json({
+          error: "Plano inválido",
+        });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user || !user.email) {
+        return res.status(400).json({
+          error: "Utilizador sem email válido",
+        });
+      }
+
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+
+      let customerId = subscription.stripeCustomerId;
+
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            userId: user.id,
+          },
+        });
+        customerId = customer.id;
+
+        await subscriptionService.updateSubscriptionPlan(userId, subscription.plan as any, {
+          customerId,
+        });
+      }
+
+      const priceIds: Record<string, string> = {
+        pro: process.env.STRIPE_PRICE_ID_PRO || "",
+        premium: process.env.STRIPE_PRICE_ID_PREMIUM || "",
+        educational: process.env.STRIPE_PRICE_ID_EDUCATIONAL || "",
+      };
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: "subscription",
+        line_items: [
+          {
+            price: priceIds[plan],
+            quantity: 1,
+          },
+        ],
+        success_url: `${process.env.REPLIT_DEV_DOMAIN || "http://localhost:5000"}/subscription?success=true`,
+        cancel_url: `${process.env.REPLIT_DEV_DOMAIN || "http://localhost:5000"}/subscription?canceled=true`,
+        metadata: {
+          userId,
+          plan,
+        },
+      });
+
+      return res.json({
+        url: session.url,
+      });
+    } catch (error: any) {
+      console.error("Error creating checkout session:", error);
+      return res.status(500).json({
+        error: "Erro ao criar sessão de pagamento",
+      });
+    }
+  });
+
+  // Stripe webhook handler
+  app.post("/api/webhooks/stripe", async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+
+    if (!sig) {
+      return res.status(400).send("Missing stripe signature");
+    }
+
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET || ""
+      );
+    } catch (err: any) {
+      console.error("Webhook signature verification failed:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    try {
+      switch (event.type) {
+        case "checkout.session.completed": {
+          const session = event.data.object as Stripe.Checkout.Session;
+          const userId = session.metadata?.userId;
+          const plan = session.metadata?.plan;
+
+          if (userId && plan && session.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(
+              session.subscription as string
+            );
+
+            await subscriptionService.updateSubscriptionPlan(userId, plan as any, {
+              customerId: session.customer as string,
+              subscriptionId: subscription.id,
+              priceId: subscription.items.data[0].price.id,
+              currentPeriodStart: new Date(subscription.current_period_start * 1000),
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            });
+          }
+          break;
+        }
+
+        case "customer.subscription.updated": {
+          const subscription = event.data.object as Stripe.Subscription;
+          const userId = subscription.metadata?.userId;
+
+          if (userId) {
+            await subscriptionService.updateSubscriptionPlan(userId, subscription.metadata?.plan as any, {
+              currentPeriodStart: new Date(subscription.current_period_start * 1000),
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            });
+          }
+          break;
+        }
+
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object as Stripe.Subscription;
+          const userId = subscription.metadata?.userId;
+
+          if (userId) {
+            await subscriptionService.updateSubscriptionPlan(userId, "free");
+          }
+          break;
+        }
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Error handling webhook:", error);
+      res.status(500).json({ error: "Webhook handler failed" });
     }
   });
 
