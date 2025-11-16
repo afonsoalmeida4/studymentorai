@@ -9,6 +9,7 @@ import {
   deleteThread,
 } from "./assistentService";
 import { chatModes } from "@shared/schema";
+import { subscriptionService } from "./subscriptionService";
 
 export function registerChatRoutes(app: Express) {
   app.post("/api/chat/threads", isAuthenticated, async (req: any, res) => {
@@ -72,11 +73,24 @@ export function registerChatRoutes(app: Express) {
         return res.status(400).json({ success: false, error: "threadId e message são obrigatórios" });
       }
 
+      const { thread } = await getChatHistory(threadId, userId);
+      
+      const chatCheck = await subscriptionService.canSendChatMessage(userId, thread.mode);
+      if (!chatCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: chatCheck.reason,
+          upgradeRequired: true,
+        });
+      }
+
       const response = await sendMessage({
         threadId,
         userId,
         userMessage: message,
       });
+
+      await subscriptionService.incrementChatMessageCount(userId);
 
       res.json({ success: true, ...response });
     } catch (error) {

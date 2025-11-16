@@ -32,7 +32,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2025-10-29.clover",
 });
 
 // Configure multer for file upload (in-memory storage)
@@ -108,6 +108,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
 
+      // Check subscription limits for uploads
+      const uploadCheck = await subscriptionService.canUpload(userId);
+      if (!uploadCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: uploadCheck.reason,
+          upgradeRequired: true,
+        } as GenerateSummaryResponse);
+      }
+
       // Validate file upload
       if (!req.file) {
         return res.status(400).json({
@@ -170,6 +180,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           learningStyle,
         });
 
+        // Check summary word count against plan limits
+        const summaryWordCount = summary.split(/\s+/).length;
+        const summaryCheck = await subscriptionService.canGenerateSummary(userId, summaryWordCount);
+        if (!summaryCheck.allowed) {
+          return res.status(403).json({
+            success: false,
+            error: summaryCheck.reason,
+            upgradeRequired: true,
+          } as GenerateSummaryResponse);
+        }
+
         // Save to database
         const savedSummary = await storage.createSummary({
           userId,
@@ -179,6 +200,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           motivationalMessage,
           isFavorite: false,
         });
+
+        // Increment usage counters
+        await Promise.all([
+          subscriptionService.incrementUploadCount(userId),
+          subscriptionService.incrementSummaryCount(userId),
+        ]);
 
         // Award XP for generating summary
         await awardXP(userId, "generate_summary", { 
@@ -1155,8 +1182,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               customerId: session.customer as string,
               subscriptionId: subscription.id,
               priceId: subscription.items.data[0].price.id,
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
             });
           }
           break;
@@ -1168,8 +1195,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           if (userId) {
             await subscriptionService.updateSubscriptionPlan(userId, subscription.metadata?.plan as any, {
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
             });
           }
           break;
