@@ -16,6 +16,13 @@ export class SubscriptionService {
   }
 
   /**
+   * Get plan limits for a given plan
+   */
+  getPlanLimits(plan: string) {
+    return planLimits[plan as SubscriptionPlan];
+  }
+
+  /**
    * Get or create subscription (defaults to free plan)
    */
   async getOrCreateSubscription(userId: string): Promise<Subscription> {

@@ -1,7 +1,8 @@
 import { db } from "./db";
-import { chatThreads, chatMessages, contentItems, topics, summaries, type ChatMode } from "@shared/schema";
+import { chatThreads, chatMessages, contentItems, topics, summaries, type ChatMode, chatModes } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 import OpenAI from "openai";
+import { z } from "zod";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -64,13 +65,17 @@ export interface ChatResponse {
 export async function createChatThread(options: CreateThreadOptions) {
   const { userId, mode, topicId, title } = options;
 
+  // Validate mode is one of the allowed values
+  const modeSchema = z.enum(chatModes);
+  const validatedMode = modeSchema.parse(mode);
+
   const thread = await db
     .insert(chatThreads)
     .values({
       userId,
-      mode,
+      mode: validatedMode,
       topicId: topicId || null,
-      title: title || (mode === "study" ? "Nova Conversa - Estudo" : "Nova Conversa - Reflexão"),
+      title: title || (validatedMode === "study" ? "Nova Conversa - Estudo" : "Nova Conversa - Reflexão"),
       isActive: true,
     })
     .returning();

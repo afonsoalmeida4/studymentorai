@@ -21,8 +21,10 @@ export function registerChatRoutes(app: Express) {
       const validMode = modeSchema.parse(mode || "study");
 
       if (validMode === "existential") {
-        const subscription = await subscriptionService.getUserSubscription(userId);
-        if (subscription.plan === "free") {
+        const subscription = await subscriptionService.getOrCreateSubscription(userId);
+        const limits = subscriptionService.getPlanLimits(subscription.plan);
+        
+        if (!limits.chatModes.includes(validMode)) {
           return res.status(403).json({
             success: false,
             error: "O Modo Existencial está disponível apenas nos planos Pro e superiores.",
@@ -86,7 +88,10 @@ export function registerChatRoutes(app: Express) {
 
       const { thread } = await getChatHistory(threadId, userId);
       
-      const chatCheck = await subscriptionService.canSendChatMessage(userId, thread.mode);
+      const modeSchema = z.enum(chatModes);
+      const validatedMode = modeSchema.parse(thread.mode);
+      
+      const chatCheck = await subscriptionService.canSendChatMessage(userId, validatedMode);
       if (!chatCheck.allowed) {
         return res.status(403).json({
           success: false,

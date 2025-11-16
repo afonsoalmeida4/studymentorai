@@ -77,17 +77,29 @@ async function aggregateTopicContent(topicId: string): Promise<string> {
   return aggregatedText.trim();
 }
 
+interface SummaryGenerationResult {
+  overallSuccess: boolean;
+  generatedStyles: string[];
+  failedStyles: Array<{ style: string; reason: string }>;
+  wordLimitReached: boolean;
+}
+
 async function generateTopicSummaries(
   topicId: string, 
   userId: string,
   specificStyle?: "visual" | "auditivo" | "logico" | "conciso"
-): Promise<boolean> {
+): Promise<SummaryGenerationResult> {
   try {
     const aggregatedContent = await aggregateTopicContent(topicId);
 
     if (aggregatedContent === "Este tópico ainda não tem conteúdo.") {
       console.log(`[TopicSummary] Topic ${topicId} has no content to summarize`);
-      return false;
+      return {
+        overallSuccess: false,
+        generatedStyles: [],
+        failedStyles: [{ style: "all", reason: "Tópico sem conteúdo" }],
+        wordLimitReached: false,
+      };
     }
 
     console.log(`[TopicSummary] Generating summary for topic ${topicId}, content length: ${aggregatedContent.length}`);
@@ -95,7 +107,9 @@ async function generateTopicSummaries(
     // If a specific style is requested, generate only that one
     const stylesToGenerate = specificStyle ? [specificStyle] : learningStyles;
 
-    let successCount = 0;
+    const generatedStyles: string[] = [];
+    const failedStyles: Array<{ style: string; reason: string }> = [];
+    let wordLimitReached = false;
 
     for (const style of stylesToGenerate) {
       try {
@@ -103,6 +117,17 @@ async function generateTopicSummaries(
           text: aggregatedContent,
           learningStyle: style,
         });
+
+        // Check word count limit before saving
+        const wordCount = result.summary.split(/\s+/).length;
+        const summaryCheck = await subscriptionService.canGenerateSummary(userId, wordCount);
+        
+        if (!summaryCheck.allowed) {
+          console.log(`[TopicSummary] Summary for ${style} exceeds word limit: ${wordCount} words`);
+          failedStyles.push({ style, reason: summaryCheck.reason || "Limite de palavras excedido" });
+          wordLimitReached = true;
+          continue;
+        }
 
         await db.insert(topicSummaries)
           .values({
@@ -120,22 +145,35 @@ async function generateTopicSummaries(
             },
           });
 
-        successCount++;
+        generatedStyles.push(style);
         console.log(`[TopicSummary] Generated ${style} summary for topic ${topicId}`);
       } catch (styleError) {
         console.error(`[TopicSummary] Failed to generate ${style} summary:`, styleError);
+        failedStyles.push({ 
+          style, 
+          reason: styleError instanceof Error ? styleError.message : "Erro desconhecido" 
+        });
       }
     }
 
-    if (successCount > 0) {
+    if (generatedStyles.length > 0) {
       await awardXP(userId, "generate_summary");
-      return true;
     }
 
-    return false;
+    return {
+      overallSuccess: generatedStyles.length > 0,
+      generatedStyles,
+      failedStyles,
+      wordLimitReached,
+    };
   } catch (error) {
     console.error("[TopicSummary] Error generating topic summaries:", error);
-    return false;
+    return {
+      overallSuccess: false,
+      generatedStyles: [],
+      failedStyles: [{ style: "all", reason: "Erro ao gerar resumos" }],
+      wordLimitReached: false,
+    };
   }
 }
 
@@ -569,16 +607,6 @@ export function registerOrganizationRoutes(app: Express) {
       const { id } = req.params;
       const { learningStyle } = req.body; // Optional: specific style to generate
 
-      // Check if user can generate summaries (wordCount check happens at generation time)
-      const summaryCheck = await subscriptionService.canGenerateSummary(userId, 0);
-      if (!summaryCheck.allowed) {
-        return res.status(403).json({
-          success: false,
-          error: summaryCheck.reason,
-          upgradeRequired: true,
-        });
-      }
-
       // Verify topic belongs to user
       const topic = await db.query.topics.findFirst({
         where: and(eq(topics.id, id), eq(topics.userId, userId)),
@@ -588,14 +616,45 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(404).json({ success: false, error: "Tópico não encontrado" });
       }
 
-      const success = await generateTopicSummaries(id, userId, learningStyle);
+      const result = await generateTopicSummaries(id, userId, learningStyle);
 
-      if (success) {
+      if (result.overallSuccess) {
         // Increment summary count after successful generation
         await subscriptionService.incrementSummaryCount(userId);
-        res.json({ success: true, message: "Resumo gerado com sucesso" });
+        
+        if (result.failedStyles.length > 0) {
+          // Partial success - some styles generated, some failed
+          res.json({ 
+            success: true, 
+            message: "Alguns resumos foram gerados com sucesso",
+            generatedStyles: result.generatedStyles,
+            failedStyles: result.failedStyles,
+          });
+        } else {
+          // Complete success
+          res.json({ 
+            success: true, 
+            message: "Resumo gerado com sucesso",
+            generatedStyles: result.generatedStyles,
+          });
+        }
+      } else if (result.wordLimitReached) {
+        // Word limit exceeded - subscription limit
+        const errorMessage = result.failedStyles[0]?.reason || "Limite de palavras excedido";
+        res.status(403).json({ 
+          success: false, 
+          error: errorMessage,
+          upgradeRequired: true,
+          failedStyles: result.failedStyles,
+        });
       } else {
-        res.status(400).json({ success: false, error: "Não foi possível gerar resumo. Verifique se o tópico tem conteúdo." });
+        // Other error
+        const errorMessage = result.failedStyles[0]?.reason || "Não foi possível gerar resumo.";
+        res.status(400).json({ 
+          success: false, 
+          error: errorMessage,
+          failedStyles: result.failedStyles,
+        });
       }
     } catch (error) {
       console.error("Error generating topic summaries:", error);
