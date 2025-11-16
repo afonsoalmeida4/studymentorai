@@ -45,6 +45,80 @@ export type ContentType = typeof contentTypes[number];
 export const chatModes = ["study", "existential"] as const;
 export type ChatMode = typeof chatModes[number];
 
+// Subscription Plan enum
+export const subscriptionPlans = ["free", "pro", "premium", "educational"] as const;
+export type SubscriptionPlan = typeof subscriptionPlans[number];
+
+// Subscription Status enum
+export const subscriptionStatuses = ["active", "canceled", "past_due", "trialing"] as const;
+export type SubscriptionStatus = typeof subscriptionStatuses[number];
+
+// Plan limits configuration
+export const planLimits = {
+  free: {
+    name: "Começa a Estudar",
+    price: 0,
+    uploadsPerMonth: 3,
+    maxSummaryWords: 1000,
+    advancedFlashcards: false,
+    chatModes: ["study"] as ChatMode[],
+    dailyChatLimit: 10,
+    workspaces: 1,
+    advancedStats: false,
+    studyPlans: false,
+    mindMaps: false,
+    sharedSpaces: false,
+    exportPdf: false,
+  },
+  pro: {
+    name: "Estuda Sem Limites",
+    price: 7.99,
+    uploadsPerMonth: -1, // unlimited
+    maxSummaryWords: -1,
+    advancedFlashcards: true,
+    chatModes: ["study", "existential"] as ChatMode[],
+    dailyChatLimit: -1,
+    workspaces: -1,
+    advancedStats: false,
+    studyPlans: false,
+    mindMaps: false,
+    sharedSpaces: false,
+    exportPdf: false,
+  },
+  premium: {
+    name: "Alta Performance",
+    price: 18.99,
+    uploadsPerMonth: -1,
+    maxSummaryWords: -1,
+    advancedFlashcards: true,
+    chatModes: ["study", "existential"] as ChatMode[],
+    dailyChatLimit: -1,
+    workspaces: -1,
+    advancedStats: true,
+    studyPlans: true,
+    mindMaps: true,
+    sharedSpaces: true,
+    exportPdf: true,
+  },
+  educational: {
+    name: "AI Classroom Pro",
+    price: 14.99, // professor individual
+    uploadsPerMonth: -1,
+    maxSummaryWords: -1,
+    advancedFlashcards: true,
+    chatModes: ["study", "existential"] as ChatMode[],
+    dailyChatLimit: -1,
+    workspaces: -1,
+    advancedStats: true,
+    studyPlans: true,
+    mindMaps: true,
+    sharedSpaces: true,
+    exportPdf: true,
+    teacherFeatures: true,
+    classManagement: true,
+  },
+} as const;
+
 // Session storage table (mandatory for Replit Auth)
 export const sessions = pgTable(
   "sessions",
@@ -80,6 +154,66 @@ export const users = pgTable("users", {
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Subscriptions table
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+    plan: varchar("plan", { length: 20 }).notNull().default("free"),
+    status: varchar("status", { length: 20 }).notNull().default("active"),
+    stripeCustomerId: varchar("stripe_customer_id"),
+    stripeSubscriptionId: varchar("stripe_subscription_id"),
+    stripePriceId: varchar("stripe_price_id"),
+    currentPeriodStart: timestamp("current_period_start"),
+    currentPeriodEnd: timestamp("current_period_end"),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_subscriptions_user_id").on(table.userId),
+    index("idx_subscriptions_status").on(table.status),
+  ],
+);
+
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type Subscription = typeof subscriptions.$inferSelect;
+
+// Usage Tracking table (for monthly limits)
+export const usageTracking = pgTable(
+  "usage_tracking",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    month: varchar("month", { length: 7 }).notNull(), // YYYY-MM format
+    uploadsCount: integer("uploads_count").default(0).notNull(),
+    chatMessagesCount: integer("chat_messages_count").default(0).notNull(),
+    summariesGenerated: integer("summaries_generated").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_usage_tracking_user_month").on(table.userId, table.month),
+    uniqueIndex("idx_usage_tracking_user_month_unique").on(table.userId, table.month),
+  ],
+);
+
+export const insertUsageTrackingSchema = createInsertSchema(usageTracking).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUsageTracking = z.infer<typeof insertUsageTrackingSchema>;
+export type UsageTracking = typeof usageTracking.$inferSelect;
 
 // Summaries table
 export const summaries = pgTable(
