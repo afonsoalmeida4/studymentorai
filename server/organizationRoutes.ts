@@ -568,6 +568,16 @@ export function registerOrganizationRoutes(app: Express) {
       const { id } = req.params;
       const { learningStyle } = req.body; // Optional: specific style to generate
 
+      // Check if user can generate summaries
+      const summaryCheck = await subscriptionService.canGenerateSummary(userId);
+      if (!summaryCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: summaryCheck.reason,
+          upgradeRequired: true,
+        });
+      }
+
       // Verify topic belongs to user
       const topic = await db.query.topics.findFirst({
         where: and(eq(topics.id, id), eq(topics.userId, userId)),
@@ -580,6 +590,8 @@ export function registerOrganizationRoutes(app: Express) {
       const success = await generateTopicSummaries(id, userId, learningStyle);
 
       if (success) {
+        // Increment summary count after successful generation
+        await subscriptionService.incrementSummaryCount(userId);
         res.json({ success: true, message: "Resumo gerado com sucesso" });
       } else {
         res.status(400).json({ success: false, error: "Não foi possível gerar resumo. Verifique se o tópico tem conteúdo." });

@@ -3,6 +3,7 @@ import { Send, Brain, Sparkles, Trash2, Plus } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,14 @@ export default function ChatView() {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
+
+  const { data: subscriptionData } = useQuery<any>({
+    queryKey: ["/api/subscription"],
+  });
+
+  const currentPlan = subscriptionData?.subscription?.plan || "free";
 
   const { data: studyThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "study"],
@@ -90,12 +99,17 @@ export default function ChatView() {
         description: "Pode começar a conversar com o AI Mentor.",
       });
     },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível criar a conversa.",
-      });
+    onError: (error: any) => {
+      if (error.status === 403) {
+        setUpgradeReason("features");
+        setShowUpgradeDialog(true);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: error.message || "Não foi possível criar a conversa.",
+        });
+      }
     },
   });
 
@@ -110,12 +124,17 @@ export default function ChatView() {
       queryClient.invalidateQueries({ queryKey: ["/api/chat/threads", selectedThreadId] });
       setMessageInput("");
     },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível enviar a mensagem.",
-      });
+    onError: (error: any) => {
+      if (error.status === 403) {
+        setUpgradeReason("chat");
+        setShowUpgradeDialog(true);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: error.message || "Não foi possível enviar a mensagem.",
+        });
+      }
     },
   });
 
@@ -339,6 +358,13 @@ export default function ChatView() {
           </>
         )}
       </div>
+
+      <UpgradeDialog
+        open={showUpgradeDialog}
+        onOpenChange={setShowUpgradeDialog}
+        limitType={upgradeReason}
+        currentPlan={currentPlan}
+      />
     </div>
   );
 }

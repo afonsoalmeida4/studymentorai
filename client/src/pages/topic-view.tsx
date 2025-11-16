@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import SummaryStudySection from "@/components/SummaryStudySection";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -56,6 +57,14 @@ export default function TopicView() {
   const [linkTitle, setLinkTitle] = useState("");
   const [selectedLearningStyles, setSelectedLearningStyles] = useState<LearningStyle[]>(["visual"]);
   const [isGenerateStylesDialogOpen, setIsGenerateStylesDialogOpen] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("uploads");
+
+  const { data: subscriptionData } = useQuery<any>({
+    queryKey: ["/api/subscription"],
+  });
+
+  const currentPlan = subscriptionData?.subscription?.plan || "free";
 
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
@@ -152,12 +161,17 @@ export default function TopicView() {
           : "Ficheiro adicionado com sucesso.",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "Erro no upload",
-        description: error.message,
-      });
+    onError: (error: any) => {
+      if (error.status === 403) {
+        setUpgradeReason("uploads");
+        setShowUpgradeDialog(true);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro no upload",
+          description: error.message,
+        });
+      }
     },
   });
 
@@ -797,6 +811,13 @@ export default function TopicView() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <UpgradeDialog
+        open={showUpgradeDialog}
+        onOpenChange={setShowUpgradeDialog}
+        limitType={upgradeReason}
+        currentPlan={currentPlan}
+      />
     </>
   );
 }

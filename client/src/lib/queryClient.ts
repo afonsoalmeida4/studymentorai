@@ -2,8 +2,19 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    try {
+      const json = await res.json();
+      const error: any = new Error(json.error || json.message || res.statusText);
+      error.status = res.status;
+      error.data = json;
+      throw error;
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        const text = res.statusText;
+        throw new Error(`${res.status}: ${text}`);
+      }
+      throw e;
+    }
   }
 }
 
