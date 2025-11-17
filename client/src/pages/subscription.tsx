@@ -9,6 +9,8 @@ import { Check, Crown, Zap, Rocket, GraduationCap, ArrowRight } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import type { Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 
 type SubscriptionDetails = {
   subscription: Subscription;
@@ -18,6 +20,33 @@ type SubscriptionDetails = {
 
 export default function SubscriptionPage() {
   const { toast } = useToast();
+  const [location, setLocation] = useLocation();
+
+  // Handle Stripe redirect callbacks
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const canceled = urlParams.get('canceled');
+
+    if (success === 'true') {
+      toast({
+        title: "✅ Pagamento Processado!",
+        description: "A tua subscrição será ativada em breve. Obrigado!",
+      });
+      // Invalidate subscription query to refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+      // Clean URL
+      window.history.replaceState({}, '', '/subscription');
+    } else if (canceled === 'true') {
+      toast({
+        title: "Pagamento Cancelado",
+        description: "Podes tentar novamente quando quiseres.",
+        variant: "default",
+      });
+      // Clean URL
+      window.history.replaceState({}, '', '/subscription');
+    }
+  }, [toast]);
 
   const { data, isLoading } = useQuery<SubscriptionDetails>({
     queryKey: ["/api/subscription"],
