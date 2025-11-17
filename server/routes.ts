@@ -1117,9 +1117,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         educational: process.env.STRIPE_PRICE_ID_EDUCATIONAL || "",
       };
 
-      // Build URLs with explicit https:// scheme for Stripe
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN || "http://localhost:5000";
-      const fullBaseUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+      // Build URLs using the actual host from the request to avoid stale domains
+      const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
+      const host = req.get('host') || req.get('x-forwarded-host') || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
+      const fullBaseUrl = `${protocol}://${host}`;
+
+      console.log('[Stripe Checkout] Creating session with URLs:', {
+        success: `${fullBaseUrl}/subscription?success=true`,
+        cancel: `${fullBaseUrl}/subscription?canceled=true`,
+        protocol,
+        host,
+        fullBaseUrl,
+      });
 
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
@@ -1137,6 +1146,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           plan,
         },
       });
+
+      console.log('[Stripe Checkout] Session created:', session.id);
 
       return res.json({
         url: session.url,
