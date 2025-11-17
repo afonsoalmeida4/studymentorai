@@ -20,11 +20,21 @@ export function UpgradeDialog({ open, onOpenChange, limitType, currentPlan }: Up
       return await apiRequest("POST", "/api/subscription/create-checkout", { plan });
     },
     onSuccess: (data) => {
+      console.log("UpgradeDialog - Checkout response:", data);
       if (data.url) {
+        console.log("UpgradeDialog - Redirecting to:", data.url);
         window.location.href = data.url;
+      } else {
+        console.error("UpgradeDialog - No URL in response:", data);
+        toast({
+          title: "Erro",
+          description: "URL de pagamento não recebido",
+          variant: "destructive",
+        });
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("UpgradeDialog - Checkout error:", error);
       toast({
         title: "Erro",
         description: "Não foi possível iniciar o processo de pagamento",
