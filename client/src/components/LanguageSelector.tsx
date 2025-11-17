@@ -1,0 +1,77 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Globe } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { supportedLanguages, languageNames, type SupportedLanguage } from "@shared/schema";
+
+export function LanguageSelector() {
+  const { i18n } = useTranslation();
+  const { toast } = useToast();
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(
+    (i18n.language as SupportedLanguage) || "pt"
+  );
+
+  const updateLanguageMutation = useMutation({
+    mutationFn: async (language: SupportedLanguage) => {
+      const result = await apiRequest("POST", "/api/user/language", { language });
+      return result;
+    },
+    onSuccess: async (data, language) => {
+      await i18n.changeLanguage(language);
+      setCurrentLanguage(language);
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      
+      toast({
+        title: "Idioma atualizado",
+        description: `A interface foi alterada para ${languageNames[language]}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: error.message || "Erro ao atualizar idioma",
+      });
+    },
+  });
+
+  const handleLanguageChange = (language: string) => {
+    const lang = language as SupportedLanguage;
+    updateLanguageMutation.mutate(lang);
+  };
+
+  return (
+    <Select value={currentLanguage} onValueChange={handleLanguageChange}>
+      <SelectTrigger
+        className="w-[160px]"
+        data-testid="select-language"
+      >
+        <div className="flex items-center gap-2">
+          <Globe className="h-4 w-4" />
+          <SelectValue />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {supportedLanguages.map((lang) => (
+          <SelectItem
+            key={lang}
+            value={lang}
+            data-testid={`option-language-${lang}`}
+          >
+            {languageNames[lang]}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}

@@ -7,6 +7,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 export interface GenerateSummaryParams {
   text: string;
   learningStyle: "visual" | "auditivo" | "logico" | "conciso";
+  language?: string;
 }
 
 export interface SummaryResult {
@@ -19,30 +20,102 @@ export interface FlashcardItem {
   answer: string;
 }
 
-const learningStylePrompts = {
-  visual: `Tutor visual: crie resumo com metáforas visuais, organize em estruturas claras (blocos, fluxos), sugira diagramas quando útil. Use linguagem que evoca imagens mentais.`,
-
-  auditivo: `Tutor auditivo: crie resumo narrativo e conversacional, explique como história, use ritmo e repetição, inclua analogias do dia-a-dia.`,
-
-  logico: `Tutor lógico: organize em passos sequenciais numerados, destaque causa e efeito, apresente raciocínio analítico e padrões.`,
-
-  conciso: `Tutor objetivo: resumo direto aos pontos-chave, frases curtas, elimine redundância, apresente apenas o essencial.`,
+const learningStylePrompts: Record<string, Record<string, string>> = {
+  pt: {
+    visual: `Tutor visual: crie resumo com metáforas visuais, organize em estruturas claras (blocos, fluxos), sugira diagramas quando útil. Use linguagem que evoca imagens mentais. RESPONDA EM PORTUGUÊS.`,
+    auditivo: `Tutor auditivo: crie resumo narrativo e conversacional, explique como história, use ritmo e repetição, inclua analogias do dia-a-dia. RESPONDA EM PORTUGUÊS.`,
+    logico: `Tutor lógico: organize em passos sequenciais numerados, destaque causa e efeito, apresente raciocínio analítico e padrões. RESPONDA EM PORTUGUÊS.`,
+    conciso: `Tutor objetivo: resumo direto aos pontos-chave, frases curtas, elimine redundância, apresente apenas o essencial. RESPONDA EM PORTUGUÊS.`,
+  },
+  en: {
+    visual: `Visual tutor: create summary with visual metaphors, organize in clear structures (blocks, flows), suggest diagrams when useful. Use language that evokes mental images. RESPOND IN ENGLISH.`,
+    auditivo: `Auditory tutor: create narrative and conversational summary, explain as a story, use rhythm and repetition, include everyday analogies. RESPOND IN ENGLISH.`,
+    logico: `Logical tutor: organize in numbered sequential steps, highlight cause and effect, present analytical reasoning and patterns. RESPOND IN ENGLISH.`,
+    conciso: `Objective tutor: direct summary to key points, short sentences, eliminate redundancy, present only the essential. RESPOND IN ENGLISH.`,
+  },
+  es: {
+    visual: `Tutor visual: cree resumen con metáforas visuales, organice en estructuras claras (bloques, flujos), sugiera diagramas cuando sea útil. Use lenguaje que evoque imágenes mentales. RESPONDA EN ESPAÑOL.`,
+    auditivo: `Tutor auditivo: cree resumen narrativo y conversacional, explique como historia, use ritmo y repetición, incluya analogías cotidianas. RESPONDA EN ESPAÑOL.`,
+    logico: `Tutor lógico: organice en pasos secuenciales numerados, destaque causa y efecto, presente razonamiento analítico y patrones. RESPONDA EN ESPAÑOL.`,
+    conciso: `Tutor objetivo: resumen directo a los puntos clave, frases cortas, elimine redundancia, presente solo lo esencial. RESPONDA EN ESPAÑOL.`,
+  },
+  fr: {
+    visual: `Tuteur visuel : créez un résumé avec des métaphores visuelles, organisez en structures claires (blocs, flux), suggérez des diagrammes si utile. Utilisez un langage qui évoque des images mentales. RÉPONDEZ EN FRANÇAIS.`,
+    auditivo: `Tuteur auditif : créez un résumé narratif et conversationnel, expliquez comme une histoire, utilisez rythme et répétition, incluez des analogies quotidiennes. RÉPONDEZ EN FRANÇAIS.`,
+    logico: `Tuteur logique : organisez en étapes séquentielles numérotées, mettez en évidence la cause et l'effet, présentez un raisonnement analytique et des modèles. RÉPONDEZ EN FRANÇAIS.`,
+    conciso: `Tuteur objectif : résumé direct aux points clés, phrases courtes, éliminez la redondance, présentez seulement l'essentiel. RÉPONDEZ EN FRANÇAIS.`,
+  },
+  de: {
+    visual: `Visueller Tutor: Erstellen Sie eine Zusammenfassung mit visuellen Metaphern, organisieren Sie in klaren Strukturen (Blöcke, Flüsse), schlagen Sie Diagramme vor, wenn nützlich. Verwenden Sie Sprache, die mentale Bilder hervorruft. ANTWORTEN SIE AUF DEUTSCH.`,
+    auditivo: `Auditiver Tutor: Erstellen Sie eine narrative und gesprächige Zusammenfassung, erklären Sie als Geschichte, verwenden Sie Rhythmus und Wiederholung, fügen Sie alltägliche Analogien hinzu. ANTWORTEN SIE AUF DEUTSCH.`,
+    logico: `Logischer Tutor: Organisieren Sie in nummerierten sequentiellen Schritten, heben Sie Ursache und Wirkung hervor, präsentieren Sie analytisches Denken und Muster. ANTWORTEN SIE AUF DEUTSCH.`,
+    conciso: `Objektiver Tutor: direkte Zusammenfassung zu den Hauptpunkten, kurze Sätze, eliminieren Sie Redundanz, präsentieren Sie nur das Wesentliche. ANTWORTEN SIE AUF DEUTSCH.`,
+  },
+  it: {
+    visual: `Tutor visivo: crea riassunto con metafore visive, organizza in strutture chiare (blocchi, flussi), suggerisci diagrammi quando utile. Usa linguaggio che evoca immagini mentali. RISPONDI IN ITALIANO.`,
+    auditivo: `Tutor uditivo: crea riassunto narrativo e conversazionale, spiega come storia, usa ritmo e ripetizione, includi analogie quotidiane. RISPONDI IN ITALIANO.`,
+    logico: `Tutor logico: organizza in passi sequenziali numerati, evidenzia causa ed effetto, presenta ragionamento analitico e pattern. RISPONDI IN ITALIANO.`,
+    conciso: `Tutor obiettivo: riassunto diretto ai punti chiave, frasi brevi, elimina ridondanza, presenta solo l'essenziale. RISPONDI IN ITALIANO.`,
+  },
 };
 
-const motivationalPrompts = {
-  visual: "Crie uma mensagem motivacional curta (1-2 frases) que use linguagem visual e inspire o estudante a imaginar o seu sucesso.",
-  auditivo: "Crie uma mensagem motivacional curta (1-2 frases) em tom encorajador e conversacional que ressoe emocionalmente.",
-  logico: "Crie uma mensagem motivacional curta (1-2 frases) que apresente uma lógica inspiradora sobre o progresso do estudante.",
-  conciso: "Crie uma mensagem motivacional curta (1 frase) poderosa e direta que motive ação imediata.",
+const motivationalPrompts: Record<string, Record<string, string>> = {
+  pt: {
+    visual: "Crie uma mensagem motivacional curta (1-2 frases) que use linguagem visual e inspire o estudante a imaginar o seu sucesso. RESPONDA EM PORTUGUÊS.",
+    auditivo: "Crie uma mensagem motivacional curta (1-2 frases) em tom encorajador e conversacional que ressoe emocionalmente. RESPONDA EM PORTUGUÊS.",
+    logico: "Crie uma mensagem motivacional curta (1-2 frases) que apresente uma lógica inspiradora sobre o progresso do estudante. RESPONDA EM PORTUGUÊS.",
+    conciso: "Crie uma mensagem motivacional curta (1 frase) poderosa e direta que motive ação imediata. RESPONDA EM PORTUGUÊS.",
+  },
+  en: {
+    visual: "Create a short motivational message (1-2 sentences) that uses visual language and inspires the student to imagine their success. RESPOND IN ENGLISH.",
+    auditivo: "Create a short motivational message (1-2 sentences) in an encouraging and conversational tone that resonates emotionally. RESPOND IN ENGLISH.",
+    logico: "Create a short motivational message (1-2 sentences) that presents inspiring logic about the student's progress. RESPOND IN ENGLISH.",
+    conciso: "Create a short motivational message (1 sentence) powerful and direct that motivates immediate action. RESPOND IN ENGLISH.",
+  },
+  es: {
+    visual: "Cree un mensaje motivacional corto (1-2 frases) que use lenguaje visual e inspire al estudiante a imaginar su éxito. RESPONDA EN ESPAÑOL.",
+    auditivo: "Cree un mensaje motivacional corto (1-2 frases) en tono alentador y conversacional que resuene emocionalmente. RESPONDA EN ESPAÑOL.",
+    logico: "Cree un mensaje motivacional corto (1-2 frases) que presente una lógica inspiradora sobre el progreso del estudiante. RESPONDA EN ESPAÑOL.",
+    conciso: "Cree un mensaje motivacional corto (1 frase) poderoso y directo que motive acción inmediata. RESPONDA EN ESPAÑOL.",
+  },
+  fr: {
+    visual: "Créez un court message motivationnel (1-2 phrases) qui utilise un langage visuel et inspire l'étudiant à imaginer son succès. RÉPONDEZ EN FRANÇAIS.",
+    auditivo: "Créez un court message motivationnel (1-2 phrases) sur un ton encourageant et conversationnel qui résonne émotionnellement. RÉPONDEZ EN FRANÇAIS.",
+    logico: "Créez un court message motivationnel (1-2 phrases) qui présente une logique inspirante sur les progrès de l'étudiant. RÉPONDEZ EN FRANÇAIS.",
+    conciso: "Créez un court message motivationnel (1 phrase) puissant et direct qui motive une action immédiate. RÉPONDEZ EN FRANÇAIS.",
+  },
+  de: {
+    visual: "Erstellen Sie eine kurze motivierende Nachricht (1-2 Sätze), die visuelle Sprache verwendet und den Schüler inspiriert, sich seinen Erfolg vorzustellen. ANTWORTEN SIE AUF DEUTSCH.",
+    auditivo: "Erstellen Sie eine kurze motivierende Nachricht (1-2 Sätze) in einem ermutigenden und gesprächigen Ton, der emotional resoniert. ANTWORTEN SIE AUF DEUTSCH.",
+    logico: "Erstellen Sie eine kurze motivierende Nachricht (1-2 Sätze), die inspirierende Logik über den Fortschritt des Schülers präsentiert. ANTWORTEN SIE AUF DEUTSCH.",
+    conciso: "Erstellen Sie eine kurze motivierende Nachricht (1 Satz), die kraftvoll und direkt ist und zu sofortigem Handeln motiviert. ANTWORTEN SIE AUF DEUTSCH.",
+  },
+  it: {
+    visual: "Crea un breve messaggio motivazionale (1-2 frasi) che usa linguaggio visivo e ispira lo studente a immaginare il proprio successo. RISPONDI IN ITALIANO.",
+    auditivo: "Crea un breve messaggio motivazionale (1-2 frasi) in tono incoraggiante e conversazionale che risuoni emotivamente. RISPONDI IN ITALIANO.",
+    logico: "Crea un breve messaggio motivazionale (1-2 frasi) che presenti una logica ispiratrice sul progresso dello studente. RISPONDI IN ITALIANO.",
+    conciso: "Crea un breve messaggio motivazionale (1 frase) potente e diretto che motivi azione immediata. RISPONDI IN ITALIANO.",
+  },
 };
 
 export async function generateSummary({
   text,
   learningStyle,
+  language = "pt",
 }: GenerateSummaryParams): Promise<SummaryResult> {
   try {
-    const systemPrompt = learningStylePrompts[learningStyle];
-    const motivationalPrompt = motivationalPrompts[learningStyle];
+    const lang = language || "pt";
+    const systemPrompt = learningStylePrompts[lang]?.[learningStyle] || learningStylePrompts["pt"][learningStyle];
+    const motivationalPrompt = motivationalPrompts[lang]?.[learningStyle] || motivationalPrompts["pt"][learningStyle];
+
+    const userPrompts: Record<string, string> = {
+      pt: `Por favor, crie um resumo do seguinte texto adaptado ao estilo de aprendizagem especificado:\n\n${text}`,
+      en: `Please create a summary of the following text adapted to the specified learning style:\n\n${text}`,
+      es: `Por favor, cree un resumen del siguiente texto adaptado al estilo de aprendizaje especificado:\n\n${text}`,
+      fr: `Veuillez créer un résumé du texte suivant adapté au style d'apprentissage spécifié:\n\n${text}`,
+      de: `Bitte erstellen Sie eine Zusammenfassung des folgenden Textes, angepasst an den angegebenen Lernstil:\n\n${text}`,
+      it: `Per favore, crea un riassunto del seguente testo adattato allo stile di apprendimento specificato:\n\n${text}`,
+    };
 
     // Generate the summary
     const summaryResponse = await openai.chat.completions.create({
@@ -54,7 +127,7 @@ export async function generateSummary({
         },
         {
           role: "user",
-          content: `Por favor, crie um resumo do seguinte texto adaptado ao estilo de aprendizagem especificado:\n\n${text}`,
+          content: userPrompts[lang] || userPrompts["pt"],
         },
       ],
       max_completion_tokens: 8192, // Increased to allow for reasoning tokens + actual response
@@ -69,7 +142,34 @@ export async function generateSummary({
       promptLength: systemPrompt.length,
     });
 
-    const summary = summaryResponse.choices[0].message.content || "Não foi possível gerar o resumo.";
+    const defaultSummaryMessages: Record<string, string> = {
+      pt: "Não foi possível gerar o resumo.",
+      en: "Could not generate summary.",
+      es: "No se pudo generar el resumen.",
+      fr: "Impossible de générer le résumé.",
+      de: "Zusammenfassung konnte nicht erstellt werden.",
+      it: "Impossibile generare il riassunto.",
+    };
+
+    const summary = summaryResponse.choices[0].message.content || defaultSummaryMessages[lang] || defaultSummaryMessages["pt"];
+
+    const motivationalUserPrompts: Record<string, string> = {
+      pt: "Gere uma mensagem motivacional para um estudante que acabou de receber este resumo.",
+      en: "Generate a motivational message for a student who just received this summary.",
+      es: "Genere un mensaje motivacional para un estudiante que acaba de recibir este resumen.",
+      fr: "Générez un message motivationnel pour un étudiant qui vient de recevoir ce résumé.",
+      de: "Generieren Sie eine motivierende Nachricht für einen Schüler, der gerade diese Zusammenfassung erhalten hat.",
+      it: "Genera un messaggio motivazionale per uno studente che ha appena ricevuto questo riassunto.",
+    };
+
+    const defaultMotivationalMessages: Record<string, string> = {
+      pt: "Continue estudando e alcançará seus objetivos!",
+      en: "Keep studying and you will achieve your goals!",
+      es: "¡Sigue estudiando y alcanzarás tus objetivos!",
+      fr: "Continuez à étudier et vous atteindrez vos objectifs !",
+      de: "Lernen Sie weiter und Sie werden Ihre Ziele erreichen!",
+      it: "Continua a studiare e raggiungerai i tuoi obiettivi!",
+    };
 
     // Generate motivational message
     const motivationalResponse = await openai.chat.completions.create({
@@ -81,13 +181,13 @@ export async function generateSummary({
         },
         {
           role: "user",
-          content: "Gere uma mensagem motivacional para um estudante que acabou de receber este resumo.",
+          content: motivationalUserPrompts[lang] || motivationalUserPrompts["pt"],
         },
       ],
       max_completion_tokens: 150,
     });
 
-    const motivationalMessage = motivationalResponse.choices[0].message.content || "Continue estudando e alcançará seus objetivos!";
+    const motivationalMessage = motivationalResponse.choices[0].message.content || defaultMotivationalMessages[lang] || defaultMotivationalMessages["pt"];
 
     return {
       summary,

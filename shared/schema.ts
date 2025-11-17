@@ -29,6 +29,20 @@ export type UserLevel = typeof userLevels[number];
 export const userRoles = ["student", "teacher"] as const;
 export type UserRole = typeof userRoles[number];
 
+// Supported Languages enum
+export const supportedLanguages = ["pt", "en", "es", "fr", "de", "it"] as const;
+export type SupportedLanguage = typeof supportedLanguages[number];
+
+// Language names for UI
+export const languageNames: Record<SupportedLanguage, string> = {
+  pt: "Português",
+  en: "English",
+  es: "Español",
+  fr: "Français",
+  de: "Deutsch",
+  it: "Italiano",
+};
+
 // Level configuration (icons will be rendered using lucide-react in UI)
 export const levelConfig = {
   iniciante: { minXp: 0, maxXp: 299, icon: "feather", name: "Iniciante" },
@@ -139,6 +153,8 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   // Role field (nullable until user selects during onboarding)
   role: varchar("role", { length: 20 }),
+  // Language preference (defaults to Portuguese)
+  language: varchar("language", { length: 5 }).default("pt").notNull(),
   // Gamification fields (displayName nullable until user sets it)
   displayName: varchar("display_name"),
   totalXp: integer("total_xp").default(0).notNull(),
@@ -367,6 +383,7 @@ export const topicSummaries = pgTable(
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
     learningStyle: varchar("learning_style", { length: 20 }).notNull(),
+    language: varchar("language", { length: 5 }).default("pt").notNull(),
     summary: text("summary").notNull(),
     motivationalMessage: text("motivational_message").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -376,8 +393,8 @@ export const topicSummaries = pgTable(
     return {
       topicIdx: index("idx_topic_summaries_topic_id").on(table.topicId),
       learningStyleIdx: index("idx_topic_summaries_learning_style").on(table.learningStyle),
-      // Ensure one summary per learning style per topic
-      uniqueTopicStyle: uniqueIndex("idx_topic_summaries_unique").on(table.topicId, table.learningStyle),
+      // Ensure one summary per learning style per topic per language
+      uniqueTopicStyleLang: uniqueIndex("idx_topic_summaries_unique").on(table.topicId, table.learningStyle, table.language),
     };
   },
 );
@@ -535,6 +552,7 @@ export const flashcards = pgTable(
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     summaryId: varchar("summary_id").references(() => summaries.id, { onDelete: "cascade" }),
     topicSummaryId: varchar("topic_summary_id").references(() => topicSummaries.id, { onDelete: "cascade" }),
+    language: varchar("language", { length: 5 }).default("pt").notNull(),
     question: text("question").notNull(),
     answer: text("answer").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

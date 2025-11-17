@@ -69,3 +69,18 @@ Authentication is handled via Replit OIDC, using session-based authentication wi
 - Error handling: 403 errors trigger UpgradeDialog on frontend, showing appropriate upgrade path
 - Usage tracking increments after successful operations (uploads, summaries, chat messages)
 - Plan limits verified via `subscriptionService.getPlanLimits()` for consistent enforcement
+
+**Internationalization (i18n) System Implementation (November 2025):**
+- Database schema updated with language support: `users.language`, `topicSummaries.language`, `flashcards.language` columns (default: "pt")
+- Installed and configured react-i18next with support for 6 languages: Portuguese, English, Spanish, French, German, Italian
+- Created comprehensive translation files for all UI elements across all supported languages
+- Implemented LanguageSelector component in header with backend synchronization
+- Created useLanguageSync hook to automatically sync user's language preference with i18n
+- API endpoint POST /api/user/language for updating user language preference
+- Modified OpenAI summary generation to support multi-language output:
+  - Learning style prompts translated to all 6 languages
+  - Motivational messages generated in user's selected language
+  - AI summaries generated in user's preferred language
+- **TODO:** Update API routes to fetch user language and pass to generateSummary()
+- **TODO:** Update flashcard generation to use user's language
+- **TODO:** Update chat AI to use user's language

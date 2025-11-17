@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguageSync } from "@/hooks/useLanguageSync";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import SubjectView from "@/pages/subject-view";
@@ -19,10 +21,13 @@ import StudentClasses from "@/pages/student-classes";
 import SubscriptionPage from "@/pages/subscription";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
+import "@/lib/i18n";
 
 function AuthenticatedRouter() {
   const { user } = useAuth();
   const typedUser = user as User | null;
+  
+  useLanguageSync();
 
   if (typedUser && !typedUser.role) {
     return <RoleSelection />;
@@ -32,8 +37,9 @@ function AuthenticatedRouter() {
     <div className="flex h-screen w-full">
       <AppSidebar />
       <div className="flex flex-col flex-1">
-        <header className="flex items-center justify-between p-2 border-b">
+        <header className="flex items-center justify-between p-2 border-b gap-2">
           <SidebarTrigger data-testid="button-sidebar-toggle" />
+          <LanguageSelector />
         </header>
         <main className="flex-1 overflow-auto">
           <Switch>

@@ -29,6 +29,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   getOrCreateUser(id: string, claims: any): Promise<User>;
   updateUserRole(userId: string, role: "student" | "teacher"): Promise<User>;
+  updateUserLanguage(userId: string, language: string): Promise<User>;
   
   // Summary operations
   createSummary(summary: InsertSummary): Promise<Summary>;
@@ -101,6 +102,23 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({
         role,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  }
+
+  async updateUserLanguage(userId: string, language: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        language,
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))

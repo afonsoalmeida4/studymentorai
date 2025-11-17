@@ -108,6 +108,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
 
+      // Get user to access language preference
+      const user = await storage.getUser(userId);
+      const userLanguage = user?.language || "pt";
+
       // Check subscription limits for uploads
       const uploadCheck = await subscriptionService.canUpload(userId);
       if (!uploadCheck.allowed) {
@@ -178,6 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { summary, motivationalMessage } = await generateSummary({
           text: pdfText,
           learningStyle,
+          language: userLanguage,
         });
 
         // Check summary word count against plan limits
@@ -1053,6 +1058,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({
         success: false,
         error: "Erro ao atualizar role",
+      });
+    }
+  });
+
+  // Update user language preference
+  app.post("/api/user/language", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { language } = req.body;
+      
+      const validLanguages = ["pt", "en", "es", "fr", "de", "it"];
+      if (!language || !validLanguages.includes(language)) {
+        return res.status(400).json({
+          success: false,
+          error: "Idioma inválido",
+        });
+      }
+
+      const updatedUser = await storage.updateUserLanguage(userId, language);
+      
+      return res.json({
+        success: true,
+        user: updatedUser,
+      });
+    } catch (error) {
+      console.error("Error updating user language:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao atualizar idioma",
       });
     }
   });
