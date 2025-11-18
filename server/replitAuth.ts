@@ -83,9 +83,15 @@ export async function setupAuth(app: Express) {
   const config = await getOidcConfig();
   
   // Use REPLIT_DOMAINS or REPLIT_DEV_DOMAIN for consistent domain
-  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 
-                 process.env.REPLIT_DEV_DOMAIN || 
-                 'localhost:5000';
+  let domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 
+               process.env.REPLIT_DEV_DOMAIN || 
+               'localhost';
+  
+  // In development, add port 5000 to match how the app is accessed
+  const isProduction = process.env.NODE_ENV === "production";
+  if (!isProduction && !domain.includes(':')) {
+    domain = `${domain}:5000`;
+  }
   
   console.log("[AUTH] Using domain for callbacks:", domain);
 
