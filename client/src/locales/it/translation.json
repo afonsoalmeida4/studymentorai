@@ -208,5 +208,66 @@
   },
   "app": {
     "tagline": "Organizza. Bilancia."
+  },
+  "landing": {
+    "hero": {
+      "title": "AI Study Mentor",
+      "description": "Trasforma documenti in conoscenza organizzata con l'IA. Studia in modo personalizzato e trova supporto per il tuo percorso di apprendimento.",
+      "cta": "Inizia Ora"
+    },
+    "features": {
+      "title": "Come Funziona",
+      "uploadPdf": {
+        "title": "1. Carica PDF",
+        "description": "Carica qualsiasi documento PDF che vuoi studiare"
+      },
+      "chooseStyle": {
+        "title": "2. Scegli lo Stile",
+        "description": "Seleziona come preferisci imparare: visivo, uditivo, logico o conciso"
+      },
+      "getSummary": {
+        "title": "3. Ricevi il Riassunto",
+        "description": "L'IA crea un riassunto personalizzato con messaggio motivazionale"
+      }
+    },
+    "learningStyles": {
+      "title": "Stili di Apprendimento",
+      "visual": {
+        "title": "Visivo",
+        "description": "Diagrammi, immagini e organizzazione visiva dei contenuti"
+      },
+      "auditory": {
+        "title": "Uditivo",
+        "description": "Spiegazioni narrative e conversazionali"
+      },
+      "logical": {
+        "title": "Logico",
+        "description": "Strutture, passaggi e ragionamento analitico"
+      },
+      "concise": {
+        "title": "Conciso",
+        "description": "Punti chiave diretti e obiettivi"
+      }
+    },
+    "benefits": {
+      "title": "Perché AI Study Mentor?",
+      "aiPowered": {
+        "title": "Alimentato da GPT-5",
+        "description": "Tecnologia AI all'avanguardia per riassunti precisi"
+      },
+      "personalized": {
+        "title": "Personalizzato",
+        "description": "Adattato al tuo stile di apprendimento unico"
+      },
+      "fast": {
+        "title": "Veloce",
+        "description": "Riassunti generati in secondi, non ore"
+      }
+    },
+    "cta": {
+      "title": "Pronto per Migliorare i Tuoi Studi?",
+      "description": "Inizia a creare riassunti personalizzati oggi. È veloce, facile e gratuito.",
+      "button": "Accedi Ora"
+    }
   }
 }

@@ -108,6 +108,67 @@
     "regenerate": "Regenerate",
     "upgrade": "Upgrade to unlock unlimited summaries"
   },
+  "landing": {
+    "hero": {
+      "title": "AI Study Mentor",
+      "description": "Transform documents into organized knowledge with AI. Study in a personalized way and find support for your learning journey.",
+      "cta": "Get Started"
+    },
+    "features": {
+      "title": "How It Works",
+      "uploadPdf": {
+        "title": "1. Upload PDF",
+        "description": "Upload any PDF document you want to study"
+      },
+      "chooseStyle": {
+        "title": "2. Choose Style",
+        "description": "Select how you prefer to learn: visual, auditory, logical or concise"
+      },
+      "getSummary": {
+        "title": "3. Get Summary",
+        "description": "AI creates a personalized summary with motivational message"
+      }
+    },
+    "learningStyles": {
+      "title": "Learning Styles",
+      "visual": {
+        "title": "Visual",
+        "description": "Diagrams, images and visual content organization"
+      },
+      "auditory": {
+        "title": "Auditory",
+        "description": "Narrative and conversational explanations"
+      },
+      "logical": {
+        "title": "Logical",
+        "description": "Structures, steps and analytical reasoning"
+      },
+      "concise": {
+        "title": "Concise",
+        "description": "Direct and objective key points"
+      }
+    },
+    "benefits": {
+      "title": "Why AI Study Mentor?",
+      "aiPowered": {
+        "title": "Powered by GPT-5",
+        "description": "Cutting-edge AI technology for accurate summaries"
+      },
+      "personalized": {
+        "title": "Personalized",
+        "description": "Adapted to your unique learning style"
+      },
+      "fast": {
+        "title": "Fast",
+        "description": "Summaries generated in seconds, not hours"
+      }
+    },
+    "cta": {
+      "title": "Ready to Improve Your Studies?",
+      "description": "Start creating personalized summaries today. It's quick, easy and free.",
+      "button": "Sign In Now"
+    }
+  },
   "flashcards": {
     "title": "Flashcards",
     "generate": "Generate Flashcards",

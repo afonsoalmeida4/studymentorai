@@ -208,5 +208,66 @@
   },
   "app": {
     "tagline": "Organise. Équilibre."
+  },
+  "landing": {
+    "hero": {
+      "title": "AI Study Mentor",
+      "description": "Transformez des documents en connaissances organisées avec l'IA. Étudiez de manière personnalisée et trouvez du soutien pour votre parcours d'apprentissage.",
+      "cta": "Commencer Maintenant"
+    },
+    "features": {
+      "title": "Comment Ça Marche",
+      "uploadPdf": {
+        "title": "1. Télécharger le PDF",
+        "description": "Téléchargez n'importe quel document PDF que vous souhaitez étudier"
+      },
+      "chooseStyle": {
+        "title": "2. Choisir le Style",
+        "description": "Sélectionnez comment vous préférez apprendre : visuel, auditif, logique ou concis"
+      },
+      "getSummary": {
+        "title": "3. Obtenir le Résumé",
+        "description": "L'IA crée un résumé personnalisé avec message motivationnel"
+      }
+    },
+    "learningStyles": {
+      "title": "Styles d'Apprentissage",
+      "visual": {
+        "title": "Visuel",
+        "description": "Diagrammes, images et organisation visuelle du contenu"
+      },
+      "auditory": {
+        "title": "Auditif",
+        "description": "Explications narratives et conversationnelles"
+      },
+      "logical": {
+        "title": "Logique",
+        "description": "Structures, étapes et raisonnement analytique"
+      },
+      "concise": {
+        "title": "Concis",
+        "description": "Points clés directs et objectifs"
+      }
+    },
+    "benefits": {
+      "title": "Pourquoi AI Study Mentor ?",
+      "aiPowered": {
+        "title": "Propulsé par GPT-5",
+        "description": "Technologie d'IA de pointe pour des résumés précis"
+      },
+      "personalized": {
+        "title": "Personnalisé",
+        "description": "Adapté à votre style d'apprentissage unique"
+      },
+      "fast": {
+        "title": "Rapide",
+        "description": "Résumés générés en secondes, pas en heures"
+      }
+    },
+    "cta": {
+      "title": "Prêt à Améliorer Vos Études ?",
+      "description": "Commencez à créer des résumés personnalisés aujourd'hui. C'est rapide, facile et gratuit.",
+      "button": "Se Connecter Maintenant"
+    }
   }
 }

@@ -10,8 +10,11 @@ import {
   FileText,
   Heart,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Landing() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -23,13 +26,13 @@ export default function Landing() {
             </div>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
-            AI Study Mentor
+            {t('landing.hero.title')}
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-4 leading-relaxed max-w-3xl mx-auto font-semibold">
-            Organiza o teu conhecimento. Encontra o teu equilíbrio.
+            {t('app.tagline')}
           </p>
           <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
-            Transforme documentos em conhecimento organizado com IA. Estude de forma personalizada e encontre apoio para a sua jornada de aprendizagem.
+            {t('landing.hero.description')}
           </p>
           <Button
             size="lg"
@@ -38,7 +41,7 @@ export default function Landing() {
             data-testid="button-login"
           >
             <Sparkles className="w-5 h-5 mr-2" />
-            Começar Agora
+            {t('landing.hero.cta')}
           </Button>
         </div>
       </section>
@@ -47,17 +50,17 @@ export default function Landing() {
       <section className="py-16 px-4 bg-card/30">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
-            Como Funciona
+            {t('landing.features.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="border-2">
               <CardContent className="p-8 text-center">
                 <FileText className="w-12 h-12 mx-auto mb-4 text-primary" />
                 <h3 className="text-xl font-semibold mb-3 text-foreground">
-                  1. Carregue o PDF
+                  {t('landing.features.uploadPdf.title')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Faça upload de qualquer documento PDF que queira estudar
+                  {t('landing.features.uploadPdf.description')}
                 </p>
               </CardContent>
             </Card>
@@ -66,10 +69,10 @@ export default function Landing() {
               <CardContent className="p-8 text-center">
                 <Brain className="w-12 h-12 mx-auto mb-4 text-primary" />
                 <h3 className="text-xl font-semibold mb-3 text-foreground">
-                  2. Escolha o Estilo
+                  {t('landing.features.chooseStyle.title')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Selecione como prefere aprender: visual, auditivo, lógico ou conciso
+                  {t('landing.features.chooseStyle.description')}
                 </p>
               </CardContent>
             </Card>
@@ -78,10 +81,10 @@ export default function Landing() {
               <CardContent className="p-8 text-center">
                 <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary" />
                 <h3 className="text-xl font-semibold mb-3 text-foreground">
-                  3. Receba o Resumo
+                  {t('landing.features.getSummary.title')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  A IA cria um resumo personalizado com mensagem motivacional
+                  {t('landing.features.getSummary.description')}
                 </p>
               </CardContent>
             </Card>
@@ -93,7 +96,7 @@ export default function Landing() {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
-            Estilos de Aprendizagem
+            {t('landing.learningStyles.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="border-2">
@@ -101,9 +104,11 @@ export default function Landing() {
                 <div className="flex items-start gap-4">
                   <Eye className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">Visual</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-foreground">
+                      {t('landing.learningStyles.visual.title')}
+                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Diagramas, imagens e organização visual do conteúdo
+                      {t('landing.learningStyles.visual.description')}
                     </p>
                   </div>
                 </div>
@@ -115,9 +120,11 @@ export default function Landing() {
                 <div className="flex items-start gap-4">
                   <Volume2 className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">Auditivo</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-foreground">
+                      {t('landing.learningStyles.auditory.title')}
+                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Explicações narrativas e conversacionais
+                      {t('landing.learningStyles.auditory.description')}
                     </p>
                   </div>
                 </div>
@@ -129,9 +136,11 @@ export default function Landing() {
                 <div className="flex items-start gap-4">
                   <Brain className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">Lógico</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-foreground">
+                      {t('landing.learningStyles.logical.title')}
+                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Estruturas, passos e raciocínio analítico
+                      {t('landing.learningStyles.logical.description')}
                     </p>
                   </div>
                 </div>
@@ -143,9 +152,11 @@ export default function Landing() {
                 <div className="flex items-start gap-4">
                   <Zap className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">Conciso</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-foreground">
+                      {t('landing.learningStyles.concise.title')}
+                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Pontos-chave diretos e objetivos
+                      {t('landing.learningStyles.concise.description')}
                     </p>
                   </div>
                 </div>
@@ -159,28 +170,34 @@ export default function Landing() {
       <section className="py-16 px-4 bg-card/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-12 text-foreground">
-            Porquê AI Study Mentor?
+            {t('landing.benefits.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <Sparkles className="w-10 h-10 mx-auto mb-4 text-primary" />
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Powered by GPT-5</h3>
+              <h3 className="text-lg font-semibold mb-2 text-foreground">
+                {t('landing.benefits.aiPowered.title')}
+              </h3>
               <p className="text-muted-foreground">
-                Tecnologia de IA de ponta para resumos precisos
+                {t('landing.benefits.aiPowered.description')}
               </p>
             </div>
             <div>
               <Heart className="w-10 h-10 mx-auto mb-4 text-primary" />
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Personalizado</h3>
+              <h3 className="text-lg font-semibold mb-2 text-foreground">
+                {t('landing.benefits.personalized.title')}
+              </h3>
               <p className="text-muted-foreground">
-                Adaptado ao seu estilo único de aprendizagem
+                {t('landing.benefits.personalized.description')}
               </p>
             </div>
             <div>
               <Zap className="w-10 h-10 mx-auto mb-4 text-primary" />
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Rápido</h3>
+              <h3 className="text-lg font-semibold mb-2 text-foreground">
+                {t('landing.benefits.fast.title')}
+              </h3>
               <p className="text-muted-foreground">
-                Resumos gerados em segundos, não horas
+                {t('landing.benefits.fast.description')}
               </p>
             </div>
           </div>
@@ -191,10 +208,10 @@ export default function Landing() {
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
-            Pronto para Melhorar os Seus Estudos?
+            {t('landing.cta.title')}
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Comece a criar resumos personalizados hoje. É rápido, fácil e gratuito.
+            {t('landing.cta.description')}
           </p>
           <Button
             size="lg"
@@ -202,7 +219,7 @@ export default function Landing() {
             onClick={() => window.location.href = "/api/login"}
             data-testid="button-cta-login"
           >
-            Entrar Agora
+            {t('landing.cta.button')}
           </Button>
         </div>
       </section>

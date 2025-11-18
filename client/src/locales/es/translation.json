@@ -208,5 +208,66 @@
     "notFound": "No encontrado.",
     "limit": "Límite alcanzado. Actualiza tu plan para continuar.",
     "upload": "Error al subir archivo. Verifica el formato y tamaño."
+  },
+  "landing": {
+    "hero": {
+      "title": "AI Study Mentor",
+      "description": "Transforme documentos en conocimiento organizado con IA. Estudie de forma personalizada y encuentre apoyo para su viaje de aprendizaje.",
+      "cta": "Empezar Ahora"
+    },
+    "features": {
+      "title": "Cómo Funciona",
+      "uploadPdf": {
+        "title": "1. Subir PDF",
+        "description": "Suba cualquier documento PDF que desee estudiar"
+      },
+      "chooseStyle": {
+        "title": "2. Elegir Estilo",
+        "description": "Seleccione cómo prefiere aprender: visual, auditivo, lógico o conciso"
+      },
+      "getSummary": {
+        "title": "3. Recibir Resumen",
+        "description": "La IA crea un resumen personalizado con mensaje motivacional"
+      }
+    },
+    "learningStyles": {
+      "title": "Estilos de Aprendizaje",
+      "visual": {
+        "title": "Visual",
+        "description": "Diagramas, imágenes y organización visual del contenido"
+      },
+      "auditory": {
+        "title": "Auditivo",
+        "description": "Explicaciones narrativas y conversacionales"
+      },
+      "logical": {
+        "title": "Lógico",
+        "description": "Estructuras, pasos y razonamiento analítico"
+      },
+      "concise": {
+        "title": "Conciso",
+        "description": "Puntos clave directos y objetivos"
+      }
+    },
+    "benefits": {
+      "title": "¿Por Qué AI Study Mentor?",
+      "aiPowered": {
+        "title": "Impulsado por GPT-5",
+        "description": "Tecnología de IA de vanguardia para resúmenes precisos"
+      },
+      "personalized": {
+        "title": "Personalizado",
+        "description": "Adaptado a su estilo único de aprendizaje"
+      },
+      "fast": {
+        "title": "Rápido",
+        "description": "Resúmenes generados en segundos, no horas"
+      }
+    },
+    "cta": {
+      "title": "¿Listo para Mejorar sus Estudios?",
+      "description": "Comience a crear resúmenes personalizados hoy. Es rápido, fácil y gratuito.",
+      "button": "Iniciar Sesión Ahora"
+    }
   }
 }

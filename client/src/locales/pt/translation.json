@@ -108,6 +108,67 @@
     "regenerate": "Regenerar",
     "upgrade": "Atualiza para desbloquear resumos ilimitados"
   },
+  "landing": {
+    "hero": {
+      "title": "AI Study Mentor",
+      "description": "Transforme documentos em conhecimento organizado com IA. Estude de forma personalizada e encontre apoio para a sua jornada de aprendizagem.",
+      "cta": "Começar Agora"
+    },
+    "features": {
+      "title": "Como Funciona",
+      "uploadPdf": {
+        "title": "1. Carregue o PDF",
+        "description": "Faça upload de qualquer documento PDF que queira estudar"
+      },
+      "chooseStyle": {
+        "title": "2. Escolha o Estilo",
+        "description": "Selecione como prefere aprender: visual, auditivo, lógico ou conciso"
+      },
+      "getSummary": {
+        "title": "3. Receba o Resumo",
+        "description": "A IA cria um resumo personalizado com mensagem motivacional"
+      }
+    },
+    "learningStyles": {
+      "title": "Estilos de Aprendizagem",
+      "visual": {
+        "title": "Visual",
+        "description": "Diagramas, imagens e organização visual do conteúdo"
+      },
+      "auditory": {
+        "title": "Auditivo",
+        "description": "Explicações narrativas e conversacionais"
+      },
+      "logical": {
+        "title": "Lógico",
+        "description": "Estruturas, passos e raciocínio analítico"
+      },
+      "concise": {
+        "title": "Conciso",
+        "description": "Pontos-chave diretos e objetivos"
+      }
+    },
+    "benefits": {
+      "title": "Porquê AI Study Mentor?",
+      "aiPowered": {
+        "title": "Powered by GPT-5",
+        "description": "Tecnologia de IA de ponta para resumos precisos"
+      },
+      "personalized": {
+        "title": "Personalizado",
+        "description": "Adaptado ao seu estilo único de aprendizagem"
+      },
+      "fast": {
+        "title": "Rápido",
+        "description": "Resumos gerados em segundos, não horas"
+      }
+    },
+    "cta": {
+      "title": "Pronto para Melhorar os Seus Estudos?",
+      "description": "Comece a criar resumos personalizados hoje. É rápido, fácil e gratuito.",
+      "button": "Entrar Agora"
+    }
+  },
   "flashcards": {
     "title": "Flashcards",
     "generate": "Gerar Flashcards",

@@ -208,5 +208,66 @@
   },
   "app": {
     "tagline": "Organisiere. Balanciere."
+  },
+  "landing": {
+    "hero": {
+      "title": "AI Study Mentor",
+      "description": "Verwandeln Sie Dokumente mit KI in organisiertes Wissen. Studieren Sie personalisiert und finden Sie Unterstützung für Ihre Lernreise.",
+      "cta": "Jetzt Beginnen"
+    },
+    "features": {
+      "title": "Wie Es Funktioniert",
+      "uploadPdf": {
+        "title": "1. PDF Hochladen",
+        "description": "Laden Sie jedes PDF-Dokument hoch, das Sie studieren möchten"
+      },
+      "chooseStyle": {
+        "title": "2. Stil Wählen",
+        "description": "Wählen Sie, wie Sie am liebsten lernen: visuell, auditiv, logisch oder prägnant"
+      },
+      "getSummary": {
+        "title": "3. Zusammenfassung Erhalten",
+        "description": "KI erstellt eine personalisierte Zusammenfassung mit motivierender Nachricht"
+      }
+    },
+    "learningStyles": {
+      "title": "Lernstile",
+      "visual": {
+        "title": "Visuell",
+        "description": "Diagramme, Bilder und visuelle Inhaltsorganisation"
+      },
+      "auditory": {
+        "title": "Auditiv",
+        "description": "Narrative und konversationelle Erklärungen"
+      },
+      "logical": {
+        "title": "Logisch",
+        "description": "Strukturen, Schritte und analytisches Denken"
+      },
+      "concise": {
+        "title": "Prägnant",
+        "description": "Direkte und objektive Schlüsselpunkte"
+      }
+    },
+    "benefits": {
+      "title": "Warum AI Study Mentor?",
+      "aiPowered": {
+        "title": "Angetrieben von GPT-5",
+        "description": "Modernste KI-Technologie für präzise Zusammenfassungen"
+      },
+      "personalized": {
+        "title": "Personalisiert",
+        "description": "An Ihren einzigartigen Lernstil angepasst"
+      },
+      "fast": {
+        "title": "Schnell",
+        "description": "Zusammenfassungen in Sekunden generiert, nicht Stunden"
+      }
+    },
+    "cta": {
+      "title": "Bereit, Ihr Studium zu Verbessern?",
+      "description": "Beginnen Sie heute mit der Erstellung personalisierter Zusammenfassungen. Es ist schnell, einfach und kostenlos.",
+      "button": "Jetzt Anmelden"
+    }
   }
 }
