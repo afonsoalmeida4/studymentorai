@@ -50,7 +50,7 @@ export default function TopicView() {
   const params = useParams<{ id: string }>();
   const topicId = params.id;
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -89,10 +89,10 @@ export default function TopicView() {
   });
 
   const { data: topicSummariesData, isLoading: topicSummariesLoading, refetch: refetchTopicSummaries } = useQuery<TopicSummariesResponse>({
-    queryKey: ["/api/topics", topicId, "summaries"],
+    queryKey: ["/api/topics", topicId, "summaries", i18n.language],
     queryFn: async () => {
       if (!topicId) throw new Error("Topic ID required");
-      const res = await fetch(`/api/topics/${topicId}/summaries`);
+      const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
       if (!res.ok) throw new Error("Failed to fetch topic summaries");
       return res.json();
     },

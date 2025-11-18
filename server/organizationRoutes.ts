@@ -10,6 +10,9 @@ import { generateSummary } from "./openai";
 import { awardXP } from "./gamificationService";
 import { subscriptionService } from "./subscriptionService";
 import { getUserLanguage } from "./languageHelper";
+import { translateTopicSummary, translateFlashcards } from "./translationService";
+import { storage } from "./storage";
+import type { SupportedLanguage } from "@shared/schema";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -676,6 +679,15 @@ export function registerOrganizationRoutes(app: Express) {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
+      const requestedLanguage = req.query.language as string | undefined;
+
+      // Get user to access language preference
+      const user = await storage.getUser(userId);
+      const targetLanguage: SupportedLanguage = requestedLanguage 
+        ? getUserLanguage(requestedLanguage) 
+        : getUserLanguage(user?.language);
+
+      console.log(`[GET /api/topics/:id/summaries] Requested language: ${targetLanguage}`);
 
       // Verify topic belongs to user
       const topic = await db.query.topics.findFirst({
@@ -686,10 +698,56 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(404).json({ success: false, error: "Tópico não encontrado" });
       }
 
-      // Fetch all summaries for this topic
-      const summariesList = await db.query.topicSummaries.findMany({
-        where: eq(topicSummaries.topicId, id),
+      // Fetch all summaries for this topic in the target language
+      let summariesList = await db.query.topicSummaries.findMany({
+        where: and(
+          eq(topicSummaries.topicId, id),
+          eq(topicSummaries.language, targetLanguage)
+        ),
       });
+
+      console.log(`[GET /api/topics/:id/summaries] Found ${summariesList.length} summaries in ${targetLanguage}`);
+
+      // If no summaries in target language, check for Portuguese originals and translate
+      if (summariesList.length === 0 && targetLanguage !== "pt") {
+        const portugueseSummaries = await db.query.topicSummaries.findMany({
+          where: and(
+            eq(topicSummaries.topicId, id),
+            eq(topicSummaries.language, "pt")
+          ),
+        });
+
+        console.log(`[GET /api/topics/:id/summaries] Found ${portugueseSummaries.length} Portuguese summaries to translate`);
+
+        // Translate each summary
+        for (const ptSummary of portugueseSummaries) {
+          try {
+            const { summary, motivationalMessage } = await translateTopicSummary(
+              ptSummary.summary,
+              ptSummary.motivationalMessage,
+              "pt",
+              targetLanguage
+            );
+
+            // Save translation to DB
+            const [translatedSummary] = await db.insert(topicSummaries)
+              .values({
+                topicId: id,
+                learningStyle: ptSummary.learningStyle,
+                language: targetLanguage,
+                summary,
+                motivationalMessage,
+              })
+              .returning();
+
+            summariesList.push(translatedSummary);
+            console.log(`[GET /api/topics/:id/summaries] Translated ${ptSummary.learningStyle} summary to ${targetLanguage}`);
+          } catch (translationError) {
+            console.error(`[GET /api/topics/:id/summaries] Failed to translate ${ptSummary.learningStyle}:`, translationError);
+            // Continue with other summaries even if one translation fails
+          }
+        }
+      }
 
       // Group by learning style for easy frontend consumption
       const summariesByStyle = summariesList.reduce((acc, item) => {
@@ -698,6 +756,7 @@ export function registerOrganizationRoutes(app: Express) {
           summary: item.summary,
           motivationalMessage: item.motivationalMessage,
           updatedAt: item.updatedAt,
+          language: item.language,
         };
         return acc;
       }, {} as Record<string, any>);
@@ -707,6 +766,7 @@ export function registerOrganizationRoutes(app: Express) {
         summaries: summariesByStyle,
         count: summariesList.length,
         hasContent: summariesList.length > 0,
+        language: targetLanguage,
       });
     } catch (error) {
       console.error("Error fetching topic summaries:", error);

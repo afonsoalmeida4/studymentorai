@@ -20,7 +20,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Resetar progresso quando mudar de modo
   useEffect(() => {
@@ -43,9 +43,9 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     flashcards: ApiFlashcard[];
     nextAvailableAt?: string | null;
   }>({
-    queryKey: ["/api/flashcards", summaryId, endpoint],
+    queryKey: ["/api/flashcards", summaryId, endpoint, i18n.language],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/${summaryId}/${endpoint}`);
+      const res = await fetch(`/api/flashcards/${summaryId}/${endpoint}?language=${i18n.language}`);
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },
@@ -60,7 +60,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
       
       if (mode === "spaced") {
         // Modo Anki: invalidar query porque a lista "due" mudou
-        await queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
+        await queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due", i18n.language] });
         setCurrentIndex(0);
       } else {
         // Modo prática: avançar para o próximo flashcard

@@ -15,12 +15,17 @@ interface SummaryStudySectionProps {
 
 export default function SummaryStudySection({ summaryId }: SummaryStudySectionProps) {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [studyMode, setStudyMode] = useState<"spaced" | "practice">("spaced");
 
   // Fetch existing flashcards
   const { data: flashcardsData, isLoading } = useQuery<GenerateFlashcardsResponse>({
-    queryKey: ["/api/flashcards", summaryId],
+    queryKey: ["/api/flashcards", summaryId, "all", i18n.language],
+    queryFn: async () => {
+      const res = await fetch(`/api/flashcards/${summaryId}/all?language=${i18n.language}`);
+      if (!res.ok) throw new Error("Failed to fetch flashcards");
+      return res.json();
+    },
     staleTime: Infinity, // Prevent immediate refetch after mutation
   });
 
@@ -32,7 +37,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
     onSuccess: (data: GenerateFlashcardsResponse) => {
       if (data.success && data.flashcards) {
         // Set the query data directly - don't invalidate to avoid race condition
-        queryClient.setQueryData<GenerateFlashcardsResponse>(["/api/flashcards", summaryId], data);
+        queryClient.setQueryData<GenerateFlashcardsResponse>(["/api/flashcards", summaryId, "all", i18n.language], data);
         
         toast({
           title: t('summaryStudy.successTitle'),
