@@ -654,5 +654,172 @@
     "messages": {
       "studentsOnly": "Cette page est réservée aux étudiants."
     }
+  },
+  "dashboard": {
+    "title": "Tableau de Bord d'Étude",
+    "subtitle": "Suivez vos progrès et recevez des recommandations personnalisées",
+    "stats": {
+      "pdfsStudied": "PDFs Étudiés",
+      "flashcardsCompleted": "Cartes Mémorisées",
+      "studyStreak": "Série d'Étude",
+      "averageAccuracy": "Précision Moyenne",
+      "keepGoing": "Continuez ainsi !",
+      "startToday": "Commencez aujourd'hui !"
+    },
+    "premium": {
+      "unlock": "Débloquer Premium",
+      "description": "Accès exclusif au Mentor IA, résumés illimités et thème doré",
+      "activate": "Activer Premium (Simulé)",
+      "activating": "Activation...",
+      "activatedTitle": "Premium Activé !",
+      "activatedMessage": "Vous avez maintenant accès à toutes les fonctionnalités exclusives.",
+      "errorTitle": "Erreur",
+      "errorMessage": "Impossible d'activer Premium."
+    },
+    "progress": {
+      "title": "Progrès des 7 Derniers Jours",
+      "subtitle": "Cartes mémorisées par jour",
+      "flashcardsLabel": "Cartes"
+    },
+    "pdfs": {
+      "title": "PDFs Étudiés",
+      "subtitle": "Historique de vos documents",
+      "sessions_one": "session",
+      "sessions_other": "sessions",
+      "accuracy": "{{percent}}% de précision",
+      "lastStudied": "Dernière : {{time}}",
+      "empty": "Vous n'avez pas encore étudié de PDF",
+      "uploadFirst": "Télécharger le premier PDF"
+    },
+    "sessions": {
+      "title": "Sessions Récentes",
+      "subtitle": "Dernières activités d'étude",
+      "empty": "Pas encore de sessions d'étude",
+      "startStudying": "Commencer à étudier"
+    },
+    "review": {
+      "title": "Plan de Révision Personnalisé",
+      "subtitle": "Recommandations générées par IA basées sur votre historique",
+      "priorities": "Sujets Prioritaires",
+      "priorityHigh": "Haute",
+      "priorityMedium": "Moyenne",
+      "priorityLow": "Basse",
+      "accuracy": "Précision : {{percent}}%",
+      "lastSession": "Dernière session : {{date}}",
+      "reviewButton": "Réviser",
+      "emptyTitle": "Plan de Révision",
+      "emptyMessage": "Complétez quelques sessions d'étude pour recevoir des recommandations personnalisées !",
+      "startButton": "Commencer à Étudier"
+    }
+  },
+  "ranking": {
+    "title": "Classement Global",
+    "subtitle": "Les meilleurs étudiants de la communauté",
+    "topUsers": "Top 10 Utilisateurs",
+    "rankedBy": "Classés par XP total cumulé",
+    "empty": "Pas encore d'utilisateurs dans le classement",
+    "anonymousUser": "Utilisateur Anonyme",
+    "howToClimb": "Comment grimper dans le classement ?",
+    "actions": {
+      "generateSummary": {
+        "xp": "+100",
+        "title": "Générer un Résumé",
+        "description": "Téléchargez un PDF et générez un résumé personnalisé"
+      },
+      "createFlashcards": {
+        "xp": "+30",
+        "title": "Créer des Cartes",
+        "description": "Générez des cartes à partir de vos résumés"
+      },
+      "completeSession": {
+        "xp": "+20+",
+        "title": "Terminer une Session d'Étude",
+        "description": "Étudiez avec des cartes et gagnez +5 XP par bonne réponse"
+      }
+    }
+  },
+  "subscription": {
+    "title": "Votre Plan",
+    "subtitle": "Choisissez le plan idéal pour vos objectifs d'étude",
+    "currentUsage": "Utilisation Actuelle",
+    "currentUsageSubtitle": "Progrès du plan Gratuit ce mois-ci",
+    "uploads": "Téléchargements",
+    "chatMessages": "Messages de chat (aujourd'hui)",
+    "popular": "Plus Populaire",
+    "currentPlan": "Plan Actuel",
+    "active": "Actif",
+    "free": "Gratuit",
+    "upgrade": "Mettre à Niveau",
+    "activeSubscription": "Abonnement Actif",
+    "activeSubscriptionSubtitle": "Votre plan {{planName}} est actif et se renouvellera automatiquement",
+    "nextRenewal": "Prochain renouvellement",
+    "toasts": {
+      "paymentSuccess": "✅ Paiement Traité !",
+      "paymentSuccessMessage": "Votre abonnement sera activé bientôt. Merci !",
+      "paymentCanceled": "Paiement Annulé",
+      "paymentCanceledMessage": "Vous pouvez réessayer quand vous voulez.",
+      "checkoutError": "Erreur",
+      "checkoutErrorMessage": "Impossible de démarrer le processus de paiement",
+      "noUrl": "URL de paiement non reçue"
+    },
+    "plans": {
+      "free": {
+        "name": "Commencer à Étudier",
+        "features": {
+          "uploads": "3 téléchargements par mois",
+          "summaries": "Résumés jusqu'à 1 000 mots",
+          "flashcards": "Cartes simples",
+          "assistant": "Assistant IA (Mode Étude)",
+          "chatLimit": "Limite de 10 messages/jour",
+          "workspace": "1 espace de travail"
+        }
+      },
+      "pro": {
+        "name": "Étudiez Sans Limites",
+        "price": "7,99€",
+        "period": "/mois",
+        "features": {
+          "uploads": "Téléchargements illimités",
+          "summaries": "Résumés illimités",
+          "flashcards": "Cartes intelligentes",
+          "assistant": "Assistant IA (Tous les modes)",
+          "chat": "Chat illimité",
+          "workspaces": "Espaces de travail illimités",
+          "dashboard": "Tableau de bord de progrès",
+          "backup": "Sauvegarde automatique"
+        }
+      },
+      "premium": {
+        "name": "Haute Performance",
+        "price": "18,99€",
+        "period": "/mois",
+        "features": {
+          "allPro": "Tout de Pro +",
+          "tutor": "Tuteur IA personnel",
+          "studyPlans": "Plans d'étude automatiques",
+          "mindMaps": "Cartes mentales automatiques",
+          "stats": "Statistiques avancées",
+          "zenMode": "Mode Zen",
+          "sharedSpaces": "Espaces partagés",
+          "pdfExport": "Exportation PDF",
+          "earlyAccess": "Accès anticipé"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "14,99€",
+        "period": "/mois",
+        "features": {
+          "allPremium": "Tout de Premium +",
+          "classManagement": "Gestion de classe",
+          "sharedLibrary": "Bibliothèque partagée",
+          "classDashboard": "Tableau de bord de classe",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Créer des fiches d'exercices",
+          "quizzes": "Mini-tests automatiques",
+          "lessonPlans": "Plans de leçon"
+        }
+      }
+    }
   }
 }

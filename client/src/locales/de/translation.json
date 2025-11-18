@@ -654,5 +654,172 @@
     "messages": {
       "studentsOnly": "Diese Seite ist nur für Studenten."
     }
+  },
+  "dashboard": {
+    "title": "Lern-Dashboard",
+    "subtitle": "Verfolgen Sie Ihren Fortschritt und erhalten Sie personalisierte Empfehlungen",
+    "stats": {
+      "pdfsStudied": "Studierte PDFs",
+      "flashcardsCompleted": "Abgeschlossene Karteikarten",
+      "studyStreak": "Lern-Serie",
+      "averageAccuracy": "Durchschnittliche Genauigkeit",
+      "keepGoing": "Weiter so!",
+      "startToday": "Beginnen Sie heute!"
+    },
+    "premium": {
+      "unlock": "Premium Freischalten",
+      "description": "Exklusiver Zugang zu KI-Mentor, unbegrenzte Zusammenfassungen und goldenem Design",
+      "activate": "Premium Aktivieren (Simuliert)",
+      "activating": "Aktivierung...",
+      "activatedTitle": "Premium Aktiviert!",
+      "activatedMessage": "Sie haben jetzt Zugriff auf alle exklusiven Funktionen.",
+      "errorTitle": "Fehler",
+      "errorMessage": "Premium konnte nicht aktiviert werden."
+    },
+    "progress": {
+      "title": "Fortschritt der Letzten 7 Tage",
+      "subtitle": "Abgeschlossene Karteikarten pro Tag",
+      "flashcardsLabel": "Karteikarten"
+    },
+    "pdfs": {
+      "title": "Studierte PDFs",
+      "subtitle": "Verlauf Ihrer Dokumente",
+      "sessions_one": "Sitzung",
+      "sessions_other": "Sitzungen",
+      "accuracy": "{{percent}}% Genauigkeit",
+      "lastStudied": "Zuletzt: {{time}}",
+      "empty": "Sie haben noch keine PDFs studiert",
+      "uploadFirst": "Erstes PDF hochladen"
+    },
+    "sessions": {
+      "title": "Letzte Sitzungen",
+      "subtitle": "Neueste Lernaktivitäten",
+      "empty": "Noch keine Lernsitzungen",
+      "startStudying": "Mit dem Lernen beginnen"
+    },
+    "review": {
+      "title": "Personalisierter Wiederholungsplan",
+      "subtitle": "KI-generierte Empfehlungen basierend auf Ihrem Verlauf",
+      "priorities": "Prioritätsthemen",
+      "priorityHigh": "Hoch",
+      "priorityMedium": "Mittel",
+      "priorityLow": "Niedrig",
+      "accuracy": "Genauigkeit: {{percent}}%",
+      "lastSession": "Letzte Sitzung: {{date}}",
+      "reviewButton": "Wiederholen",
+      "emptyTitle": "Wiederholungsplan",
+      "emptyMessage": "Absolvieren Sie einige Lernsitzungen, um personalisierte Empfehlungen zu erhalten!",
+      "startButton": "Mit dem Lernen Beginnen"
+    }
+  },
+  "ranking": {
+    "title": "Globale Rangliste",
+    "subtitle": "Die besten Studenten der Community",
+    "topUsers": "Top 10 Benutzer",
+    "rankedBy": "Rangiert nach kumuliertem Gesamt-XP",
+    "empty": "Noch keine Benutzer in der Rangliste",
+    "anonymousUser": "Anonymer Benutzer",
+    "howToClimb": "Wie steigt man in der Rangliste auf?",
+    "actions": {
+      "generateSummary": {
+        "xp": "+100",
+        "title": "Zusammenfassung Generieren",
+        "description": "Laden Sie ein PDF hoch und erstellen Sie eine personalisierte Zusammenfassung"
+      },
+      "createFlashcards": {
+        "xp": "+30",
+        "title": "Karteikarten Erstellen",
+        "description": "Generieren Sie Karteikarten aus Ihren Zusammenfassungen"
+      },
+      "completeSession": {
+        "xp": "+20+",
+        "title": "Lernsitzung Abschließen",
+        "description": "Lernen Sie mit Karteikarten und verdienen Sie +5 XP pro richtiger Antwort"
+      }
+    }
+  },
+  "subscription": {
+    "title": "Ihr Plan",
+    "subtitle": "Wählen Sie den idealen Plan für Ihre Lernziele",
+    "currentUsage": "Aktuelle Nutzung",
+    "currentUsageSubtitle": "Fortschritt des kostenlosen Plans in diesem Monat",
+    "uploads": "Uploads",
+    "chatMessages": "Chat-Nachrichten (heute)",
+    "popular": "Am Beliebtesten",
+    "currentPlan": "Aktueller Plan",
+    "active": "Aktiv",
+    "free": "Kostenlos",
+    "upgrade": "Plan Upgraden",
+    "activeSubscription": "Aktives Abonnement",
+    "activeSubscriptionSubtitle": "Ihr {{planName}}-Plan ist aktiv und wird automatisch verlängert",
+    "nextRenewal": "Nächste Verlängerung",
+    "toasts": {
+      "paymentSuccess": "✅ Zahlung Verarbeitet!",
+      "paymentSuccessMessage": "Ihr Abonnement wird bald aktiviert. Vielen Dank!",
+      "paymentCanceled": "Zahlung Abgebrochen",
+      "paymentCanceledMessage": "Sie können es jederzeit erneut versuchen.",
+      "checkoutError": "Fehler",
+      "checkoutErrorMessage": "Zahlungsvorgang konnte nicht gestartet werden",
+      "noUrl": "Zahlungs-URL nicht erhalten"
+    },
+    "plans": {
+      "free": {
+        "name": "Beginnen Sie zu Lernen",
+        "features": {
+          "uploads": "3 Uploads pro Monat",
+          "summaries": "Zusammenfassungen bis zu 1.000 Wörter",
+          "flashcards": "Einfache Karteikarten",
+          "assistant": "KI-Assistent (Lernmodus)",
+          "chatLimit": "Limit von 10 Nachrichten/Tag",
+          "workspace": "1 Arbeitsbereich"
+        }
+      },
+      "pro": {
+        "name": "Grenzenlos Lernen",
+        "price": "7,99€",
+        "period": "/Monat",
+        "features": {
+          "uploads": "Unbegrenzte Uploads",
+          "summaries": "Unbegrenzte Zusammenfassungen",
+          "flashcards": "Intelligente Karteikarten",
+          "assistant": "KI-Assistent (Alle Modi)",
+          "chat": "Unbegrenzter Chat",
+          "workspaces": "Unbegrenzte Arbeitsbereiche",
+          "dashboard": "Fortschritts-Dashboard",
+          "backup": "Automatisches Backup"
+        }
+      },
+      "premium": {
+        "name": "Hohe Leistung",
+        "price": "18,99€",
+        "period": "/Monat",
+        "features": {
+          "allPro": "Alles von Pro +",
+          "tutor": "Persönlicher KI-Tutor",
+          "studyPlans": "Automatische Lernpläne",
+          "mindMaps": "Automatische Mind Maps",
+          "stats": "Erweiterte Statistiken",
+          "zenMode": "Zen-Modus",
+          "sharedSpaces": "Gemeinsame Bereiche",
+          "pdfExport": "PDF-Export",
+          "earlyAccess": "Frühzeitiger Zugang"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "14,99€",
+        "period": "/Monat",
+        "features": {
+          "allPremium": "Alles von Premium +",
+          "classManagement": "Klassenverwaltung",
+          "sharedLibrary": "Gemeinsame Bibliothek",
+          "classDashboard": "Klassen-Dashboard",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Arbeitsblätter erstellen",
+          "quizzes": "Automatische Mini-Tests",
+          "lessonPlans": "Unterrichtspläne"
+        }
+      }
+    }
   }
 }

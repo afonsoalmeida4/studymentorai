@@ -646,5 +646,172 @@
     "messages": {
       "studentsOnly": "This page is for students only."
     }
+  },
+  "dashboard": {
+    "title": "Study Dashboard",
+    "subtitle": "Track your progress and receive personalized recommendations",
+    "stats": {
+      "pdfsStudied": "PDFs Studied",
+      "flashcardsCompleted": "Flashcards Completed",
+      "studyStreak": "Study Streak",
+      "averageAccuracy": "Average Accuracy",
+      "keepGoing": "Keep going!",
+      "startToday": "Start today!"
+    },
+    "premium": {
+      "unlock": "Unlock Premium",
+      "description": "Exclusive access to AI Mentor, unlimited summaries, and golden theme",
+      "activate": "Activate Premium (Simulated)",
+      "activating": "Activating...",
+      "activatedTitle": "Premium Activated!",
+      "activatedMessage": "You now have access to all exclusive features.",
+      "errorTitle": "Error",
+      "errorMessage": "Could not activate Premium."
+    },
+    "progress": {
+      "title": "Last 7 Days Progress",
+      "subtitle": "Flashcards completed per day",
+      "flashcardsLabel": "Flashcards"
+    },
+    "pdfs": {
+      "title": "Studied PDFs",
+      "subtitle": "History of your documents",
+      "sessions_one": "session",
+      "sessions_other": "sessions",
+      "accuracy": "{{percent}}% accuracy",
+      "lastStudied": "Last: {{time}}",
+      "empty": "No PDFs studied yet",
+      "uploadFirst": "Upload first PDF"
+    },
+    "sessions": {
+      "title": "Recent Sessions",
+      "subtitle": "Latest study activities",
+      "empty": "No study sessions yet",
+      "startStudying": "Start studying"
+    },
+    "review": {
+      "title": "Personalized Review Plan",
+      "subtitle": "AI-generated recommendations based on your history",
+      "priorities": "Priority Topics",
+      "priorityHigh": "High",
+      "priorityMedium": "Medium",
+      "priorityLow": "Low",
+      "accuracy": "Accuracy: {{percent}}%",
+      "lastSession": "Last session: {{date}}",
+      "reviewButton": "Review",
+      "emptyTitle": "Review Plan",
+      "emptyMessage": "Complete some study sessions to receive personalized recommendations!",
+      "startButton": "Start Studying"
+    }
+  },
+  "ranking": {
+    "title": "Global Ranking",
+    "subtitle": "The best students in the community",
+    "topUsers": "Top 10 Users",
+    "rankedBy": "Ranked by total XP accumulated",
+    "empty": "No users in the ranking yet",
+    "anonymousUser": "Anonymous User",
+    "howToClimb": "How to climb the ranking?",
+    "actions": {
+      "generateSummary": {
+        "xp": "+100",
+        "title": "Generate Summary",
+        "description": "Upload a PDF and generate a personalized summary"
+      },
+      "createFlashcards": {
+        "xp": "+30",
+        "title": "Create Flashcards",
+        "description": "Generate flashcards from your summaries"
+      },
+      "completeSession": {
+        "xp": "+20+",
+        "title": "Complete Study Session",
+        "description": "Study with flashcards and earn +5 XP for each correct answer"
+      }
+    }
+  },
+  "subscription": {
+    "title": "Your Plan",
+    "subtitle": "Choose the ideal plan for your study goals",
+    "currentUsage": "Current Usage",
+    "currentUsageSubtitle": "Free plan progress this month",
+    "uploads": "Uploads",
+    "chatMessages": "Chat messages (today)",
+    "popular": "Most Popular",
+    "currentPlan": "Current Plan",
+    "active": "Active",
+    "free": "Free",
+    "upgrade": "Upgrade",
+    "activeSubscription": "Active Subscription",
+    "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",
+    "nextRenewal": "Next renewal",
+    "toasts": {
+      "paymentSuccess": "✅ Payment Processed!",
+      "paymentSuccessMessage": "Your subscription will be activated soon. Thank you!",
+      "paymentCanceled": "Payment Canceled",
+      "paymentCanceledMessage": "You can try again whenever you want.",
+      "checkoutError": "Error",
+      "checkoutErrorMessage": "Could not start payment process",
+      "noUrl": "Payment URL not received"
+    },
+    "plans": {
+      "free": {
+        "name": "Start Studying",
+        "features": {
+          "uploads": "3 uploads per month",
+          "summaries": "Summaries up to 1,000 words",
+          "flashcards": "Simple flashcards",
+          "assistant": "AI Assistant (Study Mode)",
+          "chatLimit": "10 messages/day limit",
+          "workspace": "1 workspace"
+        }
+      },
+      "pro": {
+        "name": "Study Without Limits",
+        "price": "€7.99",
+        "period": "/mo",
+        "features": {
+          "uploads": "Unlimited uploads",
+          "summaries": "Unlimited summaries",
+          "flashcards": "Smart flashcards",
+          "assistant": "AI Assistant (All modes)",
+          "chat": "Unlimited chat",
+          "workspaces": "Unlimited workspaces",
+          "dashboard": "Progress dashboard",
+          "backup": "Automatic backup"
+        }
+      },
+      "premium": {
+        "name": "High Performance",
+        "price": "€18.99",
+        "period": "/mo",
+        "features": {
+          "allPro": "Everything in Pro +",
+          "tutor": "Personal AI tutor",
+          "studyPlans": "Automatic study plans",
+          "mindMaps": "Automatic mind maps",
+          "stats": "Advanced statistics",
+          "zenMode": "Zen Mode",
+          "sharedSpaces": "Shared spaces",
+          "pdfExport": "PDF export",
+          "earlyAccess": "Early access"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "€14.99",
+        "period": "/mo",
+        "features": {
+          "allPremium": "Everything in Premium +",
+          "classManagement": "Class management",
+          "sharedLibrary": "Shared library",
+          "classDashboard": "Class dashboard",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Create worksheets",
+          "quizzes": "Automatic mini-quizzes",
+          "lessonPlans": "Lesson plans"
+        }
+      }
+    }
   }
 }

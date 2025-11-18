@@ -654,5 +654,172 @@
     "messages": {
       "studentsOnly": "Questa pagina è solo per studenti."
     }
+  },
+  "dashboard": {
+    "title": "Pannello di Studio",
+    "subtitle": "Segui i tuoi progressi e ricevi raccomandazioni personalizzate",
+    "stats": {
+      "pdfsStudied": "PDF Studiati",
+      "flashcardsCompleted": "Flashcard Completate",
+      "studyStreak": "Serie di Studio",
+      "averageAccuracy": "Precisione Media",
+      "keepGoing": "Continua così!",
+      "startToday": "Inizia oggi!"
+    },
+    "premium": {
+      "unlock": "Sblocca Premium",
+      "description": "Accesso esclusivo a Mentor IA, riassunti illimitati e tema dorato",
+      "activate": "Attiva Premium (Simulato)",
+      "activating": "Attivazione...",
+      "activatedTitle": "Premium Attivato!",
+      "activatedMessage": "Ora hai accesso a tutte le funzionalità esclusive.",
+      "errorTitle": "Errore",
+      "errorMessage": "Impossibile attivare Premium."
+    },
+    "progress": {
+      "title": "Progresso degli Ultimi 7 Giorni",
+      "subtitle": "Flashcard completate per giorno",
+      "flashcardsLabel": "Flashcard"
+    },
+    "pdfs": {
+      "title": "PDF Studiati",
+      "subtitle": "Cronologia dei tuoi documenti",
+      "sessions_one": "sessione",
+      "sessions_other": "sessioni",
+      "accuracy": "{{percent}}% precisione",
+      "lastStudied": "Ultima: {{time}}",
+      "empty": "Non hai ancora studiato nessun PDF",
+      "uploadFirst": "Carica primo PDF"
+    },
+    "sessions": {
+      "title": "Sessioni Recenti",
+      "subtitle": "Ultime attività di studio",
+      "empty": "Non ci sono ancora sessioni di studio",
+      "startStudying": "Inizia a studiare"
+    },
+    "review": {
+      "title": "Piano di Ripasso Personalizzato",
+      "subtitle": "Raccomandazioni generate dall'IA basate sulla tua cronologia",
+      "priorities": "Argomenti Prioritari",
+      "priorityHigh": "Alta",
+      "priorityMedium": "Media",
+      "priorityLow": "Bassa",
+      "accuracy": "Precisione: {{percent}}%",
+      "lastSession": "Ultima sessione: {{date}}",
+      "reviewButton": "Ripassa",
+      "emptyTitle": "Piano di Ripasso",
+      "emptyMessage": "Completa alcune sessioni di studio per ricevere raccomandazioni personalizzate!",
+      "startButton": "Inizia a Studiare"
+    }
+  },
+  "ranking": {
+    "title": "Classifica Globale",
+    "subtitle": "I migliori studenti della community",
+    "topUsers": "Top 10 Utenti",
+    "rankedBy": "Classificati per XP totale accumulato",
+    "empty": "Non ci sono ancora utenti nella classifica",
+    "anonymousUser": "Utente Anonimo",
+    "howToClimb": "Come salire nella classifica?",
+    "actions": {
+      "generateSummary": {
+        "xp": "+100",
+        "title": "Genera Riassunto",
+        "description": "Carica un PDF e genera un riassunto personalizzato"
+      },
+      "createFlashcards": {
+        "xp": "+30",
+        "title": "Crea Flashcard",
+        "description": "Genera flashcard dai tuoi riassunti"
+      },
+      "completeSession": {
+        "xp": "+20+",
+        "title": "Completa Sessione di Studio",
+        "description": "Studia con le flashcard e guadagna +5 XP per ogni risposta corretta"
+      }
+    }
+  },
+  "subscription": {
+    "title": "Il Tuo Piano",
+    "subtitle": "Scegli il piano ideale per i tuoi obiettivi di studio",
+    "currentUsage": "Utilizzo Attuale",
+    "currentUsageSubtitle": "Progresso del piano Gratuito questo mese",
+    "uploads": "Caricamenti",
+    "chatMessages": "Messaggi chat (oggi)",
+    "popular": "Più Popolare",
+    "currentPlan": "Piano Attuale",
+    "active": "Attivo",
+    "free": "Gratis",
+    "upgrade": "Migliora Piano",
+    "activeSubscription": "Abbonamento Attivo",
+    "activeSubscriptionSubtitle": "Il tuo piano {{planName}} è attivo e si rinnoverà automaticamente",
+    "nextRenewal": "Prossimo rinnovo",
+    "toasts": {
+      "paymentSuccess": "✅ Pagamento Elaborato!",
+      "paymentSuccessMessage": "Il tuo abbonamento sarà attivato presto. Grazie!",
+      "paymentCanceled": "Pagamento Annullato",
+      "paymentCanceledMessage": "Puoi riprovare quando vuoi.",
+      "checkoutError": "Errore",
+      "checkoutErrorMessage": "Impossibile avviare il processo di pagamento",
+      "noUrl": "URL di pagamento non ricevuto"
+    },
+    "plans": {
+      "free": {
+        "name": "Inizia a Studiare",
+        "features": {
+          "uploads": "3 caricamenti al mese",
+          "summaries": "Riassunti fino a 1.000 parole",
+          "flashcards": "Flashcard semplici",
+          "assistant": "Assistente IA (Modalità Studio)",
+          "chatLimit": "Limite di 10 messaggi/giorno",
+          "workspace": "1 spazio di lavoro"
+        }
+      },
+      "pro": {
+        "name": "Studia Senza Limiti",
+        "price": "7,99€",
+        "period": "/mese",
+        "features": {
+          "uploads": "Caricamenti illimitati",
+          "summaries": "Riassunti illimitati",
+          "flashcards": "Flashcard intelligenti",
+          "assistant": "Assistente IA (Tutte le modalità)",
+          "chat": "Chat illimitata",
+          "workspaces": "Spazi di lavoro illimitati",
+          "dashboard": "Pannello progressi",
+          "backup": "Backup automatico"
+        }
+      },
+      "premium": {
+        "name": "Alta Performance",
+        "price": "18,99€",
+        "period": "/mese",
+        "features": {
+          "allPro": "Tutto di Pro +",
+          "tutor": "Tutor IA personale",
+          "studyPlans": "Piani di studio automatici",
+          "mindMaps": "Mappe mentali automatiche",
+          "stats": "Statistiche avanzate",
+          "zenMode": "Modalità Zen",
+          "sharedSpaces": "Spazi condivisi",
+          "pdfExport": "Esportazione PDF",
+          "earlyAccess": "Accesso anticipato"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "14,99€",
+        "period": "/mese",
+        "features": {
+          "allPremium": "Tutto di Premium +",
+          "classManagement": "Gestione classi",
+          "sharedLibrary": "Biblioteca condivisa",
+          "classDashboard": "Pannello della classe",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Crea fogli di esercizi",
+          "quizzes": "Mini-test automatici",
+          "lessonPlans": "Piani di lezione"
+        }
+      }
+    }
   }
 }
