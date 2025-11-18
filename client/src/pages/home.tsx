@@ -137,77 +137,8 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Recent Topics or Getting Started */}
-        {subjects.length === 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('home.gettingStarted.title')}</CardTitle>
-              <CardDescription>
-                {t('home.gettingStarted.subtitle')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
-                    1
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step1.title')}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {t('home.gettingStarted.step1.description')}
-                    </p>
-                    <Button 
-                      size="sm" 
-                      onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="button-add-subject"]')?.click()}
-                      data-testid="button-cta-create-subject"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      {t('home.gettingStarted.step1.button')}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
-                    2
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step2.title')}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {t('home.gettingStarted.step2.description')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
-                    3
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step3.title')}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {t('home.gettingStarted.step3.description')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
-                    4
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step4.title')}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {t('home.gettingStarted.step4.description')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
+        {/* Recent Topics */}
+        <Card>
             <CardHeader>
               <CardTitle>{t('home.recentTopics.title')}</CardTitle>
               <CardDescription>
@@ -257,7 +188,6 @@ export default function Home() {
               )}
             </CardContent>
           </Card>
-        )}
       </div>
     </div>
   );
