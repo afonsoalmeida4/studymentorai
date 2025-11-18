@@ -177,7 +177,8 @@
     "empty": "Sie haben noch keine Inhalte hinzugefügt.",
     "emptyDescription": "Laden Sie Dateien hoch oder fügen Sie Links hinzu, um zu beginnen.",
     "delete": "Inhalt löschen",
-    "deleteConfirm": "Sind Sie sicher, dass Sie diesen Inhalt löschen möchten?"
+    "deleteConfirm": "Sind Sie sicher, dass Sie diesen Inhalt löschen möchten?",
+    "aiSummary": "KI-Zusammenfassung Verfügbar"
   },
   "summaries": {
     "title": "Zusammenfassungen",
@@ -415,5 +416,15 @@
       "description": "Beginnen Sie heute mit der Erstellung personalisierter Zusammenfassungen. Es ist schnell, einfach und kostenlos.",
       "button": "Jetzt Anmelden"
     }
+  },
+  "errors": {
+    "generic": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "network": "Netzwerkfehler. Überprüfen Sie Ihre Internetverbindung.",
+    "unauthorized": "Nicht autorisiert. Bitte melden Sie sich erneut an.",
+    "notFound": "Nicht gefunden.",
+    "limit": "Limit erreicht. Aktualisieren Sie Ihren Plan, um fortzufahren.",
+    "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe.",
+    "generateSummaries": "Fehler beim Generieren der Zusammenfassungen",
+    "tryAgain": "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut."
   }
 }

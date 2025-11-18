@@ -180,7 +180,8 @@
     "empty": "Aún no has añadido ningún contenido.",
     "emptyDescription": "Sube archivos o añade enlaces para comenzar.",
     "delete": "Eliminar contenido",
-    "deleteConfirm": "¿Estás seguro de que quieres eliminar este contenido?"
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este contenido?",
+    "aiSummary": "Resumen IA Disponible"
   },
   "summaries": {
     "title": "Resúmenes",
@@ -415,5 +416,15 @@
       "description": "Comience a crear resúmenes personalizados hoy. Es rápido, fácil y gratuito.",
       "button": "Iniciar Sesión Ahora"
     }
+  },
+  "errors": {
+    "generic": "Ocurrió un error. Por favor, inténtelo de nuevo.",
+    "network": "Error de red. Verifique su conexión a internet.",
+    "unauthorized": "No autorizado. Por favor, inicie sesión nuevamente.",
+    "notFound": "No encontrado.",
+    "limit": "Límite alcanzado. Actualice su plan para continuar.",
+    "upload": "Error al cargar archivo. Verifique el formato y tamaño.",
+    "generateSummaries": "Error al generar resúmenes",
+    "tryAgain": "No se pudo completar la operación. Inténtelo de nuevo."
   }
 }

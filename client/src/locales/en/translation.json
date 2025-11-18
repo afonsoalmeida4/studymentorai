@@ -180,7 +180,8 @@
     "empty": "You haven't added any content yet.",
     "emptyDescription": "Upload files or add links to get started.",
     "delete": "Delete content",
-    "deleteConfirm": "Are you sure you want to delete this content?"
+    "deleteConfirm": "Are you sure you want to delete this content?",
+    "aiSummary": "AI Summary Available"
   },
   "summaries": {
     "title": "Summaries",
@@ -414,6 +415,8 @@
     "unauthorized": "Unauthorized. Please log in again.",
     "notFound": "Not found.",
     "limit": "Limit reached. Upgrade your plan to continue.",
-    "upload": "Error uploading file. Check format and size."
+    "upload": "Error uploading file. Check format and size.",
+    "generateSummaries": "Error generating summaries",
+    "tryAgain": "Could not complete the operation. Please try again."
   }
 }

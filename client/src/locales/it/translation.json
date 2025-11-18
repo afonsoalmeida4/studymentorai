@@ -177,7 +177,8 @@
     "empty": "Non hai ancora aggiunto nessun contenuto.",
     "emptyDescription": "Carica file o aggiungi link per iniziare.",
     "delete": "Elimina contenuto",
-    "deleteConfirm": "Sei sicuro di voler eliminare questo contenuto?"
+    "deleteConfirm": "Sei sicuro di voler eliminare questo contenuto?",
+    "aiSummary": "Riassunto IA Disponibile"
   },
   "summaries": {
     "title": "Riassunti",
@@ -415,5 +416,15 @@
       "description": "Inizia a creare riassunti personalizzati oggi. È veloce, facile e gratuito.",
       "button": "Accedi Ora"
     }
+  },
+  "errors": {
+    "generic": "Si è verificato un errore. Per favore riprova.",
+    "network": "Errore di rete. Controlla la tua connessione internet.",
+    "unauthorized": "Non autorizzato. Per favore accedi nuovamente.",
+    "notFound": "Non trovato.",
+    "limit": "Limite raggiunto. Aggiorna il tuo piano per continuare.",
+    "upload": "Errore durante il caricamento del file. Controlla formato e dimensioni.",
+    "generateSummaries": "Errore durante la generazione dei riassunti",
+    "tryAgain": "Impossibile completare l'operazione. Per favore riprova."
   }
 }

@@ -112,10 +112,10 @@ export default function TopicView() {
     onSuccess: (_data, variables) => {
       const count = variables.length;
       toast({
-        title: count === 1 ? "Resumo gerado!" : `${count} resumos gerados!`,
+        title: count === 1 ? t('topicView.generateStylesDialog.successOne') : `${count} ${t('topicView.generateStylesDialog.successMultiple')}`,
         description: count === 1 
-          ? "O resumo do tópico foi criado no estilo selecionado."
-          : "Os resumos foram criados nos estilos selecionados.",
+          ? t('topicView.generateStylesDialog.successDescriptionOne')
+          : t('topicView.generateStylesDialog.successDescriptionMultiple'),
       });
       refetchTopicSummaries();
       setIsGenerateStylesDialogOpen(false);
@@ -128,8 +128,8 @@ export default function TopicView() {
         setIsGenerateStylesDialogOpen(false);
       } else {
         toast({
-          title: "Erro ao gerar resumos",
-          description: error.message || "Não foi possível gerar os resumos. Tente novamente.",
+          title: t('errors.generateSummaries'),
+          description: error.message || t('errors.tryAgain'),
           variant: "destructive",
         });
       }
@@ -163,10 +163,8 @@ export default function TopicView() {
       setSelectedFile(null);
       setGenerateSummary(true);
       toast({
-        title: "Ficheiro carregado!",
-        description: generateSummary
-          ? "O resumo está a ser gerado com IA..."
-          : "Ficheiro adicionado com sucesso.",
+        title: t('topicView.uploadDialog.success'),
+        description: t('topicView.uploadDialog.successDescription'),
       });
     },
     onError: (error: any) => {
@@ -176,7 +174,7 @@ export default function TopicView() {
       } else {
         toast({
           variant: "destructive",
-          title: "Erro no upload",
+          title: t('topicView.uploadDialog.error'),
           description: error.message,
         });
       }
@@ -197,15 +195,15 @@ export default function TopicView() {
       setLinkUrl("");
       setLinkTitle("");
       toast({
-        title: "Link adicionado!",
-        description: "O link foi guardado com sucesso.",
+        title: t('topicView.linkDialog.success'),
+        description: t('topicView.linkDialog.successDescription'),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível adicionar o link.",
+        title: t('common.error'),
+        description: t('topicView.linkDialog.error'),
       });
     },
   });
@@ -290,9 +288,9 @@ export default function TopicView() {
             <CardContent className="pt-6">
               <div className="text-center py-12">
                 <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">Nenhum conteúdo adicionado</h3>
+                <h3 className="text-lg font-medium mb-2">{t('topicView.emptyState.title')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Comece por carregar ficheiros (PDF, Word, PowerPoint) ou adicionar links.
+                  {t('topicView.emptyState.description')}
                 </p>
               </div>
             </CardContent>
@@ -326,7 +324,7 @@ export default function TopicView() {
                               {content.summaryId && (
                                 <span className="ml-2 text-primary">
                                   <Sparkles className="w-3 h-3 inline mr-1" />
-                                  Resumo IA disponível
+                                  {t('content.aiSummary')}
                                 </span>
                               )}
                             </CardDescription>
@@ -607,7 +605,7 @@ export default function TopicView() {
                   </div>
                   <div className="max-w-sm mx-auto space-y-4">
                     <div className="space-y-3">
-                      <Label className="text-sm font-medium">Estilos de Aprendizagem</Label>
+                      <Label className="text-sm font-medium">{t('topicView.generateStylesDialog.selectStyles')}</Label>
                       <div className="grid grid-cols-2 gap-3">
                         {(["visual", "auditivo", "logico", "conciso"] as LearningStyle[]).map(style => (
                           <div key={style} className="flex items-center space-x-2">
@@ -634,8 +632,8 @@ export default function TopicView() {
                       className="w-full"
                     >
                       {generateSummariesMutation.isPending 
-                        ? "A gerar..." 
-                        : `Gerar ${selectedLearningStyles.length} Resumo${selectedLearningStyles.length !== 1 ? 's' : ''}`
+                        ? t('topicView.generateStylesDialog.generating')
+                        : t('topicView.generateStylesDialog.generate')
                       }
                     </Button>
                   </div>
@@ -654,9 +652,9 @@ export default function TopicView() {
       }}>
         <DialogContent data-testid="dialog-generate-styles">
           <DialogHeader>
-            <DialogTitle>Gerar Estilos de Aprendizagem</DialogTitle>
+            <DialogTitle>{t('topicView.generateStylesDialog.title')}</DialogTitle>
             <DialogDescription>
-              Seleciona os estilos de aprendizagem que queres gerar para este tópico.
+              {t('topicView.generateStylesDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -680,7 +678,7 @@ export default function TopicView() {
             </div>
             {getMissingStyles().length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Todos os estilos de aprendizagem já foram gerados!
+                {t('topicView.summarySection.allGenerated')}
               </p>
             )}
           </div>
@@ -691,7 +689,7 @@ export default function TopicView() {
               onClick={() => setIsGenerateStylesDialogOpen(false)}
               data-testid="button-cancel-generate-styles"
             >
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleManualGenerate}
@@ -699,8 +697,8 @@ export default function TopicView() {
               data-testid="button-submit-generate-styles"
             >
               {generateSummariesMutation.isPending
-                ? "A gerar..."
-                : `Gerar ${selectedLearningStyles.length} Estilo${selectedLearningStyles.length !== 1 ? 's' : ''}`
+                ? t('topicView.generateStylesDialog.generating')
+                : t('topicView.generateStylesDialog.generate')
               }
             </Button>
           </DialogFooter>
@@ -713,12 +711,12 @@ export default function TopicView() {
             <DialogHeader>
               <DialogTitle>{t('topicView.uploadDialog.title')}</DialogTitle>
               <DialogDescription>
-                Suporta PDF, Word (DOCX) e PowerPoint (PPTX). Máximo 10MB.
+                {t('topicView.uploadDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="file-upload">Ficheiro</Label>
+                <Label htmlFor="file-upload">{t('common.upload')}</Label>
                 <Input
                   id="file-upload"
                   type="file"
@@ -729,7 +727,7 @@ export default function TopicView() {
                 />
                 {selectedFile && (
                   <p className="text-sm text-muted-foreground">
-                    Selecionado: {selectedFile.name}
+                    {t('topicView.uploadDialog.fileSelected')}: {selectedFile.name}
                   </p>
                 )}
               </div>
@@ -741,7 +739,7 @@ export default function TopicView() {
                   data-testid="checkbox-generate-summary"
                 />
                 <Label htmlFor="generate-summary" className="text-sm cursor-pointer">
-                  Gerar resumo com IA (recomendado)
+                  {t('topicView.uploadDialog.generateSummary')}
                 </Label>
               </div>
             </div>
@@ -752,14 +750,14 @@ export default function TopicView() {
                 onClick={() => setIsUploadDialogOpen(false)}
                 data-testid="button-cancel-upload"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!selectedFile || uploadMutation.isPending}
                 data-testid="button-submit-upload"
               >
-                {uploadMutation.isPending ? "A carregar..." : "Carregar"}
+                {uploadMutation.isPending ? t('topicView.uploadDialog.uploading') : t('topicView.uploadDialog.upload')}
               </Button>
             </DialogFooter>
           </form>
@@ -772,29 +770,29 @@ export default function TopicView() {
             <DialogHeader>
               <DialogTitle>{t('topicView.linkDialog.title')}</DialogTitle>
               <DialogDescription>
-                Adicione um link externo relevante para este tópico.
+                {t('topicView.linkDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="link-url">URL</Label>
+                <Label htmlFor="link-url">{t('topicView.linkDialog.urlLabel')}</Label>
                 <Input
                   id="link-url"
                   type="url"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
-                  placeholder="https://exemplo.com"
+                  placeholder={t('topicView.linkDialog.urlPlaceholder')}
                   data-testid="input-link-url"
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="link-title">Título (opcional)</Label>
+                <Label htmlFor="link-title">{t('topicView.linkDialog.titleLabel')}</Label>
                 <Input
                   id="link-title"
                   value={linkTitle}
                   onChange={(e) => setLinkTitle(e.target.value)}
-                  placeholder="Deixe vazio para usar o URL"
+                  placeholder={t('topicView.linkDialog.titlePlaceholder')}
                   data-testid="input-link-title"
                 />
               </div>
@@ -806,14 +804,14 @@ export default function TopicView() {
                 onClick={() => setIsLinkDialogOpen(false)}
                 data-testid="button-cancel-link"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!linkUrl.trim() || linkMutation.isPending}
                 data-testid="button-submit-link"
               >
-                {linkMutation.isPending ? "A adicionar..." : "Adicionar"}
+                {linkMutation.isPending ? t('topicView.linkDialog.adding') : t('topicView.linkDialog.add')}
               </Button>
             </DialogFooter>
           </form>

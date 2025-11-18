@@ -180,7 +180,8 @@
     "empty": "Ainda não adicionaste nenhum conteúdo.",
     "emptyDescription": "Carrega ficheiros ou adiciona links para começar.",
     "delete": "Eliminar conteúdo",
-    "deleteConfirm": "Tens a certeza que queres eliminar este conteúdo?"
+    "deleteConfirm": "Tens a certeza que queres eliminar este conteúdo?",
+    "aiSummary": "Resumo IA disponível"
   },
   "summaries": {
     "title": "Resumos",
@@ -414,6 +415,8 @@
     "unauthorized": "Não autorizado. Por favor, faz login novamente.",
     "notFound": "Não encontrado.",
     "limit": "Limite atingido. Atualiza o teu plano para continuar.",
-    "upload": "Erro ao carregar ficheiro. Verifica o formato e tamanho."
+    "upload": "Erro ao carregar ficheiro. Verifica o formato e tamanho.",
+    "generateSummaries": "Erro ao gerar resumos",
+    "tryAgain": "Não foi possível completar a operação. Tente novamente."
   }
 }
