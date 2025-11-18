@@ -30,7 +30,6 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Plus, Users, Copy, Trash2, UserMinus } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { AppHeader } from "@/components/AppHeader";
 import type { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
@@ -165,7 +164,6 @@ export default function MyClasses() {
   if (typedUser?.role !== "teacher") {
     return (
       <div className="min-h-screen bg-background">
-        <AppHeader />
         <div className="container mx-auto py-8 px-4 max-w-7xl">
           <p className="text-muted-foreground">{t("myClasses.messages.teachersOnly")}</p>
         </div>
@@ -179,7 +177,6 @@ export default function MyClasses() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader />
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div>

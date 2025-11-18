@@ -29,7 +29,6 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Plus, Users, LogOut, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { AppHeader } from "@/components/AppHeader";
 import type { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
@@ -121,7 +120,6 @@ export default function StudentClasses() {
   if (typedUser?.role !== "student") {
     return (
       <div className="min-h-screen bg-background">
-        <AppHeader />
         <div className="container mx-auto py-8 px-4 max-w-7xl">
           <p className="text-muted-foreground">{t('studentClasses.messages.studentsOnly')}</p>
         </div>
@@ -133,7 +131,6 @@ export default function StudentClasses() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader />
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div>
