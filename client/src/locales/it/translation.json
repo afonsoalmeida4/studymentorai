@@ -105,6 +105,63 @@
     "regenerate": "Rigenera",
     "upgrade": "Aggiorna per sbloccare riassunti illimitati"
   },
+  "home": {
+    "title": "Benvenuto in AI Study Mentor",
+    "subtitle": "Organizza la tua conoscenza. Trova il tuo equilibrio.",
+    "description": "Una piattaforma completa per organizzare materiali di studio, elaborare documenti con l'IA e trovare supporto nel tuo percorso di apprendimento.",
+    "stats": {
+      "subjects": "Materie",
+      "topics": "Argomenti",
+      "aiModes": "Modalità IA"
+    },
+    "cards": {
+      "subjects": {
+        "title": "Materie",
+        "empty": "Crea la tua prima materia per iniziare",
+        "count_one": "{{count}} materia creata",
+        "count_other": "{{count}} materie create",
+        "createButton": "Crea Materia",
+        "viewButton": "Vedi Materie"
+      },
+      "aiMentor": {
+        "title": "AI Mentor",
+        "description": "Chatta in modalità Studio o Esistenziale",
+        "button": "Apri Chat"
+      },
+      "summaries": {
+        "title": "Riassunti IA",
+        "description": "Genera riassunti personalizzati automaticamente",
+        "detail": "Carica PDF, Word o PowerPoint nei tuoi argomenti"
+      }
+    },
+    "recentTopics": {
+      "title": "Argomenti Recenti",
+      "subtitle": "I tuoi argomenti creati più di recente",
+      "empty": "Non hai ancora argomenti",
+      "createFirst": "Crea Primo Argomento"
+    },
+    "gettingStarted": {
+      "title": "Inizia",
+      "subtitle": "Segui questi passaggi per sfruttare al meglio AI Study Mentor",
+      "step1": {
+        "title": "Crea una Materia",
+        "description": "Usa la barra laterale a sinistra e fai clic sul pulsante + per creare la tua prima materia",
+        "button": "Crea Materia"
+      },
+      "step2": {
+        "title": "Aggiungi Argomenti",
+        "description": "All'interno di ogni materia, crea argomenti specifici per organizzare i contenuti"
+      },
+      "step3": {
+        "title": "Carica Materiali",
+        "description": "Aggiungi file (PDF, DOCX, PPTX) o link esterni, con riassunto IA opzionale"
+      },
+      "step4": {
+        "title": "Chatta con AI Mentor",
+        "description": "Usa la modalità Studio per aiuto sui contenuti o Esistenziale per motivazione"
+      }
+    }
+  },
   "flashcards": {
     "title": "Flashcard",
     "generate": "Genera Flashcard",

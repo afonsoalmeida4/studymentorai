@@ -3,10 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { GraduationCap, BookOpen, Brain, Sparkles, ArrowRight, Plus, FileText } from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import type { Subject, Topic } from "@shared/schema";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const { data: subjects = [] } = useQuery<Subject[]>({
     queryKey: ["/api/subjects"],
@@ -36,13 +38,13 @@ export default function Home() {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-            Bem-vindo ao AI Study Mentor
+            {t('home.title')}
           </h1>
           <p className="text-xl text-muted-foreground mb-2">
-            Organiza o teu conhecimento. Encontra o teu equilíbrio.
+            {t('home.subtitle')}
           </p>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Uma plataforma completa para organizar materiais de estudo, processar documentos com IA e encontrar apoio na tua jornada de aprendizagem.
+            {t('home.description')}
           </p>
         </div>
 
@@ -52,19 +54,19 @@ export default function Home() {
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-foreground">{subjects.length}</div>
-                <p className="text-sm text-muted-foreground">Disciplinas</p>
+                <p className="text-sm text-muted-foreground">{t('home.stats.subjects')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-foreground">{allTopics.length}</div>
-                <p className="text-sm text-muted-foreground">Tópicos</p>
+                <p className="text-sm text-muted-foreground">{t('home.stats.topics')}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <div className="text-2xl font-bold text-foreground">2</div>
-                <p className="text-sm text-muted-foreground">Modos AI</p>
+                <p className="text-sm text-muted-foreground">{t('home.stats.aiModes')}</p>
               </CardContent>
             </Card>
           </div>
@@ -78,18 +80,18 @@ export default function Home() {
                 <div className="p-2 rounded-lg bg-blue-500/10">
                   <BookOpen className="w-6 h-6 text-blue-500" />
                 </div>
-                <CardTitle className="text-lg">Disciplinas</CardTitle>
+                <CardTitle className="text-lg">{t('home.cards.subjects.title')}</CardTitle>
               </div>
               <CardDescription>
                 {subjects.length === 0 
-                  ? "Crie a sua primeira disciplina para começar"
-                  : `${subjects.length} disciplina${subjects.length !== 1 ? 's' : ''} criada${subjects.length !== 1 ? 's' : ''}`
+                  ? t('home.cards.subjects.empty')
+                  : t('home.cards.subjects.count_other', { count: subjects.length })
                 }
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant="ghost" size="sm" className="w-full justify-between">
-                {subjects.length === 0 ? "Criar Disciplina" : "Ver Disciplinas"}
+                {subjects.length === 0 ? t('home.cards.subjects.createButton') : t('home.cards.subjects.viewButton')}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </CardContent>
@@ -101,15 +103,15 @@ export default function Home() {
                 <div className="p-2 rounded-lg bg-purple-500/10">
                   <Brain className="w-6 h-6 text-purple-500" />
                 </div>
-                <CardTitle className="text-lg">AI Mentor</CardTitle>
+                <CardTitle className="text-lg">{t('home.cards.aiMentor.title')}</CardTitle>
               </div>
               <CardDescription>
-                Converse em modo Estudo ou Existencial
+                {t('home.cards.aiMentor.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant="ghost" size="sm" className="w-full justify-between">
-                Abrir Chat
+                {t('home.cards.aiMentor.button')}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </CardContent>
@@ -121,15 +123,15 @@ export default function Home() {
                 <div className="p-2 rounded-lg bg-amber-500/10">
                   <Sparkles className="w-6 h-6 text-amber-500" />
                 </div>
-                <CardTitle className="text-lg">Resumos IA</CardTitle>
+                <CardTitle className="text-lg">{t('home.cards.summaries.title')}</CardTitle>
               </div>
               <CardDescription>
-                Gere resumos personalizados automaticamente
+                {t('home.cards.summaries.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Faça upload de PDF, Word ou PowerPoint nos seus tópicos
+                {t('home.cards.summaries.detail')}
               </p>
             </CardContent>
           </Card>
@@ -139,9 +141,9 @@ export default function Home() {
         {subjects.length === 0 ? (
           <Card>
             <CardHeader>
-              <CardTitle>Começar</CardTitle>
+              <CardTitle>{t('home.gettingStarted.title')}</CardTitle>
               <CardDescription>
-                Siga estes passos para aproveitar ao máximo o AI Study Mentor
+                {t('home.gettingStarted.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -151,9 +153,9 @@ export default function Home() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Crie uma Disciplina</h3>
+                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step1.title')}</h3>
                     <p className="text-sm text-muted-foreground mb-2">
-                      Use a sidebar à esquerda e clique no botão + para criar a sua primeira disciplina
+                      {t('home.gettingStarted.step1.description')}
                     </p>
                     <Button 
                       size="sm" 
@@ -161,7 +163,7 @@ export default function Home() {
                       data-testid="button-cta-create-subject"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Criar Disciplina
+                      {t('home.gettingStarted.step1.button')}
                     </Button>
                   </div>
                 </div>
@@ -171,9 +173,9 @@ export default function Home() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Adicione Tópicos</h3>
+                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step2.title')}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Dentro de cada disciplina, crie tópicos específicos para organizar o conteúdo
+                      {t('home.gettingStarted.step2.description')}
                     </p>
                   </div>
                 </div>
@@ -183,9 +185,9 @@ export default function Home() {
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Faça Upload de Materiais</h3>
+                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step3.title')}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Adicione ficheiros (PDF, DOCX, PPTX) ou links externos, com resumo IA opcional
+                      {t('home.gettingStarted.step3.description')}
                     </p>
                   </div>
                 </div>
@@ -195,9 +197,9 @@ export default function Home() {
                     4
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Converse com o AI Mentor</h3>
+                    <h3 className="font-semibold mb-1">{t('home.gettingStarted.step4.title')}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Use o modo Estudo para ajuda com conteúdo ou Existencial para motivação
+                      {t('home.gettingStarted.step4.description')}
                     </p>
                   </div>
                 </div>
@@ -207,23 +209,23 @@ export default function Home() {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>Tópicos Recentes</CardTitle>
+              <CardTitle>{t('home.recentTopics.title')}</CardTitle>
               <CardDescription>
-                Os seus tópicos mais recentemente criados
+                {t('home.recentTopics.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {recentTopics.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Ainda não tem tópicos</p>
+                  <p className="text-sm">{t('home.recentTopics.empty')}</p>
                   <Button 
                     size="sm" 
                     variant="outline" 
                     className="mt-4"
                     onClick={() => setLocation("/subjects")}
                   >
-                    Criar Primeiro Tópico
+                    {t('home.recentTopics.createFirst')}
                   </Button>
                 </div>
               ) : (
@@ -244,7 +246,7 @@ export default function Home() {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">{topic.name}</p>
                           <p className="text-xs text-muted-foreground truncate">
-                            {subject?.name ?? "Disciplina"}
+                            {subject?.name ?? t('home.stats.subjects')}
                           </p>
                         </div>
                         <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />

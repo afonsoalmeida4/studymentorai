@@ -105,6 +105,63 @@
     "regenerate": "Régénérer",
     "upgrade": "Mettez à niveau pour débloquer des résumés illimités"
   },
+  "home": {
+    "title": "Bienvenue sur AI Study Mentor",
+    "subtitle": "Organisez vos connaissances. Trouvez votre équilibre.",
+    "description": "Une plateforme complète pour organiser vos supports d'étude, traiter des documents avec l'IA et trouver du soutien pour votre parcours d'apprentissage.",
+    "stats": {
+      "subjects": "Matières",
+      "topics": "Sujets",
+      "aiModes": "Modes IA"
+    },
+    "cards": {
+      "subjects": {
+        "title": "Matières",
+        "empty": "Créez votre première matière pour commencer",
+        "count_one": "{{count}} matière créée",
+        "count_other": "{{count}} matières créées",
+        "createButton": "Créer une Matière",
+        "viewButton": "Voir les Matières"
+      },
+      "aiMentor": {
+        "title": "AI Mentor",
+        "description": "Discutez en mode Étude ou Existentiel",
+        "button": "Ouvrir le Chat"
+      },
+      "summaries": {
+        "title": "Résumés IA",
+        "description": "Générez des résumés personnalisés automatiquement",
+        "detail": "Téléchargez PDF, Word ou PowerPoint vers vos sujets"
+      }
+    },
+    "recentTopics": {
+      "title": "Sujets Récents",
+      "subtitle": "Vos sujets créés le plus récemment",
+      "empty": "Vous n'avez pas encore de sujets",
+      "createFirst": "Créer le Premier Sujet"
+    },
+    "gettingStarted": {
+      "title": "Commencer",
+      "subtitle": "Suivez ces étapes pour tirer le meilleur parti d'AI Study Mentor",
+      "step1": {
+        "title": "Créer une Matière",
+        "description": "Utilisez la barre latérale à gauche et cliquez sur le bouton + pour créer votre première matière",
+        "button": "Créer une Matière"
+      },
+      "step2": {
+        "title": "Ajouter des Sujets",
+        "description": "Dans chaque matière, créez des sujets spécifiques pour organiser le contenu"
+      },
+      "step3": {
+        "title": "Télécharger des Supports",
+        "description": "Ajoutez des fichiers (PDF, DOCX, PPTX) ou des liens externes, avec résumé IA optionnel"
+      },
+      "step4": {
+        "title": "Discuter avec AI Mentor",
+        "description": "Utilisez le mode Étude pour l'aide au contenu ou Existentiel pour la motivation"
+      }
+    }
+  },
   "flashcards": {
     "title": "Cartes Mémoire",
     "generate": "Générer des Cartes",

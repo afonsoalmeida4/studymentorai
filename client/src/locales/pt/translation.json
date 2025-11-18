@@ -108,6 +108,63 @@
     "regenerate": "Regenerar",
     "upgrade": "Atualiza para desbloquear resumos ilimitados"
   },
+  "home": {
+    "title": "Bem-vindo ao AI Study Mentor",
+    "subtitle": "Organiza o teu conhecimento. Encontra o teu equilíbrio.",
+    "description": "Uma plataforma completa para organizar materiais de estudo, processar documentos com IA e encontrar apoio na tua jornada de aprendizagem.",
+    "stats": {
+      "subjects": "Disciplinas",
+      "topics": "Tópicos",
+      "aiModes": "Modos AI"
+    },
+    "cards": {
+      "subjects": {
+        "title": "Disciplinas",
+        "empty": "Crie a sua primeira disciplina para começar",
+        "count_one": "{{count}} disciplina criada",
+        "count_other": "{{count}} disciplinas criadas",
+        "createButton": "Criar Disciplina",
+        "viewButton": "Ver Disciplinas"
+      },
+      "aiMentor": {
+        "title": "AI Mentor",
+        "description": "Converse em modo Estudo ou Existencial",
+        "button": "Abrir Chat"
+      },
+      "summaries": {
+        "title": "Resumos IA",
+        "description": "Gere resumos personalizados automaticamente",
+        "detail": "Faça upload de PDF, Word ou PowerPoint nos seus tópicos"
+      }
+    },
+    "recentTopics": {
+      "title": "Tópicos Recentes",
+      "subtitle": "Os seus tópicos mais recentemente criados",
+      "empty": "Ainda não tem tópicos",
+      "createFirst": "Criar Primeiro Tópico"
+    },
+    "gettingStarted": {
+      "title": "Começar",
+      "subtitle": "Siga estes passos para aproveitar ao máximo o AI Study Mentor",
+      "step1": {
+        "title": "Crie uma Disciplina",
+        "description": "Use a sidebar à esquerda e clique no botão + para criar a sua primeira disciplina",
+        "button": "Criar Disciplina"
+      },
+      "step2": {
+        "title": "Adicione Tópicos",
+        "description": "Dentro de cada disciplina, crie tópicos específicos para organizar o conteúdo"
+      },
+      "step3": {
+        "title": "Faça Upload de Materiais",
+        "description": "Adicione ficheiros (PDF, DOCX, PPTX) ou links externos, com resumo IA opcional"
+      },
+      "step4": {
+        "title": "Converse com o AI Mentor",
+        "description": "Use o modo Estudo para ajuda com conteúdo ou Existencial para motivação"
+      }
+    }
+  },
   "landing": {
     "hero": {
       "title": "AI Study Mentor",

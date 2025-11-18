@@ -74,13 +74,23 @@ Authentication is handled via Replit OIDC, using session-based authentication wi
 - Database schema updated with language support: `users.language`, `topicSummaries.language`, `flashcards.language` columns (default: "pt")
 - Installed and configured react-i18next with support for 6 languages: Portuguese, English, Spanish, French, German, Italian
 - Created comprehensive translation files for all UI elements across all supported languages
-- Implemented LanguageSelector component in header with backend synchronization
+- Implemented LanguageSelector component in header with backend synchronization (fixed to use `user.language` directly)
 - Created useLanguageSync hook to automatically sync user's language preference with i18n
 - API endpoint POST /api/user/language for updating user language preference
-- Modified OpenAI summary generation to support multi-language output:
+- Created centralized language helper (`server/languageHelper.ts`):
+  - `getUserLanguage()` - fetches user language with robust fallback to "pt"
+  - `normalizeLanguage()` - normalizes language codes (e.g., "pt-BR" → "pt", "en-US" → "en") to supported languages
+- All backend services updated to use language helper:
+  - Flashcard generation API (`server/routes.ts`) fetches user language
+  - Chat AI API (`server/chatRoutes.ts`) fetches user language
+  - OpenAI services (`server/openai.ts`) normalize language input
+  - Chat assistant service (`server/assistentService.ts`) normalizes language input
+- Multi-language AI content generation fully implemented:
   - Learning style prompts translated to all 6 languages
   - Motivational messages generated in user's selected language
   - AI summaries generated in user's preferred language
-- **TODO:** Update API routes to fetch user language and pass to generateSummary()
-- **TODO:** Update flashcard generation to use user's language
-- **TODO:** Update chat AI to use user's language
+  - Flashcards generated in user's preferred language
+  - Chat responses generated in user's preferred language
+- Frontend pages translated:
+  - Landing page (complete)
+  - Home page (complete)

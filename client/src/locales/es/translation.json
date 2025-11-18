@@ -108,6 +108,63 @@
     "regenerate": "Regenerar",
     "upgrade": "Actualiza para desbloquear resúmenes ilimitados"
   },
+  "home": {
+    "title": "Bienvenido a AI Study Mentor",
+    "subtitle": "Organiza tu conocimiento. Encuentra tu equilibrio.",
+    "description": "Una plataforma completa para organizar materiales de estudio, procesar documentos con IA y encontrar apoyo en tu viaje de aprendizaje.",
+    "stats": {
+      "subjects": "Materias",
+      "topics": "Temas",
+      "aiModes": "Modos de IA"
+    },
+    "cards": {
+      "subjects": {
+        "title": "Materias",
+        "empty": "Crea tu primera materia para empezar",
+        "count_one": "{{count}} materia creada",
+        "count_other": "{{count}} materias creadas",
+        "createButton": "Crear Materia",
+        "viewButton": "Ver Materias"
+      },
+      "aiMentor": {
+        "title": "AI Mentor",
+        "description": "Conversa en modo Estudio o Existencial",
+        "button": "Abrir Chat"
+      },
+      "summaries": {
+        "title": "Resúmenes de IA",
+        "description": "Genera resúmenes personalizados automáticamente",
+        "detail": "Sube PDF, Word o PowerPoint a tus temas"
+      }
+    },
+    "recentTopics": {
+      "title": "Temas Recientes",
+      "subtitle": "Tus temas creados más recientemente",
+      "empty": "Aún no tienes temas",
+      "createFirst": "Crear Primer Tema"
+    },
+    "gettingStarted": {
+      "title": "Comenzar",
+      "subtitle": "Sigue estos pasos para aprovechar al máximo AI Study Mentor",
+      "step1": {
+        "title": "Crea una Materia",
+        "description": "Usa la barra lateral izquierda y haz clic en el botón + para crear tu primera materia",
+        "button": "Crear Materia"
+      },
+      "step2": {
+        "title": "Añade Temas",
+        "description": "Dentro de cada materia, crea temas específicos para organizar el contenido"
+      },
+      "step3": {
+        "title": "Sube Materiales",
+        "description": "Añade archivos (PDF, DOCX, PPTX) o enlaces externos, con resumen de IA opcional"
+      },
+      "step4": {
+        "title": "Conversa con AI Mentor",
+        "description": "Usa el modo Estudio para ayuda con contenido o Existencial para motivación"
+      }
+    }
+  },
   "flashcards": {
     "title": "Tarjetas",
     "generate": "Generar Tarjetas",

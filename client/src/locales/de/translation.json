@@ -105,6 +105,63 @@
     "regenerate": "Neu generieren",
     "upgrade": "Upgrade für unbegrenzte Zusammenfassungen"
   },
+  "home": {
+    "title": "Willkommen bei AI Study Mentor",
+    "subtitle": "Organisieren Sie Ihr Wissen. Finden Sie Ihr Gleichgewicht.",
+    "description": "Eine vollständige Plattform zum Organisieren von Lernmaterialien, Verarbeiten von Dokumenten mit KI und Unterstützung auf Ihrem Lernweg.",
+    "stats": {
+      "subjects": "Fächer",
+      "topics": "Themen",
+      "aiModes": "KI-Modi"
+    },
+    "cards": {
+      "subjects": {
+        "title": "Fächer",
+        "empty": "Erstellen Sie Ihr erstes Fach, um zu beginnen",
+        "count_one": "{{count}} Fach erstellt",
+        "count_other": "{{count}} Fächer erstellt",
+        "createButton": "Fach Erstellen",
+        "viewButton": "Fächer Ansehen"
+      },
+      "aiMentor": {
+        "title": "AI Mentor",
+        "description": "Chatten Sie im Lern- oder Existenziellen Modus",
+        "button": "Chat Öffnen"
+      },
+      "summaries": {
+        "title": "KI-Zusammenfassungen",
+        "description": "Erstellen Sie automatisch personalisierte Zusammenfassungen",
+        "detail": "Laden Sie PDF, Word oder PowerPoint zu Ihren Themen hoch"
+      }
+    },
+    "recentTopics": {
+      "title": "Neueste Themen",
+      "subtitle": "Ihre zuletzt erstellten Themen",
+      "empty": "Sie haben noch keine Themen",
+      "createFirst": "Erstes Thema Erstellen"
+    },
+    "gettingStarted": {
+      "title": "Erste Schritte",
+      "subtitle": "Befolgen Sie diese Schritte, um das Beste aus AI Study Mentor herauszuholen",
+      "step1": {
+        "title": "Ein Fach Erstellen",
+        "description": "Verwenden Sie die Seitenleiste links und klicken Sie auf die +-Schaltfläche, um Ihr erstes Fach zu erstellen",
+        "button": "Fach Erstellen"
+      },
+      "step2": {
+        "title": "Themen Hinzufügen",
+        "description": "Erstellen Sie in jedem Fach spezifische Themen zur Organisation des Inhalts"
+      },
+      "step3": {
+        "title": "Materialien Hochladen",
+        "description": "Fügen Sie Dateien (PDF, DOCX, PPTX) oder externe Links mit optionaler KI-Zusammenfassung hinzu"
+      },
+      "step4": {
+        "title": "Mit AI Mentor Chatten",
+        "description": "Verwenden Sie den Lernmodus für Inhaltshilfe oder Existenziell für Motivation"
+      }
+    }
+  },
   "flashcards": {
     "title": "Lernkarten",
     "generate": "Lernkarten erstellen",

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -12,13 +11,16 @@ import { Globe } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { supportedLanguages, languageNames, type SupportedLanguage } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
+import type { User } from "@shared/schema";
 
 export function LanguageSelector() {
   const { i18n } = useTranslation();
   const { toast } = useToast();
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(
-    (i18n.language as SupportedLanguage) || "pt"
-  );
+  const { user } = useAuth();
+  const typedUser = user as User | null;
+
+  const currentLanguage = (typedUser?.language as SupportedLanguage) || (i18n.language as SupportedLanguage) || "pt";
 
   const updateLanguageMutation = useMutation({
     mutationFn: async (language: SupportedLanguage) => {
@@ -27,7 +29,6 @@ export function LanguageSelector() {
     },
     onSuccess: async (data, language) => {
       await i18n.changeLanguage(language);
-      setCurrentLanguage(language);
       
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       

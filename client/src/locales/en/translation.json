@@ -108,6 +108,63 @@
     "regenerate": "Regenerate",
     "upgrade": "Upgrade to unlock unlimited summaries"
   },
+  "home": {
+    "title": "Welcome to AI Study Mentor",
+    "subtitle": "Organize your knowledge. Find your balance.",
+    "description": "A complete platform to organize study materials, process documents with AI and find support for your learning journey.",
+    "stats": {
+      "subjects": "Subjects",
+      "topics": "Topics",
+      "aiModes": "AI Modes"
+    },
+    "cards": {
+      "subjects": {
+        "title": "Subjects",
+        "empty": "Create your first subject to get started",
+        "count_one": "{{count}} subject created",
+        "count_other": "{{count}} subjects created",
+        "createButton": "Create Subject",
+        "viewButton": "View Subjects"
+      },
+      "aiMentor": {
+        "title": "AI Mentor",
+        "description": "Chat in Study or Existential mode",
+        "button": "Open Chat"
+      },
+      "summaries": {
+        "title": "AI Summaries",
+        "description": "Generate personalized summaries automatically",
+        "detail": "Upload PDF, Word or PowerPoint to your topics"
+      }
+    },
+    "recentTopics": {
+      "title": "Recent Topics",
+      "subtitle": "Your most recently created topics",
+      "empty": "You don't have any topics yet",
+      "createFirst": "Create First Topic"
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "subtitle": "Follow these steps to make the most of AI Study Mentor",
+      "step1": {
+        "title": "Create a Subject",
+        "description": "Use the sidebar on the left and click the + button to create your first subject",
+        "button": "Create Subject"
+      },
+      "step2": {
+        "title": "Add Topics",
+        "description": "Within each subject, create specific topics to organize content"
+      },
+      "step3": {
+        "title": "Upload Materials",
+        "description": "Add files (PDF, DOCX, PPTX) or external links, with optional AI summary"
+      },
+      "step4": {
+        "title": "Chat with AI Mentor",
+        "description": "Use Study mode for content help or Existential for motivation"
+      }
+    }
+  },
   "landing": {
     "hero": {
       "title": "AI Study Mentor",
