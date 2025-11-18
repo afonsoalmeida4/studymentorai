@@ -18,6 +18,7 @@ import {
   type SupportedLanguage,
   flashcards,
   flashcardAttempts,
+  flashcardTranslations,
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -75,6 +76,27 @@ async function resolveFlashcardContext(
   }
 
   return null;
+}
+
+/**
+ * Resolve base flashcard ID for SM-2 progress sharing across languages.
+ * If flashcard is a translation, returns the base (PT) flashcard ID.
+ * Otherwise returns the flashcard ID itself.
+ */
+async function resolveBaseFlashcardId(flashcardId: string): Promise<string> {
+  // Check if this flashcard is a translation
+  const translation = await db.query.flashcardTranslations.findFirst({
+    where: eq(flashcardTranslations.translatedFlashcardId, flashcardId),
+  });
+
+  if (translation) {
+    // This is a translated flashcard - return base flashcard ID
+    console.log(`[SM-2 Mapping] Translated flashcard ${flashcardId} → base ${translation.baseFlashcardId}`);
+    return translation.baseFlashcardId;
+  }
+
+  // This is a base flashcard (PT) or not translated yet
+  return flashcardId;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -481,60 +503,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[GET /api/flashcards/:summaryId/due] Found ${flashcardsInLanguage.length} flashcards in ${targetLanguage}`);
 
+      // Resolve base flashcard IDs for SM-2 progress lookup
+      const flashcardIdMappings = await Promise.all(
+        flashcardsInLanguage.map(async (fc) => ({
+          translatedId: fc.id,
+          baseId: await resolveBaseFlashcardId(fc.id),
+          flashcard: fc,
+        }))
+      );
 
-      // Now filter for due flashcards based on attempts
+      // Now filter for due flashcards based on attempts (using BASE flashcard IDs)
       const now = new Date();
-      const flashcardIdsInLanguage = flashcardsInLanguage.map(fc => fc.id);
+      const baseFlashcardIds = flashcardIdMappings.map(m => m.baseId);
       
-      const result = await db
-        .select({
-          flashcard: flashcards,
-          attempt: flashcardAttempts,
-        })
-        .from(flashcards)
-        .leftJoin(
-          flashcardAttempts,
-          and(
-            eq(flashcards.id, flashcardAttempts.flashcardId),
-            eq(flashcardAttempts.userId, userId)
-          )
-        )
-        .where(sql`${flashcards.id} IN (${sql.join(flashcardIdsInLanguage.map(id => sql`${id}`), sql`, `)})`)
-        .orderBy(flashcardAttempts.nextReviewDate);
-
-      const dueFlashcards = result
-        .filter(row => {
-          if (!row.attempt || !row.attempt.id) {
-            return true; // New flashcard without attempt
-          }
-          return row.attempt.nextReviewDate && row.attempt.nextReviewDate <= now;
-        })
-        .map(row => row.flashcard);
-      
-      // Get next available review date for upcoming flashcards
-      const upcomingQuery = await db
-        .select({
-          nextReviewDate: flashcardAttempts.nextReviewDate,
-        })
-        .from(flashcards)
-        .innerJoin(
-          flashcardAttempts,
-          and(
-            eq(flashcards.id, flashcardAttempts.flashcardId),
-            eq(flashcardAttempts.userId, userId)
-          )
-        )
+      // Query attempts using BASE flashcard IDs
+      const attemptsMap = new Map<string, any>();
+      const attemptsResult = await db
+        .select()
+        .from(flashcardAttempts)
         .where(
           and(
-            sql`${flashcards.id} IN (${sql.join(flashcardIdsInLanguage.map(id => sql`${id}`), sql`, `)})`,
-            gt(flashcardAttempts.nextReviewDate, now)
+            sql`${flashcardAttempts.flashcardId} IN (${sql.join(baseFlashcardIds.map(id => sql`${id}`), sql`, `)})`,
+            eq(flashcardAttempts.userId, userId)
           )
-        )
-        .orderBy(asc(flashcardAttempts.nextReviewDate))
-        .limit(1);
+        );
       
-      const nextAvailableAt = upcomingQuery.length > 0 
-        ? upcomingQuery[0].nextReviewDate 
+      // Map attempts by base flashcard ID
+      for (const attempt of attemptsResult) {
+        attemptsMap.set(attempt.flashcardId, attempt);
+      }
+
+      // Filter due flashcards
+      const dueFlashcards = flashcardIdMappings
+        .filter(mapping => {
+          const attempt = attemptsMap.get(mapping.baseId);
+          if (!attempt || !attempt.id) {
+            return true; // New flashcard without attempt
+          }
+          return attempt.nextReviewDate && attempt.nextReviewDate <= now;
+        })
+        .map(mapping => mapping.flashcard);
+      
+      // Get next available review date for upcoming flashcards
+      const upcomingAttempts = attemptsResult.filter(
+        attempt => attempt.nextReviewDate && attempt.nextReviewDate > now
+      );
+      const nextAvailableAt = upcomingAttempts.length > 0
+        ? upcomingAttempts.sort((a, b) => 
+            (a.nextReviewDate?.getTime() || 0) - (b.nextReviewDate?.getTime() || 0)
+          )[0].nextReviewDate
         : null;
       
       return res.json({
@@ -667,16 +684,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get latest attempt for this flashcard
-      const latestAttempt = await storage.getLatestAttempt(userId, flashcardId);
+      // Resolve base flashcard ID for SM-2 progress sharing across languages
+      const baseFlashcardId = await resolveBaseFlashcardId(flashcardId);
+
+      // Get latest attempt for BASE flashcard (shared across all translations)
+      const latestAttempt = await storage.getLatestAttempt(userId, baseFlashcardId);
 
       // Calculate next review using SM-2 algorithm
       const scheduling = calculateNextReview(rating, latestAttempt);
 
-      // Save attempt
+      // Save attempt to BASE flashcard (ensures progress shared across languages)
       await storage.createFlashcardAttempt({
         userId,
-        flashcardId,
+        flashcardId: baseFlashcardId,
         rating,
         attemptDate: new Date(),
         nextReviewDate: scheduling.nextReviewDate,

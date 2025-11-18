@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "./db";
-import { topicSummaries, flashcards } from "@shared/schema";
+import { topicSummaries, flashcards, flashcardTranslations } from "@shared/schema";
 import type { SupportedLanguage, TopicSummary, Flashcard } from "@shared/schema";
 import OpenAI from "openai";
 
@@ -187,6 +187,18 @@ export async function getOrCreateTranslatedFlashcards(
       answer: fc.answer,
     }))
   ).returning();
+
+  // 7. Create flashcard translation mappings for SM-2 progress sharing
+  if (targetLanguage !== "pt" && newFlashcards.length === sourceFlashcards.length) {
+    const translationMappings = newFlashcards.map((translatedFC, index) => ({
+      baseFlashcardId: sourceFlashcards[index].id, // PT flashcard (base)
+      translatedFlashcardId: translatedFC.id,      // Translated flashcard
+      targetLanguage,
+    }));
+
+    await db.insert(flashcardTranslations).values(translationMappings);
+    console.log(`[Translation Mappings CREATED] ${translationMappings.length} mappings for ${targetLanguage}`);
+  }
 
   console.log(`[Translation Cache STORED] ${newFlashcards.length} flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
 
