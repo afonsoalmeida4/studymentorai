@@ -251,6 +251,27 @@
     "descriptionPlaceholder": "Brief description...",
     "creating": "Creating..."
   },
+  "summaryStudy": {
+    "title": "Study Flashcards",
+    "description": "Generate interactive flashcards to test your knowledge",
+    "loading": "Loading flashcards...",
+    "successTitle": "Flashcards generated successfully!",
+    "successDescription": "{{count}} flashcards created for study.",
+    "errorGenerate": "Could not generate flashcards.",
+    "errorGenerateTitle": "Error generating flashcards",
+    "generating": "Generating flashcards...",
+    "generateButton": "Generate Flashcards",
+    "available": "{{count}} flashcard available",
+    "available_plural": "{{count}} flashcards available",
+    "modeAnki": "Anki Review",
+    "modePractice": "Practice All"
+  },
+  "appHeader": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "ranking": "Ranking",
+    "logout": "Logout"
+  },
   "upgradeDialog": {
     "errorNoUrl": "Payment URL not received",
     "errorCheckout": "Could not start payment process",

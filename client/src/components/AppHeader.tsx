@@ -1,12 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { GraduationCap, LogOut, BarChart3, Trophy, Home } from "lucide-react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 interface AppHeaderProps {
   showNavigation?: boolean;
 }
 
 export function AppHeader({ showNavigation = true }: AppHeaderProps) {
+  const { t } = useTranslation();
+  
   return (
     <header className="border-b">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -19,19 +22,19 @@ export function AppHeader({ showNavigation = true }: AppHeaderProps) {
             <Link href="/home">
               <Button variant="outline" size="default" data-testid="button-home">
                 <Home className="w-4 h-4 mr-2" />
-                Início
+                {t('appHeader.home')}
               </Button>
             </Link>
             <Link href="/dashboard">
               <Button variant="outline" size="default" data-testid="button-dashboard">
                 <BarChart3 className="w-4 h-4 mr-2" />
-                Dashboard
+                {t('appHeader.dashboard')}
               </Button>
             </Link>
             <Link href="/ranking">
               <Button variant="outline" size="default" data-testid="button-ranking">
                 <Trophy className="w-4 h-4 mr-2" />
-                Ranking
+                {t('appHeader.ranking')}
               </Button>
             </Link>
             <Button
@@ -41,7 +44,7 @@ export function AppHeader({ showNavigation = true }: AppHeaderProps) {
               data-testid="button-logout"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Sair
+              {t('appHeader.logout')}
             </Button>
           </div>
         )}

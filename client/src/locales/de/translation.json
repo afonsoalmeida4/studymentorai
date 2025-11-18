@@ -248,6 +248,27 @@
     "descriptionPlaceholder": "Kurze Beschreibung...",
     "creating": "Erstellen..."
   },
+  "summaryStudy": {
+    "title": "Lernkarteikarten",
+    "description": "Generieren Sie interaktive Karteikarten, um Ihr Wissen zu testen",
+    "loading": "Karteikarten werden geladen...",
+    "successTitle": "Karteikarten erfolgreich generiert!",
+    "successDescription": "{{count}} Karteikarten zum Lernen erstellt.",
+    "errorGenerate": "Karteikarten konnten nicht generiert werden.",
+    "errorGenerateTitle": "Fehler beim Generieren von Karteikarten",
+    "generating": "Karteikarten werden generiert...",
+    "generateButton": "Karteikarten Generieren",
+    "available": "{{count}} Karteikarte verfügbar",
+    "available_plural": "{{count}} Karteikarten verfügbar",
+    "modeAnki": "Anki-Wiederholung",
+    "modePractice": "Alles Üben"
+  },
+  "appHeader": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "ranking": "Rangliste",
+    "logout": "Abmelden"
+  },
   "upgradeDialog": {
     "errorNoUrl": "Zahlungs-URL nicht erhalten",
     "errorCheckout": "Zahlungsvorgang konnte nicht gestartet werden",

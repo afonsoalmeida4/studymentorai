@@ -248,6 +248,27 @@
     "descriptionPlaceholder": "Brève description...",
     "creating": "Création..."
   },
+  "summaryStudy": {
+    "title": "Cartes d'Étude",
+    "description": "Générez des cartes interactives pour tester vos connaissances",
+    "loading": "Chargement des cartes...",
+    "successTitle": "Cartes générées avec succès!",
+    "successDescription": "{{count}} cartes créées pour l'étude.",
+    "errorGenerate": "Impossible de générer les cartes.",
+    "errorGenerateTitle": "Erreur lors de la génération des cartes",
+    "generating": "Génération des cartes...",
+    "generateButton": "Générer des Cartes",
+    "available": "{{count}} carte disponible",
+    "available_plural": "{{count}} cartes disponibles",
+    "modeAnki": "Révision Anki",
+    "modePractice": "Tout Pratiquer"
+  },
+  "appHeader": {
+    "home": "Accueil",
+    "dashboard": "Tableau de Bord",
+    "ranking": "Classement",
+    "logout": "Déconnexion"
+  },
   "upgradeDialog": {
     "errorNoUrl": "URL de paiement non reçue",
     "errorCheckout": "Impossible de démarrer le processus de paiement",

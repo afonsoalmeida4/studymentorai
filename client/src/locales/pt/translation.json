@@ -251,6 +251,27 @@
     "descriptionPlaceholder": "Breve descrição...",
     "creating": "A criar..."
   },
+  "summaryStudy": {
+    "title": "Flashcards de Estudo",
+    "description": "Gere flashcards interativos para testar os seus conhecimentos",
+    "loading": "A carregar flashcards...",
+    "successTitle": "Flashcards gerados com sucesso!",
+    "successDescription": "{{count}} flashcards criados para estudo.",
+    "errorGenerate": "Não foi possível gerar flashcards.",
+    "errorGenerateTitle": "Erro ao gerar flashcards",
+    "generating": "A gerar flashcards...",
+    "generateButton": "Gerar Flashcards",
+    "available": "{{count}} flashcard disponível",
+    "available_plural": "{{count}} flashcards disponíveis",
+    "modeAnki": "Revisão Anki",
+    "modePractice": "Praticar Tudo"
+  },
+  "appHeader": {
+    "home": "Início",
+    "dashboard": "Dashboard",
+    "ranking": "Ranking",
+    "logout": "Sair"
+  },
   "upgradeDialog": {
     "errorNoUrl": "URL de pagamento não recebido",
     "errorCheckout": "Não foi possível iniciar o processo de pagamento",

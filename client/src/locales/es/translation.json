@@ -251,6 +251,27 @@
     "descriptionPlaceholder": "Breve descripción...",
     "creating": "Creando..."
   },
+  "summaryStudy": {
+    "title": "Tarjetas de Estudio",
+    "description": "Genere tarjetas interactivas para probar sus conocimientos",
+    "loading": "Cargando tarjetas...",
+    "successTitle": "¡Tarjetas generadas con éxito!",
+    "successDescription": "{{count}} tarjetas creadas para estudio.",
+    "errorGenerate": "No se pudieron generar tarjetas.",
+    "errorGenerateTitle": "Error al generar tarjetas",
+    "generating": "Generando tarjetas...",
+    "generateButton": "Generar Tarjetas",
+    "available": "{{count}} tarjeta disponible",
+    "available_plural": "{{count}} tarjetas disponibles",
+    "modeAnki": "Revisión Anki",
+    "modePractice": "Practicar Todo"
+  },
+  "appHeader": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "ranking": "Clasificación",
+    "logout": "Salir"
+  },
   "upgradeDialog": {
     "errorNoUrl": "URL de pago no recibida",
     "errorCheckout": "No se pudo iniciar el proceso de pago",

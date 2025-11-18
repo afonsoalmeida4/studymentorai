@@ -7,6 +7,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { GenerateFlashcardsResponse } from "@shared/schema";
 import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
 import { Loader2, Brain, Sparkles, Calendar, Dumbbell } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SummaryStudySectionProps {
   summaryId: string;
@@ -14,6 +15,7 @@ interface SummaryStudySectionProps {
 
 export default function SummaryStudySection({ summaryId }: SummaryStudySectionProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [studyMode, setStudyMode] = useState<"spaced" | "practice">("spaced");
 
   // Fetch existing flashcards
@@ -33,21 +35,21 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
         queryClient.setQueryData<GenerateFlashcardsResponse>(["/api/flashcards", summaryId], data);
         
         toast({
-          title: "Flashcards gerados com sucesso!",
-          description: `${data.flashcards.length} flashcards criados para estudo.`,
+          title: t('summaryStudy.successTitle'),
+          description: t('summaryStudy.successDescription', { count: data.flashcards.length }),
         });
       } else {
         toast({
           variant: "destructive",
-          title: "Erro",
-          description: data.error || "Não foi possível gerar flashcards.",
+          title: t('common.error'),
+          description: data.error || t('summaryStudy.errorGenerate'),
         });
       }
     },
     onError: (error: Error) => {
       toast({
         variant: "destructive",
-        title: "Erro ao gerar flashcards",
+        title: t('summaryStudy.errorGenerateTitle'),
         description: error.message,
       });
     },
@@ -64,7 +66,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
       <Card className="border-2">
         <CardContent className="p-8 text-center">
           <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">A carregar flashcards...</p>
+          <p className="text-sm text-muted-foreground">{t('summaryStudy.loading')}</p>
         </CardContent>
       </Card>
     );
@@ -80,9 +82,9 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                 <Brain className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-xl">Flashcards de Estudo</CardTitle>
+                <CardTitle className="text-xl">{t('summaryStudy.title')}</CardTitle>
                 <CardDescription>
-                  Gere flashcards interativos para testar os seus conhecimentos
+                  {t('summaryStudy.description')}
                 </CardDescription>
               </div>
             </div>
@@ -98,12 +100,12 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
               {generateMutation.isPending ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  A gerar flashcards...
+                  {t('summaryStudy.generating')}
                 </>
               ) : (
                 <>
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Gerar Flashcards
+                  {t('summaryStudy.generateButton')}
                 </>
               )}
             </Button>
@@ -118,9 +120,9 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   <Brain className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Flashcards de Estudo</CardTitle>
+                  <CardTitle className="text-xl">{t('summaryStudy.title')}</CardTitle>
                   <CardDescription>
-                    {flashcardsData.flashcards?.length || 0} flashcard{(flashcardsData.flashcards?.length || 0) !== 1 ? 's' : ''} disponíve{(flashcardsData.flashcards?.length || 0) !== 1 ? 'is' : 'l'}
+                    {t('summaryStudy.available', { count: flashcardsData.flashcards?.length || 0 })}
                   </CardDescription>
                 </div>
               </div>
@@ -133,7 +135,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   className="gap-2"
                 >
                   <Calendar className="w-4 h-4" />
-                  Revisão Anki
+                  {t('summaryStudy.modeAnki')}
                 </Button>
                 <Button
                   variant={studyMode === "practice" ? "default" : "outline"}
@@ -143,7 +145,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   className="gap-2"
                 >
                   <Dumbbell className="w-4 h-4" />
-                  Praticar Tudo
+                  {t('summaryStudy.modePractice')}
                 </Button>
               </div>
             </div>

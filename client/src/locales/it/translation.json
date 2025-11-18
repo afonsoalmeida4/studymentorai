@@ -248,6 +248,27 @@
     "descriptionPlaceholder": "Breve descrizione...",
     "creating": "Creazione..."
   },
+  "summaryStudy": {
+    "title": "Schede di Studio",
+    "description": "Genera schede interattive per testare le tue conoscenze",
+    "loading": "Caricamento schede...",
+    "successTitle": "Schede generate con successo!",
+    "successDescription": "{{count}} schede create per lo studio.",
+    "errorGenerate": "Impossibile generare le schede.",
+    "errorGenerateTitle": "Errore nella generazione delle schede",
+    "generating": "Generazione schede...",
+    "generateButton": "Genera Schede",
+    "available": "{{count}} scheda disponibile",
+    "available_plural": "{{count}} schede disponibili",
+    "modeAnki": "Revisione Anki",
+    "modePractice": "Pratica Tutto"
+  },
+  "appHeader": {
+    "home": "Home",
+    "dashboard": "Pannello",
+    "ranking": "Classifica",
+    "logout": "Esci"
+  },
   "upgradeDialog": {
     "errorNoUrl": "URL di pagamento non ricevuto",
     "errorCheckout": "Impossibile avviare il processo di pagamento",
