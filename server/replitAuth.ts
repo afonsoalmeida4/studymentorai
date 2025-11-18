@@ -70,6 +70,13 @@ export async function setupAuth(app: Express) {
   app.use(passport.session());
 
   const config = await getOidcConfig();
+  
+  // Use REPLIT_DOMAINS or REPLIT_DEV_DOMAIN for consistent domain
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 
+                 process.env.REPLIT_DEV_DOMAIN || 
+                 'localhost:5000';
+  
+  console.log("[AUTH] Using domain for callbacks:", domain);
 
   const verify: VerifyFunction = async (
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
@@ -89,83 +96,59 @@ export async function setupAuth(app: Express) {
     }
   };
 
-  // Keep track of registered strategies
-  const registeredStrategies = new Set<string>();
-
-  // Helper function to ensure strategy exists for a domain
-  const ensureStrategy = (domain: string) => {
-    const strategyName = `replitauth:${domain}`;
-    if (!registeredStrategies.has(strategyName)) {
-      const strategy = new Strategy(
-        {
-          name: strategyName,
-          config,
-          scope: "openid email profile offline_access",
-          callbackURL: `https://${domain}/api/callback`,
-        },
-        verify,
-      );
-      passport.use(strategy);
-      registeredStrategies.add(strategyName);
-    }
-  };
+  // Create single strategy with consistent domain
+  const strategy = new Strategy(
+    {
+      name: "replitauth",
+      config,
+      scope: "openid email profile offline_access",
+      callbackURL: `https://${domain}/api/callback`,
+    },
+    verify,
+  );
+  
+  passport.use(strategy);
+  console.log("[AUTH] Strategy registered with callback URL:", `https://${domain}/api/callback`);
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
     console.log("[AUTH] Login route hit");
-    console.log("[AUTH] Hostname:", req.hostname);
-    console.log("[AUTH] Host header:", req.headers.host);
-    console.log("[AUTH] Protocol:", req.protocol);
-    console.log("[AUTH] Full URL would be:", `${req.protocol}://${req.hostname}`);
     
-    ensureStrategy(req.hostname);
-    const callbackURL = `https://${req.hostname}/api/callback`;
-    console.log("[AUTH] Callback URL will be:", callbackURL);
-    
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    passport.authenticate("replitauth", {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    console.log("[AUTH] Callback route hit, hostname:", req.hostname);
+    console.log("[AUTH] Callback route hit");
     console.log("[AUTH] Query params:", req.query);
     
-    try {
-      ensureStrategy(req.hostname);
-      const strategyName = `replitauth:${req.hostname}`;
-      console.log("[AUTH] Using strategy:", strategyName);
+    passport.authenticate("replitauth", (err: any, user: any, info: any) => {
+      console.log("[AUTH] Authenticate callback - err:", err, "user:", !!user, "info:", info);
       
-      passport.authenticate(strategyName, (err: any, user: any, info: any) => {
-        console.log("[AUTH] Authenticate callback - err:", err, "user:", user, "info:", info);
-        
-        if (err) {
-          console.error("[AUTH] Authentication error:", err);
+      if (err) {
+        console.error("[AUTH] Authentication error:", err);
+        return res.redirect("/api/login");
+      }
+      
+      if (!user) {
+        console.error("[AUTH] No user returned");
+        return res.redirect("/api/login");
+      }
+      
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("[AUTH] Login error:", loginErr);
           return res.redirect("/api/login");
         }
         
-        if (!user) {
-          console.error("[AUTH] No user returned");
-          return res.redirect("/api/login");
-        }
-        
-        req.login(user, (loginErr) => {
-          if (loginErr) {
-            console.error("[AUTH] Login error:", loginErr);
-            return res.redirect("/api/login");
-          }
-          
-          console.log("[AUTH] Login successful, redirecting to /");
-          return res.redirect("/");
-        });
-      })(req, res, next);
-    } catch (error) {
-      console.error("[AUTH] Callback error:", error);
-      return res.redirect("/api/login");
-    }
+        console.log("[AUTH] Login successful, redirecting to /");
+        return res.redirect("/");
+      });
+    })(req, res, next);
   });
 
   app.get("/api/logout", (req, res) => {
