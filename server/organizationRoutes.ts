@@ -9,6 +9,7 @@ import { extractTextFromFile, validateFileType, isValidFileSize } from "./textEx
 import { generateSummary } from "./openai";
 import { awardXP } from "./gamificationService";
 import { subscriptionService } from "./subscriptionService";
+import { getUserLanguage } from "./languageHelper";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -104,6 +105,9 @@ async function generateTopicSummaries(
 
     console.log(`[TopicSummary] Generating summary for topic ${topicId}, content length: ${aggregatedContent.length}`);
 
+    const userLanguage = await getUserLanguage(userId);
+    console.log(`[TopicSummary] Using language: ${userLanguage}`);
+
     // If a specific style is requested, generate only that one
     const stylesToGenerate = specificStyle ? [specificStyle] : learningStyles;
 
@@ -116,6 +120,7 @@ async function generateTopicSummaries(
         const result = await generateSummary({
           text: aggregatedContent,
           learningStyle: style,
+          language: userLanguage,
         });
 
         // Check word count limit before saving
@@ -469,6 +474,9 @@ export function registerOrganizationRoutes(app: Express) {
         const { storage } = await import("./storage");
         const { contentSummaries: contentSummariesTable } = await import("@shared/schema");
         
+        const userLanguage = await getUserLanguage(userId);
+        console.log(`[ContentUpload] Using language: ${userLanguage} for summaries`);
+        
         // Generate all 4 summaries sequentially to avoid rate limits
         const learningStyles: Array<"visual" | "auditivo" | "logico" | "conciso"> = ["visual", "auditivo", "logico", "conciso"];
         let successfulSummaries = 0;
@@ -478,6 +486,7 @@ export function registerOrganizationRoutes(app: Express) {
             const { summary, motivationalMessage } = await generateSummary({
               text: limitedText,
               learningStyle: style,
+              language: userLanguage,
             });
 
             const savedSummary = await storage.createSummary({
