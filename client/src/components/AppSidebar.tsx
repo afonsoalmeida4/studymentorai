@@ -177,18 +177,7 @@ export function AppSidebar() {
                   >
                     <Link href="/subscription">
                       <Crown className="w-4 h-4" />
-                      <div className="flex items-center justify-between w-full gap-2">
-                        <span>{t('nav.subscription')}</span>
-                        {subscriptionData && (
-                          <Badge 
-                            variant={subscriptionData.subscription.plan === "free" ? "outline" : "default"}
-                            className="text-xs"
-                            data-testid={`badge-plan-${subscriptionData.subscription.plan}`}
-                          >
-                            {subscriptionData.limits.name.split(" ")[0]}
-                          </Badge>
-                        )}
-                      </div>
+                      <span>{t('nav.subscription')}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
