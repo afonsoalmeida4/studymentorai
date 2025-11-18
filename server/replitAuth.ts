@@ -10,10 +10,15 @@ import { storage } from "./storage";
 
 const getOidcConfig = memoize(
   async () => {
-    return await client.discovery(
-      new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID!
+    const issuerUrl = process.env.ISSUER_URL ?? "https://replit.com/oidc";
+    const clientId = process.env.REPL_ID!;
+    console.log("[AUTH] OIDC Config - Issuer:", issuerUrl, "Client ID:", clientId);
+    const config = await client.discovery(
+      new URL(issuerUrl),
+      clientId
     );
+    console.log("[AUTH] OIDC Discovery complete");
+    return config;
   },
   { maxAge: 3600 * 1000 }
 );
@@ -27,6 +32,12 @@ export function getSession() {
     ttl: sessionTtl,
     tableName: "sessions",
   });
+  
+  // Replit always uses HTTPS, so secure should be true even in development
+  const isProduction = process.env.NODE_ENV === "production";
+  
+  console.log("[AUTH] Session config - secure: true, sameSite:", isProduction ? "strict" : "lax");
+  
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
@@ -34,8 +45,8 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      secure: true, // Always true on Replit (HTTPS)
+      sameSite: isProduction ? "strict" : "lax",
       maxAge: sessionTtl,
     },
   });
