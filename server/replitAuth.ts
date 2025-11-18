@@ -75,10 +75,18 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    try {
+      console.log("[AUTH] Verify function called");
+      const user = {};
+      updateUserSession(user, tokens);
+      console.log("[AUTH] User session updated, claims:", tokens.claims());
+      await upsertUser(tokens.claims());
+      console.log("[AUTH] User upserted successfully");
+      verified(null, user);
+    } catch (error) {
+      console.error("[AUTH] Error in verify function:", error);
+      verified(error as Error);
+    }
   };
 
   // Keep track of registered strategies
@@ -114,6 +122,7 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    console.log("[AUTH] Callback route hit");
     ensureStrategy(req.hostname);
     passport.authenticate(`replitauth:${req.hostname}`, {
       successReturnToOrRedirect: "/",
