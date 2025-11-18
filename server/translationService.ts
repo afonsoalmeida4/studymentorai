@@ -1,5 +1,8 @@
+import { eq, and } from "drizzle-orm";
+import { db } from "./db";
+import { topicSummaries, flashcards } from "@shared/schema";
+import type { SupportedLanguage, TopicSummary, Flashcard } from "@shared/schema";
 import OpenAI from "openai";
-import type { SupportedLanguage } from "@shared/schema";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -14,9 +17,186 @@ const languageNameMap: Record<SupportedLanguage, string> = {
 };
 
 /**
- * Translate a topic summary to a target language using GPT-4
+ * Get or create a translated topic summary.
+ * Checks DB cache first, translates and persists if not found.
+ * 
+ * @param summaryId - ID of the original summary (any language)
+ * @param targetLanguage - Target language code
+ * @returns Translated summary from DB (cached or newly created)
  */
-export async function translateTopicSummary(
+export async function getOrCreateTranslatedSummary(
+  summaryId: string,
+  targetLanguage: SupportedLanguage
+): Promise<TopicSummary> {
+  // 1. Fetch the original summary to get topicId and learningStyle
+  const originalSummary = await db.query.topicSummaries.findFirst({
+    where: eq(topicSummaries.id, summaryId),
+  });
+
+  if (!originalSummary) {
+    throw new Error(`Summary ${summaryId} not found`);
+  }
+
+  // 2. Check if translated version already exists in DB
+  const existingTranslation = await db.query.topicSummaries.findFirst({
+    where: and(
+      eq(topicSummaries.topicId, originalSummary.topicId),
+      eq(topicSummaries.learningStyle, originalSummary.learningStyle),
+      eq(topicSummaries.language, targetLanguage)
+    ),
+  });
+
+  if (existingTranslation) {
+    // Cache hit! Return existing translation
+    console.log(`[Translation Cache HIT] Summary ${summaryId} -> ${targetLanguage}`);
+    return existingTranslation;
+  }
+
+  // 3. Cache miss - need to translate
+  console.log(`[Translation Cache MISS] Summary ${summaryId} -> ${targetLanguage} - translating...`);
+  
+  // Always translate from Portuguese (base language)
+  const sourceLanguage: SupportedLanguage = "pt";
+  
+  // If original is not PT, fetch the PT version first
+  let sourceSummary = originalSummary;
+  if (originalSummary.language !== "pt") {
+    const ptSummary = await db.query.topicSummaries.findFirst({
+      where: and(
+        eq(topicSummaries.topicId, originalSummary.topicId),
+        eq(topicSummaries.learningStyle, originalSummary.learningStyle),
+        eq(topicSummaries.language, "pt")
+      ),
+    });
+    
+    if (!ptSummary) {
+      throw new Error(`Portuguese base summary not found for ${summaryId}`);
+    }
+    sourceSummary = ptSummary;
+  }
+
+  // 4. Translate via GPT-4
+  const translated = await translateSummaryText(
+    sourceSummary.summary,
+    sourceSummary.motivationalMessage,
+    sourceLanguage,
+    targetLanguage
+  );
+
+  // 5. Persist translated summary to DB
+  const [newSummary] = await db.insert(topicSummaries).values({
+    topicId: originalSummary.topicId,
+    learningStyle: originalSummary.learningStyle,
+    language: targetLanguage,
+    summary: translated.summary,
+    motivationalMessage: translated.motivationalMessage,
+  }).returning();
+
+  console.log(`[Translation Cache STORED] Summary ${summaryId} -> ${targetLanguage} as ${newSummary.id}`);
+  
+  return newSummary;
+}
+
+/**
+ * Get or create translated flashcards for a topic summary.
+ * Checks DB cache first, translates and persists if not found.
+ * 
+ * @param topicSummaryId - ID of the topic summary (in any language)
+ * @param targetLanguage - Target language code
+ * @returns Array of translated flashcards from DB (cached or newly created)
+ */
+export async function getOrCreateTranslatedFlashcards(
+  topicSummaryId: string,
+  targetLanguage: SupportedLanguage
+): Promise<Flashcard[]> {
+  // 1. Fetch the original topic summary to get topic and learning style info
+  const originalSummary = await db.query.topicSummaries.findFirst({
+    where: eq(topicSummaries.id, topicSummaryId),
+  });
+
+  if (!originalSummary) {
+    throw new Error(`Topic summary ${topicSummaryId} not found`);
+  }
+
+  // 2. Get or create the translated summary (needed for FK relationship)
+  const translatedSummary = await getOrCreateTranslatedSummary(topicSummaryId, targetLanguage);
+
+  // 3. Check if translated flashcards already exist in DB
+  const existingFlashcards = await db.query.flashcards.findMany({
+    where: and(
+      eq(flashcards.topicSummaryId, translatedSummary.id),
+      eq(flashcards.language, targetLanguage)
+    ),
+  });
+
+  if (existingFlashcards.length > 0) {
+    // Cache hit! Return existing translated flashcards
+    console.log(`[Translation Cache HIT] ${existingFlashcards.length} flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
+    return existingFlashcards;
+  }
+
+  // 4. Cache miss - need to translate flashcards
+  console.log(`[Translation Cache MISS] Flashcards for summary ${topicSummaryId} -> ${targetLanguage} - translating...`);
+
+  // Always translate from Portuguese (base language)
+  const sourceLanguage: SupportedLanguage = "pt";
+  
+  // Fetch Portuguese flashcards
+  const ptSummary = await db.query.topicSummaries.findFirst({
+    where: and(
+      eq(topicSummaries.topicId, originalSummary.topicId),
+      eq(topicSummaries.learningStyle, originalSummary.learningStyle),
+      eq(topicSummaries.language, "pt")
+    ),
+  });
+
+  if (!ptSummary) {
+    throw new Error(`Portuguese base summary not found for ${topicSummaryId}`);
+  }
+
+  const sourceFlashcards = await db.query.flashcards.findMany({
+    where: and(
+      eq(flashcards.topicSummaryId, ptSummary.id),
+      eq(flashcards.language, "pt")
+    ),
+  });
+
+  if (sourceFlashcards.length === 0) {
+    // No flashcards to translate - return empty array
+    return [];
+  }
+
+  // 5. Translate flashcards via GPT-4
+  const flashcardsData = sourceFlashcards.map(fc => ({
+    question: fc.question,
+    answer: fc.answer,
+  }));
+
+  const translatedFlashcardsData = await translateFlashcardsText(
+    flashcardsData,
+    sourceLanguage,
+    targetLanguage
+  );
+
+  // 6. Persist translated flashcards to DB
+  const newFlashcards = await db.insert(flashcards).values(
+    translatedFlashcardsData.map(fc => ({
+      topicSummaryId: translatedSummary.id,
+      language: targetLanguage,
+      question: fc.question,
+      answer: fc.answer,
+    }))
+  ).returning();
+
+  console.log(`[Translation Cache STORED] ${newFlashcards.length} flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
+
+  return newFlashcards;
+}
+
+/**
+ * Internal: Translate summary text using GPT-4 (no DB interaction)
+ */
+async function translateSummaryText(
   summary: string,
   motivationalMessage: string,
   fromLanguage: SupportedLanguage,
@@ -85,9 +265,9 @@ Respond ONLY with a JSON object in this exact format:
 }
 
 /**
- * Translate flashcards to a target language using GPT-4
+ * Internal: Translate flashcards text using GPT-4 (no DB interaction)
  */
-export async function translateFlashcards(
+async function translateFlashcardsText(
   flashcards: Array<{ question: string; answer: string }>,
   fromLanguage: SupportedLanguage,
   toLanguage: SupportedLanguage

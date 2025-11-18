@@ -4,7 +4,7 @@ import multer from "multer";
 import Stripe from "stripe";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
 import { getUserLanguage } from "./languageHelper";
-import { translateTopicSummary, translateFlashcards } from "./translationService";
+import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards } from "./translationService";
 import { 
   generateSummaryRequestSchema, 
   generateFlashcardsRequestSchema,
@@ -461,19 +461,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get flashcards in target language
+      // Get or create translated flashcards
       let flashcardsInLanguage;
       if (context.type === "topicSummary") {
-        flashcardsInLanguage = await db
-          .select()
-          .from(flashcards)
-          .where(
-            and(
-              eq(flashcards.topicSummaryId, summaryId),
-              eq(flashcards.language, targetLanguage)
-            )
-          );
+        // Use new translation service with persistent cache
+        flashcardsInLanguage = await getOrCreateTranslatedFlashcards(summaryId, targetLanguage);
       } else {
+        // Legacy summary system - use manual translation (no cache)
         flashcardsInLanguage = await db
           .select()
           .from(flashcards)
@@ -487,70 +481,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[GET /api/flashcards/:summaryId/due] Found ${flashcardsInLanguage.length} flashcards in ${targetLanguage}`);
 
-      // If no flashcards in target language and target is not Portuguese, translate from Portuguese
-      if (flashcardsInLanguage.length === 0 && targetLanguage !== "pt") {
-        let portugueseFlashcards;
-        if (context.type === "topicSummary") {
-          portugueseFlashcards = await db
-            .select()
-            .from(flashcards)
-            .where(
-              and(
-                eq(flashcards.topicSummaryId, summaryId),
-                eq(flashcards.language, "pt")
-              )
-            );
-        } else {
-          portugueseFlashcards = await db
-            .select()
-            .from(flashcards)
-            .where(
-              and(
-                eq(flashcards.summaryId, summaryId),
-                eq(flashcards.language, "pt")
-              )
-            );
-        }
-
-        console.log(`[GET /api/flashcards/:summaryId/due] Found ${portugueseFlashcards.length} Portuguese flashcards to translate`);
-
-        if (portugueseFlashcards.length > 0) {
-          try {
-            // Translate all flashcards
-            const flashcardsToTranslate = portugueseFlashcards.map(fc => ({
-              question: fc.question,
-              answer: fc.answer,
-            }));
-
-            const translatedFlashcards = await translateFlashcards(
-              flashcardsToTranslate,
-              "pt",
-              targetLanguage
-            );
-
-            // Save translated flashcards to DB
-            const flashcardsToInsert = translatedFlashcards.map((fc, index) => ({
-              ...(context.type === "topicSummary" 
-                ? { topicSummaryId: summaryId, summaryId: null }
-                : { summaryId, topicSummaryId: null }),
-              language: targetLanguage,
-              question: fc.question,
-              answer: fc.answer,
-            }));
-
-            flashcardsInLanguage = await db
-              .insert(flashcards)
-              .values(flashcardsToInsert)
-              .returning();
-
-            console.log(`[GET /api/flashcards/:summaryId/due] Translated and saved ${flashcardsInLanguage.length} flashcards to ${targetLanguage}`);
-          } catch (translationError) {
-            console.error(`[GET /api/flashcards/:summaryId/due] Translation failed:`, translationError);
-            // Return Portuguese flashcards as fallback
-            flashcardsInLanguage = portugueseFlashcards;
-          }
-        }
-      }
 
       // Now filter for due flashcards based on attempts
       const now = new Date();
@@ -649,19 +579,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Fetch flashcards in target language
+      // Get or create translated flashcards
       let allFlashcards;
       if (context.type === "topicSummary") {
-        allFlashcards = await db
-          .select()
-          .from(flashcards)
-          .where(
-            and(
-              eq(flashcards.topicSummaryId, summaryId),
-              eq(flashcards.language, targetLanguage)
-            )
-          );
+        // Use new translation service with persistent cache
+        allFlashcards = await getOrCreateTranslatedFlashcards(summaryId, targetLanguage);
       } else {
+        // Legacy summary system - use manual translation (no cache)
         allFlashcards = await db
           .select()
           .from(flashcards)
@@ -673,72 +597,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
       }
 
-      console.log(`[GET /api/flashcards/:summaryId/all] Found ${allFlashcards.length} flashcards in ${targetLanguage}`);
+      console.log(`[GET /api/flashcards/:summaryId/all] Returning ${allFlashcards.length} flashcards in ${targetLanguage}`);
 
-      // If no flashcards in target language and target is not Portuguese, translate from Portuguese
-      if (allFlashcards.length === 0 && targetLanguage !== "pt") {
-        let portugueseFlashcards;
-        if (context.type === "topicSummary") {
-          portugueseFlashcards = await db
-            .select()
-            .from(flashcards)
-            .where(
-              and(
-                eq(flashcards.topicSummaryId, summaryId),
-                eq(flashcards.language, "pt")
-              )
-            );
-        } else {
-          portugueseFlashcards = await db
-            .select()
-            .from(flashcards)
-            .where(
-              and(
-                eq(flashcards.summaryId, summaryId),
-                eq(flashcards.language, "pt")
-              )
-            );
-        }
-
-        console.log(`[GET /api/flashcards/:summaryId/all] Found ${portugueseFlashcards.length} Portuguese flashcards to translate`);
-
-        if (portugueseFlashcards.length > 0) {
-          try {
-            // Translate all flashcards
-            const flashcardsToTranslate = portugueseFlashcards.map(fc => ({
-              question: fc.question,
-              answer: fc.answer,
-            }));
-
-            const translatedFlashcards = await translateFlashcards(
-              flashcardsToTranslate,
-              "pt",
-              targetLanguage
-            );
-
-            // Save translated flashcards to DB
-            const flashcardsToInsert = translatedFlashcards.map((fc, index) => ({
-              ...(context.type === "topicSummary" 
-                ? { topicSummaryId: summaryId, summaryId: null }
-                : { summaryId, topicSummaryId: null }),
-              language: targetLanguage,
-              question: fc.question,
-              answer: fc.answer,
-            }));
-
-            allFlashcards = await db
-              .insert(flashcards)
-              .values(flashcardsToInsert)
-              .returning();
-
-            console.log(`[GET /api/flashcards/:summaryId/all] Translated and saved ${allFlashcards.length} flashcards to ${targetLanguage}`);
-          } catch (translationError) {
-            console.error(`[GET /api/flashcards/:summaryId/all] Translation failed:`, translationError);
-            // Return Portuguese flashcards as fallback
-            allFlashcards = portugueseFlashcards;
-          }
-        }
-      }
       
       return res.json({
         success: true,
