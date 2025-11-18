@@ -122,12 +122,41 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
-    console.log("[AUTH] Callback route hit");
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
-    })(req, res, next);
+    console.log("[AUTH] Callback route hit, hostname:", req.hostname);
+    console.log("[AUTH] Query params:", req.query);
+    
+    try {
+      ensureStrategy(req.hostname);
+      const strategyName = `replitauth:${req.hostname}`;
+      console.log("[AUTH] Using strategy:", strategyName);
+      
+      passport.authenticate(strategyName, (err: any, user: any, info: any) => {
+        console.log("[AUTH] Authenticate callback - err:", err, "user:", user, "info:", info);
+        
+        if (err) {
+          console.error("[AUTH] Authentication error:", err);
+          return res.redirect("/api/login");
+        }
+        
+        if (!user) {
+          console.error("[AUTH] No user returned");
+          return res.redirect("/api/login");
+        }
+        
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            console.error("[AUTH] Login error:", loginErr);
+            return res.redirect("/api/login");
+          }
+          
+          console.log("[AUTH] Login successful, redirecting to /");
+          return res.redirect("/");
+        });
+      })(req, res, next);
+    } catch (error) {
+      console.error("[AUTH] Callback error:", error);
+      return res.redirect("/api/login");
+    }
   });
 
   app.get("/api/logout", (req, res) => {
