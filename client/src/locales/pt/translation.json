@@ -20,13 +20,21 @@
     "download": "Descarregar",
     "language": "Idioma"
   },
+  "app": {
+    "tagline": "Organiza. Equilibra."
+  },
   "nav": {
+    "navigation": "Navegação",
+    "home": "Início",
+    "dashboard": "Dashboard",
+    "ranking": "Ranking",
+    "tools": "Ferramentas",
     "subjects": "Matérias",
-    "chat": "Chat AI",
+    "chat": "AI Mentor",
     "profile": "Perfil",
     "settings": "Definições",
     "classes": "Turmas",
-    "subscription": "Subscrição",
+    "subscription": "Plano",
     "logout": "Sair"
   },
   "auth": {
@@ -41,11 +49,22 @@
   "subjects": {
     "title": "As Minhas Matérias",
     "create": "Nova Matéria",
-    "name": "Nome da matéria",
-    "description": "Descrição",
+    "newSubject": "Nova Disciplina",
+    "createDescription": "Crie uma nova disciplina para organizar os seus tópicos de estudo.",
+    "name": "Nome",
+    "namePlaceholder": "Ex: Matemática",
+    "description": "Descrição (opcional)",
+    "descriptionPlaceholder": "Breve descrição...",
+    "color": "Cor",
     "icon": "Ícone",
     "empty": "Ainda não criaste nenhuma matéria.",
     "emptyDescription": "Cria a tua primeira matéria para começar a organizar o teu conhecimento.",
+    "noSubjects": "Nenhuma disciplina criada.",
+    "clickToStart": "Clique em + para começar.",
+    "creating": "A criar...",
+    "createSuccess": "Disciplina criada!",
+    "createSuccessMessage": "A sua nova disciplina foi adicionada com sucesso.",
+    "createError": "Não foi possível criar a disciplina.",
     "delete": "Eliminar matéria",
     "deleteConfirm": "Tens a certeza que queres eliminar esta matéria? Todos os tópicos e conteúdos serão eliminados."
   },

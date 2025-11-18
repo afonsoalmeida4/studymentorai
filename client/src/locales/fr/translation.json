@@ -27,7 +27,12 @@
     "settings": "Paramètres",
     "classes": "Classes",
     "subscription": "Abonnement",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "navigation": "Navigation",
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "ranking": "Classement",
+    "tools": "Outils"
   },
   "auth": {
     "login": "Connexion",
@@ -47,7 +52,18 @@
     "empty": "Vous n'avez pas encore créé de matières.",
     "emptyDescription": "Créez votre première matière pour commencer à organiser vos connaissances.",
     "delete": "Supprimer la matière",
-    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette matière ? Tous les sujets et contenus seront supprimés."
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette matière ? Tous les sujets et contenus seront supprimés.",
+    "newSubject": "Nouvelle Matière",
+    "createDescription": "Créez une nouvelle matière pour organiser vos sujets d'étude.",
+    "namePlaceholder": "Ex: Mathématiques",
+    "descriptionPlaceholder": "Brève description...",
+    "color": "Couleur",
+    "noSubjects": "Aucune matière créée.",
+    "clickToStart": "Cliquez sur + pour commencer.",
+    "creating": "Création...",
+    "createSuccess": "Matière créée!",
+    "createSuccessMessage": "Votre nouvelle matière a été ajoutée avec succès.",
+    "createError": "Impossible de créer la matière."
   },
   "topics": {
     "title": "Sujets",
@@ -189,5 +205,8 @@
     "notFound": "Non trouvé.",
     "limit": "Limite atteinte. Mettez à niveau votre plan pour continuer.",
     "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille."
+  },
+  "app": {
+    "tagline": "Organise. Équilibre."
   }
 }

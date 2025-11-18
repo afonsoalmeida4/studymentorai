@@ -1,0 +1,17 @@
+  "app": {
+    "tagline": "Organise. Équilibre."
+  },
+  "nav": {
+    "navigation": "Navigation",
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "ranking": "Classement",
+    "tools": "Outils",
+    "subjects": "Matières",
+    "chat": "AI Mentor",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "classes": "Classes",
+    "subscription": "Plan",
+    "logout": "Déconnexion"
+  },

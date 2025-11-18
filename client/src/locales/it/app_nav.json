@@ -1,0 +1,17 @@
+  "app": {
+    "tagline": "Organizza. Bilancia."
+  },
+  "nav": {
+    "navigation": "Navigazione",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "ranking": "Classifica",
+    "tools": "Strumenti",
+    "subjects": "Materie",
+    "chat": "AI Mentor",
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "classes": "Classi",
+    "subscription": "Piano",
+    "logout": "Esci"
+  },

@@ -1,0 +1,17 @@
+  "app": {
+    "tagline": "Organisiere. Balanciere."
+  },
+  "nav": {
+    "navigation": "Navigation",
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "ranking": "Rangliste",
+    "tools": "Werkzeuge",
+    "subjects": "Fächer",
+    "chat": "AI Mentor",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "classes": "Klassen",
+    "subscription": "Plan",
+    "logout": "Abmelden"
+  },

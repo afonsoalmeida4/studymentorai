@@ -27,7 +27,12 @@
     "settings": "Impostazioni",
     "classes": "Classi",
     "subscription": "Abbonamento",
-    "logout": "Esci"
+    "logout": "Esci",
+    "navigation": "Navigazione",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "ranking": "Classifica",
+    "tools": "Strumenti"
   },
   "auth": {
     "login": "Accedi",
@@ -47,7 +52,18 @@
     "empty": "Non hai ancora creato nessuna materia.",
     "emptyDescription": "Crea la tua prima materia per iniziare a organizzare la tua conoscenza.",
     "delete": "Elimina materia",
-    "deleteConfirm": "Sei sicuro di voler eliminare questa materia? Tutti gli argomenti e i contenuti saranno eliminati."
+    "deleteConfirm": "Sei sicuro di voler eliminare questa materia? Tutti gli argomenti e i contenuti saranno eliminati.",
+    "newSubject": "Nuova Materia",
+    "createDescription": "Crea una nuova materia per organizzare i tuoi argomenti di studio.",
+    "namePlaceholder": "Es: Matematica",
+    "descriptionPlaceholder": "Breve descrizione...",
+    "color": "Colore",
+    "noSubjects": "Nessuna materia creata.",
+    "clickToStart": "Clicca su + per iniziare.",
+    "creating": "Creazione...",
+    "createSuccess": "Materia creata!",
+    "createSuccessMessage": "La tua nuova materia è stata aggiunta con successo.",
+    "createError": "Impossibile creare la materia."
   },
   "topics": {
     "title": "Argomenti",
@@ -189,5 +205,8 @@
     "notFound": "Non trovato.",
     "limit": "Limite raggiunto. Aggiorna il tuo piano per continuare.",
     "upload": "Errore nel caricamento del file. Controlla formato e dimensione."
+  },
+  "app": {
+    "tagline": "Organizza. Bilancia."
   }
 }

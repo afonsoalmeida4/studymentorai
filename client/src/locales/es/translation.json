@@ -20,13 +20,21 @@
     "download": "Descargar",
     "language": "Idioma"
   },
+  "app": {
+    "tagline": "Organiza. Equilibra."
+  },
   "nav": {
+    "navigation": "Navegación",
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "ranking": "Clasificación",
+    "tools": "Herramientas",
     "subjects": "Materias",
-    "chat": "Chat IA",
+    "chat": "AI Mentor",
     "profile": "Perfil",
     "settings": "Configuración",
     "classes": "Clases",
-    "subscription": "Suscripción",
+    "subscription": "Plan",
     "logout": "Salir"
   },
   "auth": {
@@ -41,11 +49,22 @@
   "subjects": {
     "title": "Mis Materias",
     "create": "Nueva Materia",
-    "name": "Nombre de la materia",
-    "description": "Descripción",
+    "newSubject": "Nueva Asignatura",
+    "createDescription": "Crea una nueva asignatura para organizar tus temas de estudio.",
+    "name": "Nombre",
+    "namePlaceholder": "Ej: Matemáticas",
+    "description": "Descripción (opcional)",
+    "descriptionPlaceholder": "Breve descripción...",
+    "color": "Color",
     "icon": "Icono",
     "empty": "Aún no has creado ninguna materia.",
     "emptyDescription": "Crea tu primera materia para comenzar a organizar tu conocimiento.",
+    "noSubjects": "No hay asignaturas creadas.",
+    "clickToStart": "Haz clic en + para comenzar.",
+    "creating": "Creando...",
+    "createSuccess": "¡Asignatura creada!",
+    "createSuccessMessage": "Tu nueva asignatura se ha añadido con éxito.",
+    "createError": "No se pudo crear la asignatura.",
     "delete": "Eliminar materia",
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta materia? Todos los temas y contenidos serán eliminados."
   },

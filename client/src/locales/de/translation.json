@@ -27,7 +27,12 @@
     "settings": "Einstellungen",
     "classes": "Klassen",
     "subscription": "Abonnement",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "navigation": "Navigation",
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "ranking": "Rangliste",
+    "tools": "Werkzeuge"
   },
   "auth": {
     "login": "Anmelden",
@@ -47,7 +52,18 @@
     "empty": "Sie haben noch keine Fächer erstellt.",
     "emptyDescription": "Erstellen Sie Ihr erstes Fach, um Ihr Wissen zu organisieren.",
     "delete": "Fach löschen",
-    "deleteConfirm": "Sind Sie sicher, dass Sie dieses Fach löschen möchten? Alle Themen und Inhalte werden gelöscht."
+    "deleteConfirm": "Sind Sie sicher, dass Sie dieses Fach löschen möchten? Alle Themen und Inhalte werden gelöscht.",
+    "newSubject": "Neues Fach",
+    "createDescription": "Erstellen Sie ein neues Fach zur Organisation Ihrer Lernthemen.",
+    "namePlaceholder": "Z.B.: Mathematik",
+    "descriptionPlaceholder": "Kurze Beschreibung...",
+    "color": "Farbe",
+    "noSubjects": "Keine Fächer erstellt.",
+    "clickToStart": "Klicken Sie auf +, um zu beginnen.",
+    "creating": "Erstellen...",
+    "createSuccess": "Fach erstellt!",
+    "createSuccessMessage": "Ihr neues Fach wurde erfolgreich hinzugefügt.",
+    "createError": "Fach konnte nicht erstellt werden."
   },
   "topics": {
     "title": "Themen",
@@ -189,5 +205,8 @@
     "notFound": "Nicht gefunden.",
     "limit": "Limit erreicht. Upgraden Sie Ihren Plan, um fortzufahren.",
     "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe."
+  },
+  "app": {
+    "tagline": "Organisiere. Balanciere."
   }
 }

@@ -20,13 +20,21 @@
     "download": "Download",
     "language": "Language"
   },
+  "app": {
+    "tagline": "Organize. Balance."
+  },
   "nav": {
+    "navigation": "Navigation",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "ranking": "Ranking",
+    "tools": "Tools",
     "subjects": "Subjects",
-    "chat": "AI Chat",
+    "chat": "AI Mentor",
     "profile": "Profile",
     "settings": "Settings",
     "classes": "Classes",
-    "subscription": "Subscription",
+    "subscription": "Plan",
     "logout": "Logout"
   },
   "auth": {
@@ -41,11 +49,22 @@
   "subjects": {
     "title": "My Subjects",
     "create": "New Subject",
-    "name": "Subject name",
-    "description": "Description",
+    "newSubject": "New Subject",
+    "createDescription": "Create a new subject to organize your study topics.",
+    "name": "Name",
+    "namePlaceholder": "E.g: Mathematics",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "Brief description...",
+    "color": "Color",
     "icon": "Icon",
     "empty": "You haven't created any subjects yet.",
     "emptyDescription": "Create your first subject to start organizing your knowledge.",
+    "noSubjects": "No subjects created.",
+    "clickToStart": "Click + to get started.",
+    "creating": "Creating...",
+    "createSuccess": "Subject created!",
+    "createSuccessMessage": "Your new subject has been added successfully.",
+    "createError": "Could not create subject.",
     "delete": "Delete subject",
     "deleteConfirm": "Are you sure you want to delete this subject? All topics and content will be deleted."
   },

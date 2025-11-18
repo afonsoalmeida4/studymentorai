@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Users, Crown } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ type SubscriptionDetails = {
 };
 
 export function AppSidebar() {
+  const { t } = useTranslation();
   const [location] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -78,16 +80,16 @@ export function AppSidebar() {
       setNewSubjectDescription("");
       setNewSubjectColor("#6366f1");
       toast({
-        title: "Disciplina criada!",
-        description: "A sua nova disciplina foi adicionada com sucesso.",
+        title: t('subjects.createSuccess'),
+        description: t('subjects.createSuccessMessage'),
       });
     },
     onError: (error: any) => {
       console.error("Error creating subject:", error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: error?.message || "Não foi possível criar a disciplina.",
+        title: t('common.error'),
+        description: error?.message || t('subjects.createError'),
       });
     },
   });
@@ -107,14 +109,14 @@ export function AppSidebar() {
             <GraduationCap className="w-6 h-6 text-primary" data-testid="icon-app-logo" />
             <div className="flex flex-col">
               <span className="font-semibold text-sm">AI Study Mentor</span>
-              <span className="text-xs text-muted-foreground">Organiza. Equilibra.</span>
+              <span className="text-xs text-muted-foreground">{t('app.tagline')}</span>
             </div>
           </div>
         </SidebarHeader>
 
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Navegação</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('nav.navigation')}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -125,7 +127,7 @@ export function AppSidebar() {
                   >
                     <Link href="/">
                       <Home className="w-4 h-4" />
-                      <span>Início</span>
+                      <span>{t('nav.home')}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -137,7 +139,7 @@ export function AppSidebar() {
                   >
                     <Link href="/dashboard">
                       <BarChart3 className="w-4 h-4" />
-                      <span>Dashboard</span>
+                      <span>{t('nav.dashboard')}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -149,7 +151,7 @@ export function AppSidebar() {
                   >
                     <Link href="/ranking">
                       <Trophy className="w-4 h-4" />
-                      <span>Ranking</span>
+                      <span>{t('nav.ranking')}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -162,7 +164,7 @@ export function AppSidebar() {
                     >
                       <Link href="/classes">
                         <Users className="w-4 h-4" />
-                        <span>{typedUser.role === "teacher" ? "Minhas Turmas" : "As Minhas Turmas"}</span>
+                        <span>{t('nav.classes')}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -176,7 +178,7 @@ export function AppSidebar() {
                     <Link href="/subscription">
                       <Crown className="w-4 h-4" />
                       <div className="flex items-center justify-between w-full gap-2">
-                        <span>Plano</span>
+                        <span>{t('nav.subscription')}</span>
                         {subscriptionData && (
                           <Badge 
                             variant={subscriptionData.subscription.plan === "free" ? "outline" : "default"}
@@ -196,7 +198,7 @@ export function AppSidebar() {
 
           <SidebarGroup>
             <div className="flex items-center justify-between px-2">
-              <SidebarGroupLabel>Disciplinas</SidebarGroupLabel>
+              <SidebarGroupLabel>{t('nav.subjects')}</SidebarGroupLabel>
               <Button
                 size="icon"
                 variant="ghost"
@@ -211,9 +213,9 @@ export function AppSidebar() {
               <SidebarMenu>
                 {subjects.length === 0 ? (
                   <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                    Nenhuma disciplina criada.
+                    {t('subjects.noSubjects')}
                     <br />
-                    Clique em + para começar.
+                    {t('subjects.clickToStart')}
                   </div>
                 ) : (
                   subjects.map((subject) => (
@@ -239,7 +241,7 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <SidebarGroup>
-            <SidebarGroupLabel>Ferramentas</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('nav.tools')}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -250,7 +252,7 @@ export function AppSidebar() {
                   >
                     <Link href="/chat">
                       <Brain className="w-4 h-4" />
-                      <span>AI Mentor</span>
+                      <span>{t('nav.chat')}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -267,7 +269,7 @@ export function AppSidebar() {
                 data-testid="button-logout"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Sair</span>
+                <span>{t('nav.logout')}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -278,35 +280,35 @@ export function AppSidebar() {
         <DialogContent data-testid="dialog-create-subject">
           <form onSubmit={handleCreateSubject}>
             <DialogHeader>
-              <DialogTitle>Nova Disciplina</DialogTitle>
+              <DialogTitle>{t('subjects.newSubject')}</DialogTitle>
               <DialogDescription>
-                Crie uma nova disciplina para organizar os seus tópicos de estudo.
+                {t('subjects.createDescription')}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="subject-name">Nome</Label>
+                <Label htmlFor="subject-name">{t('subjects.name')}</Label>
                 <Input
                   id="subject-name"
                   value={newSubjectName}
                   onChange={(e) => setNewSubjectName(e.target.value)}
-                  placeholder="Ex: Matemática"
+                  placeholder={t('subjects.namePlaceholder')}
                   data-testid="input-subject-name"
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="subject-description">Descrição (opcional)</Label>
+                <Label htmlFor="subject-description">{t('subjects.description')}</Label>
                 <Textarea
                   id="subject-description"
                   value={newSubjectDescription}
                   onChange={(e) => setNewSubjectDescription(e.target.value)}
-                  placeholder="Breve descrição..."
+                  placeholder={t('subjects.descriptionPlaceholder')}
                   data-testid="input-subject-description"
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="subject-color">Cor</Label>
+                <Label htmlFor="subject-color">{t('subjects.color')}</Label>
                 <div className="flex gap-2 items-center">
                   <Input
                     id="subject-color"
@@ -327,14 +329,14 @@ export function AppSidebar() {
                 onClick={() => setIsSubjectDialogOpen(false)}
                 data-testid="button-cancel-subject"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!newSubjectName.trim() || createSubjectMutation.isPending}
                 data-testid="button-submit-subject"
               >
-                {createSubjectMutation.isPending ? "A criar..." : "Criar"}
+                {createSubjectMutation.isPending ? t('subjects.creating') : t('common.create')}
               </Button>
             </DialogFooter>
           </form>
