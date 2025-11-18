@@ -17,6 +17,16 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
+// Debug logger for ALL requests
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url}`);
+  if (req.url.includes('/api/')) {
+    console.log(`[REQUEST HEADERS]`, req.headers);
+    console.log(`[REQUEST QUERY]`, req.query);
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
