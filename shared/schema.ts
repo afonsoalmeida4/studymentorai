@@ -579,6 +579,45 @@ export const flashcardsRelations = relations(flashcards, ({ one, many }) => ({
   attempts: many(flashcardAttempts),
 }));
 
+// Flashcard Translations table (maps flashcards across languages for shared SM-2 progress)
+export const flashcardTranslations = pgTable(
+  "flashcard_translations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    baseFlashcardId: varchar("base_flashcard_id").notNull().references(() => flashcards.id, { onDelete: "cascade" }),
+    translatedFlashcardId: varchar("translated_flashcard_id").notNull().references(() => flashcards.id, { onDelete: "cascade" }),
+    targetLanguage: varchar("target_language", { length: 5 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    baseFlashcardIdx: index("idx_flashcard_translations_base").on(table.baseFlashcardId),
+    translatedFlashcardIdx: index("idx_flashcard_translations_translated").on(table.translatedFlashcardId),
+    // Ensure one translation per language for each base flashcard
+    uniqueBaseLanguage: uniqueIndex("idx_flashcard_translations_unique").on(table.baseFlashcardId, table.targetLanguage),
+  }),
+);
+
+export const insertFlashcardTranslationSchema = createInsertSchema(flashcardTranslations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertFlashcardTranslation = z.infer<typeof insertFlashcardTranslationSchema>;
+export type FlashcardTranslation = typeof flashcardTranslations.$inferSelect;
+
+export const flashcardTranslationsRelations = relations(flashcardTranslations, ({ one }) => ({
+  baseFlashcard: one(flashcards, {
+    fields: [flashcardTranslations.baseFlashcardId],
+    references: [flashcards.id],
+    relationName: "baseFlashcard",
+  }),
+  translatedFlashcard: one(flashcards, {
+    fields: [flashcardTranslations.translatedFlashcardId],
+    references: [flashcards.id],
+    relationName: "translatedFlashcard",
+  }),
+}));
+
 // Study Sessions table (for progress tracking)
 export const studySessions = pgTable(
   "study_sessions",
