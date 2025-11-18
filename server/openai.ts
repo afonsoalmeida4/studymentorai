@@ -98,6 +98,135 @@ const motivationalPrompts: Record<string, Record<string, string>> = {
   },
 };
 
+const flashcardSystemPrompts: Record<string, string> = {
+  pt: `Você é um especialista em educação que cria flashcards eficazes para estudo.
+Crie flashcards com perguntas claras e respostas concisas baseadas no texto fornecido.
+Cada flashcard deve testar um conceito-chave ou fato importante.
+Gere entre 5 e 10 flashcards.
+
+Retorne a resposta APENAS como um array JSON válido no seguinte formato:
+[
+  {"question": "Pergunta aqui?", "answer": "Resposta concisa aqui"},
+  {"question": "Outra pergunta?", "answer": "Outra resposta"}
+]
+
+NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array JSON.
+RESPONDA EM PORTUGUÊS.`,
+  en: `You are an education expert who creates effective flashcards for studying.
+Create flashcards with clear questions and concise answers based on the provided text.
+Each flashcard should test a key concept or important fact.
+Generate between 5 and 10 flashcards.
+
+Return the response ONLY as a valid JSON array in the following format:
+[
+  {"question": "Question here?", "answer": "Concise answer here"},
+  {"question": "Another question?", "answer": "Another answer"}
+]
+
+DO NOT include any additional text, markdown, or explanations. ONLY the JSON array.
+RESPOND IN ENGLISH.`,
+  es: `Eres un experto en educación que crea flashcards efectivas para estudiar.
+Crea flashcards con preguntas claras y respuestas concisas basadas en el texto proporcionado.
+Cada flashcard debe probar un concepto clave o hecho importante.
+Genera entre 5 y 10 flashcards.
+
+Devuelve la respuesta SOLO como un array JSON válido en el siguiente formato:
+[
+  {"question": "¿Pregunta aquí?", "answer": "Respuesta concisa aquí"},
+  {"question": "¿Otra pregunta?", "answer": "Otra respuesta"}
+]
+
+NO incluyas ningún texto adicional, markdown o explicaciones. SOLO el array JSON.
+RESPONDE EN ESPAÑOL.`,
+  fr: `Vous êtes un expert en éducation qui crée des flashcards efficaces pour étudier.
+Créez des flashcards avec des questions claires et des réponses concises basées sur le texte fourni.
+Chaque flashcard doit tester un concept clé ou un fait important.
+Générez entre 5 et 10 flashcards.
+
+Retournez la réponse UNIQUEMENT sous forme de tableau JSON valide dans le format suivant :
+[
+  {"question": "Question ici ?", "answer": "Réponse concise ici"},
+  {"question": "Autre question ?", "answer": "Autre réponse"}
+]
+
+N'incluez AUCUN texte supplémentaire, markdown ou explications. UNIQUEMENT le tableau JSON.
+RÉPONDEZ EN FRANÇAIS.`,
+  de: `Sie sind ein Bildungsexperte, der effektive Lernkarten zum Lernen erstellt.
+Erstellen Sie Lernkarten mit klaren Fragen und prägnanten Antworten basierend auf dem bereitgestellten Text.
+Jede Lernkarte sollte ein Schlüsselkonzept oder eine wichtige Tatsache testen.
+Generieren Sie zwischen 5 und 10 Lernkarten.
+
+Geben Sie die Antwort NUR als gültiges JSON-Array im folgenden Format zurück:
+[
+  {"question": "Frage hier?", "answer": "Prägnante Antwort hier"},
+  {"question": "Andere Frage?", "answer": "Andere Antwort"}
+]
+
+Fügen Sie KEINEN zusätzlichen Text, Markdown oder Erklärungen hinzu. NUR das JSON-Array.
+ANTWORTEN SIE AUF DEUTSCH.`,
+  it: `Sei un esperto di educazione che crea flashcard efficaci per studiare.
+Crea flashcard con domande chiare e risposte concise basate sul testo fornito.
+Ogni flashcard dovrebbe testare un concetto chiave o un fatto importante.
+Genera tra 5 e 10 flashcard.
+
+Restituisci la risposta SOLO come un array JSON valido nel seguente formato:
+[
+  {"question": "Domanda qui?", "answer": "Risposta concisa qui"},
+  {"question": "Altra domanda?", "answer": "Altra risposta"}
+]
+
+NON includere alcun testo aggiuntivo, markdown o spiegazioni. SOLO l'array JSON.
+RISPONDI IN ITALIANO.`,
+};
+
+const flashcardUserPrompts: Record<string, string> = {
+  pt: "Crie flashcards baseados neste resumo:",
+  en: "Create flashcards based on this summary:",
+  es: "Crea flashcards basadas en este resumen:",
+  fr: "Créez des flashcards basées sur ce résumé :",
+  de: "Erstellen Sie Lernkarten basierend auf dieser Zusammenfassung:",
+  it: "Crea flashcard basate su questo riassunto:",
+};
+
+const flashcardErrorMessages: Record<string, { invalidFormat: string; invalidArray: string; noValidCards: string; generalError: string }> = {
+  pt: {
+    invalidFormat: "Formato de resposta inválido da IA",
+    invalidArray: "A resposta da IA não é um array de flashcards",
+    noValidCards: "Nenhum flashcard válido foi gerado. Por favor, tente novamente.",
+    generalError: "Falha ao gerar flashcards. Por favor, tente novamente.",
+  },
+  en: {
+    invalidFormat: "Invalid AI response format",
+    invalidArray: "AI response is not a flashcard array",
+    noValidCards: "No valid flashcards were generated. Please try again.",
+    generalError: "Failed to generate flashcards. Please try again.",
+  },
+  es: {
+    invalidFormat: "Formato de respuesta de IA inválido",
+    invalidArray: "La respuesta de IA no es un array de flashcards",
+    noValidCards: "No se generaron flashcards válidas. Por favor, inténtalo de nuevo.",
+    generalError: "Error al generar flashcards. Por favor, inténtalo de nuevo.",
+  },
+  fr: {
+    invalidFormat: "Format de réponse IA invalide",
+    invalidArray: "La réponse IA n'est pas un tableau de flashcards",
+    noValidCards: "Aucune flashcard valide n'a été générée. Veuillez réessayer.",
+    generalError: "Échec de la génération de flashcards. Veuillez réessayer.",
+  },
+  de: {
+    invalidFormat: "Ungültiges KI-Antwortformat",
+    invalidArray: "KI-Antwort ist kein Lernkarten-Array",
+    noValidCards: "Es wurden keine gültigen Lernkarten generiert. Bitte versuchen Sie es erneut.",
+    generalError: "Fehler beim Generieren von Lernkarten. Bitte versuchen Sie es erneut.",
+  },
+  it: {
+    invalidFormat: "Formato di risposta IA non valido",
+    invalidArray: "La risposta IA non è un array di flashcard",
+    noValidCards: "Nessuna flashcard valida è stata generata. Per favore riprova.",
+    generalError: "Errore nella generazione di flashcard. Per favore riprova.",
+  },
+};
+
 export async function generateSummary({
   text,
   learningStyle,
@@ -199,20 +328,12 @@ export async function generateSummary({
   }
 }
 
-export async function generateFlashcards(summaryText: string): Promise<FlashcardItem[]> {
+export async function generateFlashcards(summaryText: string, language: string = "pt"): Promise<FlashcardItem[]> {
   try {
-    const systemPrompt = `Você é um especialista em educação que cria flashcards eficazes para estudo.
-Crie flashcards com perguntas claras e respostas concisas baseadas no texto fornecido.
-Cada flashcard deve testar um conceito-chave ou fato importante.
-Gere entre 5 e 10 flashcards.
-
-Retorne a resposta APENAS como um array JSON válido no seguinte formato:
-[
-  {"question": "Pergunta aqui?", "answer": "Resposta concisa aqui"},
-  {"question": "Outra pergunta?", "answer": "Outra resposta"}
-]
-
-NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array JSON.`;
+    const lang = language || "pt";
+    const systemPrompt = flashcardSystemPrompts[lang] || flashcardSystemPrompts["pt"];
+    const userPrompt = flashcardUserPrompts[lang] || flashcardUserPrompts["pt"];
+    const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
 
     const response = await openai.chat.completions.create({
       model: "gpt-5",
@@ -223,7 +344,7 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
         },
         {
           role: "user",
-          content: `Crie flashcards baseados neste resumo:\n\n${summaryText}`,
+          content: `${userPrompt}\n\n${summaryText}`,
         },
       ],
       max_completion_tokens: 2048,
@@ -251,7 +372,7 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
     } catch (parseError) {
       console.error("Failed to parse flashcards JSON:", parseError);
       console.error("Content received:", content.substring(0, 500));
-      throw new Error("Formato de resposta inválido da IA");
+      throw new Error(errors.invalidFormat);
     }
     
     console.log("[generateFlashcards] Parsed flashcards count:", Array.isArray(flashcards) ? flashcards.length : "not an array");
@@ -262,7 +383,7 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
     // Validate the structure
     if (!Array.isArray(flashcards)) {
       console.error("Response is not an array:", flashcards);
-      throw new Error("A resposta da IA não é um array de flashcards");
+      throw new Error(errors.invalidArray);
     }
     
     // Ensure each flashcard has question and answer
@@ -277,16 +398,24 @@ NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array J
       if (flashcards.length > 0) {
         console.error("Sample invalid flashcard:", JSON.stringify(flashcards[0]));
       }
-      throw new Error("Nenhum flashcard válido foi gerado. Por favor, tente novamente.");
+      throw new Error(errors.noValidCards);
     }
     
     return validFlashcards;
   } catch (error) {
     console.error("Error generating flashcards with GPT-5:", error);
-    if (error instanceof Error && error.message.includes("IA")) {
-      throw error;
+    if (error instanceof Error) {
+      // Re-throw errors with localized messages
+      const lang = language || "pt";
+      const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
+      const localizedErrors = Object.values(errors);
+      if (localizedErrors.some(msg => error.message.includes(msg))) {
+        throw error;
+      }
     }
-    throw new Error("Falha ao gerar flashcards. Por favor, tente novamente.");
+    const lang = language || "pt";
+    const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
+    throw new Error(errors.generalError);
   }
 }
 
