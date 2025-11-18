@@ -540,5 +540,119 @@
     "upload": "Errore durante il caricamento del file. Controlla formato e dimensioni.",
     "generateSummaries": "Errore durante la generazione dei riassunti",
     "tryAgain": "Impossibile completare l'operazione. Per favore riprova."
+  },
+  "myClasses": {
+    "title": "Le Mie Classi",
+    "subtitle": "Gestisci le tue classi e monitora i progressi dei tuoi studenti",
+    "toasts": {
+      "classCreated": "Classe creata!",
+      "classCreatedDescription": "La tua classe è stata creata con successo.",
+      "classDeleted": "Classe eliminata",
+      "classDeletedDescription": "La classe è stata eliminata con successo.",
+      "studentRemoved": "Studente rimosso",
+      "studentRemovedDescription": "Lo studente è stato rimosso dalla classe.",
+      "codeCopied": "Codice copiato!",
+      "codeCopiedDescription": "Il codice di invito è stato copiato negli appunti.",
+      "nameRequired": "Nome obbligatorio",
+      "nameRequiredDescription": "Per favore inserisci un nome per la classe.",
+      "error": "Errore",
+      "createClassError": "Impossibile creare la classe.",
+      "deleteClassError": "Impossibile eliminare la classe.",
+      "removeStudentError": "Impossibile rimuovere lo studente."
+    },
+    "labels": {
+      "className": "Nome della Classe",
+      "description": "Descrizione (facoltativa)",
+      "inviteCode": "Codice di Invito",
+      "students": "Studenti ({{count}})",
+      "level": "Livello"
+    },
+    "placeholders": {
+      "className": "Es: Matematica 3° Media",
+      "description": "Descrizione della classe..."
+    },
+    "buttons": {
+      "newClass": "Nuova Classe",
+      "createClass": "Crea Classe",
+      "creating": "Creazione...",
+      "delete": "Elimina",
+      "cancel": "Annulla",
+      "copy": "Copia",
+      "remove": "Rimuovi",
+      "viewDetails": "Vedi dettagli →"
+    },
+    "dialogs": {
+      "createClass": {
+        "title": "Crea Nuova Classe",
+        "description": "Crea una classe per organizzare e monitorare i tuoi studenti"
+      },
+      "deleteClass": {
+        "title": "Sei sicuro?",
+        "description": "Questa azione non può essere annullata. Questo eliminerà permanentemente la classe e rimuoverà tutti gli studenti."
+      },
+      "removeStudent": {
+        "title": "Rimuovere lo studente?",
+        "description": "Sei sicuro di voler rimuovere questo studente dalla classe?"
+      }
+    },
+    "empty": {
+      "noClasses": "Non hai ancora nessuna classe",
+      "noClassesDescription": "Crea la tua prima classe per iniziare a monitorare i tuoi studenti",
+      "noStudents": "Non ci sono ancora studenti in questa classe"
+    },
+    "messages": {
+      "teachersOnly": "Questa pagina è solo per insegnanti.",
+      "noDescription": "Nessuna descrizione",
+      "noName": "Nessun nome"
+    },
+    "status": {
+      "active": "Attiva"
+    }
+  },
+  "studentClasses": {
+    "title": "Le Mie Classi",
+    "subtitle": "Classi a cui sei iscritto",
+    "toasts": {
+      "joinSuccess": "Iscritto alla classe!",
+      "joinSuccessDescription": "Sei stato aggiunto alla classe con successo.",
+      "joinError": "Impossibile unirsi alla classe.",
+      "leaveSuccess": "Uscito dalla classe",
+      "leaveSuccessDescription": "Sei stato rimosso dalla classe con successo.",
+      "leaveError": "Impossibile lasciare la classe.",
+      "codeRequired": "Codice obbligatorio",
+      "codeRequiredDescription": "Per favore inserisci un codice di invito.",
+      "invalidCode": "Codice non valido",
+      "invalidCodeDescription": "Il codice di invito deve essere di 8 caratteri."
+    },
+    "labels": {
+      "inviteCode": "Codice di Invito",
+      "inviteCodePlaceholder": "Es: ABC12345",
+      "codeLength": "Il codice è di 8 caratteri",
+      "noDescription": "Nessuna descrizione",
+      "enrolledSince": "Iscritto dal {{date}}"
+    },
+    "buttons": {
+      "joinClass": "Unisciti alla Classe",
+      "join": "Unisciti",
+      "joining": "Iscrizione in corso...",
+      "leaveClass": "Lascia la Classe",
+      "leave": "Lascia"
+    },
+    "dialogs": {
+      "joinTitle": "Unisciti a una Classe",
+      "joinDescription": "Inserisci il codice di invito fornito dal tuo insegnante",
+      "leaveTitle": "Sei sicuro?",
+      "leaveDescription": "Uscirai dalla classe \"{{className}}\". Dovrai richiedere un nuovo codice di invito all'insegnante per rientrare."
+    },
+    "emptyState": {
+      "title": "Non sei ancora in nessuna classe",
+      "description": "Chiedi al tuo insegnante il codice di invito per unirti a una classe"
+    },
+    "badges": {
+      "active": "Attiva"
+    },
+    "messages": {
+      "studentsOnly": "Questa pagina è solo per studenti."
+    }
   }
 }

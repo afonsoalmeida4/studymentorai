@@ -532,5 +532,119 @@
     "upload": "Erro ao carregar ficheiro. Verifica o formato e tamanho.",
     "generateSummaries": "Erro ao gerar resumos",
     "tryAgain": "Não foi possível completar a operação. Tente novamente."
+  },
+  "myClasses": {
+    "title": "As Minhas Turmas",
+    "subtitle": "Gere as tuas turmas e acompanha o progresso dos teus alunos",
+    "toasts": {
+      "classCreated": "Turma criada!",
+      "classCreatedDescription": "A tua turma foi criada com sucesso.",
+      "classDeleted": "Turma eliminada",
+      "classDeletedDescription": "A turma foi eliminada com sucesso.",
+      "studentRemoved": "Aluno removido",
+      "studentRemovedDescription": "O aluno foi removido da turma.",
+      "codeCopied": "Código copiado!",
+      "codeCopiedDescription": "O código de convite foi copiado para a área de transferência.",
+      "nameRequired": "Nome obrigatório",
+      "nameRequiredDescription": "Por favor, insere um nome para a turma.",
+      "error": "Erro",
+      "createClassError": "Não foi possível criar a turma.",
+      "deleteClassError": "Não foi possível eliminar a turma.",
+      "removeStudentError": "Não foi possível remover o aluno."
+    },
+    "labels": {
+      "className": "Nome da Turma",
+      "description": "Descrição (opcional)",
+      "inviteCode": "Código de Convite",
+      "students": "Alunos ({{count}})",
+      "level": "Nível"
+    },
+    "placeholders": {
+      "className": "Ex: Matemática 10º A",
+      "description": "Descrição da turma..."
+    },
+    "buttons": {
+      "newClass": "Nova Turma",
+      "createClass": "Criar Turma",
+      "creating": "A criar...",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "copy": "Copiar",
+      "remove": "Remover",
+      "viewDetails": "Ver detalhes →"
+    },
+    "dialogs": {
+      "createClass": {
+        "title": "Criar Nova Turma",
+        "description": "Cria uma turma para organizar e acompanhar os teus alunos"
+      },
+      "deleteClass": {
+        "title": "Tens a certeza?",
+        "description": "Esta ação não pode ser revertida. Isto irá eliminar permanentemente a turma e remover todos os alunos."
+      },
+      "removeStudent": {
+        "title": "Remover aluno?",
+        "description": "Tens a certeza que queres remover este aluno da turma?"
+      }
+    },
+    "empty": {
+      "noClasses": "Ainda não tens turmas",
+      "noClassesDescription": "Cria a tua primeira turma para começar a acompanhar os teus alunos",
+      "noStudents": "Ainda não há alunos nesta turma"
+    },
+    "messages": {
+      "teachersOnly": "Esta página é apenas para professores.",
+      "noDescription": "Sem descrição",
+      "noName": "Sem nome"
+    },
+    "status": {
+      "active": "Ativa"
+    }
+  },
+  "studentClasses": {
+    "title": "As Minhas Turmas",
+    "subtitle": "Turmas em que estás inscrito",
+    "toasts": {
+      "joinSuccess": "Entrou na turma!",
+      "joinSuccessDescription": "Foste adicionado à turma com sucesso.",
+      "joinError": "Não foi possível juntar-se à turma.",
+      "leaveSuccess": "Saíste da turma",
+      "leaveSuccessDescription": "Foste removido da turma com sucesso.",
+      "leaveError": "Não foi possível sair da turma.",
+      "codeRequired": "Código obrigatório",
+      "codeRequiredDescription": "Por favor, insere um código de convite.",
+      "invalidCode": "Código inválido",
+      "invalidCodeDescription": "O código de convite deve ter 8 caracteres."
+    },
+    "labels": {
+      "inviteCode": "Código de Convite",
+      "inviteCodePlaceholder": "Ex: ABC12345",
+      "codeLength": "O código tem 8 caracteres",
+      "noDescription": "Sem descrição",
+      "enrolledSince": "Inscrito desde {{date}}"
+    },
+    "buttons": {
+      "joinClass": "Juntar a Turma",
+      "join": "Juntar-me",
+      "joining": "A juntar...",
+      "leaveClass": "Sair da Turma",
+      "leave": "Sair"
+    },
+    "dialogs": {
+      "joinTitle": "Juntar-se a uma Turma",
+      "joinDescription": "Insere o código de convite fornecido pelo teu professor",
+      "leaveTitle": "Tens a certeza?",
+      "leaveDescription": "Vais sair da turma \"{{className}}\". Terás de pedir um novo código de convite ao professor para voltares a entrar."
+    },
+    "emptyState": {
+      "title": "Ainda não estás em nenhuma turma",
+      "description": "Pede ao teu professor o código de convite para te juntares a uma turma"
+    },
+    "badges": {
+      "active": "Ativa"
+    },
+    "messages": {
+      "studentsOnly": "Esta página é apenas para alunos."
+    }
   }
 }

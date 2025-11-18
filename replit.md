@@ -100,7 +100,22 @@ Authentication is handled via Replit OIDC, using session-based authentication wi
   - FlashcardDeck.tsx (complete - all flashcard UI strings)
   - AnkiFlashcardDeck.tsx (complete - Anki SRS UI strings, difficulty ratings, progress tracking)
   - UpgradeDialog.tsx (complete - all subscription upgrade prompts, benefits, pricing)
-- **Translation Coverage Status (November 18, 2025):**
-  - ✅ COMPLETED: Flashcards, SubjectView, UpgradeDialog (critical user-facing components)
-  - ⏳ IN PROGRESS: Remaining pages (ChatView, Dashboard, Subscription, Classes, RoleSelection, Ranking)
-  - ⏳ IN PROGRESS: Remaining components (AppHeader, SummaryStudySection, XPProgressBar, LevelBadge)
+- **Translation Coverage Status (November 18, 2025 - 3:30 PM) - MAJOR PROGRESS:**
+  - ✅ **COMPLETED & VERIFIED COMPONENTS** (All 6 languages: PT, EN, ES, FR, DE, IT):
+    - FlashcardDeck.tsx (20+ translation keys)
+    - AnkiFlashcardDeck.tsx (difficulty ratings, SRS UI, progress tracking)
+    - SubjectView page (18+ keys covering toasts, dialogs, empty states)
+    - UpgradeDialog (critical subscription component - 30+ keys for 4 limit types, verified by architect)
+    - AppHeader (4 navigation keys)
+    - SummaryStudySection (flashcard generation UI - 13 keys)
+  - ✅ **COMPLETED PAGES** (All 6 languages synchronized):
+    - **my-classes.tsx** (465 lines - teacher class management, 44+ strings translated, organized namespace)
+    - **student-classes.tsx** (288 lines - student enrollment, complete namespace with toasts/labels/buttons/dialogs)
+  - ⏳ **REMAINING PAGES** (Portuguese hardcoded - LOWER PRIORITY):
+    - ChatView (AI chat interface)
+    - Dashboard (user progress overview)
+    - Subscription (plan management)
+    - RoleSelection (teacher/student onboarding)
+    - Ranking (leaderboard)
+  - ℹ️ **SMALL COMPONENTS**: XPProgressBar, LevelBadge (no user-facing strings)
+  - 🎯 **CRITICAL USER FLOWS NOW TRANSLATED**: Subject management, flashcards, class system, subscription upgrades

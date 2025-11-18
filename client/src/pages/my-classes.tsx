@@ -33,6 +33,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import type { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 interface Class {
   id: string;
@@ -56,6 +57,7 @@ interface Student {
 }
 
 export default function MyClasses() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const typedUser = user as User | null;
@@ -79,8 +81,8 @@ export default function MyClasses() {
     },
     onSuccess: () => {
       toast({
-        title: "Turma criada!",
-        description: "A tua turma foi criada com sucesso.",
+        title: t("myClasses.toasts.classCreated"),
+        description: t("myClasses.toasts.classCreatedDescription"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/classes"] });
       setIsCreateDialogOpen(false);
@@ -89,8 +91,8 @@ export default function MyClasses() {
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível criar a turma.",
+        title: t("myClasses.toasts.error"),
+        description: t("myClasses.toasts.createClassError"),
         variant: "destructive",
       });
     },
@@ -102,16 +104,16 @@ export default function MyClasses() {
     },
     onSuccess: () => {
       toast({
-        title: "Turma eliminada",
-        description: "A turma foi eliminada com sucesso.",
+        title: t("myClasses.toasts.classDeleted"),
+        description: t("myClasses.toasts.classDeletedDescription"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/classes"] });
       setSelectedClassId(null);
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível eliminar a turma.",
+        title: t("myClasses.toasts.error"),
+        description: t("myClasses.toasts.deleteClassError"),
         variant: "destructive",
       });
     },
@@ -123,15 +125,15 @@ export default function MyClasses() {
     },
     onSuccess: () => {
       toast({
-        title: "Aluno removido",
-        description: "O aluno foi removido da turma.",
+        title: t("myClasses.toasts.studentRemoved"),
+        description: t("myClasses.toasts.studentRemovedDescription"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/classes", selectedClassId] });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível remover o aluno.",
+        title: t("myClasses.toasts.error"),
+        description: t("myClasses.toasts.removeStudentError"),
         variant: "destructive",
       });
     },
@@ -140,16 +142,16 @@ export default function MyClasses() {
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(code);
     toast({
-      title: "Código copiado!",
-      description: "O código de convite foi copiado para a área de transferência.",
+      title: t("myClasses.toasts.codeCopied"),
+      description: t("myClasses.toasts.codeCopiedDescription"),
     });
   };
 
   const handleCreateClass = () => {
     if (!newClassName.trim()) {
       toast({
-        title: "Nome obrigatório",
-        description: "Por favor, insere um nome para a turma.",
+        title: t("myClasses.toasts.nameRequired"),
+        description: t("myClasses.toasts.nameRequiredDescription"),
         variant: "destructive",
       });
       return;
@@ -165,7 +167,7 @@ export default function MyClasses() {
       <div className="min-h-screen bg-background">
         <AppHeader />
         <div className="container mx-auto py-8 px-4 max-w-7xl">
-          <p className="text-muted-foreground">Esta página é apenas para professores.</p>
+          <p className="text-muted-foreground">{t("myClasses.messages.teachersOnly")}</p>
         </div>
       </div>
     );
@@ -182,43 +184,43 @@ export default function MyClasses() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2" data-testid="title-my-classes">
-              As Minhas Turmas
+              {t("myClasses.title")}
             </h1>
             <p className="text-muted-foreground">
-              Gere as tuas turmas e acompanha o progresso dos teus alunos
+              {t("myClasses.subtitle")}
             </p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-class">
                 <Plus className="w-4 h-4 mr-2" />
-                Nova Turma
+                {t("myClasses.buttons.newClass")}
               </Button>
             </DialogTrigger>
             <DialogContent data-testid="dialog-create-class">
               <DialogHeader>
-                <DialogTitle>Criar Nova Turma</DialogTitle>
+                <DialogTitle>{t("myClasses.dialogs.createClass.title")}</DialogTitle>
                 <DialogDescription>
-                  Cria uma turma para organizar e acompanhar os teus alunos
+                  {t("myClasses.dialogs.createClass.description")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="class-name">Nome da Turma</Label>
+                  <Label htmlFor="class-name">{t("myClasses.labels.className")}</Label>
                   <Input
                     id="class-name"
                     data-testid="input-class-name"
-                    placeholder="Ex: Matemática 10º A"
+                    placeholder={t("myClasses.placeholders.className")}
                     value={newClassName}
                     onChange={(e) => setNewClassName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="class-description">Descrição (opcional)</Label>
+                  <Label htmlFor="class-description">{t("myClasses.labels.description")}</Label>
                   <Textarea
                     id="class-description"
                     data-testid="input-class-description"
-                    placeholder="Descrição da turma..."
+                    placeholder={t("myClasses.placeholders.description")}
                     value={newClassDescription}
                     onChange={(e) => setNewClassDescription(e.target.value)}
                   />
@@ -230,7 +232,7 @@ export default function MyClasses() {
                   disabled={createClassMutation.isPending}
                   data-testid="button-submit-create-class"
                 >
-                  {createClassMutation.isPending ? "A criar..." : "Criar Turma"}
+                  {createClassMutation.isPending ? t("myClasses.buttons.creating") : t("myClasses.buttons.createClass")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -255,9 +257,9 @@ export default function MyClasses() {
           <Card>
             <CardContent className="py-12 text-center">
               <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Ainda não tens turmas</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("myClasses.empty.noClasses")}</h3>
               <p className="text-muted-foreground mb-4">
-                Cria a tua primeira turma para começar a acompanhar os teus alunos
+                {t("myClasses.empty.noClassesDescription")}
               </p>
             </CardContent>
           </Card>
@@ -277,12 +279,12 @@ export default function MyClasses() {
                         {classItem.name}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        {classItem.description || "Sem descrição"}
+                        {classItem.description || t("myClasses.messages.noDescription")}
                       </CardDescription>
                     </div>
                     {classItem.isActive && (
                       <Badge variant="secondary" data-testid={`badge-active-${classItem.id}`}>
-                        Ativa
+                        {t("myClasses.status.active")}
                       </Badge>
                     )}
                   </div>
@@ -305,7 +307,7 @@ export default function MyClasses() {
                     </Button>
                   </div>
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Ver detalhes →</span>
+                    <span>{t("myClasses.buttons.viewDetails")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -323,31 +325,30 @@ export default function MyClasses() {
                       {selectedClass?.name}
                     </DialogTitle>
                     <DialogDescription className="mt-1">
-                      {selectedClass?.description || "Sem descrição"}
+                      {selectedClass?.description || t("myClasses.messages.noDescription")}
                     </DialogDescription>
                   </div>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" size="sm" data-testid="button-delete-class">
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Eliminar
+                        {t("myClasses.buttons.delete")}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Tens a certeza?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("myClasses.dialogs.deleteClass.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Esta ação não pode ser revertida. Isto irá eliminar permanentemente a turma
-                          e remover todos os alunos.
+                          {t("myClasses.dialogs.deleteClass.description")}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel data-testid="button-cancel-delete">Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel data-testid="button-cancel-delete">{t("myClasses.buttons.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteClassMutation.mutate(selectedClassId)}
                           data-testid="button-confirm-delete"
                         >
-                          Eliminar
+                          {t("myClasses.buttons.delete")}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -358,7 +359,7 @@ export default function MyClasses() {
               <div className="space-y-4 mt-4">
                 <div className="flex items-center gap-2 p-4 border rounded-md">
                   <div className="flex-1">
-                    <Label className="text-sm font-medium">Código de Convite</Label>
+                    <Label className="text-sm font-medium">{t("myClasses.labels.inviteCode")}</Label>
                     <p className="font-mono text-lg mt-1" data-testid="text-invite-code">
                       {selectedClass?.inviteCode}
                     </p>
@@ -368,13 +369,13 @@ export default function MyClasses() {
                     data-testid="button-copy-invite"
                   >
                     <Copy className="w-4 h-4 mr-2" />
-                    Copiar
+                    {t("myClasses.buttons.copy")}
                   </Button>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-semibold mb-3">
-                    Alunos ({students.length})
+                    {t("myClasses.labels.students", { count: students.length })}
                   </h3>
                   {studentsLoading ? (
                     <div className="space-y-3">
@@ -393,7 +394,7 @@ export default function MyClasses() {
                       <CardContent className="py-8 text-center">
                         <Users className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
                         <p className="text-muted-foreground">
-                          Ainda não há alunos nesta turma
+                          {t("myClasses.empty.noStudents")}
                         </p>
                       </CardContent>
                     </Card>
@@ -407,11 +408,11 @@ export default function MyClasses() {
                         >
                           <div className="flex-1">
                             <p className="font-medium" data-testid={`text-student-name-${student.id}`}>
-                              {student.displayName || student.firstName || "Sem nome"}
+                              {student.displayName || student.firstName || t("myClasses.messages.noName")}
                             </p>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant="secondary" className="text-xs">
-                                Nível: {student.currentLevel}
+                                {t("myClasses.labels.level")}: {student.currentLevel}
                               </Badge>
                               <Badge variant="outline" className="text-xs">
                                 {student.totalXp} XP
@@ -430,13 +431,13 @@ export default function MyClasses() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Remover aluno?</AlertDialogTitle>
+                                <AlertDialogTitle>{t("myClasses.dialogs.removeStudent.title")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tens a certeza que queres remover este aluno da turma?
+                                  {t("myClasses.dialogs.removeStudent.description")}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogCancel>{t("myClasses.buttons.cancel")}</AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() =>
                                     removeStudentMutation.mutate({
@@ -445,7 +446,7 @@ export default function MyClasses() {
                                     })
                                   }
                                 >
-                                  Remover
+                                  {t("myClasses.buttons.remove")}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>

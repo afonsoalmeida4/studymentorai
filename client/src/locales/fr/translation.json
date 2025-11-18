@@ -540,5 +540,119 @@
     "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille.",
     "generateSummaries": "Erreur lors de la génération des résumés",
     "tryAgain": "Impossible de terminer l'opération. Veuillez réessayer."
+  },
+  "myClasses": {
+    "title": "Mes Classes",
+    "subtitle": "Gérez vos classes et suivez les progrès de vos élèves",
+    "toasts": {
+      "classCreated": "Classe créée !",
+      "classCreatedDescription": "Votre classe a été créée avec succès.",
+      "classDeleted": "Classe supprimée",
+      "classDeletedDescription": "La classe a été supprimée avec succès.",
+      "studentRemoved": "Élève retiré",
+      "studentRemovedDescription": "L'élève a été retiré de la classe.",
+      "codeCopied": "Code copié !",
+      "codeCopiedDescription": "Le code d'invitation a été copié dans le presse-papiers.",
+      "nameRequired": "Nom obligatoire",
+      "nameRequiredDescription": "Veuillez entrer un nom pour la classe.",
+      "error": "Erreur",
+      "createClassError": "Impossible de créer la classe.",
+      "deleteClassError": "Impossible de supprimer la classe.",
+      "removeStudentError": "Impossible de retirer l'élève."
+    },
+    "labels": {
+      "className": "Nom de la Classe",
+      "description": "Description (optionnel)",
+      "inviteCode": "Code d'Invitation",
+      "students": "Élèves ({{count}})",
+      "level": "Niveau"
+    },
+    "placeholders": {
+      "className": "Ex : Mathématiques 3ème",
+      "description": "Description de la classe..."
+    },
+    "buttons": {
+      "newClass": "Nouvelle Classe",
+      "createClass": "Créer la Classe",
+      "creating": "Création...",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "copy": "Copier",
+      "remove": "Retirer",
+      "viewDetails": "Voir les détails →"
+    },
+    "dialogs": {
+      "createClass": {
+        "title": "Créer une Nouvelle Classe",
+        "description": "Créez une classe pour organiser et suivre vos élèves"
+      },
+      "deleteClass": {
+        "title": "Êtes-vous sûr ?",
+        "description": "Cette action est irréversible. Cela supprimera définitivement la classe et retirera tous les élèves."
+      },
+      "removeStudent": {
+        "title": "Retirer l'élève ?",
+        "description": "Êtes-vous sûr de vouloir retirer cet élève de la classe ?"
+      }
+    },
+    "empty": {
+      "noClasses": "Vous n'avez pas encore de classes",
+      "noClassesDescription": "Créez votre première classe pour commencer à suivre vos élèves",
+      "noStudents": "Il n'y a pas encore d'élèves dans cette classe"
+    },
+    "messages": {
+      "teachersOnly": "Cette page est réservée aux enseignants.",
+      "noDescription": "Aucune description",
+      "noName": "Sans nom"
+    },
+    "status": {
+      "active": "Active"
+    }
+  },
+  "studentClasses": {
+    "title": "Mes Classes",
+    "subtitle": "Classes dans lesquelles vous êtes inscrit",
+    "toasts": {
+      "joinSuccess": "Rejoint la classe !",
+      "joinSuccessDescription": "Vous avez été ajouté à la classe avec succès.",
+      "joinError": "Impossible de rejoindre la classe.",
+      "leaveSuccess": "Quitté la classe",
+      "leaveSuccessDescription": "Vous avez été retiré de la classe avec succès.",
+      "leaveError": "Impossible de quitter la classe.",
+      "codeRequired": "Code obligatoire",
+      "codeRequiredDescription": "Veuillez entrer un code d'invitation.",
+      "invalidCode": "Code invalide",
+      "invalidCodeDescription": "Le code d'invitation doit comporter 8 caractères."
+    },
+    "labels": {
+      "inviteCode": "Code d'Invitation",
+      "inviteCodePlaceholder": "Ex: ABC12345",
+      "codeLength": "Le code comporte 8 caractères",
+      "noDescription": "Aucune description",
+      "enrolledSince": "Inscrit depuis {{date}}"
+    },
+    "buttons": {
+      "joinClass": "Rejoindre une Classe",
+      "join": "Rejoindre",
+      "joining": "Rejoindre en cours...",
+      "leaveClass": "Quitter la Classe",
+      "leave": "Quitter"
+    },
+    "dialogs": {
+      "joinTitle": "Rejoindre une Classe",
+      "joinDescription": "Entrez le code d'invitation fourni par votre enseignant",
+      "leaveTitle": "Êtes-vous sûr ?",
+      "leaveDescription": "Vous allez quitter la classe \"{{className}}\". Vous devrez demander un nouveau code d'invitation à l'enseignant pour rejoindre à nouveau."
+    },
+    "emptyState": {
+      "title": "Vous n'êtes dans aucune classe pour le moment",
+      "description": "Demandez à votre enseignant un code d'invitation pour rejoindre une classe"
+    },
+    "badges": {
+      "active": "Active"
+    },
+    "messages": {
+      "studentsOnly": "Cette page est réservée aux étudiants."
+    }
   }
 }

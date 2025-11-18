@@ -532,5 +532,119 @@
     "upload": "Error uploading file. Check format and size.",
     "generateSummaries": "Error generating summaries",
     "tryAgain": "Could not complete the operation. Please try again."
+  },
+  "myClasses": {
+    "title": "My Classes",
+    "subtitle": "Manage your classes and track your students' progress",
+    "toasts": {
+      "classCreated": "Class created!",
+      "classCreatedDescription": "Your class has been created successfully.",
+      "classDeleted": "Class deleted",
+      "classDeletedDescription": "The class has been deleted successfully.",
+      "studentRemoved": "Student removed",
+      "studentRemovedDescription": "The student has been removed from the class.",
+      "codeCopied": "Code copied!",
+      "codeCopiedDescription": "The invite code has been copied to the clipboard.",
+      "nameRequired": "Name required",
+      "nameRequiredDescription": "Please enter a name for the class.",
+      "error": "Error",
+      "createClassError": "Could not create class.",
+      "deleteClassError": "Could not delete class.",
+      "removeStudentError": "Could not remove student."
+    },
+    "labels": {
+      "className": "Class Name",
+      "description": "Description (optional)",
+      "inviteCode": "Invite Code",
+      "students": "Students ({{count}})",
+      "level": "Level"
+    },
+    "placeholders": {
+      "className": "E.g: Mathematics 10th Grade",
+      "description": "Class description..."
+    },
+    "buttons": {
+      "newClass": "New Class",
+      "createClass": "Create Class",
+      "creating": "Creating...",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "copy": "Copy",
+      "remove": "Remove",
+      "viewDetails": "View details →"
+    },
+    "dialogs": {
+      "createClass": {
+        "title": "Create New Class",
+        "description": "Create a class to organize and track your students"
+      },
+      "deleteClass": {
+        "title": "Are you sure?",
+        "description": "This action cannot be undone. This will permanently delete the class and remove all students."
+      },
+      "removeStudent": {
+        "title": "Remove student?",
+        "description": "Are you sure you want to remove this student from the class?"
+      }
+    },
+    "empty": {
+      "noClasses": "You don't have any classes yet",
+      "noClassesDescription": "Create your first class to start tracking your students",
+      "noStudents": "There are no students in this class yet"
+    },
+    "messages": {
+      "teachersOnly": "This page is for teachers only.",
+      "noDescription": "No description",
+      "noName": "No name"
+    },
+    "status": {
+      "active": "Active"
+    }
+  },
+  "studentClasses": {
+    "title": "My Classes",
+    "subtitle": "Classes you are enrolled in",
+    "toasts": {
+      "joinSuccess": "Joined class!",
+      "joinSuccessDescription": "You have been added to the class successfully.",
+      "joinError": "Could not join class.",
+      "leaveSuccess": "Left class",
+      "leaveSuccessDescription": "You have been removed from the class successfully.",
+      "leaveError": "Could not leave class.",
+      "codeRequired": "Code required",
+      "codeRequiredDescription": "Please enter an invite code.",
+      "invalidCode": "Invalid code",
+      "invalidCodeDescription": "The invite code must be 8 characters long."
+    },
+    "labels": {
+      "inviteCode": "Invite Code",
+      "inviteCodePlaceholder": "E.g: ABC12345",
+      "codeLength": "The code is 8 characters long",
+      "noDescription": "No description",
+      "enrolledSince": "Enrolled since {{date}}"
+    },
+    "buttons": {
+      "joinClass": "Join Class",
+      "join": "Join",
+      "joining": "Joining...",
+      "leaveClass": "Leave Class",
+      "leave": "Leave"
+    },
+    "dialogs": {
+      "joinTitle": "Join a Class",
+      "joinDescription": "Enter the invite code provided by your teacher",
+      "leaveTitle": "Are you sure?",
+      "leaveDescription": "You will leave the class \"{{className}}\". You will need to request a new invite code from the teacher to rejoin."
+    },
+    "emptyState": {
+      "title": "You are not in any class yet",
+      "description": "Ask your teacher for an invite code to join a class"
+    },
+    "badges": {
+      "active": "Active"
+    },
+    "messages": {
+      "studentsOnly": "This page is for students only."
+    }
   }
 }

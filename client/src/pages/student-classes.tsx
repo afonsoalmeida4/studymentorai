@@ -32,6 +32,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import type { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 interface ClassEnrollment {
   id: string;
@@ -43,6 +44,7 @@ interface ClassEnrollment {
 }
 
 export default function StudentClasses() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const typedUser = user as User | null;
@@ -59,8 +61,8 @@ export default function StudentClasses() {
     },
     onSuccess: () => {
       toast({
-        title: "Entrou na turma!",
-        description: "Foste adicionado à turma com sucesso.",
+        title: t('studentClasses.toasts.joinSuccess'),
+        description: t('studentClasses.toasts.joinSuccessDescription'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/classes"] });
       setIsJoinDialogOpen(false);
@@ -68,8 +70,8 @@ export default function StudentClasses() {
     },
     onError: (error: any) => {
       toast({
-        title: "Erro",
-        description: error?.message || "Não foi possível juntar-se à turma.",
+        title: t('common.error'),
+        description: error?.message || t('studentClasses.toasts.joinError'),
         variant: "destructive",
       });
     },
@@ -81,15 +83,15 @@ export default function StudentClasses() {
     },
     onSuccess: () => {
       toast({
-        title: "Saíste da turma",
-        description: "Foste removido da turma com sucesso.",
+        title: t('studentClasses.toasts.leaveSuccess'),
+        description: t('studentClasses.toasts.leaveSuccessDescription'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/classes"] });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível sair da turma.",
+        title: t('common.error'),
+        description: t('studentClasses.toasts.leaveError'),
         variant: "destructive",
       });
     },
@@ -99,16 +101,16 @@ export default function StudentClasses() {
     const trimmedCode = inviteCode.trim();
     if (!trimmedCode) {
       toast({
-        title: "Código obrigatório",
-        description: "Por favor, insere um código de convite.",
+        title: t('studentClasses.toasts.codeRequired'),
+        description: t('studentClasses.toasts.codeRequiredDescription'),
         variant: "destructive",
       });
       return;
     }
     if (trimmedCode.length !== 8) {
       toast({
-        title: "Código inválido",
-        description: "O código de convite deve ter 8 caracteres.",
+        title: t('studentClasses.toasts.invalidCode'),
+        description: t('studentClasses.toasts.invalidCodeDescription'),
         variant: "destructive",
       });
       return;
@@ -121,7 +123,7 @@ export default function StudentClasses() {
       <div className="min-h-screen bg-background">
         <AppHeader />
         <div className="container mx-auto py-8 px-4 max-w-7xl">
-          <p className="text-muted-foreground">Esta página é apenas para alunos.</p>
+          <p className="text-muted-foreground">{t('studentClasses.messages.studentsOnly')}</p>
         </div>
       </div>
     );
@@ -136,40 +138,40 @@ export default function StudentClasses() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2" data-testid="title-student-classes">
-              As Minhas Turmas
+              {t('studentClasses.title')}
             </h1>
             <p className="text-muted-foreground">
-              Turmas em que estás inscrito
+              {t('studentClasses.subtitle')}
             </p>
           </div>
           <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-join-class">
                 <Plus className="w-4 h-4 mr-2" />
-                Juntar a Turma
+                {t('studentClasses.buttons.joinClass')}
               </Button>
             </DialogTrigger>
             <DialogContent data-testid="dialog-join-class">
               <DialogHeader>
-                <DialogTitle>Juntar-se a uma Turma</DialogTitle>
+                <DialogTitle>{t('studentClasses.dialogs.joinTitle')}</DialogTitle>
                 <DialogDescription>
-                  Insere o código de convite fornecido pelo teu professor
+                  {t('studentClasses.dialogs.joinDescription')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="invite-code">Código de Convite</Label>
+                  <Label htmlFor="invite-code">{t('studentClasses.labels.inviteCode')}</Label>
                   <Input
                     id="invite-code"
                     data-testid="input-invite-code"
-                    placeholder="Ex: ABC12345"
+                    placeholder={t('studentClasses.labels.inviteCodePlaceholder')}
                     value={inviteCode}
                     onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                     maxLength={8}
                     className="font-mono tracking-wider"
                   />
                   <p className="text-xs text-muted-foreground">
-                    O código tem 8 caracteres
+                    {t('studentClasses.labels.codeLength')}
                   </p>
                 </div>
               </div>
@@ -179,7 +181,7 @@ export default function StudentClasses() {
                   disabled={joinClassMutation.isPending}
                   data-testid="button-submit-join-class"
                 >
-                  {joinClassMutation.isPending ? "A juntar..." : "Juntar-me"}
+                  {joinClassMutation.isPending ? t('studentClasses.buttons.joining') : t('studentClasses.buttons.join')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -204,9 +206,9 @@ export default function StudentClasses() {
           <Card>
             <CardContent className="py-12 text-center">
               <GraduationCap className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Ainda não estás em nenhuma turma</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('studentClasses.emptyState.title')}</h3>
               <p className="text-muted-foreground mb-4">
-                Pede ao teu professor o código de convite para te juntares a uma turma
+                {t('studentClasses.emptyState.description')}
               </p>
             </CardContent>
           </Card>
@@ -225,12 +227,12 @@ export default function StudentClasses() {
                         {classItem.name}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        {classItem.description || "Sem descrição"}
+                        {classItem.description || t('studentClasses.labels.noDescription')}
                       </CardDescription>
                     </div>
                     {classItem.isActive && (
                       <Badge variant="secondary" data-testid={`badge-active-${classItem.id}`}>
-                        Ativa
+                        {t('studentClasses.badges.active')}
                       </Badge>
                     )}
                   </div>
@@ -239,10 +241,12 @@ export default function StudentClasses() {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="w-4 h-4" />
                     <span>
-                      Inscrito desde {new Date(classItem.enrolledAt).toLocaleDateString('pt-PT', { 
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
+                      {t('studentClasses.labels.enrolledSince', { 
+                        date: new Date(classItem.enrolledAt).toLocaleDateString('pt-PT', { 
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })
                       })}
                     </span>
                   </div>
@@ -255,24 +259,23 @@ export default function StudentClasses() {
                         data-testid={`button-leave-class-${classItem.id}`}
                       >
                         <LogOut className="w-4 h-4 mr-2" />
-                        Sair da Turma
+                        {t('studentClasses.buttons.leaveClass')}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Tens a certeza?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('studentClasses.dialogs.leaveTitle')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Vais sair da turma "{classItem.name}". Terás de pedir um novo código de
-                          convite ao professor para voltares a entrar.
+                          {t('studentClasses.dialogs.leaveDescription', { className: classItem.name })}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => leaveClassMutation.mutate(classItem.id)}
                           data-testid={`button-confirm-leave-${classItem.id}`}
                         >
-                          Sair
+                          {t('studentClasses.buttons.leave')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
