@@ -80,6 +80,95 @@
     "generateSummary": "Gerar Resumo",
     "viewSummary": "Ver Resumo"
   },
+  "topicView": {
+    "title": "Tópico",
+    "uploadFile": "Carregar Ficheiro",
+    "addLink": "Adicionar Link",
+    "tabs": {
+      "all": "Todos",
+      "files": "Ficheiros",
+      "links": "Links"
+    },
+    "emptyState": {
+      "title": "Sem Conteúdo",
+      "description": "Comece por carregar ficheiros ou adicionar links para este tópico.",
+      "uploadButton": "Carregar Primeiro Ficheiro",
+      "addLinkButton": "Adicionar Primeiro Link"
+    },
+    "summarySection": {
+      "title": "Resumo & Estudo",
+      "description": "Gere resumos adaptados ao teu estilo de aprendizagem e cria flashcards para estudar",
+      "generateMore": "Gerar Mais Estilos",
+      "allGenerated": "Todos os estilos de aprendizagem já foram gerados!",
+      "noContent": "Sem Conteúdo para Resumir",
+      "noContentDescription": "Adicione ficheiros ou links ao tópico para gerar resumos.",
+      "visual": {
+        "title": "Resumo Visual",
+        "description": "Ideal para quem aprende melhor com imagens e diagramas"
+      },
+      "auditivo": {
+        "title": "Resumo Auditivo",
+        "description": "Perfeito para quem aprende ouvindo e discutindo"
+      },
+      "logico": {
+        "title": "Resumo Lógico",
+        "description": "Para quem prefere lógica, padrões e raciocínio"
+      },
+      "conciso": {
+        "title": "Resumo Conciso",
+        "description": "Resumo direto ao ponto, sem floreados"
+      }
+    },
+    "uploadDialog": {
+      "title": "Carregar Ficheiro",
+      "description": "Faça upload de um documento (PDF, DOCX, PPTX) para este tópico.",
+      "selectFile": "Selecionar ficheiro",
+      "fileSelected": "ficheiro selecionado",
+      "generateSummary": "Gerar resumo automático com IA",
+      "selectStyles": "Selecionar estilos de aprendizagem",
+      "uploading": "A carregar...",
+      "upload": "Carregar",
+      "success": "Ficheiro carregado!",
+      "successDescription": "O seu ficheiro foi adicionado ao tópico.",
+      "error": "Não foi possível carregar o ficheiro."
+    },
+    "linkDialog": {
+      "title": "Adicionar Link",
+      "description": "Adicione um link externo a este tópico.",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://...",
+      "titleLabel": "Título (opcional)",
+      "titlePlaceholder": "Nome do link",
+      "adding": "A adicionar...",
+      "add": "Adicionar Link",
+      "success": "Link adicionado!",
+      "successDescription": "O link foi adicionado ao tópico.",
+      "error": "Não foi possível adicionar o link."
+    },
+    "generateStylesDialog": {
+      "title": "Gerar Estilos de Aprendizagem",
+      "description": "Selecione os estilos de aprendizagem que pretende gerar para este tópico.",
+      "selectStyles": "Selecionar estilos",
+      "visual": "Visual",
+      "auditivo": "Auditivo",
+      "logico": "Lógico",
+      "conciso": "Conciso",
+      "generating": "A gerar...",
+      "generate": "Gerar Resumos",
+      "successOne": "Resumo gerado!",
+      "successMultiple": "resumos gerados!",
+      "successDescriptionOne": "O resumo do tópico foi criado no estilo selecionado.",
+      "successDescriptionMultiple": "Os resumos foram criados nos estilos selecionados."
+    },
+    "deleteContent": {
+      "title": "Eliminar conteúdo?",
+      "description": "Esta ação não pode ser revertida.",
+      "deleting": "A eliminar...",
+      "delete": "Eliminar",
+      "success": "Conteúdo eliminado!",
+      "successDescription": "O conteúdo foi removido do tópico."
+    }
+  },
   "content": {
     "title": "Conteúdo",
     "addFile": "Adicionar Ficheiro",

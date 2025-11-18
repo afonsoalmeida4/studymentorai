@@ -77,6 +77,95 @@
     "generateSummary": "Zusammenfassung erstellen",
     "viewSummary": "Zusammenfassung anzeigen"
   },
+  "topicView": {
+    "title": "Thema",
+    "uploadFile": "Datei Hochladen",
+    "addLink": "Link Hinzufügen",
+    "tabs": {
+      "all": "Alle",
+      "files": "Dateien",
+      "links": "Links"
+    },
+    "emptyState": {
+      "title": "Kein Inhalt",
+      "description": "Beginnen Sie mit dem Hochladen von Dateien oder Hinzufügen von Links zu diesem Thema.",
+      "uploadButton": "Erste Datei Hochladen",
+      "addLinkButton": "Ersten Link Hinzufügen"
+    },
+    "summarySection": {
+      "title": "Zusammenfassung & Lernen",
+      "description": "Generieren Sie Zusammenfassungen, die an Ihren Lernstil angepasst sind, und erstellen Sie Lernkarten zum Lernen",
+      "generateMore": "Mehr Stile Generieren",
+      "allGenerated": "Alle Lernstile wurden generiert!",
+      "noContent": "Kein Inhalt zum Zusammenfassen",
+      "noContentDescription": "Fügen Sie Dateien oder Links zum Thema hinzu, um Zusammenfassungen zu generieren.",
+      "visual": {
+        "title": "Visuelle Zusammenfassung",
+        "description": "Ideal für diejenigen, die am besten mit Bildern und Diagrammen lernen"
+      },
+      "auditivo": {
+        "title": "Auditive Zusammenfassung",
+        "description": "Perfekt für diejenigen, die durch Hören und Diskutieren lernen"
+      },
+      "logico": {
+        "title": "Logische Zusammenfassung",
+        "description": "Für diejenigen, die Logik, Muster und Argumentation bevorzugen"
+      },
+      "conciso": {
+        "title": "Prägnante Zusammenfassung",
+        "description": "Direkte Zusammenfassung, ohne Schnörkel"
+      }
+    },
+    "uploadDialog": {
+      "title": "Datei Hochladen",
+      "description": "Laden Sie ein Dokument (PDF, DOCX, PPTX) zu diesem Thema hoch.",
+      "selectFile": "Datei auswählen",
+      "fileSelected": "Datei ausgewählt",
+      "generateSummary": "Automatische KI-Zusammenfassung generieren",
+      "selectStyles": "Lernstile auswählen",
+      "uploading": "Hochladen...",
+      "upload": "Hochladen",
+      "success": "Datei hochgeladen!",
+      "successDescription": "Ihre Datei wurde zum Thema hinzugefügt.",
+      "error": "Datei konnte nicht hochgeladen werden."
+    },
+    "linkDialog": {
+      "title": "Link Hinzufügen",
+      "description": "Fügen Sie einen externen Link zu diesem Thema hinzu.",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://...",
+      "titleLabel": "Titel (optional)",
+      "titlePlaceholder": "Link-Name",
+      "adding": "Hinzufügen...",
+      "add": "Link Hinzufügen",
+      "success": "Link hinzugefügt!",
+      "successDescription": "Der Link wurde zum Thema hinzugefügt.",
+      "error": "Link konnte nicht hinzugefügt werden."
+    },
+    "generateStylesDialog": {
+      "title": "Lernstile Generieren",
+      "description": "Wählen Sie die Lernstile aus, die Sie für dieses Thema generieren möchten.",
+      "selectStyles": "Stile auswählen",
+      "visual": "Visuell",
+      "auditivo": "Auditiv",
+      "logico": "Logisch",
+      "conciso": "Prägnant",
+      "generating": "Generieren...",
+      "generate": "Zusammenfassungen Generieren",
+      "successOne": "Zusammenfassung generiert!",
+      "successMultiple": "Zusammenfassungen generiert!",
+      "successDescriptionOne": "Die Themenzusammenfassung wurde im ausgewählten Stil erstellt.",
+      "successDescriptionMultiple": "Die Zusammenfassungen wurden in den ausgewählten Stilen erstellt."
+    },
+    "deleteContent": {
+      "title": "Inhalt löschen?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleting": "Löschen...",
+      "delete": "Löschen",
+      "success": "Inhalt gelöscht!",
+      "successDescription": "Der Inhalt wurde aus dem Thema entfernt."
+    }
+  },
   "content": {
     "title": "Inhalt",
     "addFile": "Datei hinzufügen",

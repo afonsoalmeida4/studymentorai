@@ -4,6 +4,7 @@ import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink } from "lucide-
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import SummaryStudySection from "@/components/SummaryStudySection";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ export default function TopicView() {
   const params = useParams<{ id: string }>();
   const topicId = params.id;
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -259,7 +261,7 @@ export default function TopicView() {
     <>
       <div className="p-6 max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-2">{topic?.name || "Tópico"}</h1>
+          <h1 className="text-3xl font-semibold mb-2">{topic?.name || t('topicView.title')}</h1>
           {topic?.description && (
             <p className="text-muted-foreground">{topic.description}</p>
           )}
@@ -271,7 +273,7 @@ export default function TopicView() {
             data-testid="button-upload-file"
           >
             <Upload className="w-4 h-4 mr-2" />
-            Carregar Ficheiro
+            {t('topicView.uploadFile')}
           </Button>
           <Button
             variant="outline"
@@ -279,7 +281,7 @@ export default function TopicView() {
             data-testid="button-add-link"
           >
             <Link2 className="w-4 h-4 mr-2" />
-            Adicionar Link
+            {t('topicView.addLink')}
           </Button>
         </div>
 
@@ -299,13 +301,13 @@ export default function TopicView() {
           <Tabs defaultValue="all" className="w-full">
             <TabsList>
               <TabsTrigger value="all" data-testid="tab-all-content">
-                Todos ({contents.length})
+                {t('topicView.tabs.all')} ({contents.length})
               </TabsTrigger>
               <TabsTrigger value="files" data-testid="tab-files">
-                Ficheiros ({contents.filter((c) => c.contentType !== "link").length})
+                {t('topicView.tabs.files')} ({contents.filter((c) => c.contentType !== "link").length})
               </TabsTrigger>
               <TabsTrigger value="links" data-testid="tab-links">
-                Links ({contents.filter((c) => c.contentType === "link").length})
+                {t('topicView.tabs.links')} ({contents.filter((c) => c.contentType === "link").length})
               </TabsTrigger>
             </TabsList>
 
@@ -411,9 +413,9 @@ export default function TopicView() {
         {contents.length > 0 && (
           <div className="mt-12">
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-2">Resumo & Estudo</h2>
+              <h2 className="text-2xl font-semibold mb-2">{t('topicView.summarySection.title')}</h2>
               <p className="text-muted-foreground text-sm">
-                Gere resumos adaptados ao teu estilo de aprendizagem e cria flashcards para estudar
+                {t('topicView.summarySection.description')}
               </p>
             </div>
 
@@ -460,7 +462,7 @@ export default function TopicView() {
                           data-testid="button-generate-more-styles"
                         >
                           <Sparkles className="w-4 h-4 mr-2" />
-                          Gerar Mais Estilos ({missingStyles.length})
+                          {t('topicView.summarySection.generateMore')} ({missingStyles.length})
                         </Button>
                       </div>
                     )}
@@ -468,22 +470,22 @@ export default function TopicView() {
                     <TabsList className={`grid w-full ${gridClass}`}>
                       {visual ? (
                         <TabsTrigger value="visual" data-testid="tab-summary-visual">
-                          Visual
+                          {t('topicView.generateStylesDialog.visual')}
                         </TabsTrigger>
                       ) : null}
                       {auditivo ? (
                         <TabsTrigger value="auditivo" data-testid="tab-summary-auditivo">
-                          Auditivo
+                          {t('topicView.generateStylesDialog.auditivo')}
                         </TabsTrigger>
                       ) : null}
                       {logico ? (
                         <TabsTrigger value="logico" data-testid="tab-summary-logico">
-                          Lógico
+                          {t('topicView.generateStylesDialog.logico')}
                         </TabsTrigger>
                       ) : null}
                       {conciso ? (
                         <TabsTrigger value="conciso" data-testid="tab-summary-conciso">
-                          Conciso
+                          {t('topicView.generateStylesDialog.conciso')}
                         </TabsTrigger>
                       ) : null}
                     </TabsList>
@@ -492,7 +494,7 @@ export default function TopicView() {
                       <TabsContent value="visual" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">Resumo Visual</CardTitle>
+                            <CardTitle className="text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -517,7 +519,7 @@ export default function TopicView() {
                       <TabsContent value="auditivo" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">Resumo Auditivo</CardTitle>
+                            <CardTitle className="text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -542,7 +544,7 @@ export default function TopicView() {
                       <TabsContent value="logico" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">Resumo Lógico</CardTitle>
+                            <CardTitle className="text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -567,7 +569,7 @@ export default function TopicView() {
                       <TabsContent value="conciso" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">Resumo Conciso</CardTitle>
+                            <CardTitle className="text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -709,7 +711,7 @@ export default function TopicView() {
         <DialogContent data-testid="dialog-upload-file">
           <form onSubmit={handleUpload}>
             <DialogHeader>
-              <DialogTitle>Carregar Ficheiro</DialogTitle>
+              <DialogTitle>{t('topicView.uploadDialog.title')}</DialogTitle>
               <DialogDescription>
                 Suporta PDF, Word (DOCX) e PowerPoint (PPTX). Máximo 10MB.
               </DialogDescription>
@@ -768,7 +770,7 @@ export default function TopicView() {
         <DialogContent data-testid="dialog-add-link">
           <form onSubmit={handleAddLink}>
             <DialogHeader>
-              <DialogTitle>Adicionar Link</DialogTitle>
+              <DialogTitle>{t('topicView.linkDialog.title')}</DialogTitle>
               <DialogDescription>
                 Adicione um link externo relevante para este tópico.
               </DialogDescription>

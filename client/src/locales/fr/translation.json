@@ -77,6 +77,95 @@
     "generateSummary": "Générer un Résumé",
     "viewSummary": "Voir le Résumé"
   },
+  "topicView": {
+    "title": "Sujet",
+    "uploadFile": "Télécharger un Fichier",
+    "addLink": "Ajouter un Lien",
+    "tabs": {
+      "all": "Tous",
+      "files": "Fichiers",
+      "links": "Liens"
+    },
+    "emptyState": {
+      "title": "Aucun Contenu",
+      "description": "Commencez par télécharger des fichiers ou ajouter des liens à ce sujet.",
+      "uploadButton": "Télécharger le Premier Fichier",
+      "addLinkButton": "Ajouter le Premier Lien"
+    },
+    "summarySection": {
+      "title": "Résumé et Étude",
+      "description": "Générez des résumés adaptés à votre style d'apprentissage et créez des flashcards pour étudier",
+      "generateMore": "Générer Plus de Styles",
+      "allGenerated": "Tous les styles d'apprentissage ont été générés!",
+      "noContent": "Aucun Contenu à Résumer",
+      "noContentDescription": "Ajoutez des fichiers ou des liens au sujet pour générer des résumés.",
+      "visual": {
+        "title": "Résumé Visuel",
+        "description": "Idéal pour ceux qui apprennent mieux avec des images et des diagrammes"
+      },
+      "auditivo": {
+        "title": "Résumé Auditif",
+        "description": "Parfait pour ceux qui apprennent en écoutant et en discutant"
+      },
+      "logico": {
+        "title": "Résumé Logique",
+        "description": "Pour ceux qui préfèrent la logique, les modèles et le raisonnement"
+      },
+      "conciso": {
+        "title": "Résumé Concis",
+        "description": "Résumé direct, sans fioritures"
+      }
+    },
+    "uploadDialog": {
+      "title": "Télécharger un Fichier",
+      "description": "Téléchargez un document (PDF, DOCX, PPTX) vers ce sujet.",
+      "selectFile": "Sélectionner un fichier",
+      "fileSelected": "fichier sélectionné",
+      "generateSummary": "Générer un résumé automatique par IA",
+      "selectStyles": "Sélectionner les styles d'apprentissage",
+      "uploading": "Téléchargement...",
+      "upload": "Télécharger",
+      "success": "Fichier téléchargé!",
+      "successDescription": "Votre fichier a été ajouté au sujet.",
+      "error": "Impossible de télécharger le fichier."
+    },
+    "linkDialog": {
+      "title": "Ajouter un Lien",
+      "description": "Ajoutez un lien externe à ce sujet.",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://...",
+      "titleLabel": "Titre (optionnel)",
+      "titlePlaceholder": "Nom du lien",
+      "adding": "Ajout...",
+      "add": "Ajouter un Lien",
+      "success": "Lien ajouté!",
+      "successDescription": "Le lien a été ajouté au sujet.",
+      "error": "Impossible d'ajouter le lien."
+    },
+    "generateStylesDialog": {
+      "title": "Générer des Styles d'Apprentissage",
+      "description": "Sélectionnez les styles d'apprentissage que vous souhaitez générer pour ce sujet.",
+      "selectStyles": "Sélectionner les styles",
+      "visual": "Visuel",
+      "auditivo": "Auditif",
+      "logico": "Logique",
+      "conciso": "Concis",
+      "generating": "Génération...",
+      "generate": "Générer des Résumés",
+      "successOne": "Résumé généré!",
+      "successMultiple": "résumés générés!",
+      "successDescriptionOne": "Le résumé du sujet a été créé dans le style sélectionné.",
+      "successDescriptionMultiple": "Les résumés ont été créés dans les styles sélectionnés."
+    },
+    "deleteContent": {
+      "title": "Supprimer le contenu?",
+      "description": "Cette action ne peut pas être annulée.",
+      "deleting": "Suppression...",
+      "delete": "Supprimer",
+      "success": "Contenu supprimé!",
+      "successDescription": "Le contenu a été retiré du sujet."
+    }
+  },
   "content": {
     "title": "Contenu",
     "addFile": "Ajouter un Fichier",

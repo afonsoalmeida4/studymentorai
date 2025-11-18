@@ -80,6 +80,95 @@
     "generateSummary": "Generate Summary",
     "viewSummary": "View Summary"
   },
+  "topicView": {
+    "title": "Topic",
+    "uploadFile": "Upload File",
+    "addLink": "Add Link",
+    "tabs": {
+      "all": "All",
+      "files": "Files",
+      "links": "Links"
+    },
+    "emptyState": {
+      "title": "No Content",
+      "description": "Start by uploading files or adding links to this topic.",
+      "uploadButton": "Upload First File",
+      "addLinkButton": "Add First Link"
+    },
+    "summarySection": {
+      "title": "Summary & Study",
+      "description": "Generate summaries adapted to your learning style and create flashcards to study",
+      "generateMore": "Generate More Styles",
+      "allGenerated": "All learning styles have been generated!",
+      "noContent": "No Content to Summarize",
+      "noContentDescription": "Add files or links to the topic to generate summaries.",
+      "visual": {
+        "title": "Visual Summary",
+        "description": "Ideal for those who learn best with images and diagrams"
+      },
+      "auditivo": {
+        "title": "Auditory Summary",
+        "description": "Perfect for those who learn by listening and discussing"
+      },
+      "logico": {
+        "title": "Logical Summary",
+        "description": "For those who prefer logic, patterns and reasoning"
+      },
+      "conciso": {
+        "title": "Concise Summary",
+        "description": "Straight to the point summary, no frills"
+      }
+    },
+    "uploadDialog": {
+      "title": "Upload File",
+      "description": "Upload a document (PDF, DOCX, PPTX) to this topic.",
+      "selectFile": "Select file",
+      "fileSelected": "file selected",
+      "generateSummary": "Generate automatic AI summary",
+      "selectStyles": "Select learning styles",
+      "uploading": "Uploading...",
+      "upload": "Upload",
+      "success": "File uploaded!",
+      "successDescription": "Your file has been added to the topic.",
+      "error": "Could not upload the file."
+    },
+    "linkDialog": {
+      "title": "Add Link",
+      "description": "Add an external link to this topic.",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://...",
+      "titleLabel": "Title (optional)",
+      "titlePlaceholder": "Link name",
+      "adding": "Adding...",
+      "add": "Add Link",
+      "success": "Link added!",
+      "successDescription": "The link has been added to the topic.",
+      "error": "Could not add the link."
+    },
+    "generateStylesDialog": {
+      "title": "Generate Learning Styles",
+      "description": "Select the learning styles you want to generate for this topic.",
+      "selectStyles": "Select styles",
+      "visual": "Visual",
+      "auditivo": "Auditory",
+      "logico": "Logical",
+      "conciso": "Concise",
+      "generating": "Generating...",
+      "generate": "Generate Summaries",
+      "successOne": "Summary generated!",
+      "successMultiple": "summaries generated!",
+      "successDescriptionOne": "The topic summary has been created in the selected style.",
+      "successDescriptionMultiple": "The summaries have been created in the selected styles."
+    },
+    "deleteContent": {
+      "title": "Delete content?",
+      "description": "This action cannot be undone.",
+      "deleting": "Deleting...",
+      "delete": "Delete",
+      "success": "Content deleted!",
+      "successDescription": "The content has been removed from the topic."
+    }
+  },
   "content": {
     "title": "Content",
     "addFile": "Add File",

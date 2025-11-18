@@ -77,6 +77,95 @@
     "generateSummary": "Genera Riassunto",
     "viewSummary": "Visualizza Riassunto"
   },
+  "topicView": {
+    "title": "Argomento",
+    "uploadFile": "Carica File",
+    "addLink": "Aggiungi Link",
+    "tabs": {
+      "all": "Tutti",
+      "files": "File",
+      "links": "Link"
+    },
+    "emptyState": {
+      "title": "Nessun Contenuto",
+      "description": "Inizia caricando file o aggiungendo link a questo argomento.",
+      "uploadButton": "Carica Primo File",
+      "addLinkButton": "Aggiungi Primo Link"
+    },
+    "summarySection": {
+      "title": "Riassunto e Studio",
+      "description": "Genera riassunti adattati al tuo stile di apprendimento e crea flashcard per studiare",
+      "generateMore": "Genera Altri Stili",
+      "allGenerated": "Tutti gli stili di apprendimento sono stati generati!",
+      "noContent": "Nessun Contenuto da Riassumere",
+      "noContentDescription": "Aggiungi file o link all'argomento per generare riassunti.",
+      "visual": {
+        "title": "Riassunto Visivo",
+        "description": "Ideale per chi apprende meglio con immagini e diagrammi"
+      },
+      "auditivo": {
+        "title": "Riassunto Uditivo",
+        "description": "Perfetto per chi apprende ascoltando e discutendo"
+      },
+      "logico": {
+        "title": "Riassunto Logico",
+        "description": "Per chi preferisce logica, schemi e ragionamento"
+      },
+      "conciso": {
+        "title": "Riassunto Conciso",
+        "description": "Riassunto diretto al punto, senza fronzoli"
+      }
+    },
+    "uploadDialog": {
+      "title": "Carica File",
+      "description": "Carica un documento (PDF, DOCX, PPTX) in questo argomento.",
+      "selectFile": "Seleziona file",
+      "fileSelected": "file selezionato",
+      "generateSummary": "Genera riassunto automatico con IA",
+      "selectStyles": "Seleziona stili di apprendimento",
+      "uploading": "Caricamento...",
+      "upload": "Carica",
+      "success": "File caricato!",
+      "successDescription": "Il tuo file è stato aggiunto all'argomento.",
+      "error": "Impossibile caricare il file."
+    },
+    "linkDialog": {
+      "title": "Aggiungi Link",
+      "description": "Aggiungi un link esterno a questo argomento.",
+      "urlLabel": "URL",
+      "urlPlaceholder": "https://...",
+      "titleLabel": "Titolo (opzionale)",
+      "titlePlaceholder": "Nome del link",
+      "adding": "Aggiunta...",
+      "add": "Aggiungi Link",
+      "success": "Link aggiunto!",
+      "successDescription": "Il link è stato aggiunto all'argomento.",
+      "error": "Impossibile aggiungere il link."
+    },
+    "generateStylesDialog": {
+      "title": "Genera Stili di Apprendimento",
+      "description": "Seleziona gli stili di apprendimento che desideri generare per questo argomento.",
+      "selectStyles": "Seleziona stili",
+      "visual": "Visivo",
+      "auditivo": "Uditivo",
+      "logico": "Logico",
+      "conciso": "Conciso",
+      "generating": "Generazione...",
+      "generate": "Genera Riassunti",
+      "successOne": "Riassunto generato!",
+      "successMultiple": "riassunti generati!",
+      "successDescriptionOne": "Il riassunto dell'argomento è stato creato nello stile selezionato.",
+      "successDescriptionMultiple": "I riassunti sono stati creati negli stili selezionati."
+    },
+    "deleteContent": {
+      "title": "Eliminare il contenuto?",
+      "description": "Questa azione non può essere annullata.",
+      "deleting": "Eliminazione...",
+      "delete": "Elimina",
+      "success": "Contenuto eliminato!",
+      "successDescription": "Il contenuto è stato rimosso dall'argomento."
+    }
+  },
   "content": {
     "title": "Contenuto",
     "addFile": "Aggiungi File",

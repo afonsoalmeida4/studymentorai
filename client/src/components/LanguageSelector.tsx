@@ -17,27 +17,21 @@ import type { User } from "@shared/schema";
 export function LanguageSelector() {
   const { i18n } = useTranslation();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const typedUser = user as User | null;
 
-  const currentLanguage = (typedUser?.language as SupportedLanguage) || (i18n.language as SupportedLanguage) || "pt";
+  const currentLanguage = (i18n.language as SupportedLanguage) || "pt";
 
   const updateLanguageMutation = useMutation({
-    mutationFn: async (language: SupportedLanguage) => {
+    mutationFn: async ({ language, previousLanguage }: { language: SupportedLanguage, previousLanguage: SupportedLanguage }) => {
+      await i18n.changeLanguage(language);
       const result = await apiRequest("POST", "/api/user/language", { language });
       return result;
     },
-    onSuccess: async (data, language) => {
-      await i18n.changeLanguage(language);
-      
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      
-      toast({
-        title: "Idioma atualizado",
-        description: `A interface foi alterada para ${languageNames[language]}`,
-      });
     },
-    onError: (error: any) => {
+    onError: (error: any, { previousLanguage }) => {
+      i18n.changeLanguage(previousLanguage);
+      
       toast({
         variant: "destructive",
         title: "Erro",
@@ -48,7 +42,8 @@ export function LanguageSelector() {
 
   const handleLanguageChange = (language: string) => {
     const lang = language as SupportedLanguage;
-    updateLanguageMutation.mutate(lang);
+    const previousLanguage = currentLanguage;
+    updateLanguageMutation.mutate({ language: lang, previousLanguage });
   };
 
   return (
