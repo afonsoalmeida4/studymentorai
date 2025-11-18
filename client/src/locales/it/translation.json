@@ -195,6 +195,37 @@
     "regenerate": "Rigenera",
     "upgrade": "Aggiorna per sbloccare riassunti illimitati"
   },
+  "flashcards": {
+    "question": "Domanda",
+    "answer": "Risposta",
+    "clickToFlip": "Clicca per girare",
+    "markAsReviewed": "Segna come revisionata",
+    "markAsUnreviewed": "Segna come non revisionata",
+    "noFlashcards": "Nessuna scheda disponibile.",
+    "studyProgress": "Progressi di Studio",
+    "reviewed": "revisionate",
+    "anki": {
+      "loading": "Caricamento schede...",
+      "errorRecording": "Errore nella registrazione della risposta. Riprova.",
+      "availableNow": "Disponibile ora",
+      "allReviewed": "Tutto revisionato!",
+      "noFlashcards": "Non hai schede da rivedere ora.",
+      "nextAvailable": "Prossima disponibile tra",
+      "sessionComplete": "Sessione completata!",
+      "reviewed": "Hai revisionato",
+      "practiced": "Hai praticato",
+      "time": "Tempo",
+      "reviewAgain": "Rivedi di nuovo",
+      "practiceAgain": "Pratica di nuovo",
+      "progress": "Progresso",
+      "clickToSeeAnswer": "Clicca per vedere la risposta",
+      "howWasYourAnswer": "Come è andata la tua risposta?",
+      "again": "Di nuovo",
+      "hard": "Difficile",
+      "good": "Bene",
+      "easy": "Facile"
+    }
+  },
   "home": {
     "title": "Benvenuto in AI Study Mentor",
     "subtitle": "Organizza la tua conoscenza. Trova il tuo equilibrio.",

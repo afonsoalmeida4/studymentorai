@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import type { ApiFlashcard } from "@shared/schema";
 import { RotateCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface FlipCardItemProps {
   flashcard: ApiFlashcard;
@@ -13,6 +14,7 @@ interface FlipCardItemProps {
 
 function FlipCardItem({ flashcard, isReviewed, onToggleReviewed }: FlipCardItemProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="perspective-1000">
@@ -40,11 +42,11 @@ function FlipCardItem({ flashcard, isReviewed, onToggleReviewed }: FlipCardItemP
             </div>
             <div className="flex items-center justify-between pt-4 border-t">
               <Badge variant="secondary" className="text-xs">
-                Pergunta
+                {t('flashcards.question')}
               </Badge>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <RotateCw className="w-3 h-3" />
-                <span>Clique para virar</span>
+                <span>{t('flashcards.clickToFlip')}</span>
               </div>
             </div>
           </CardContent>
@@ -67,7 +69,7 @@ function FlipCardItem({ flashcard, isReviewed, onToggleReviewed }: FlipCardItemP
             </div>
             <div className="flex items-center justify-between pt-4 border-t">
               <Badge variant="default" className="text-xs">
-                Resposta
+                {t('flashcards.answer')}
               </Badge>
               <button
                 onClick={(e) => {
@@ -77,7 +79,7 @@ function FlipCardItem({ flashcard, isReviewed, onToggleReviewed }: FlipCardItemP
                 className="text-xs text-primary hover:underline"
                 data-testid={`button-review-${flashcard.id}`}
               >
-                {isReviewed ? "Marcar como não revista" : "Marcar como revista"}
+                {isReviewed ? t('flashcards.markAsUnreviewed') : t('flashcards.markAsReviewed')}
               </button>
             </div>
           </CardContent>
@@ -93,6 +95,7 @@ interface FlashcardDeckProps {
 
 export default function FlashcardDeck({ flashcards }: FlashcardDeckProps) {
   const [reviewedCards, setReviewedCards] = useState<Set<string>>(new Set());
+  const { t } = useTranslation();
 
   const handleToggleReviewed = (id: string) => {
     setReviewedCards((prev) => {
@@ -113,7 +116,7 @@ export default function FlashcardDeck({ flashcards }: FlashcardDeckProps) {
   if (flashcards.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        <p>Nenhum flashcard disponível.</p>
+        <p>{t('flashcards.noFlashcards')}</p>
       </div>
     );
   }
@@ -123,9 +126,9 @@ export default function FlashcardDeck({ flashcards }: FlashcardDeckProps) {
       {/* Progress Tracker */}
       <div className="space-y-2" data-testid="flashcard-progress">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Progresso de Estudo</span>
+          <span className="text-muted-foreground">{t('flashcards.studyProgress')}</span>
           <span className="font-medium text-foreground">
-            {reviewedCards.size} / {flashcards.length} revistas
+            {reviewedCards.size} / {flashcards.length} {t('flashcards.reviewed')}
           </span>
         </div>
         <Progress value={progress} className="h-2" />

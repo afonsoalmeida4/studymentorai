@@ -198,6 +198,37 @@
     "regenerate": "Regenerate",
     "upgrade": "Upgrade to unlock unlimited summaries"
   },
+  "flashcards": {
+    "question": "Question",
+    "answer": "Answer",
+    "clickToFlip": "Click to flip",
+    "markAsReviewed": "Mark as reviewed",
+    "markAsUnreviewed": "Mark as unreviewed",
+    "noFlashcards": "No flashcards available.",
+    "studyProgress": "Study Progress",
+    "reviewed": "reviewed",
+    "anki": {
+      "loading": "Loading flashcards...",
+      "errorRecording": "Error recording response. Please try again.",
+      "availableNow": "Available now",
+      "allReviewed": "All reviewed!",
+      "noFlashcards": "You have no flashcards to review right now.",
+      "nextAvailable": "Next available in",
+      "sessionComplete": "Session complete!",
+      "reviewed": "Reviewed",
+      "practiced": "Practiced",
+      "time": "Time",
+      "reviewAgain": "Review again",
+      "practiceAgain": "Practice again",
+      "progress": "Progress",
+      "clickToSeeAnswer": "Click to see answer",
+      "howWasYourAnswer": "How was your answer?",
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy"
+    }
+  },
   "home": {
     "title": "Welcome to AI Study Mentor",
     "subtitle": "Organize your knowledge. Find your balance.",

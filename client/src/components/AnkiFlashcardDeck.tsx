@@ -8,6 +8,7 @@ import { RotateCw, Check, Clock } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface AnkiFlashcardDeckProps {
   summaryId: string;
@@ -19,6 +20,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Resetar progresso quando mudar de modo
   useEffect(() => {
@@ -67,8 +69,8 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Erro ao registar resposta. Tenta novamente.",
+        title: t('common.error'),
+        description: t('flashcards.anki.errorRecording'),
         variant: "destructive",
       });
     },
@@ -97,7 +99,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
       const next = new Date(nextAvailableAt);
       const diffMs = next.getTime() - now.getTime();
       
-      if (diffMs <= 0) return "Disponível agora";
+      if (diffMs <= 0) return t('flashcards.anki.availableNow');
       
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
       const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -133,7 +135,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   if (isLoading) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">A carregar flashcards...</p>
+        <p className="text-muted-foreground">{t('flashcards.anki.loading')}</p>
       </div>
     );
   }
@@ -143,15 +145,15 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
       <div className="text-center py-12 space-y-4">
         <Check className="w-16 h-16 mx-auto text-primary" />
         <div>
-          <h3 className="text-xl font-semibold mb-2">Tudo revisto!</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('flashcards.anki.allReviewed')}</h3>
           <p className="text-muted-foreground">
-            Não tens flashcards para rever agora.
+            {t('flashcards.anki.noFlashcards')}
           </p>
           {mode === "spaced" && countdown && (
             <div className="mt-4">
               <Badge variant="outline" className="gap-1.5 text-base px-3 py-1.5">
                 <Clock className="w-4 h-4" />
-                Próximo disponível em: {countdown}
+                {t('flashcards.anki.nextAvailable')}: {countdown}
               </Badge>
             </div>
           )}
@@ -165,12 +167,12 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
       <div className="text-center py-12 space-y-4">
         <Check className="w-16 h-16 mx-auto text-primary" />
         <div>
-          <h3 className="text-xl font-semibold mb-2">Sessão concluída!</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('flashcards.anki.sessionComplete')}</h3>
           <p className="text-muted-foreground">
-            {mode === "spaced" ? "Reviste" : "Praticaste"} {flashcards.length} flashcard{flashcards.length !== 1 ? 's' : ''}.
+            {mode === "spaced" ? t('flashcards.anki.reviewed') : t('flashcards.anki.practiced')} {flashcards.length} flashcard{flashcards.length !== 1 ? 's' : ''}.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
-            Tempo: {formatTime(sessionTime)}
+            {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
         </div>
         <Button
@@ -181,7 +183,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
           }}
           data-testid="button-restart-study"
         >
-          {mode === "spaced" ? "Rever novamente" : "Praticar novamente"}
+          {mode === "spaced" ? t('flashcards.anki.reviewAgain') : t('flashcards.anki.practiceAgain')}
         </Button>
       </div>
     );
@@ -192,7 +194,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
       <div className="space-y-2" data-testid="flashcard-progress">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">Progresso</span>
+            <span className="text-muted-foreground">{t('flashcards.anki.progress')}</span>
             <Badge variant="outline" className="gap-1.5">
               <Clock className="w-3 h-3" />
               {formatTime(sessionTime)}
@@ -226,10 +228,10 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
                 </p>
               </div>
               <div className="flex items-center justify-between pt-6 border-t">
-                <Badge variant="secondary">Pergunta</Badge>
+                <Badge variant="secondary">{t('flashcards.question')}</Badge>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <RotateCw className="w-4 h-4" />
-                  <span>Clique para ver a resposta</span>
+                  <span>{t('flashcards.anki.clickToSeeAnswer')}</span>
                 </div>
               </div>
             </CardContent>
@@ -246,9 +248,9 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
                 </p>
               </div>
               <div className="space-y-4 pt-6 border-t">
-                <Badge variant="default" className="mb-2">Resposta</Badge>
+                <Badge variant="default" className="mb-2">{t('flashcards.answer')}</Badge>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Como foi a tua resposta?
+                  {t('flashcards.anki.howWasYourAnswer')}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <Button
@@ -258,7 +260,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
                     className="border-red-500/50 hover:bg-red-500/10"
                     data-testid="button-again"
                   >
-                    <span className="text-red-600 dark:text-red-400">Novamente</span>
+                    <span className="text-red-600 dark:text-red-400">{t('flashcards.anki.again')}</span>
                   </Button>
                   <Button
                     onClick={() => handleRating(2)}
@@ -267,7 +269,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
                     className="border-orange-500/50 hover:bg-orange-500/10"
                     data-testid="button-hard"
                   >
-                    <span className="text-orange-600 dark:text-orange-400">Difícil</span>
+                    <span className="text-orange-600 dark:text-orange-400">{t('flashcards.anki.hard')}</span>
                   </Button>
                   <Button
                     onClick={() => handleRating(3)}
@@ -276,7 +278,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
                     className="border-green-500/50 hover:bg-green-500/10"
                     data-testid="button-good"
                   >
-                    <span className="text-green-600 dark:text-green-400">Bom</span>
+                    <span className="text-green-600 dark:text-green-400">{t('flashcards.anki.good')}</span>
                   </Button>
                   <Button
                     onClick={() => handleRating(4)}
@@ -285,7 +287,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
                     className="border-blue-500/50 hover:bg-blue-500/10"
                     data-testid="button-easy"
                   >
-                    <span className="text-blue-600 dark:text-blue-400">Fácil</span>
+                    <span className="text-blue-600 dark:text-blue-400">{t('flashcards.anki.easy')}</span>
                   </Button>
                 </div>
               </div>

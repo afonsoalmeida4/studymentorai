@@ -198,6 +198,37 @@
     "regenerate": "Regenerar",
     "upgrade": "Atualiza para desbloquear resumos ilimitados"
   },
+  "flashcards": {
+    "question": "Pergunta",
+    "answer": "Resposta",
+    "clickToFlip": "Clique para virar",
+    "markAsReviewed": "Marcar como revista",
+    "markAsUnreviewed": "Marcar como não revista",
+    "noFlashcards": "Nenhum flashcard disponível.",
+    "studyProgress": "Progresso de Estudo",
+    "reviewed": "revistas",
+    "anki": {
+      "loading": "A carregar flashcards...",
+      "errorRecording": "Erro ao registar resposta. Tenta novamente.",
+      "availableNow": "Disponível agora",
+      "allReviewed": "Tudo revisto!",
+      "noFlashcards": "Não tens flashcards para rever agora.",
+      "nextAvailable": "Próximo disponível em",
+      "sessionComplete": "Sessão concluída!",
+      "reviewed": "Reviste",
+      "practiced": "Praticaste",
+      "time": "Tempo",
+      "reviewAgain": "Rever novamente",
+      "practiceAgain": "Praticar novamente",
+      "progress": "Progresso",
+      "clickToSeeAnswer": "Clique para ver a resposta",
+      "howWasYourAnswer": "Como foi a tua resposta?",
+      "again": "Novamente",
+      "hard": "Difícil",
+      "good": "Bom",
+      "easy": "Fácil"
+    }
+  },
   "home": {
     "title": "Bem-vindo ao AI Study Mentor",
     "subtitle": "Organiza o teu conhecimento. Encontra o teu equilíbrio.",

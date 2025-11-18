@@ -195,6 +195,37 @@
     "regenerate": "Régénérer",
     "upgrade": "Mettez à niveau pour débloquer des résumés illimités"
   },
+  "flashcards": {
+    "question": "Question",
+    "answer": "Réponse",
+    "clickToFlip": "Cliquez pour retourner",
+    "markAsReviewed": "Marquer comme révisée",
+    "markAsUnreviewed": "Marquer comme non révisée",
+    "noFlashcards": "Aucune carte disponible.",
+    "studyProgress": "Progression de l'Étude",
+    "reviewed": "révisées",
+    "anki": {
+      "loading": "Chargement des cartes...",
+      "errorRecording": "Erreur d'enregistrement de la réponse. Réessayez.",
+      "availableNow": "Disponible maintenant",
+      "allReviewed": "Tout révisé!",
+      "noFlashcards": "Vous n'avez pas de cartes à réviser maintenant.",
+      "nextAvailable": "Prochaine disponible dans",
+      "sessionComplete": "Session terminée!",
+      "reviewed": "Vous avez révisé",
+      "practiced": "Vous avez pratiqué",
+      "time": "Temps",
+      "reviewAgain": "Réviser à nouveau",
+      "practiceAgain": "Pratiquer à nouveau",
+      "progress": "Progression",
+      "clickToSeeAnswer": "Cliquez pour voir la réponse",
+      "howWasYourAnswer": "Comment était votre réponse?",
+      "again": "Encore",
+      "hard": "Difficile",
+      "good": "Bien",
+      "easy": "Facile"
+    }
+  },
   "home": {
     "title": "Bienvenue sur AI Study Mentor",
     "subtitle": "Organisez vos connaissances. Trouvez votre équilibre.",
