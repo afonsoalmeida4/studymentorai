@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import Stripe from "stripe";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
+import { getUserLanguage } from "./languageHelper";
 import { 
   generateSummaryRequestSchema, 
   generateFlashcardsRequestSchema,
@@ -298,6 +299,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("[Flashcards] Request body:", { summaryId, topicSummaryId, userId });
       
+      // Fetch user language preference with robust fallback
+      const user = await storage.getUser(userId);
+      const userLanguage = getUserLanguage(user?.language);
+      
       if (!summaryId && !topicSummaryId) {
         return res.status(400).json({
           success: false,
@@ -340,6 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         summaryText = topicSummary.summary;
         flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
           topicSummaryId,
+          language: userLanguage,
           question: fc.question,
           answer: fc.answer,
         }));
@@ -366,12 +372,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         summaryText = summary.summary;
         flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
           summaryId,
+          language: userLanguage,
           question: fc.question,
           answer: fc.answer,
         }));
       }
 
-      const flashcardsData = await generateFlashcards(summaryText);
+      const flashcardsData = await generateFlashcards(summaryText, userLanguage);
       const savedFlashcards = await storage.createFlashcards(flashcardsQuery(flashcardsData));
 
       await awardXP(userId, "create_flashcards", { 

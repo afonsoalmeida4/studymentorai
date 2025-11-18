@@ -10,6 +10,7 @@ import {
 } from "./assistentService";
 import { chatModes } from "@shared/schema";
 import { subscriptionService } from "./subscriptionService";
+import { getUserLanguage } from "./languageHelper";
 
 export function registerChatRoutes(app: Express) {
   app.post("/api/chat/threads", isAuthenticated, async (req: any, res) => {
@@ -100,10 +101,16 @@ export function registerChatRoutes(app: Express) {
         });
       }
 
+      // Fetch user language preference with robust fallback
+      const { storage } = await import("./storage");
+      const user = await storage.getUser(userId);
+      const userLanguage = getUserLanguage(user?.language);
+
       const response = await sendMessage({
         threadId,
         userId,
         userMessage: message,
+        language: userLanguage,
       });
 
       await subscriptionService.incrementChatMessageCount(userId);

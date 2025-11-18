@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { normalizeLanguage } from "./languageHelper";
 
 // This is using OpenAI's API, which points to OpenAI's API servers and requires your own API key.
 // The newest OpenAI model is "gpt-5" which was released August 7, 2025. Do not change this unless explicitly requested by the user
@@ -233,7 +234,8 @@ export async function generateSummary({
   language = "pt",
 }: GenerateSummaryParams): Promise<SummaryResult> {
   try {
-    const lang = language || "pt";
+    const lang = normalizeLanguage(language, "pt");
+    console.log(`[generateSummary] Using language: ${lang}`);
     const systemPrompt = learningStylePrompts[lang]?.[learningStyle] || learningStylePrompts["pt"][learningStyle];
     const motivationalPrompt = motivationalPrompts[lang]?.[learningStyle] || motivationalPrompts["pt"][learningStyle];
 
@@ -330,7 +332,8 @@ export async function generateSummary({
 
 export async function generateFlashcards(summaryText: string, language: string = "pt"): Promise<FlashcardItem[]> {
   try {
-    const lang = language || "pt";
+    const lang = normalizeLanguage(language, "pt");
+    console.log(`[generateFlashcards] Using language: ${lang}`);
     const systemPrompt = flashcardSystemPrompts[lang] || flashcardSystemPrompts["pt"];
     const userPrompt = flashcardUserPrompts[lang] || flashcardUserPrompts["pt"];
     const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
