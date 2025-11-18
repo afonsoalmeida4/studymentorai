@@ -132,6 +132,21 @@ export async function getOrCreateTranslatedFlashcards(
   if (existingFlashcards.length > 0) {
     // Cache hit! Return existing translated flashcards
     console.log(`[Translation Cache HIT] ${existingFlashcards.length} flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
+    
+    /**
+     * LIMITATION: Older cached translations (created before flashcard_translations system)
+     * will NOT have shared SM-2 progress across languages.
+     * 
+     * Why no backfill?
+     * - Without stored metadata (baseFlashcardId or questionHash), there's no deterministic
+     *   way to pair translated flashcards with base Portuguese flashcards
+     * - Pairing by createdAt order is unreliable if users edited/reordered/regenerated cards
+     * - Incorrect mappings would corrupt SM-2 progress (worse than no sharing)
+     * 
+     * Solution: Users can re-generate flashcards to get shared SM-2 progress.
+     * New flashcards (cache miss below) correctly populate flashcard_translations.
+     */
+    
     return existingFlashcards;
   }
 
@@ -154,11 +169,13 @@ export async function getOrCreateTranslatedFlashcards(
     throw new Error(`Portuguese base summary not found for ${topicSummaryId}`);
   }
 
+  // CRITICAL: ORDER BY createdAt to ensure deterministic pairing with translated flashcards
   const sourceFlashcards = await db.query.flashcards.findMany({
     where: and(
       eq(flashcards.topicSummaryId, ptSummary.id),
       eq(flashcards.language, "pt")
     ),
+    orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt), asc(flashcards.id)],
   });
 
   if (sourceFlashcards.length === 0) {
