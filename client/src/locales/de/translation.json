@@ -248,6 +248,46 @@
     "descriptionPlaceholder": "Kurze Beschreibung...",
     "creating": "Erstellen..."
   },
+  "upgradeDialog": {
+    "errorNoUrl": "Zahlungs-URL nicht erhalten",
+    "errorCheckout": "Zahlungsvorgang konnte nicht gestartet werden",
+    "benefitsTitle": "Mit dem Upgrade erhalten Sie:",
+    "notNow": "Jetzt Nicht",
+    "processing": "Verarbeitung...",
+    "upgradeButton": "Upgrade ({{price}}/Monat)",
+    "uploads": {
+      "title": "Upload-Limit Erreicht",
+      "description": "Sie haben das Limit von 3 Uploads pro Monat des Free-Plans erreicht. Upgraden Sie, um unbegrenzt Dokumente hochzuladen!",
+      "benefit1": "Unbegrenzte Uploads von PDFs, Word und PowerPoint",
+      "benefit2": "Unbegrenzte Zusammenfassungen mit Lernstilen",
+      "benefit3": "Intelligente Karteikarten mit Spaced Repetition",
+      "benefit4": "KI-Assistent verfügbar 24/7"
+    },
+    "chat": {
+      "title": "Chat-Limit Erreicht",
+      "description": "Sie haben das Limit von 10 Nachrichten pro Tag des Free-Plans erreicht. Upgraden Sie, um unbegrenzt mit Ihrem AI Mentor zu chatten!",
+      "benefit1": "Unbegrenzter KI-Chat (Lern- und Existenzieller Modus)",
+      "benefit2": "Unbegrenzte Uploads und Zusammenfassungen",
+      "benefit3": "Erweiterte Fortschrittsübersicht",
+      "benefit4": "Intelligente Karteikarten"
+    },
+    "summaries": {
+      "title": "Zusammenfassungs-Limit Erreicht",
+      "description": "Zusammenfassungen im Free-Plan sind auf 1.000 Wörter begrenzt. Upgraden Sie für unbegrenzte und vollständige Zusammenfassungen!",
+      "benefit1": "Unbegrenzte Zusammenfassungen (keine Wortbegrenzung)",
+      "benefit2": "Personalisierte Lernstile",
+      "benefit3": "Unbegrenzte Uploads",
+      "benefit4": "Unbegrenzter KI-Chat"
+    },
+    "features": {
+      "title": "Premium-Funktion",
+      "description": "Diese Funktion ist nur für bezahlte Pläne verfügbar. Upgraden Sie, um auf alle erweiterten Tools zuzugreifen!",
+      "benefit1": "Zugriff auf alle Premium-Funktionen",
+      "benefit2": "Persönlicher KI-Tutor",
+      "benefit3": "Automatische Lernpläne",
+      "benefit4": "Erweiterte Statistiken und Mind Maps"
+    }
+  },
   "home": {
     "title": "Willkommen bei AI Study Mentor",
     "subtitle": "Organisieren Sie Ihr Wissen. Finden Sie Ihr Gleichgewicht.",

@@ -248,6 +248,46 @@
     "descriptionPlaceholder": "Breve descrizione...",
     "creating": "Creazione..."
   },
+  "upgradeDialog": {
+    "errorNoUrl": "URL di pagamento non ricevuto",
+    "errorCheckout": "Impossibile avviare il processo di pagamento",
+    "benefitsTitle": "Con l'aggiornamento otterrai:",
+    "notNow": "Non Ora",
+    "processing": "Elaborazione...",
+    "upgradeButton": "Aggiorna ({{price}}/mese)",
+    "uploads": {
+      "title": "Limite di Caricamenti Raggiunto",
+      "description": "Hai raggiunto il limite di 3 caricamenti al mese del piano Free. Aggiorna per continuare a caricare documenti illimitatamente!",
+      "benefit1": "Caricamenti illimitati di PDF, Word e PowerPoint",
+      "benefit2": "Riassunti illimitati con stili di apprendimento",
+      "benefit3": "Schede intelligenti con ripetizione spaziata",
+      "benefit4": "Assistente IA disponibile 24/7"
+    },
+    "chat": {
+      "title": "Limite di Chat Raggiunto",
+      "description": "Hai raggiunto il limite di 10 messaggi al giorno del piano Free. Aggiorna per chattare senza limiti con il tuo AI Mentor!",
+      "benefit1": "Chat illimitata con IA (Modalità Studio ed Esistenziale)",
+      "benefit2": "Caricamenti e riassunti illimitati",
+      "benefit3": "Dashboard progressi avanzata",
+      "benefit4": "Schede intelligenti"
+    },
+    "summaries": {
+      "title": "Limite di Riassunti Raggiunto",
+      "description": "I riassunti del piano Free sono limitati a 1.000 parole. Aggiorna per riassunti illimitati e completi!",
+      "benefit1": "Riassunti illimitati (senza limite di parole)",
+      "benefit2": "Stili di apprendimento personalizzati",
+      "benefit3": "Caricamenti illimitati",
+      "benefit4": "Chat illimitata con IA"
+    },
+    "features": {
+      "title": "Funzionalità Premium",
+      "description": "Questa funzionalità è disponibile solo per piani a pagamento. Aggiorna per accedere a tutti gli strumenti avanzati!",
+      "benefit1": "Accesso a tutte le funzionalità Premium",
+      "benefit2": "Tutor IA personale",
+      "benefit3": "Piani di studio automatici",
+      "benefit4": "Statistiche avanzate e mappe mentali"
+    }
+  },
   "home": {
     "title": "Benvenuto in AI Study Mentor",
     "subtitle": "Organizza la tua conoscenza. Trova il tuo equilibrio.",

@@ -94,3 +94,13 @@ Authentication is handled via Replit OIDC, using session-based authentication wi
 - Frontend pages translated:
   - Landing page (complete)
   - Home page (complete)
+  - SubjectView page (complete - all strings including toasts, dialogs, empty states)
+  - TopicView page (already translated previously)
+- Frontend components translated:
+  - FlashcardDeck.tsx (complete - all flashcard UI strings)
+  - AnkiFlashcardDeck.tsx (complete - Anki SRS UI strings, difficulty ratings, progress tracking)
+  - UpgradeDialog.tsx (complete - all subscription upgrade prompts, benefits, pricing)
+- **Translation Coverage Status (November 18, 2025):**
+  - ✅ COMPLETED: Flashcards, SubjectView, UpgradeDialog (critical user-facing components)
+  - ⏳ IN PROGRESS: Remaining pages (ChatView, Dashboard, Subscription, Classes, RoleSelection, Ranking)
+  - ⏳ IN PROGRESS: Remaining components (AppHeader, SummaryStudySection, XPProgressBar, LevelBadge)

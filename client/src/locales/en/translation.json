@@ -251,6 +251,46 @@
     "descriptionPlaceholder": "Brief description...",
     "creating": "Creating..."
   },
+  "upgradeDialog": {
+    "errorNoUrl": "Payment URL not received",
+    "errorCheckout": "Could not start payment process",
+    "benefitsTitle": "With the upgrade you'll get:",
+    "notNow": "Not Now",
+    "processing": "Processing...",
+    "upgradeButton": "Upgrade ({{price}}/month)",
+    "uploads": {
+      "title": "Upload Limit Reached",
+      "description": "You've reached the 3 uploads per month limit of the Free plan. Upgrade to continue uploading documents unlimited!",
+      "benefit1": "Unlimited uploads of PDFs, Word and PowerPoint",
+      "benefit2": "Unlimited summaries with learning styles",
+      "benefit3": "Smart flashcards with spaced repetition",
+      "benefit4": "AI assistant available 24/7"
+    },
+    "chat": {
+      "title": "Chat Limit Reached",
+      "description": "You've reached the 10 messages per day limit of the Free plan. Upgrade to chat without limits with your AI Mentor!",
+      "benefit1": "Unlimited AI chat (Study and Existential Mode)",
+      "benefit2": "Unlimited uploads and summaries",
+      "benefit3": "Advanced progress dashboard",
+      "benefit4": "Smart flashcards"
+    },
+    "summaries": {
+      "title": "Summary Limit Reached",
+      "description": "Free plan summaries are limited to 1,000 words. Upgrade for unlimited and complete summaries!",
+      "benefit1": "Unlimited summaries (no word limit)",
+      "benefit2": "Personalized learning styles",
+      "benefit3": "Unlimited uploads",
+      "benefit4": "Unlimited AI chat"
+    },
+    "features": {
+      "title": "Premium Feature",
+      "description": "This feature is only available for paid plans. Upgrade to access all advanced tools!",
+      "benefit1": "Access to all Premium features",
+      "benefit2": "Personal AI tutor",
+      "benefit3": "Automatic study plans",
+      "benefit4": "Advanced statistics and mind maps"
+    }
+  },
   "home": {
     "title": "Welcome to AI Study Mentor",
     "subtitle": "Organize your knowledge. Find your balance.",

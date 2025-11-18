@@ -251,6 +251,46 @@
     "descriptionPlaceholder": "Breve descripción...",
     "creating": "Creando..."
   },
+  "upgradeDialog": {
+    "errorNoUrl": "URL de pago no recibida",
+    "errorCheckout": "No se pudo iniciar el proceso de pago",
+    "benefitsTitle": "Con la actualización obtendrás:",
+    "notNow": "Ahora No",
+    "processing": "Procesando...",
+    "upgradeButton": "Actualizar ({{price}}/mes)",
+    "uploads": {
+      "title": "Límite de Subidas Alcanzado",
+      "description": "Has alcanzado el límite de 3 subidas por mes del plan Free. ¡Actualiza para continuar subiendo documentos ilimitadamente!",
+      "benefit1": "Subidas ilimitadas de PDFs, Word y PowerPoint",
+      "benefit2": "Resúmenes ilimitados con estilos de aprendizaje",
+      "benefit3": "Tarjetas inteligentes con repetición espaciada",
+      "benefit4": "Asistente IA disponible 24/7"
+    },
+    "chat": {
+      "title": "Límite de Chat Alcanzado",
+      "description": "Has alcanzado el límite de 10 mensajes por día del plan Free. ¡Actualiza para conversar sin límites con tu AI Mentor!",
+      "benefit1": "Chat ilimitado con IA (Modo Estudio y Existencial)",
+      "benefit2": "Subidas y resúmenes ilimitados",
+      "benefit3": "Panel de progreso avanzado",
+      "benefit4": "Tarjetas inteligentes"
+    },
+    "summaries": {
+      "title": "Límite de Resúmenes Alcanzado",
+      "description": "Los resúmenes del plan Free están limitados a 1.000 palabras. ¡Actualiza para resúmenes ilimitados y completos!",
+      "benefit1": "Resúmenes ilimitados (sin límite de palabras)",
+      "benefit2": "Estilos de aprendizaje personalizados",
+      "benefit3": "Subidas ilimitadas",
+      "benefit4": "Chat ilimitado con IA"
+    },
+    "features": {
+      "title": "Funcionalidad Premium",
+      "description": "Esta funcionalidad está disponible solo para planes de pago. ¡Actualiza para acceder a todas las herramientas avanzadas!",
+      "benefit1": "Acceso a todas las funcionalidades Premium",
+      "benefit2": "Tutor IA personal",
+      "benefit3": "Planes de estudio automáticos",
+      "benefit4": "Estadísticas avanzadas y mapas mentales"
+    }
+  },
   "home": {
     "title": "Bienvenido a AI Study Mentor",
     "subtitle": "Organiza tu conocimiento. Encuentra tu equilibrio.",

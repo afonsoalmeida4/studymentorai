@@ -248,6 +248,46 @@
     "descriptionPlaceholder": "Brève description...",
     "creating": "Création..."
   },
+  "upgradeDialog": {
+    "errorNoUrl": "URL de paiement non reçue",
+    "errorCheckout": "Impossible de démarrer le processus de paiement",
+    "benefitsTitle": "Avec la mise à niveau vous obtiendrez:",
+    "notNow": "Pas Maintenant",
+    "processing": "Traitement...",
+    "upgradeButton": "Mettre à Niveau ({{price}}/mois)",
+    "uploads": {
+      "title": "Limite de Téléchargements Atteinte",
+      "description": "Vous avez atteint la limite de 3 téléchargements par mois du plan Free. Mettez à niveau pour continuer à télécharger des documents de manière illimitée!",
+      "benefit1": "Téléchargements illimités de PDFs, Word et PowerPoint",
+      "benefit2": "Résumés illimités avec styles d'apprentissage",
+      "benefit3": "Cartes intelligentes avec répétition espacée",
+      "benefit4": "Assistant IA disponible 24/7"
+    },
+    "chat": {
+      "title": "Limite de Chat Atteinte",
+      "description": "Vous avez atteint la limite de 10 messages par jour du plan Free. Mettez à niveau pour discuter sans limites avec votre AI Mentor!",
+      "benefit1": "Chat illimité avec l'IA (Mode Étude et Existentiel)",
+      "benefit2": "Téléchargements et résumés illimités",
+      "benefit3": "Tableau de bord de progression avancé",
+      "benefit4": "Cartes intelligentes"
+    },
+    "summaries": {
+      "title": "Limite de Résumés Atteinte",
+      "description": "Les résumés du plan Free sont limités à 1 000 mots. Mettez à niveau pour des résumés illimités et complets!",
+      "benefit1": "Résumés illimités (sans limite de mots)",
+      "benefit2": "Styles d'apprentissage personnalisés",
+      "benefit3": "Téléchargements illimités",
+      "benefit4": "Chat illimité avec l'IA"
+    },
+    "features": {
+      "title": "Fonctionnalité Premium",
+      "description": "Cette fonctionnalité n'est disponible que pour les plans payants. Mettez à niveau pour accéder à tous les outils avancés!",
+      "benefit1": "Accès à toutes les fonctionnalités Premium",
+      "benefit2": "Tuteur IA personnel",
+      "benefit3": "Plans d'étude automatiques",
+      "benefit4": "Statistiques avancées et cartes mentales"
+    }
+  },
   "home": {
     "title": "Bienvenue sur AI Study Mentor",
     "subtitle": "Organisez vos connaissances. Trouvez votre équilibre.",

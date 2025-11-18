@@ -251,6 +251,46 @@
     "descriptionPlaceholder": "Breve descrição...",
     "creating": "A criar..."
   },
+  "upgradeDialog": {
+    "errorNoUrl": "URL de pagamento não recebido",
+    "errorCheckout": "Não foi possível iniciar o processo de pagamento",
+    "benefitsTitle": "Com o upgrade vais ter:",
+    "notNow": "Agora Não",
+    "processing": "A processar...",
+    "upgradeButton": "Fazer Upgrade ({{price}}/mês)",
+    "uploads": {
+      "title": "Limite de Uploads Atingido",
+      "description": "Atingiste o limite de 3 uploads por mês do plano Free. Faz upgrade para continuar a carregar documentos ilimitadamente!",
+      "benefit1": "Uploads ilimitados de PDFs, Word e PowerPoint",
+      "benefit2": "Resumos ilimitados com estilos de aprendizagem",
+      "benefit3": "Flashcards inteligentes com spaced repetition",
+      "benefit4": "Assistente IA disponível 24/7"
+    },
+    "chat": {
+      "title": "Limite de Chat Atingido",
+      "description": "Atingiste o limite de 10 mensagens por dia do plano Free. Faz upgrade para conversar sem limites com o teu AI Mentor!",
+      "benefit1": "Chat ilimitado com IA (Modo Estudo e Existencial)",
+      "benefit2": "Uploads e resumos ilimitados",
+      "benefit3": "Dashboard de progresso avançado",
+      "benefit4": "Flashcards inteligentes"
+    },
+    "summaries": {
+      "title": "Limite de Resumos Atingido",
+      "description": "Os resumos do plano Free são limitados a 1.000 palavras. Faz upgrade para resumos ilimitados e completos!",
+      "benefit1": "Resumos ilimitados (sem limite de palavras)",
+      "benefit2": "Estilos de aprendizagem personalizados",
+      "benefit3": "Uploads ilimitados",
+      "benefit4": "Chat ilimitado com IA"
+    },
+    "features": {
+      "title": "Funcionalidade Premium",
+      "description": "Esta funcionalidade está disponível apenas para planos pagos. Faz upgrade para aceder a todas as ferramentas avançadas!",
+      "benefit1": "Acesso a todas as funcionalidades Premium",
+      "benefit2": "Tutor IA pessoal",
+      "benefit3": "Planos de estudo automáticos",
+      "benefit4": "Estatísticas avançadas e mapas mentais"
+    }
+  },
   "home": {
     "title": "Bem-vindo ao AI Study Mentor",
     "subtitle": "Organiza o teu conhecimento. Encontra o teu equilíbrio.",
