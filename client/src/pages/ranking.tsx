@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trophy, Medal, Award } from "lucide-react";
 import { type UserLevel } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 interface LeaderboardEntry {
   userId: string;
@@ -23,17 +24,18 @@ function getRankIcon(rank: number) {
   return null;
 }
 
-function getUserDisplayName(entry: LeaderboardEntry): string {
-  if (entry.displayName) return entry.displayName;
-  if (entry.firstName && entry.lastName) return `${entry.firstName} ${entry.lastName}`;
-  if (entry.firstName) return entry.firstName;
-  return "Utilizador Anónimo";
-}
-
 export default function Ranking() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ success: boolean; leaderboard: LeaderboardEntry[] }>({
     queryKey: ["/api/leaderboard"],
   });
+
+  function getUserDisplayName(entry: LeaderboardEntry): string {
+    if (entry.displayName) return entry.displayName;
+    if (entry.firstName && entry.lastName) return `${entry.firstName} ${entry.lastName}`;
+    if (entry.firstName) return entry.firstName;
+    return t("ranking.anonymousUser");
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,18 +43,18 @@ export default function Ranking() {
       <div className="max-w-4xl mx-auto space-y-6 p-6">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold" data-testid="heading-ranking">
-            Classificação Global
+            {t("ranking.title")}
           </h1>
           <p className="text-muted-foreground" data-testid="text-ranking-description">
-            Os melhores estudantes da comunidade
+            {t("ranking.subtitle")}
           </p>
         </div>
 
         <Card data-testid="card-leaderboard">
           <CardHeader>
-            <CardTitle>Top 10 Utilizadores</CardTitle>
+            <CardTitle>{t("ranking.topUsers")}</CardTitle>
             <CardDescription>
-              Classificados por XP total acumulado
+              {t("ranking.rankedBy")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -68,7 +70,7 @@ export default function Ranking() {
               </div>
             ) : !data?.success || data.leaderboard.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                Ainda não há utilizadores no ranking
+                {t("ranking.empty")}
               </div>
             ) : (
               <div className="space-y-2">
@@ -97,7 +99,7 @@ export default function Ranking() {
                           {displayName}
                         </div>
                         <div className="text-sm text-muted-foreground" data-testid={`text-user-xp-${entry.rank}`}>
-                          {entry.totalXp.toLocaleString()} XP
+                          {entry.totalXp.toLocaleString()} {t("common.xp")}
                         </div>
                       </div>
 
@@ -116,41 +118,41 @@ export default function Ranking() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Como subir no ranking?</CardTitle>
+            <CardTitle>{t("ranking.howToClimb")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="bg-primary/10 text-primary rounded-lg p-2 mt-0.5">
-                <span className="font-bold">+100</span>
+                <span className="font-bold">{t("ranking.actions.generateSummary.xp")}</span>
               </div>
               <div>
-                <div className="font-medium">Gerar Resumo</div>
+                <div className="font-medium">{t("ranking.actions.generateSummary.title")}</div>
                 <div className="text-sm text-muted-foreground">
-                  Faz upload de um PDF e gera um resumo personalizado
+                  {t("ranking.actions.generateSummary.description")}
                 </div>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
               <div className="bg-primary/10 text-primary rounded-lg p-2 mt-0.5">
-                <span className="font-bold">+30</span>
+                <span className="font-bold">{t("ranking.actions.createFlashcards.xp")}</span>
               </div>
               <div>
-                <div className="font-medium">Criar Flashcards</div>
+                <div className="font-medium">{t("ranking.actions.createFlashcards.title")}</div>
                 <div className="text-sm text-muted-foreground">
-                  Gera flashcards a partir dos teus resumos
+                  {t("ranking.actions.createFlashcards.description")}
                 </div>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
               <div className="bg-primary/10 text-primary rounded-lg p-2 mt-0.5">
-                <span className="font-bold">+20+</span>
+                <span className="font-bold">{t("ranking.actions.completeSession.xp")}</span>
               </div>
               <div>
-                <div className="font-medium">Completar Sessão de Estudo</div>
+                <div className="font-medium">{t("ranking.actions.completeSession.title")}</div>
                 <div className="text-sm text-muted-foreground">
-                  Estuda com flashcards e ganha +5 XP por cada acerto
+                  {t("ranking.actions.completeSession.description")}
                 </div>
               </div>
             </div>

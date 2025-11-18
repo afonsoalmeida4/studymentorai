@@ -18,7 +18,8 @@
     "close": "Close",
     "upload": "Upload file",
     "download": "Download",
-    "language": "Language"
+    "language": "Language",
+    "xp": "XP"
   },
   "app": {
     "tagline": "Organize. Balance."

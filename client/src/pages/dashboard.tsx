@@ -8,14 +8,52 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { GetDashboardStatsResponse, GetReviewPlanResponse } from "@shared/schema";
 import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, enUS, es, fr, de, it, type Locale } from "date-fns/locale";
 import { GamificationHeader } from "@/components/GamificationHeader";
 import { AppHeader } from "@/components/AppHeader";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
+
+const dateLocaleMap: Record<string, Locale> = {
+  pt: ptBR,
+  "pt-PT": ptBR,
+  "pt-BR": ptBR,
+  en: enUS,
+  "en-US": enUS,
+  "en-GB": enUS,
+  "en-CA": enUS,
+  es: es,
+  "es-ES": es,
+  "es-MX": es,
+  fr: fr,
+  "fr-FR": fr,
+  "fr-CA": fr,
+  de: de,
+  "de-DE": de,
+  it: it,
+  "it-IT": it,
+};
+
+function getDateFnsLocale(language: string): Locale {
+  // Try exact match
+  if (dateLocaleMap[language]) {
+    return dateLocaleMap[language];
+  }
+  // Try base language (split on '-')
+  const baseLang = language.split('-')[0];
+  if (dateLocaleMap[baseLang]) {
+    return dateLocaleMap[baseLang];
+  }
+  // Default fallback
+  return ptBR;
+}
 
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const dateLocale = useMemo(() => getDateFnsLocale(i18n.language), [i18n.language]);
   const { data: statsData, isLoading: statsLoading } = useQuery<GetDashboardStatsResponse>({
     queryKey: ["/api/dashboard-stats"],
   });
@@ -34,16 +72,16 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       toast({
-        title: "Premium Ativado!",
-        description: "Agora tens acesso a todos os recursos exclusivos.",
+        title: t("dashboard.premium.activatedTitle"),
+        description: t("dashboard.premium.activatedMessage"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gamification/profile"] });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível ativar o Premium.",
+        title: t("dashboard.premium.errorTitle"),
+        description: t("dashboard.premium.errorMessage"),
         variant: "destructive",
       });
     },
@@ -54,8 +92,8 @@ export default function Dashboard() {
       <AppHeader />
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" data-testid="title-dashboard">Dashboard de Estudo</h1>
-          <p className="text-muted-foreground">Acompanhe o seu progresso e receba recomendações personalizadas</p>
+          <h1 className="text-3xl font-bold mb-2" data-testid="title-dashboard">{t("dashboard.title")}</h1>
+          <p className="text-muted-foreground">{t("dashboard.subtitle")}</p>
         </div>
 
         <div className="mb-6">
@@ -80,7 +118,7 @@ export default function Dashboard() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">PDFs Estudados</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.pdfsStudied")}</CardTitle>
                   <BookOpen className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -90,7 +128,7 @@ export default function Dashboard() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Flashcards Completados</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.flashcardsCompleted")}</CardTitle>
                   <Target className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -100,20 +138,20 @@ export default function Dashboard() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Dias Consecutivos</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.studyStreak")}</CardTitle>
                   <Flame className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold" data-testid="stat-study-streak">{stats?.studyStreak || 0}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {stats?.studyStreak && stats.studyStreak > 0 ? "Continue assim!" : "Comece hoje!"}
+                    {stats?.studyStreak && stats.studyStreak > 0 ? t("dashboard.stats.keepGoing") : t("dashboard.stats.startToday")}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Precisão Média</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.averageAccuracy")}</CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -130,11 +168,11 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2">
                   <Crown className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                   <CardTitle className="text-amber-900 dark:text-amber-100">
-                    Desbloqueie o Premium
+                    {t("dashboard.premium.unlock")}
                   </CardTitle>
                 </div>
                 <CardDescription className="text-amber-800 dark:text-amber-300">
-                  Acesso exclusivo ao Mentor IA, resumos ilimitados, e tema dourado
+                  {t("dashboard.premium.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -144,7 +182,7 @@ export default function Dashboard() {
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                   data-testid="button-activate-premium"
                 >
-                  {activatePremiumMutation.isPending ? "A ativar..." : "Ativar Premium (Simulado)"}
+                  {activatePremiumMutation.isPending ? t("dashboard.premium.activating") : t("dashboard.premium.activate")}
                 </Button>
               </CardContent>
             </Card>
@@ -152,8 +190,8 @@ export default function Dashboard() {
             {stats?.recentSessions && stats.recentSessions.length > 0 && (
               <Card className="mb-8">
                 <CardHeader>
-                  <CardTitle>Progresso dos Últimos 7 Dias</CardTitle>
-                  <CardDescription>Flashcards completados por dia</CardDescription>
+                  <CardTitle>{t("dashboard.progress.title")}</CardTitle>
+                  <CardDescription>{t("dashboard.progress.subtitle")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -167,7 +205,7 @@ export default function Dashboard() {
                         dataKey="flashcardsCompleted" 
                         stroke="hsl(var(--primary))" 
                         strokeWidth={2}
-                        name="Flashcards"
+                        name={t("dashboard.progress.flashcardsLabel")}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -181,9 +219,9 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    PDFs Estudados
+                    {t("dashboard.pdfs.title")}
                   </CardTitle>
-                  <CardDescription>Histórico dos seus documentos</CardDescription>
+                  <CardDescription>{t("dashboard.pdfs.subtitle")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {stats?.studiedPDFs && stats.studiedPDFs.length > 0 ? (
@@ -197,16 +235,16 @@ export default function Dashboard() {
                                 {pdf.learningStyle}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                {pdf.totalSessions} {pdf.totalSessions === 1 ? 'sessão' : 'sessões'}
+                                {pdf.totalSessions} {t(`dashboard.pdfs.sessions_${pdf.totalSessions === 1 ? 'one' : 'other'}`)}
                               </span>
                               {pdf.averageAccuracy > 0 && (
                                 <span className="text-xs text-muted-foreground">
-                                  {pdf.averageAccuracy.toFixed(0)}% precisão
+                                  {t("dashboard.pdfs.accuracy", { percent: pdf.averageAccuracy.toFixed(0) })}
                                 </span>
                               )}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                              Última: {formatDistanceToNow(new Date(pdf.lastStudied), { addSuffix: true, locale: ptBR })}
+                              {t("dashboard.pdfs.lastStudied", { time: formatDistanceToNow(new Date(pdf.lastStudied), { addSuffix: true, locale: dateLocale }) })}
                             </p>
                           </div>
                         </div>
@@ -215,10 +253,10 @@ export default function Dashboard() {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <FileText className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                      <p className="text-sm">Nenhum PDF estudado ainda</p>
+                      <p className="text-sm">{t("dashboard.pdfs.empty")}</p>
                       <Link href="/">
                         <Button variant="outline" size="sm" className="mt-3" data-testid="button-upload-first-pdf">
-                          Carregar primeiro PDF
+                          {t("dashboard.pdfs.uploadFirst")}
                         </Button>
                       </Link>
                     </div>
@@ -231,9 +269,9 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
-                    Sessões Recentes
+                    {t("dashboard.sessions.title")}
                   </CardTitle>
-                  <CardDescription>Últimas atividades de estudo</CardDescription>
+                  <CardDescription>{t("dashboard.sessions.subtitle")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {stats?.recentStudySessions && stats.recentStudySessions.length > 0 ? (
@@ -252,7 +290,7 @@ export default function Dashboard() {
                               </Badge>
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {formatDistanceToNow(new Date(session.studyDate), { addSuffix: true, locale: ptBR })}
+                              {formatDistanceToNow(new Date(session.studyDate), { addSuffix: true, locale: dateLocale })}
                             </p>
                           </div>
                         </div>
@@ -261,10 +299,10 @@ export default function Dashboard() {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <Clock className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                      <p className="text-sm">Nenhuma sessão de estudo ainda</p>
+                      <p className="text-sm">{t("dashboard.sessions.empty")}</p>
                       <Link href="/">
                         <Button variant="outline" size="sm" className="mt-3" data-testid="button-start-first-session">
-                          Começar a estudar
+                          {t("dashboard.sessions.startStudying")}
                         </Button>
                       </Link>
                     </div>
@@ -287,8 +325,8 @@ export default function Dashboard() {
         ) : reviewPlan.length > 0 ? (
           <Card>
             <CardHeader>
-              <CardTitle>Plano de Revisão Personalizado</CardTitle>
-              <CardDescription>Recomendações geradas por IA com base no seu histórico</CardDescription>
+              <CardTitle>{t("dashboard.review.title")}</CardTitle>
+              <CardDescription>{t("dashboard.review.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {aiRecommendation && (
@@ -298,7 +336,7 @@ export default function Dashboard() {
               )}
 
               <div className="space-y-4">
-                <h3 className="font-semibold">Tópicos Prioritários</h3>
+                <h3 className="font-semibold">{t("dashboard.review.priorities")}</h3>
                 {reviewPlan.map((item, index) => (
                   <div key={item.summaryId} className="flex items-start justify-between gap-4 p-4 border rounded-lg hover-elevate" data-testid={`review-item-${index}`}>
                     <div className="flex-1">
@@ -309,18 +347,18 @@ export default function Dashboard() {
                           item.priority === 'medium' ? 'default' : 
                           'secondary'
                         }>
-                          {item.priority === 'high' ? 'Alta' : item.priority === 'medium' ? 'Média' : 'Baixa'}
+                          {item.priority === 'high' ? t("dashboard.review.priorityHigh") : item.priority === 'medium' ? t("dashboard.review.priorityMedium") : t("dashboard.review.priorityLow")}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{item.recommendation}</p>
                       <div className="flex gap-4 text-xs text-muted-foreground">
-                        <span>Precisão: {item.accuracy.toFixed(1)}%</span>
-                        <span>Última sessão: {new Date(item.lastStudied).toLocaleDateString('pt-PT')}</span>
+                        <span>{t("dashboard.review.accuracy", { percent: item.accuracy.toFixed(1) })}</span>
+                        <span>{t("dashboard.review.lastSession", { date: new Date(item.lastStudied).toLocaleDateString(i18n.language === 'pt' ? 'pt-PT' : i18n.language === 'en' ? 'en-US' : i18n.language) })}</span>
                       </div>
                     </div>
                     <Link href="/home">
                       <Button size="sm" variant="outline" data-testid={`button-review-${index}`}>
-                        Revisar
+                        {t("dashboard.review.reviewButton")}
                       </Button>
                     </Link>
                   </div>
@@ -331,15 +369,15 @@ export default function Dashboard() {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>Plano de Revisão</CardTitle>
+              <CardTitle>{t("dashboard.review.emptyTitle")}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Complete algumas sessões de estudo para receber recomendações personalizadas!
+                {t("dashboard.review.emptyMessage")}
               </p>
               <Link href="/home">
                 <Button className="mt-4" data-testid="button-start-studying">
-                  Começar a Estudar
+                  {t("dashboard.review.startButton")}
                 </Button>
               </Link>
             </CardContent>

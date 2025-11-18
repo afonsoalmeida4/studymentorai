@@ -18,7 +18,8 @@
     "close": "Cerrar",
     "upload": "Subir archivo",
     "download": "Descargar",
-    "language": "Idioma"
+    "language": "Idioma",
+    "xp": "XP"
   },
   "app": {
     "tagline": "Organiza. Equilibra."

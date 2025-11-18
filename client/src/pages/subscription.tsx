@@ -9,8 +9,9 @@ import { Check, Crown, Zap, Rocket, GraduationCap, ArrowRight } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import type { Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 type SubscriptionDetails = {
   subscription: Subscription;
@@ -18,9 +19,44 @@ type SubscriptionDetails = {
   limits: typeof planLimits[SubscriptionPlan];
 };
 
+const dateLocaleStringMap: Record<string, string> = {
+  pt: "pt-PT",
+  "pt-PT": "pt-PT",
+  en: "en-US",
+  "en-US": "en-US",
+  "en-GB": "en-GB",
+  "en-CA": "en-CA",
+  es: "es-ES",
+  "es-ES": "es-ES",
+  "es-MX": "es-MX",
+  fr: "fr-FR",
+  "fr-FR": "fr-FR",
+  "fr-CA": "fr-CA",
+  de: "de-DE",
+  "de-DE": "de-DE",
+  it: "it-IT",
+  "it-IT": "it-IT",
+};
+
+function getDateLocale(language: string): string {
+  // Try exact match
+  if (dateLocaleStringMap[language]) {
+    return dateLocaleStringMap[language];
+  }
+  // Try base language (split on '-')
+  const baseLang = language.split('-')[0];
+  if (dateLocaleStringMap[baseLang]) {
+    return dateLocaleStringMap[baseLang];
+  }
+  // Default fallback
+  return "pt-PT";
+}
+
 export default function SubscriptionPage() {
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
+  const dateLocale = useMemo(() => getDateLocale(i18n.language), [i18n.language]);
 
   // Handle Stripe redirect callbacks
   useEffect(() => {
@@ -30,8 +66,8 @@ export default function SubscriptionPage() {
 
     if (success === 'true') {
       toast({
-        title: "✅ Pagamento Processado!",
-        description: "A tua subscrição será ativada em breve. Obrigado!",
+        title: t("subscription.toasts.paymentSuccess"),
+        description: t("subscription.toasts.paymentSuccessMessage"),
       });
       // Invalidate subscription query to refresh data
       queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
@@ -39,8 +75,8 @@ export default function SubscriptionPage() {
       window.history.replaceState({}, '', '/subscription');
     } else if (canceled === 'true') {
       toast({
-        title: "Pagamento Cancelado",
-        description: "Podes tentar novamente quando quiseres.",
+        title: t("subscription.toasts.paymentCanceled"),
+        description: t("subscription.toasts.paymentCanceledMessage"),
         variant: "default",
       });
       // Clean URL
@@ -64,8 +100,8 @@ export default function SubscriptionPage() {
       } else {
         console.error("No URL in response:", data);
         toast({
-          title: "Erro",
-          description: "URL de pagamento não recebido",
+          title: t("subscription.toasts.checkoutError"),
+          description: t("subscription.toasts.noUrl"),
           variant: "destructive",
         });
       }
@@ -73,8 +109,8 @@ export default function SubscriptionPage() {
     onError: (error) => {
       console.error("Checkout error:", error);
       toast({
-        title: "Erro",
-        description: "Não foi possível iniciar o processo de pagamento",
+        title: t("subscription.toasts.checkoutError"),
+        description: t("subscription.toasts.checkoutErrorMessage"),
         variant: "destructive",
       });
     },
@@ -110,74 +146,28 @@ export default function SubscriptionPage() {
   const plans = [
     {
       id: "free",
-      name: "Começa a Estudar",
-      price: "0€",
       icon: Zap,
       color: "text-muted-foreground",
-      features: [
-        "3 uploads por mês",
-        "Resumos até 1.000 palavras",
-        "Flashcards simples",
-        "Assistente IA (Modo Estudo)",
-        "Limite de 10 mensagens/dia",
-        "1 workspace",
-      ],
+      featureKeys: ["uploads", "summaries", "flashcards", "assistant", "chatLimit", "workspace"],
     },
     {
       id: "pro",
-      name: "Estuda Sem Limites",
-      price: "7,99€",
-      period: "/mês",
       icon: Crown,
       color: "text-blue-600 dark:text-blue-400",
       popular: true,
-      features: [
-        "Uploads ilimitados",
-        "Resumos ilimitados",
-        "Flashcards inteligentes",
-        "Assistente IA (Todos os modos)",
-        "Chat ilimitado",
-        "Workspaces ilimitados",
-        "Dashboard de progresso",
-        "Backup automático",
-      ],
+      featureKeys: ["uploads", "summaries", "flashcards", "assistant", "chat", "workspaces", "dashboard", "backup"],
     },
     {
       id: "premium",
-      name: "Alta Performance",
-      price: "18,99€",
-      period: "/mês",
       icon: Rocket,
       color: "text-purple-600 dark:text-purple-400",
-      features: [
-        "Tudo do Pro +",
-        "Tutor IA pessoal",
-        "Planos de estudo automáticos",
-        "Mapas mentais automáticos",
-        "Estatísticas avançadas",
-        "Modo Zen",
-        "Espaços partilhados",
-        "Exportação PDF",
-        "Acesso antecipado",
-      ],
+      featureKeys: ["allPro", "tutor", "studyPlans", "mindMaps", "stats", "zenMode", "sharedSpaces", "pdfExport", "earlyAccess"],
     },
     {
       id: "educational",
-      name: "AI Classroom Pro",
-      price: "14,99€",
-      period: "/mês",
       icon: GraduationCap,
       color: "text-green-600 dark:text-green-400",
-      features: [
-        "Tudo do Premium +",
-        "Gestão de turmas",
-        "Biblioteca partilhada",
-        "Dashboard da turma",
-        "AI Teacher Assistant",
-        "Criar fichas de exercícios",
-        "Mini-testes automáticos",
-        "Planos de aula",
-      ],
+      featureKeys: ["allPremium", "classManagement", "sharedLibrary", "classDashboard", "teacherAssistant", "worksheets", "quizzes", "lessonPlans"],
     },
   ];
 
@@ -185,23 +175,23 @@ export default function SubscriptionPage() {
     <div className="container max-w-6xl mx-auto p-6 space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold" data-testid="text-subscription-title">
-          O Teu Plano
+          {t("subscription.title")}
         </h1>
         <p className="text-muted-foreground" data-testid="text-subscription-subtitle">
-          Escolhe o plano ideal para os teus objetivos de estudo
+          {t("subscription.subtitle")}
         </p>
       </div>
 
       {currentPlan === "free" && (
         <Card className="border-primary/50">
           <CardHeader>
-            <CardTitle>Utilização Atual</CardTitle>
-            <CardDescription>Progresso do plano Free este mês</CardDescription>
+            <CardTitle>{t("subscription.currentUsage")}</CardTitle>
+            <CardDescription>{t("subscription.currentUsageSubtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span>Uploads</span>
+                <span>{t("subscription.uploads")}</span>
                 <span className="text-muted-foreground">
                   {usage.uploadsCount} / {limits.uploadsPerMonth}
                 </span>
@@ -210,7 +200,7 @@ export default function SubscriptionPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span>Mensagens de chat (hoje)</span>
+                <span>{t("subscription.chatMessages")}</span>
                 <span className="text-muted-foreground">
                   {usage.chatMessagesCount} / {limits.dailyChatLimit}
                 </span>
@@ -235,14 +225,14 @@ export default function SubscriptionPage() {
               {plan.popular && !isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-primary" data-testid="badge-popular">
-                    Mais Popular
+                    {t("subscription.popular")}
                   </Badge>
                 </div>
               )}
               {isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge variant="outline" className="bg-background" data-testid="badge-current">
-                    Plano Atual
+                    {t("subscription.currentPlan")}
                   </Badge>
                 </div>
               )}
@@ -250,22 +240,24 @@ export default function SubscriptionPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Icon className={`h-6 w-6 ${plan.color}`} />
-                  <CardTitle className="text-lg">{plan.name}</CardTitle>
+                  <CardTitle className="text-lg">{t(`subscription.plans.${plan.id}.name`)}</CardTitle>
                 </div>
                 <div className="mt-4">
-                  <span className="text-3xl font-bold">{plan.price}</span>
-                  {plan.period && (
-                    <span className="text-muted-foreground">{plan.period}</span>
+                  <span className="text-3xl font-bold">
+                    {plan.id === "free" ? t("subscription.free") : t(`subscription.plans.${plan.id}.price`)}
+                  </span>
+                  {plan.id !== "free" && (
+                    <span className="text-muted-foreground">{t(`subscription.plans.${plan.id}.period`)}</span>
                   )}
                 </div>
               </CardHeader>
 
               <CardContent>
                 <ul className="space-y-2">
-                  {plan.features.map((feature, index) => (
+                  {plan.featureKeys.map((featureKey, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm">
                       <Check className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-                      <span>{feature}</span>
+                      <span>{t(`subscription.plans.${plan.id}.features.${featureKey}`)}</span>
                     </li>
                   ))}
                 </ul>
@@ -279,7 +271,7 @@ export default function SubscriptionPage() {
                     disabled
                     data-testid={`button-current-${plan.id}`}
                   >
-                    Ativo
+                    {t("subscription.active")}
                   </Button>
                 ) : plan.id === "free" ? (
                   <Button 
@@ -288,7 +280,7 @@ export default function SubscriptionPage() {
                     disabled
                     data-testid="button-free"
                   >
-                    Grátis
+                    {t("subscription.free")}
                   </Button>
                 ) : (
                   <Button
@@ -297,7 +289,7 @@ export default function SubscriptionPage() {
                     disabled={createCheckoutMutation.isPending}
                     data-testid={`button-upgrade-${plan.id}`}
                   >
-                    Fazer Upgrade
+                    {t("subscription.upgrade")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 )}
@@ -310,17 +302,17 @@ export default function SubscriptionPage() {
       {currentPlan !== "free" && (
         <Card>
           <CardHeader>
-            <CardTitle>Subscrição Ativa</CardTitle>
+            <CardTitle>{t("subscription.activeSubscription")}</CardTitle>
             <CardDescription>
-              O teu plano {limits.name} está ativo e renovará automaticamente
+              {t("subscription.activeSubscriptionSubtitle", { planName: t(`subscription.plans.${currentPlan}.name`) })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {data.subscription.currentPeriodEnd && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Próxima renovação</span>
+                <span className="text-sm text-muted-foreground">{t("subscription.nextRenewal")}</span>
                 <span className="font-medium">
-                  {new Date(data.subscription.currentPeriodEnd).toLocaleDateString("pt-PT")}
+                  {new Date(data.subscription.currentPeriodEnd).toLocaleDateString(dateLocale)}
                 </span>
               </div>
             )}
