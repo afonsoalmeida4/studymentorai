@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, BookOpen } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -25,6 +26,7 @@ export default function SubjectView() {
   const subjectId = params.id;
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
   const [newTopicName, setNewTopicName] = useState("");
   const [newTopicDescription, setNewTopicDescription] = useState("");
@@ -63,15 +65,15 @@ export default function SubjectView() {
       setNewTopicName("");
       setNewTopicDescription("");
       toast({
-        title: "Tópico criado!",
-        description: "O seu novo tópico foi adicionado com sucesso.",
+        title: t('subjectView.topicCreated'),
+        description: t('subjectView.topicCreatedDescription'),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível criar o tópico.",
+        title: t('common.error'),
+        description: t('subjectView.errorCreatingTopic'),
       });
     },
   });
@@ -87,9 +89,9 @@ export default function SubjectView() {
     return (
       <div className="p-6 max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-2">Bem-vindo</h1>
+          <h1 className="text-3xl font-semibold mb-2">{t('subjectView.welcome')}</h1>
           <p className="text-muted-foreground">
-            Selecione uma disciplina na barra lateral para começar a organizar o seu conhecimento.
+            {t('subjectView.selectSubject')}
           </p>
         </div>
 
@@ -98,12 +100,12 @@ export default function SubjectView() {
             <CardContent className="pt-6">
               <div className="text-center py-12">
                 <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">Nenhuma disciplina criada</h3>
+                <h3 className="text-lg font-medium mb-2">{t('subjectView.noSubjects')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Comece criando a sua primeira disciplina para organizar tópicos de estudo.
+                  {t('subjectView.createFirstSubject')}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Clique no botão + na barra lateral.
+                  {t('subjectView.clickPlus')}
                 </p>
               </div>
             </CardContent>
@@ -148,7 +150,7 @@ export default function SubjectView() {
               className="w-5 h-5 rounded"
               style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
             />
-            <h1 className="text-3xl font-semibold">{currentSubject?.name || "Disciplina"}</h1>
+            <h1 className="text-3xl font-semibold">{currentSubject?.name || t('subjectView.subject')}</h1>
           </div>
           {currentSubject?.description && (
             <p className="text-muted-foreground">{currentSubject.description}</p>
@@ -156,13 +158,13 @@ export default function SubjectView() {
         </div>
 
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-medium">Tópicos</h2>
+          <h2 className="text-xl font-medium">{t('subjectView.topics')}</h2>
           <Button
             onClick={() => setIsTopicDialogOpen(true)}
             data-testid="button-add-topic"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Novo Tópico
+            {t('subjectView.newTopic')}
           </Button>
         </div>
 
@@ -171,9 +173,9 @@ export default function SubjectView() {
             <CardContent className="pt-6">
               <div className="text-center py-12">
                 <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">Nenhum tópico criado</h3>
+                <h3 className="text-lg font-medium mb-2">{t('subjectView.noTopics')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Crie tópicos para organizar os seus materiais de estudo.
+                  {t('subjectView.createTopicsDescription')}
                 </p>
                 <Button
                   variant="outline"
@@ -181,7 +183,7 @@ export default function SubjectView() {
                   data-testid="button-create-first-topic"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Criar Primeiro Tópico
+                  {t('subjectView.createFirstTopic')}
                 </Button>
               </div>
             </CardContent>
@@ -211,30 +213,30 @@ export default function SubjectView() {
         <DialogContent data-testid="dialog-create-topic">
           <form onSubmit={handleCreateTopic}>
             <DialogHeader>
-              <DialogTitle>Novo Tópico</DialogTitle>
+              <DialogTitle>{t('subjectView.newTopic')}</DialogTitle>
               <DialogDescription>
-                Crie um novo tópico dentro de {currentSubject?.name}.
+                {t('subjectView.createTopicIn', { subject: currentSubject?.name })}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="topic-name">Nome</Label>
+                <Label htmlFor="topic-name">{t('subjectView.name')}</Label>
                 <Input
                   id="topic-name"
                   value={newTopicName}
                   onChange={(e) => setNewTopicName(e.target.value)}
-                  placeholder="Ex: Álgebra Linear"
+                  placeholder={t('subjectView.namePlaceholder')}
                   data-testid="input-topic-name"
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="topic-description">Descrição (opcional)</Label>
+                <Label htmlFor="topic-description">{t('subjectView.descriptionOptional')}</Label>
                 <Textarea
                   id="topic-description"
                   value={newTopicDescription}
                   onChange={(e) => setNewTopicDescription(e.target.value)}
-                  placeholder="Breve descrição..."
+                  placeholder={t('subjectView.descriptionPlaceholder')}
                   data-testid="input-topic-description"
                 />
               </div>
@@ -246,14 +248,14 @@ export default function SubjectView() {
                 onClick={() => setIsTopicDialogOpen(false)}
                 data-testid="button-cancel-topic"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!newTopicName.trim() || createTopicMutation.isPending}
                 data-testid="button-submit-topic"
               >
-                {createTopicMutation.isPending ? "A criar..." : "Criar"}
+                {createTopicMutation.isPending ? t('subjectView.creating') : t('common.create')}
               </Button>
             </DialogFooter>
           </form>

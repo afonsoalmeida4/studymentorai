@@ -226,6 +226,28 @@
       "easy": "Facile"
     }
   },
+  "subjectView": {
+    "topicCreated": "Argomento creato!",
+    "topicCreatedDescription": "Il tuo nuovo argomento è stato aggiunto con successo.",
+    "errorCreatingTopic": "Impossibile creare l'argomento.",
+    "welcome": "Benvenuto",
+    "selectSubject": "Seleziona una materia dalla barra laterale per iniziare a organizzare le tue conoscenze.",
+    "noSubjects": "Nessuna materia creata",
+    "createFirstSubject": "Inizia creando la tua prima materia per organizzare gli argomenti di studio.",
+    "clickPlus": "Clicca sul pulsante + nella barra laterale.",
+    "subject": "Materia",
+    "topics": "Argomenti",
+    "newTopic": "Nuovo Argomento",
+    "noTopics": "Nessun argomento creato",
+    "createTopicsDescription": "Crea argomenti per organizzare i tuoi materiali di studio.",
+    "createFirstTopic": "Crea Primo Argomento",
+    "createTopicIn": "Crea un nuovo argomento all'interno di {{subject}}.",
+    "name": "Nome",
+    "namePlaceholder": "Es: Algebra Lineare",
+    "descriptionOptional": "Descrizione (opzionale)",
+    "descriptionPlaceholder": "Breve descrizione...",
+    "creating": "Creazione..."
+  },
   "home": {
     "title": "Benvenuto in AI Study Mentor",
     "subtitle": "Organizza la tua conoscenza. Trova il tuo equilibrio.",

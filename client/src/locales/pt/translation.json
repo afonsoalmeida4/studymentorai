@@ -229,6 +229,28 @@
       "easy": "Fácil"
     }
   },
+  "subjectView": {
+    "topicCreated": "Tópico criado!",
+    "topicCreatedDescription": "O seu novo tópico foi adicionado com sucesso.",
+    "errorCreatingTopic": "Não foi possível criar o tópico.",
+    "welcome": "Bem-vindo",
+    "selectSubject": "Selecione uma disciplina na barra lateral para começar a organizar o seu conhecimento.",
+    "noSubjects": "Nenhuma disciplina criada",
+    "createFirstSubject": "Comece criando a sua primeira disciplina para organizar tópicos de estudo.",
+    "clickPlus": "Clique no botão + na barra lateral.",
+    "subject": "Disciplina",
+    "topics": "Tópicos",
+    "newTopic": "Novo Tópico",
+    "noTopics": "Nenhum tópico criado",
+    "createTopicsDescription": "Crie tópicos para organizar os seus materiais de estudo.",
+    "createFirstTopic": "Criar Primeiro Tópico",
+    "createTopicIn": "Crie um novo tópico dentro de {{subject}}.",
+    "name": "Nome",
+    "namePlaceholder": "Ex: Álgebra Linear",
+    "descriptionOptional": "Descrição (opcional)",
+    "descriptionPlaceholder": "Breve descrição...",
+    "creating": "A criar..."
+  },
   "home": {
     "title": "Bem-vindo ao AI Study Mentor",
     "subtitle": "Organiza o teu conhecimento. Encontra o teu equilíbrio.",

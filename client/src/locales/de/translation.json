@@ -226,6 +226,28 @@
       "easy": "Leicht"
     }
   },
+  "subjectView": {
+    "topicCreated": "Thema erstellt!",
+    "topicCreatedDescription": "Ihr neues Thema wurde erfolgreich hinzugefügt.",
+    "errorCreatingTopic": "Thema konnte nicht erstellt werden.",
+    "welcome": "Willkommen",
+    "selectSubject": "Wählen Sie ein Fach in der Seitenleiste aus, um Ihr Wissen zu organisieren.",
+    "noSubjects": "Keine Fächer erstellt",
+    "createFirstSubject": "Beginnen Sie mit Ihrem ersten Fach, um Lernthemen zu organisieren.",
+    "clickPlus": "Klicken Sie auf die Schaltfläche + in der Seitenleiste.",
+    "subject": "Fach",
+    "topics": "Themen",
+    "newTopic": "Neues Thema",
+    "noTopics": "Keine Themen erstellt",
+    "createTopicsDescription": "Erstellen Sie Themen, um Ihre Lernmaterialien zu organisieren.",
+    "createFirstTopic": "Erstes Thema Erstellen",
+    "createTopicIn": "Erstellen Sie ein neues Thema in {{subject}}.",
+    "name": "Name",
+    "namePlaceholder": "z.B. Lineare Algebra",
+    "descriptionOptional": "Beschreibung (optional)",
+    "descriptionPlaceholder": "Kurze Beschreibung...",
+    "creating": "Erstellen..."
+  },
   "home": {
     "title": "Willkommen bei AI Study Mentor",
     "subtitle": "Organisieren Sie Ihr Wissen. Finden Sie Ihr Gleichgewicht.",

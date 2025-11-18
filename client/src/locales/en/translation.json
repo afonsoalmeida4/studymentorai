@@ -229,6 +229,28 @@
       "easy": "Easy"
     }
   },
+  "subjectView": {
+    "topicCreated": "Topic created!",
+    "topicCreatedDescription": "Your new topic has been added successfully.",
+    "errorCreatingTopic": "Failed to create topic.",
+    "welcome": "Welcome",
+    "selectSubject": "Select a subject from the sidebar to start organizing your knowledge.",
+    "noSubjects": "No subjects created",
+    "createFirstSubject": "Start by creating your first subject to organize study topics.",
+    "clickPlus": "Click the + button in the sidebar.",
+    "subject": "Subject",
+    "topics": "Topics",
+    "newTopic": "New Topic",
+    "noTopics": "No topics created",
+    "createTopicsDescription": "Create topics to organize your study materials.",
+    "createFirstTopic": "Create First Topic",
+    "createTopicIn": "Create a new topic within {{subject}}.",
+    "name": "Name",
+    "namePlaceholder": "E.g., Linear Algebra",
+    "descriptionOptional": "Description (optional)",
+    "descriptionPlaceholder": "Brief description...",
+    "creating": "Creating..."
+  },
   "home": {
     "title": "Welcome to AI Study Mentor",
     "subtitle": "Organize your knowledge. Find your balance.",

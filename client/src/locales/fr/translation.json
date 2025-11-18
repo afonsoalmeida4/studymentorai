@@ -226,6 +226,28 @@
       "easy": "Facile"
     }
   },
+  "subjectView": {
+    "topicCreated": "Sujet créé!",
+    "topicCreatedDescription": "Votre nouveau sujet a été ajouté avec succès.",
+    "errorCreatingTopic": "Échec de la création du sujet.",
+    "welcome": "Bienvenue",
+    "selectSubject": "Sélectionnez une matière dans la barre latérale pour commencer à organiser vos connaissances.",
+    "noSubjects": "Aucune matière créée",
+    "createFirstSubject": "Commencez par créer votre première matière pour organiser les sujets d'étude.",
+    "clickPlus": "Cliquez sur le bouton + dans la barre latérale.",
+    "subject": "Matière",
+    "topics": "Sujets",
+    "newTopic": "Nouveau Sujet",
+    "noTopics": "Aucun sujet créé",
+    "createTopicsDescription": "Créez des sujets pour organiser vos supports d'étude.",
+    "createFirstTopic": "Créer Premier Sujet",
+    "createTopicIn": "Créer un nouveau sujet dans {{subject}}.",
+    "name": "Nom",
+    "namePlaceholder": "Ex: Algèbre Linéaire",
+    "descriptionOptional": "Description (facultative)",
+    "descriptionPlaceholder": "Brève description...",
+    "creating": "Création..."
+  },
   "home": {
     "title": "Bienvenue sur AI Study Mentor",
     "subtitle": "Organisez vos connaissances. Trouvez votre équilibre.",
