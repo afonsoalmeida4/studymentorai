@@ -170,10 +170,24 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
+      // Use the same domain logic as the callback URL
+      let logoutRedirectDomain = process.env.REPLIT_DOMAINS?.split(',')[0] || 
+                                  process.env.REPLIT_DEV_DOMAIN || 
+                                  'localhost';
+      
+      // In development, add port 5000
+      if (!isProduction && !logoutRedirectDomain.includes(':')) {
+        logoutRedirectDomain = `${logoutRedirectDomain}:5000`;
+      }
+      
+      const postLogoutUrl = `https://${logoutRedirectDomain}/`;
+      
+      console.log("[AUTH] Logout - post_logout_redirect_uri:", postLogoutUrl);
+      
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
+          post_logout_redirect_uri: postLogoutUrl,
         }).href
       );
     });
