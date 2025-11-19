@@ -1262,7 +1262,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Build URLs using the actual host from the request to avoid stale domains
       const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
-      const host = req.get('host') || req.get('x-forwarded-host') || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
+      let host = req.get('host') || req.get('x-forwarded-host') || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
+      
+      // In development, ensure port :5000 is included if not already present
+      const isProduction = process.env.NODE_ENV === "production";
+      if (!isProduction && host && !host.includes(':')) {
+        host = `${host}:5000`;
+      }
+      
       const fullBaseUrl = `${protocol}://${host}`;
 
       console.log('[Stripe Checkout] Creating session with URLs:', {
