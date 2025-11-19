@@ -29,36 +29,43 @@ function AuthenticatedRouter() {
   
   useLanguageSync();
 
+  const style = {
+    "--sidebar-width": "16rem",
+    "--sidebar-width-icon": "3rem",
+  };
+
   if (typedUser && !typedUser.role) {
     return <RoleSelection />;
   }
 
   return (
-    <div className="flex h-screen w-full">
-      <AppSidebar />
-      <div className="flex flex-col flex-1">
-        <header className="flex items-center justify-between p-2 border-b gap-2">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger data-testid="button-sidebar-toggle" />
-          </div>
-          <LanguageSelector />
-        </header>
-        <main className="flex-1 overflow-auto">
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/ranking" component={Ranking} />
-            <Route path="/subscription" component={SubscriptionPage} />
-            <Route path="/classes" component={typedUser?.role === "teacher" ? MyClasses : StudentClasses} />
-            <Route path="/subjects" component={SubjectView} />
-            <Route path="/subject/:id" component={SubjectView} />
-            <Route path="/topic/:id" component={TopicView} />
-            <Route path="/chat" component={ChatView} />
-            <Route component={NotFound} />
-          </Switch>
-        </main>
+    <SidebarProvider style={style as React.CSSProperties}>
+      <div className="flex h-screen w-full">
+        <AppSidebar />
+        <div className="flex flex-col flex-1">
+          <header className="flex items-center justify-between p-2 border-b gap-2">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger data-testid="button-sidebar-toggle" />
+            </div>
+            <LanguageSelector />
+          </header>
+          <main className="flex-1 overflow-auto">
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/ranking" component={Ranking} />
+              <Route path="/subscription" component={SubscriptionPage} />
+              <Route path="/classes" component={typedUser?.role === "teacher" ? MyClasses : StudentClasses} />
+              <Route path="/subjects" component={SubjectView} />
+              <Route path="/subject/:id" component={SubjectView} />
+              <Route path="/topic/:id" component={TopicView} />
+              <Route path="/chat" component={ChatView} />
+              <Route component={NotFound} />
+            </Switch>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
 
@@ -89,18 +96,11 @@ function Router() {
 }
 
 function App() {
-  const style = {
-    "--sidebar-width": "16rem",
-    "--sidebar-width-icon": "3rem",
-  };
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <SidebarProvider style={style as React.CSSProperties}>
-          <Toaster />
-          <Router />
-        </SidebarProvider>
+        <Toaster />
+        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );
