@@ -24,7 +24,7 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-        <div className="max-w-4xl mx-auto px-8 py-4 flex items-center justify-between">
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
               <GraduationCap className="w-6 h-6 text-primary" />
@@ -38,58 +38,71 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Sparkles className="w-4 h-4" />
-            {t('landing.hero.badge')}
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-            {t('landing.hero.title')}
-          </h1>
-          <p className="text-xl text-muted-foreground mb-4 leading-relaxed font-semibold">
-            {t('app.tagline')}
-          </p>
-          <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
-            {t('landing.hero.description')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="px-8 text-lg font-semibold"
-              onClick={() => window.location.href = "/api/login"}
-              data-testid="button-login"
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              {t('landing.hero.cta')}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-8 text-lg font-semibold"
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-              data-testid="button-learn-more"
-            >
-              {t('landing.hero.learnMore')}
-            </Button>
-          </div>
-          
-          {/* Visual Mockup */}
-          <div className="mt-12">
-            <div className="rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-6 max-w-xl mx-auto">
-              <div className="grid grid-cols-4 gap-3">
-                <Card className="p-3 hover-elevate">
-                  <BookOpen className="w-6 h-6 text-primary mx-auto" />
-                </Card>
-                <Card className="p-3 hover-elevate">
-                  <Brain className="w-6 h-6 text-primary mx-auto" />
-                </Card>
-                <Card className="p-3 hover-elevate">
-                  <Trophy className="w-6 h-6 text-primary mx-auto" />
-                </Card>
-                <Card className="p-3 hover-elevate">
-                  <Target className="w-6 h-6 text-primary mx-auto" />
-                </Card>
+      <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-6 md:px-12">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Text */}
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                <Sparkles className="w-4 h-4" />
+                {t('landing.hero.badge')}
+              </div>
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
+                {t('landing.hero.title')}
+              </h1>
+              <p className="text-xl text-muted-foreground mb-4 leading-relaxed font-semibold">
+                {t('app.tagline')}
+              </p>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                {t('landing.hero.description')}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button
+                  size="lg"
+                  className="px-8 text-lg font-semibold"
+                  onClick={() => window.location.href = "/api/login"}
+                  data-testid="button-login"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  {t('landing.hero.cta')}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="px-8 text-lg font-semibold"
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                  data-testid="button-learn-more"
+                >
+                  {t('landing.hero.learnMore')}
+                </Button>
+              </div>
+            </div>
+            
+            {/* Right Column - Visual Mockup */}
+            <div className="relative">
+              <div className="rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8">
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-6 hover-elevate">
+                    <BookOpen className="w-10 h-10 text-primary mb-3 mx-auto" />
+                    <div className="h-2 bg-primary/20 rounded mb-2" />
+                    <div className="h-2 bg-primary/10 rounded w-3/4 mx-auto" />
+                  </Card>
+                  <Card className="p-6 hover-elevate">
+                    <Brain className="w-10 h-10 text-primary mb-3 mx-auto" />
+                    <div className="h-2 bg-primary/20 rounded mb-2" />
+                    <div className="h-2 bg-primary/10 rounded w-3/4 mx-auto" />
+                  </Card>
+                  <Card className="p-6 hover-elevate">
+                    <Trophy className="w-10 h-10 text-primary mb-3 mx-auto" />
+                    <div className="h-2 bg-primary/20 rounded mb-2" />
+                    <div className="h-2 bg-primary/10 rounded w-3/4 mx-auto" />
+                  </Card>
+                  <Card className="p-6 hover-elevate">
+                    <Target className="w-10 h-10 text-primary mb-3 mx-auto" />
+                    <div className="h-2 bg-primary/20 rounded mb-2" />
+                    <div className="h-2 bg-primary/10 rounded w-3/4 mx-auto" />
+                  </Card>
+                </div>
               </div>
             </div>
           </div>
@@ -97,8 +110,8 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-8 bg-card/30">
-        <div className="max-w-4xl mx-auto">
+      <section id="features" className="py-20 px-6 md:px-12 bg-card/30">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               {t('landing.features.title')}
@@ -196,8 +209,8 @@ export default function Landing() {
       </section>
 
       {/* Learning Styles Section */}
-      <section className="py-20 px-8">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-20 px-6 md:px-12">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               {t('landing.learningStyles.title')}
@@ -283,8 +296,8 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-8 bg-card/30">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-20 px-6 md:px-12 bg-card/30">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               {t('landing.benefits.title')}
@@ -329,8 +342,8 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-8">
-        <div className="max-w-2xl mx-auto text-center">
+      <section className="py-24 px-6 md:px-12">
+        <div className="w-full max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             {t('landing.cta.title')}
           </h2>
@@ -350,8 +363,8 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-8">
-        <div className="max-w-4xl mx-auto text-center text-sm text-muted-foreground">
+      <footer className="border-t py-8 px-6 md:px-12">
+        <div className="w-full max-w-7xl mx-auto text-center text-sm text-muted-foreground">
           <p>© 2024 AI Study Mentor. {t('landing.footer.rights')}</p>
         </div>
       </footer>
