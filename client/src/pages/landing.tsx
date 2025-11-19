@@ -24,7 +24,7 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
               <GraduationCap className="w-6 h-6 text-primary" />
@@ -38,8 +38,8 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-6">
+        <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             {t('landing.hero.badge')}
@@ -105,8 +105,8 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-card/30">
-        <div className="max-w-6xl mx-auto">
+      <section id="features" className="py-20 px-6 bg-card/30">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               {t('landing.features.title')}
@@ -204,8 +204,8 @@ export default function Landing() {
       </section>
 
       {/* Learning Styles Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               {t('landing.learningStyles.title')}
@@ -291,8 +291,8 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4 bg-card/30">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-20 px-6 bg-card/30">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               {t('landing.benefits.title')}
@@ -337,8 +337,8 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-24 px-6">
+        <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             {t('landing.cta.title')}
           </h2>
@@ -358,8 +358,8 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-4">
-        <div className="max-w-6xl mx-auto text-center text-sm text-muted-foreground">
+      <footer className="border-t py-8 px-6">
+        <div className="max-w-5xl mx-auto text-center text-sm text-muted-foreground">
           <p>© 2024 AI Study Mentor. {t('landing.footer.rights')}</p>
         </div>
       </footer>
