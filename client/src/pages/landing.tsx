@@ -39,67 +39,65 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 md:pt-40 md:pb-28 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
-                {t('landing.hero.badge')}
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-                {t('landing.hero.title')}
-              </h1>
-              <p className="text-xl text-muted-foreground mb-4 leading-relaxed">
-                {t('app.tagline')}
-              </p>
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                {t('landing.hero.description')}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="px-8 text-lg font-semibold"
-                  onClick={() => window.location.href = "/api/login"}
-                  data-testid="button-login"
-                >
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  {t('landing.hero.cta')}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="px-8 text-lg font-semibold"
-                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  data-testid="button-learn-more"
-                >
-                  {t('landing.hero.learnMore')}
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8 flex items-center justify-center">
-                <div className="grid grid-cols-2 gap-4 w-full">
-                  <Card className="p-4 hover-elevate">
-                    <BookOpen className="w-8 h-8 text-primary mb-2" />
-                    <div className="h-2 bg-primary/20 rounded mb-1" />
-                    <div className="h-2 bg-primary/10 rounded w-2/3" />
-                  </Card>
-                  <Card className="p-4 hover-elevate">
-                    <Brain className="w-8 h-8 text-primary mb-2" />
-                    <div className="h-2 bg-primary/20 rounded mb-1" />
-                    <div className="h-2 bg-primary/10 rounded w-2/3" />
-                  </Card>
-                  <Card className="p-4 hover-elevate">
-                    <Trophy className="w-8 h-8 text-primary mb-2" />
-                    <div className="h-2 bg-primary/20 rounded mb-1" />
-                    <div className="h-2 bg-primary/10 rounded w-2/3" />
-                  </Card>
-                  <Card className="p-4 hover-elevate">
-                    <Sparkles className="w-8 h-8 text-primary mb-2" />
-                    <div className="h-2 bg-primary/20 rounded mb-1" />
-                    <div className="h-2 bg-primary/10 rounded w-2/3" />
-                  </Card>
-                </div>
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+            <Sparkles className="w-4 h-4" />
+            {t('landing.hero.badge')}
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
+            {t('landing.hero.title')}
+          </h1>
+          <p className="text-xl text-muted-foreground mb-4 leading-relaxed font-semibold">
+            {t('app.tagline')}
+          </p>
+          <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
+            {t('landing.hero.description')}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              className="px-8 text-lg font-semibold"
+              onClick={() => window.location.href = "/api/login"}
+              data-testid="button-login"
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              {t('landing.hero.cta')}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 text-lg font-semibold"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              data-testid="button-learn-more"
+            >
+              {t('landing.hero.learnMore')}
+            </Button>
+          </div>
+          
+          {/* Visual Mockup */}
+          <div className="mt-16 max-w-3xl mx-auto">
+            <div className="rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="p-4 hover-elevate">
+                  <BookOpen className="w-8 h-8 text-primary mb-2 mx-auto" />
+                  <div className="h-2 bg-primary/20 rounded mb-1" />
+                  <div className="h-2 bg-primary/10 rounded w-2/3 mx-auto" />
+                </Card>
+                <Card className="p-4 hover-elevate">
+                  <Brain className="w-8 h-8 text-primary mb-2 mx-auto" />
+                  <div className="h-2 bg-primary/20 rounded mb-1" />
+                  <div className="h-2 bg-primary/10 rounded w-2/3 mx-auto" />
+                </Card>
+                <Card className="p-4 hover-elevate">
+                  <Trophy className="w-8 h-8 text-primary mb-2 mx-auto" />
+                  <div className="h-2 bg-primary/20 rounded mb-1" />
+                  <div className="h-2 bg-primary/10 rounded w-2/3 mx-auto" />
+                </Card>
+                <Card className="p-4 hover-elevate">
+                  <Target className="w-8 h-8 text-primary mb-2 mx-auto" />
+                  <div className="h-2 bg-primary/20 rounded mb-1" />
+                  <div className="h-2 bg-primary/10 rounded w-2/3 mx-auto" />
+                </Card>
               </div>
             </div>
           </div>
