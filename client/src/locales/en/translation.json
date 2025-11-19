@@ -341,27 +341,43 @@
   },
   "landing": {
     "hero": {
+      "badge": "AI-Powered Study Platform",
       "title": "AI Study Mentor",
       "description": "Transform documents into organized knowledge with AI. Study in a personalized way and find support for your learning journey.",
-      "cta": "Get Started"
+      "cta": "Get Started",
+      "learnMore": "Learn More"
     },
     "features": {
       "title": "How It Works",
+      "subtitle": "Powerful tools to organize, study and evolve",
       "uploadPdf": {
-        "title": "1. Upload PDF",
-        "description": "Upload any PDF document you want to study"
+        "title": "Document Upload",
+        "description": "Upload PDFs, Word and PowerPoint. AI automatically extracts and organizes content."
       },
       "chooseStyle": {
-        "title": "2. Choose Style",
-        "description": "Select how you prefer to learn: visual, auditory, logical or concise"
+        "title": "Learning Styles",
+        "description": "Choose how you prefer to learn: visual, auditory, logical or concise. Personalized summaries for you."
       },
       "getSummary": {
-        "title": "3. Get Summary",
-        "description": "AI creates a personalized summary with motivational message"
+        "title": "AI Summaries",
+        "description": "Receive summaries adapted to your style, with motivational messages and study tips."
+      },
+      "flashcards": {
+        "title": "Smart Flashcards",
+        "description": "SM-2 spaced repetition system (Anki-style) for effective and lasting memorization."
+      },
+      "classes": {
+        "title": "Classes & Teachers",
+        "description": "Teachers can create classes and track student progress in real-time."
+      },
+      "gamification": {
+        "title": "Gamification & Ranking",
+        "description": "Earn XP, level up and compete with other students on the global leaderboard."
       }
     },
     "learningStyles": {
       "title": "Learning Styles",
+      "subtitle": "AI adapts to the way you learn best",
       "visual": {
         "title": "Visual",
         "description": "Diagrams, images and visual content organization"
@@ -382,22 +398,25 @@
     "benefits": {
       "title": "Why AI Study Mentor?",
       "aiPowered": {
-        "title": "Powered by GPT-5",
-        "description": "Cutting-edge AI technology for accurate summaries"
+        "title": "Advanced AI",
+        "description": "Cutting-edge GPT-4 technology for precise and personalized summaries"
       },
       "personalized": {
         "title": "Personalized",
-        "description": "Adapted to your unique learning style"
+        "description": "Adapted to your unique learning style and goals"
       },
       "fast": {
-        "title": "Fast",
-        "description": "Summaries generated in seconds, not hours"
+        "title": "Fast & Effective",
+        "description": "Summaries generated in seconds, not hours. Study more in less time."
       }
     },
     "cta": {
       "title": "Ready to Improve Your Studies?",
-      "description": "Start creating personalized summaries today. It's quick, easy and free.",
-      "button": "Sign In Now"
+      "description": "Join thousands of students who already organize knowledge and study intelligently.",
+      "button": "Start Free"
+    },
+    "footer": {
+      "rights": "All rights reserved."
     }
   },
   "flashcards": {

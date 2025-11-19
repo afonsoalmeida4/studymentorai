@@ -469,27 +469,43 @@
   },
   "landing": {
     "hero": {
+      "badge": "KI-gestützte Lernplattform",
       "title": "AI Study Mentor",
       "description": "Verwandeln Sie Dokumente mit KI in organisiertes Wissen. Studieren Sie personalisiert und finden Sie Unterstützung für Ihre Lernreise.",
-      "cta": "Jetzt Beginnen"
+      "cta": "Jetzt Beginnen",
+      "learnMore": "Mehr Erfahren"
     },
     "features": {
       "title": "Wie Es Funktioniert",
+      "subtitle": "Leistungsstarke Tools zum Organisieren, Lernen und Weiterentwickeln",
       "uploadPdf": {
-        "title": "1. PDF Hochladen",
-        "description": "Laden Sie jedes PDF-Dokument hoch, das Sie studieren möchten"
+        "title": "Dokument-Upload",
+        "description": "Laden Sie PDFs, Word und PowerPoint hoch. KI extrahiert und organisiert Inhalte automatisch."
       },
       "chooseStyle": {
-        "title": "2. Stil Wählen",
-        "description": "Wählen Sie, wie Sie am liebsten lernen: visuell, auditiv, logisch oder prägnant"
+        "title": "Lernstile",
+        "description": "Wählen Sie, wie Sie am liebsten lernen: visuell, auditiv, logisch oder prägnant. Personalisierte Zusammenfassungen für Sie."
       },
       "getSummary": {
-        "title": "3. Zusammenfassung Erhalten",
-        "description": "KI erstellt eine personalisierte Zusammenfassung mit motivierender Nachricht"
+        "title": "KI-Zusammenfassungen",
+        "description": "Erhalten Sie an Ihren Stil angepasste Zusammenfassungen mit motivierenden Nachrichten und Lerntipps."
+      },
+      "flashcards": {
+        "title": "Intelligente Karteikarten",
+        "description": "SM-2-Wiederholungssystem (Anki-Stil) für effektives und dauerhaftes Auswendiglernen."
+      },
+      "classes": {
+        "title": "Klassen & Lehrer",
+        "description": "Lehrer können Klassen erstellen und den Fortschritt der Schüler in Echtzeit verfolgen."
+      },
+      "gamification": {
+        "title": "Gamification & Rangliste",
+        "description": "Verdienen Sie XP, steigen Sie auf und konkurrieren Sie mit anderen Studenten in der globalen Rangliste."
       }
     },
     "learningStyles": {
       "title": "Lernstile",
+      "subtitle": "KI passt sich der Art an, wie Sie am besten lernen",
       "visual": {
         "title": "Visuell",
         "description": "Diagramme, Bilder und visuelle Inhaltsorganisation"
@@ -510,22 +526,25 @@
     "benefits": {
       "title": "Warum AI Study Mentor?",
       "aiPowered": {
-        "title": "Angetrieben von GPT-5",
-        "description": "Modernste KI-Technologie für präzise Zusammenfassungen"
+        "title": "Fortgeschrittene KI",
+        "description": "Hochmoderne GPT-4-Technologie für präzise und personalisierte Zusammenfassungen"
       },
       "personalized": {
         "title": "Personalisiert",
-        "description": "An Ihren einzigartigen Lernstil angepasst"
+        "description": "An Ihren einzigartigen Lernstil und Ihre Ziele angepasst"
       },
       "fast": {
-        "title": "Schnell",
-        "description": "Zusammenfassungen in Sekunden generiert, nicht Stunden"
+        "title": "Schnell & Effektiv",
+        "description": "Zusammenfassungen in Sekunden generiert, nicht Stunden. Lernen Sie mehr in weniger Zeit."
       }
     },
     "cta": {
       "title": "Bereit, Ihr Studium zu Verbessern?",
-      "description": "Beginnen Sie heute mit der Erstellung personalisierter Zusammenfassungen. Es ist schnell, einfach und kostenlos.",
-      "button": "Jetzt Anmelden"
+      "description": "Schließen Sie sich Tausenden von Studenten an, die bereits Wissen organisieren und intelligent lernen.",
+      "button": "Kostenlos Starten"
+    },
+    "footer": {
+      "rights": "Alle Rechte vorbehalten."
     }
   },
   "errors": {

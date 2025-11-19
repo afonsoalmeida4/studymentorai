@@ -469,27 +469,43 @@
   },
   "landing": {
     "hero": {
+      "badge": "Plateforme d'Études avec IA",
       "title": "AI Study Mentor",
       "description": "Transformez des documents en connaissances organisées avec l'IA. Étudiez de manière personnalisée et trouvez du soutien pour votre parcours d'apprentissage.",
-      "cta": "Commencer Maintenant"
+      "cta": "Commencer Maintenant",
+      "learnMore": "En Savoir Plus"
     },
     "features": {
       "title": "Comment Ça Marche",
+      "subtitle": "Outils puissants pour organiser, étudier et évoluer",
       "uploadPdf": {
-        "title": "1. Télécharger le PDF",
-        "description": "Téléchargez n'importe quel document PDF que vous souhaitez étudier"
+        "title": "Téléchargement de Documents",
+        "description": "Téléchargez des PDFs, Word et PowerPoint. L'IA extrait et organise automatiquement le contenu."
       },
       "chooseStyle": {
-        "title": "2. Choisir le Style",
-        "description": "Sélectionnez comment vous préférez apprendre : visuel, auditif, logique ou concis"
+        "title": "Styles d'Apprentissage",
+        "description": "Choisissez comment vous préférez apprendre : visuel, auditif, logique ou concis. Résumés personnalisés pour vous."
       },
       "getSummary": {
-        "title": "3. Obtenir le Résumé",
-        "description": "L'IA crée un résumé personnalisé avec message motivationnel"
+        "title": "Résumés avec IA",
+        "description": "Recevez des résumés adaptés à votre style, avec des messages motivationnels et des conseils d'étude."
+      },
+      "flashcards": {
+        "title": "Cartes Intelligentes",
+        "description": "Système de répétition espacée SM-2 (style Anki) pour une mémorisation efficace et durable."
+      },
+      "classes": {
+        "title": "Classes et Professeurs",
+        "description": "Les professeurs peuvent créer des classes et suivre les progrès des élèves en temps réel."
+      },
+      "gamification": {
+        "title": "Gamification et Classement",
+        "description": "Gagnez de l'XP, montez de niveau et rivalisez avec d'autres étudiants dans le classement global."
       }
     },
     "learningStyles": {
       "title": "Styles d'Apprentissage",
+      "subtitle": "L'IA s'adapte à la façon dont vous apprenez le mieux",
       "visual": {
         "title": "Visuel",
         "description": "Diagrammes, images et organisation visuelle du contenu"
@@ -510,22 +526,25 @@
     "benefits": {
       "title": "Pourquoi AI Study Mentor ?",
       "aiPowered": {
-        "title": "Propulsé par GPT-5",
-        "description": "Technologie d'IA de pointe pour des résumés précis"
+        "title": "IA Avancée",
+        "description": "Technologie GPT-4 de pointe pour des résumés précis et personnalisés"
       },
       "personalized": {
         "title": "Personnalisé",
-        "description": "Adapté à votre style d'apprentissage unique"
+        "description": "Adapté à votre style d'apprentissage et objectifs uniques"
       },
       "fast": {
-        "title": "Rapide",
-        "description": "Résumés générés en secondes, pas en heures"
+        "title": "Rapide et Efficace",
+        "description": "Résumés générés en secondes, pas en heures. Étudiez plus en moins de temps."
       }
     },
     "cta": {
       "title": "Prêt à Améliorer Vos Études ?",
-      "description": "Commencez à créer des résumés personnalisés aujourd'hui. C'est rapide, facile et gratuit.",
-      "button": "Se Connecter Maintenant"
+      "description": "Rejoignez des milliers d'étudiants qui organisent déjà leurs connaissances et étudient intelligemment.",
+      "button": "Commencer Gratuitement"
+    },
+    "footer": {
+      "rights": "Tous droits réservés."
     }
   },
   "errors": {
