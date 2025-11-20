@@ -728,7 +728,7 @@ export default function TopicView() {
                     <div className="space-y-3">
                       <Label className="text-sm font-medium">{t('topicView.generateStylesDialog.selectStyles')}</Label>
                       <div className="grid grid-cols-2 gap-3">
-                        {(["visual", "auditivo", "logico", "conciso"] as LearningStyle[]).map(style => (
+                        {getMissingStyles().map(style => (
                           <div key={style} className="flex items-center space-x-2">
                             <Checkbox
                               id={`style-${style}`}

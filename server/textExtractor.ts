@@ -31,7 +31,8 @@ export async function extractTextFromFile(
 }
 
 async function extractFromPDF(buffer: Buffer): Promise<ExtractedContent> {
-  const pdfParse = (await import("pdf-parse")) as any;
+  const pdfParseModule = await import("pdf-parse");
+  const pdfParse = pdfParseModule.default || pdfParseModule;
   const data = await pdfParse(buffer);
   
   return {
