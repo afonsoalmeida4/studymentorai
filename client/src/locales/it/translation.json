@@ -394,8 +394,10 @@
     "send": "Invia",
     "newChat": "Nuova Chat",
     "empty": "Inizia una conversazione con il tuo assistente IA.",
-    "studyMode": "Modalità Studio: si concentra su domande accademiche.",
-    "existentialMode": "Modalità Esistenziale: esplora domande filosofiche e di vita.",
+    "studyMode": "Studio",
+    "existentialMode": "Vita",
+    "selectTopic": "Seleziona un argomento",
+    "selectTopicDescription": "Per la Modalità Studio, devi selezionare un argomento.",
     "upgrade": "Aggiorna a Pro per sbloccare la chat esistenziale"
   },
   "gamification": {

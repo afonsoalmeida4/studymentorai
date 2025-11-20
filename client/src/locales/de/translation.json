@@ -394,8 +394,10 @@
     "send": "Senden",
     "newChat": "Neuer Chat",
     "empty": "Beginnen Sie ein Gespräch mit Ihrem KI-Assistenten.",
-    "studyMode": "Lernmodus: konzentriert sich auf akademische Fragen.",
-    "existentialMode": "Existenzieller Modus: erforscht philosophische und Lebensfragen.",
+    "studyMode": "Lernen",
+    "existentialMode": "Leben",
+    "selectTopic": "Wählen Sie ein Thema",
+    "selectTopicDescription": "Für den Lernmodus müssen Sie ein Thema auswählen.",
     "upgrade": "Upgrade auf Pro für existenziellen Chat"
   },
   "gamification": {

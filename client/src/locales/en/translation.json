@@ -477,8 +477,10 @@
     "send": "Send",
     "newChat": "New Chat",
     "empty": "Start a conversation with your AI assistant.",
-    "studyMode": "Study Mode: focuses on academic questions.",
-    "existentialMode": "Existential Mode: explores philosophical and life questions.",
+    "studyMode": "Study",
+    "existentialMode": "Life",
+    "selectTopic": "Select a topic",
+    "selectTopicDescription": "For Study Mode, you need to select a topic.",
     "upgrade": "Upgrade to Pro to unlock existential chat"
   },
   "gamification": {

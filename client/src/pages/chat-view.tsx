@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Brain, Sparkles, Trash2, Plus } from "lucide-react";
+import { Send, Brain, Sparkles, Trash2, Plus, Lock } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 import type { ChatThread, ChatMessage, Topic } from "@shared/schema";
 
 type ChatMode = "study" | "existential";
@@ -25,6 +27,7 @@ interface ThreadWithMessages extends ChatThread {
 }
 
 export default function ChatView() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeMode, setActiveMode] = useState<ChatMode>("study");
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
@@ -34,11 +37,9 @@ export default function ChatView() {
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
 
-  const { data: subscriptionData } = useQuery<any>({
-    queryKey: ["/api/subscription"],
-  });
-
-  const currentPlan = subscriptionData?.subscription?.plan || "free";
+  const { subscription } = useSubscription();
+  const currentPlan = subscription?.plan || "free";
+  const isExistentialLocked = currentPlan === "free";
 
   const { data: studyThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "study"],
@@ -167,15 +168,30 @@ export default function ChatView() {
   };
 
   const handleStartNewThread = () => {
+    if (activeMode === "existential" && isExistentialLocked) {
+      setUpgradeReason("features");
+      setShowUpgradeDialog(true);
+      return;
+    }
     if (activeMode === "study" && !selectedTopicId) {
       toast({
         variant: "destructive",
-        title: "Selecione um tópico",
-        description: "Para Study Mode, precisa de selecionar um tópico.",
+        title: t('chat.selectTopic'),
+        description: t('chat.selectTopicDescription'),
       });
       return;
     }
     createThreadMutation.mutate(activeMode);
+  };
+
+  const handleModeChange = (newMode: string) => {
+    if (newMode === "existential" && isExistentialLocked) {
+      setUpgradeReason("features");
+      setShowUpgradeDialog(true);
+      return;
+    }
+    setActiveMode(newMode as ChatMode);
+    setSelectedThreadId(null);
   };
 
   useEffect(() => {
@@ -190,15 +206,20 @@ export default function ChatView() {
     <div className="flex h-full">
       <div className="w-64 border-r flex flex-col">
         <div className="p-4 border-b">
-          <Tabs value={activeMode} onValueChange={(v) => setActiveMode(v as ChatMode)}>
+          <Tabs value={activeMode} onValueChange={handleModeChange}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="study" data-testid="tab-study-mode">
                 <Brain className="w-4 h-4 mr-2" />
-                Study
+                {t('chat.studyMode')}
               </TabsTrigger>
-              <TabsTrigger value="existential" data-testid="tab-existential-mode">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Life
+              <TabsTrigger 
+                value="existential" 
+                data-testid="tab-existential-mode"
+                disabled={isExistentialLocked}
+              >
+                {isExistentialLocked && <Lock className="w-3 h-3 mr-2" />}
+                {!isExistentialLocked && <Sparkles className="w-4 h-4 mr-2" />}
+                {t('chat.existentialMode')}
               </TabsTrigger>
             </TabsList>
           </Tabs>
