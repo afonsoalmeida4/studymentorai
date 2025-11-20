@@ -104,6 +104,8 @@
       "allGenerated": "¡Todos los estilos de aprendizaje ya han sido generados!",
       "noContent": "Sin Contenido para Resumir",
       "noContentDescription": "Añade archivos o enlaces al tema para generar resúmenes.",
+      "noAllowedSummaries": "No tienes resúmenes permitidos en tu plan actual.",
+      "generateAllowedStyle": "Genera un resumen en un estilo permitido por tu plan.",
       "visual": {
         "title": "Resumen Visual",
         "description": "Ideal para quienes aprenden mejor con imágenes y diagramas"

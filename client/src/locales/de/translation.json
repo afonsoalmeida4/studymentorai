@@ -101,6 +101,8 @@
       "allGenerated": "Alle Lernstile wurden generiert!",
       "noContent": "Kein Inhalt zum Zusammenfassen",
       "noContentDescription": "Fügen Sie Dateien oder Links zum Thema hinzu, um Zusammenfassungen zu generieren.",
+      "noAllowedSummaries": "Sie haben keine zulässigen Zusammenfassungen in Ihrem aktuellen Plan.",
+      "generateAllowedStyle": "Generieren Sie eine Zusammenfassung in einem von Ihrem Plan zugelassenen Stil.",
       "visual": {
         "title": "Visuelle Zusammenfassung",
         "description": "Ideal für diejenigen, die am besten mit Bildern und Diagrammen lernen"

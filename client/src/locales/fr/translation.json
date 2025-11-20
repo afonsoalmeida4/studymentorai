@@ -101,6 +101,8 @@
       "allGenerated": "Tous les styles d'apprentissage ont été générés!",
       "noContent": "Aucun Contenu à Résumer",
       "noContentDescription": "Ajoutez des fichiers ou des liens au sujet pour générer des résumés.",
+      "noAllowedSummaries": "Vous n'avez pas de résumés autorisés dans votre plan actuel.",
+      "generateAllowedStyle": "Générez un résumé dans un style autorisé par votre plan.",
       "visual": {
         "title": "Résumé Visuel",
         "description": "Idéal pour ceux qui apprennent mieux avec des images et des diagrammes"

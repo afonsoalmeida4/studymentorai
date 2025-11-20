@@ -101,6 +101,8 @@
       "allGenerated": "Tutti gli stili di apprendimento sono stati generati!",
       "noContent": "Nessun Contenuto da Riassumere",
       "noContentDescription": "Aggiungi file o link all'argomento per generare riassunti.",
+      "noAllowedSummaries": "Non hai riassunti consentiti nel tuo piano attuale.",
+      "generateAllowedStyle": "Genera un riassunto in uno stile consentito dal tuo piano.",
       "visual": {
         "title": "Riassunto Visivo",
         "description": "Ideale per chi apprende meglio con immagini e diagrammi"

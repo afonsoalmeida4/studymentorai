@@ -99,6 +99,8 @@
       "allGenerated": "Todos os estilos de aprendizagem já foram gerados!",
       "noContent": "Sem Conteúdo para Resumir",
       "noContentDescription": "Adicione ficheiros ou links ao tópico para gerar resumos.",
+      "noAllowedSummaries": "Não tens resumos permitidos no teu plano atual.",
+      "generateAllowedStyle": "Gera um resumo num estilo permitido pelo teu plano.",
       "visual": {
         "title": "Resumo Visual",
         "description": "Ideal para quem aprende melhor com imagens e diagramas"

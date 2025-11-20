@@ -104,6 +104,8 @@
       "allGenerated": "All learning styles have been generated!",
       "noContent": "No Content to Summarize",
       "noContentDescription": "Add files or links to the topic to generate summaries.",
+      "noAllowedSummaries": "You don't have allowed summaries in your current plan.",
+      "generateAllowedStyle": "Generate a summary in a style allowed by your plan.",
       "visual": {
         "title": "Visual Summary",
         "description": "Ideal for those who learn best with images and diagrams"

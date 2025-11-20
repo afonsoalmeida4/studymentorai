@@ -503,17 +503,73 @@ export default function TopicView() {
             ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (
               (() => {
                 const summaries = topicSummariesData.summaries;
-                const visual = summaries.visual;
-                const auditivo = summaries.auditivo;
-                const logico = summaries.logico;
-                const conciso = summaries.conciso;
+                const allowedStyles = limits?.allowedLearningStyles || ["conciso"];
                 
-                const availableStyles = Object.keys(summaries) as LearningStyle[];
+                const visual = allowedStyles.includes("visual") ? summaries.visual : undefined;
+                const auditivo = allowedStyles.includes("auditivo") ? summaries.auditivo : undefined;
+                const logico = allowedStyles.includes("logico") ? summaries.logico : undefined;
+                const conciso = allowedStyles.includes("conciso") ? summaries.conciso : undefined;
+                
+                const availableStyles = Object.keys(summaries).filter(style => 
+                  allowedStyles.includes(style as LearningStyle)
+                ) as LearningStyle[];
                 const missingStyles = getMissingStyles();
                 const gridClass = availableStyles.length === 1 ? "grid-cols-1" 
                   : availableStyles.length === 2 ? "grid-cols-2"
                   : availableStyles.length === 3 ? "grid-cols-3"
                   : "grid-cols-4";
+                
+                if (availableStyles.length === 0) {
+                  return (
+                    <Card>
+                      <CardContent className="py-12 text-center space-y-6">
+                        <Sparkles className="w-12 h-12 mx-auto text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {t('topicView.summarySection.noAllowedSummaries')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {t('topicView.summarySection.generateAllowedStyle')}
+                          </p>
+                        </div>
+                        <div className="max-w-sm mx-auto space-y-4">
+                          <div className="space-y-3">
+                            <Label className="text-sm font-medium">{t('topicView.generateStylesDialog.selectStyles')}</Label>
+                            <div className="grid grid-cols-2 gap-3">
+                              {getMissingStyles().map(style => (
+                                <div key={style} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`style-${style}`}
+                                    checked={selectedLearningStyles.includes(style)}
+                                    onCheckedChange={() => toggleLearningStyle(style)}
+                                    data-testid={`checkbox-style-${style}`}
+                                  />
+                                  <Label
+                                    htmlFor={`style-${style}`}
+                                    className="text-sm cursor-pointer capitalize"
+                                  >
+                                    {style}
+                                  </Label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <Button
+                            onClick={handleManualGenerate}
+                            disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
+                            data-testid="button-manual-generate"
+                            className="w-full"
+                          >
+                            {generateSummariesMutation.isPending 
+                              ? t('topicView.generateStylesDialog.generating')
+                              : t('topicView.generateStylesDialog.generate')
+                            }
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                }
                 
                 return (
                   <div className="space-y-4">
