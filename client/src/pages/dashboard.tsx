@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Flame, Target, TrendingUp, FileText, Clock, CheckCircle2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { GetDashboardStatsResponse, GetReviewPlanResponse } from "@shared/schema";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR, enUS, es, fr, de, it, type Locale } from "date-fns/locale";
 import { GamificationHeader } from "@/components/GamificationHeader";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const dateLocaleMap: Record<string, Locale> = {
   pt: ptBR,
@@ -52,14 +53,29 @@ function getDateFnsLocale(language: string): Locale {
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const dateLocale = useMemo(() => getDateFnsLocale(i18n.language), [i18n.language]);
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
+
+  useEffect(() => {
+    if (!isLoadingSubscription && subscription?.plan === "free") {
+      setLocation("/subscription");
+    }
+  }, [subscription, isLoadingSubscription, setLocation]);
+
   const { data: statsData, isLoading: statsLoading } = useQuery<GetDashboardStatsResponse>({
     queryKey: ["/api/dashboard-stats"],
+    enabled: subscription?.plan !== "free",
   });
 
   const { data: reviewData, isLoading: reviewLoading } = useQuery<GetReviewPlanResponse>({
     queryKey: ["/api/review-plan"],
+    enabled: subscription?.plan !== "free",
   });
+
+  if (isLoadingSubscription || subscription?.plan === "free") {
+    return null;
+  }
 
   const stats = statsData?.stats;
   const reviewPlan = reviewData?.reviewPlan || [];

@@ -57,8 +57,8 @@ export function AppSidebar() {
     select: (data: any) => data.subjects || [],
   });
 
-  const { currentPlan, isLoading: isLoadingSubscription } = useSubscription();
-  const isPremiumUser = currentPlan === "pro" || currentPlan === "premium";
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
+  const isPremiumUser = subscription?.plan === "pro" || subscription?.plan === "premium";
 
   const createSubjectMutation = useMutation({
     mutationFn: async () => {
