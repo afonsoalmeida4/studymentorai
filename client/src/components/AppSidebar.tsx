@@ -30,6 +30,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import type { Subject, User, Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -56,9 +57,8 @@ export function AppSidebar() {
     select: (data: any) => data.subjects || [],
   });
 
-  const { data: subscriptionData } = useQuery<SubscriptionDetails>({
-    queryKey: ["/api/subscription"],
-  });
+  const { currentPlan, isLoading: isLoadingSubscription } = useSubscription();
+  const isPremiumUser = currentPlan === "pro" || currentPlan === "premium";
 
   const createSubjectMutation = useMutation({
     mutationFn: async () => {
@@ -131,30 +131,34 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location === "/dashboard"}
-                    data-testid="button-dashboard"
-                  >
-                    <Link href="/dashboard">
-                      <BarChart3 className="w-4 h-4" />
-                      <span>{t('nav.dashboard')}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location === "/ranking"}
-                    data-testid="button-ranking"
-                  >
-                    <Link href="/ranking">
-                      <Trophy className="w-4 h-4" />
-                      <span>{t('nav.ranking')}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {isPremiumUser && (
+                  <>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location === "/dashboard"}
+                        data-testid="button-dashboard"
+                      >
+                        <Link href="/dashboard">
+                          <BarChart3 className="w-4 h-4" />
+                          <span>{t('nav.dashboard')}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location === "/ranking"}
+                        data-testid="button-ranking"
+                      >
+                        <Link href="/ranking">
+                          <Trophy className="w-4 h-4" />
+                          <span>{t('nav.ranking')}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </>
+                )}
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
@@ -215,25 +219,27 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          <SidebarGroup>
-            <SidebarGroupLabel>{t('nav.tools')}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location === "/chat"}
-                    data-testid="button-ai-chat"
-                  >
-                    <Link href="/chat">
-                      <Brain className="w-4 h-4" />
-                      <span>{t('nav.chat')}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          {isPremiumUser && (
+            <SidebarGroup>
+              <SidebarGroupLabel>{t('nav.tools')}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location === "/chat"}
+                      data-testid="button-ai-chat"
+                    >
+                      <Link href="/chat">
+                        <Brain className="w-4 h-4" />
+                        <span>{t('nav.chat')}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
         </SidebarContent>
 
         <SidebarFooter>
