@@ -504,13 +504,13 @@
     "copyInviteCode": "Copiar Código"
   },
   "subscription": {
-    "title": "Subscrição",
-    "subtitle": "Escolhe o plano perfeito para ti",
+    "title": "O Teu Plano",
+    "subtitle": "Escolhe o plano ideal para os teus objetivos de estudo",
     "currentPlan": "Plano Atual",
-    "upgrade": "Atualizar",
+    "upgrade": "Fazer Upgrade",
     "manage": "Gerir Subscrição",
     "free": "Grátis",
-    "popular": "Popular",
+    "popular": "Mais Popular",
     "active": "Ativo",
     "billing": {
       "monthly": "Mensal",
@@ -520,12 +520,12 @@
       "save": "Poupa 19%",
       "saveMoney": "Poupa {{amount}}€"
     },
-    "currentUsage": "Uso Atual",
-    "currentUsageSubtitle": "Acompanha o teu uso mensal",
+    "currentUsage": "Utilização Atual",
+    "currentUsageSubtitle": "Progresso do plano Free este mês",
     "uploads": "Uploads",
-    "chatMessages": "Mensagens de Chat",
+    "chatMessages": "Mensagens de chat (hoje)",
     "activeSubscription": "Subscrição Ativa",
-    "activeSubscriptionSubtitle": "Estás inscrito no plano {{planName}}",
+    "activeSubscriptionSubtitle": "O teu plano {{planName}} está ativo e renovará automaticamente",
     "nextRenewal": "Próxima renovação",
     "features": "Funcionalidades",
     "uploadLimit": "{{count}} uploads por mês",
@@ -537,51 +537,70 @@
     "studyPlans": "Planos de estudo",
     "subscribe": "Subscrever",
     "toasts": {
-      "paymentSuccess": "Pagamento bem-sucedido!",
-      "paymentSuccessMessage": "A tua subscrição foi ativada.",
-      "paymentCanceled": "Pagamento cancelado",
+      "paymentSuccess": "✅ Pagamento Processado!",
+      "paymentSuccessMessage": "A tua subscrição será ativada em breve. Obrigado!",
+      "paymentCanceled": "Pagamento Cancelado",
       "paymentCanceledMessage": "Podes tentar novamente quando quiseres.",
-      "checkoutError": "Erro no checkout",
-      "checkoutErrorMessage": "Não foi possível processar o pagamento.",
-      "noUrl": "URL de checkout não disponível"
+      "checkoutError": "Erro",
+      "checkoutErrorMessage": "Não foi possível iniciar o processo de pagamento",
+      "noUrl": "URL de pagamento não recebido"
     },
     "plans": {
       "free": {
-        "name": "Grátis",
+        "name": "Começa a Estudar",
         "features": {
-          "uploads": "5 uploads por mês",
-          "summaries": "Resumos básicos",
-          "flashcards": "Flashcards básicos",
-          "assistant": "Assistente de estudo",
-          "chatLimit": "10 mensagens de chat/dia",
-          "workspace": "1 espaço de trabalho"
+          "uploads": "3 uploads por mês",
+          "summaries": "Resumos até 1.000 palavras",
+          "flashcards": "Flashcards simples",
+          "assistant": "Assistente IA (Modo Estudo)",
+          "chatLimit": "Limite de 10 mensagens/dia",
+          "workspace": "1 workspace"
         }
       },
       "pro": {
-        "name": "Pro",
+        "name": "Estuda Sem Limites",
+        "price": "6,19€",
+        "period": "/mês",
         "features": {
           "uploads": "Uploads ilimitados",
-          "summaries": "Resumos avançados",
-          "flashcards": "Flashcards ilimitados",
-          "assistant": "Assistente AI completo",
+          "summaries": "Resumos ilimitados",
+          "flashcards": "Flashcards inteligentes",
+          "assistant": "Assistente IA (Todos os modos)",
           "chat": "Chat ilimitado",
-          "workspaces": "Espaços ilimitados",
-          "dashboard": "Dashboard avançado",
+          "workspaces": "Workspaces ilimitados",
+          "dashboard": "Dashboard de progresso",
           "backup": "Backup automático"
         }
       },
       "premium": {
-        "name": "Premium",
+        "name": "Alta Performance",
+        "price": "12,29€",
+        "period": "/mês",
         "features": {
           "allPro": "Tudo do Pro +",
-          "tutor": "Tutor AI personalizado",
-          "studyPlans": "Planos de estudo adaptativos",
+          "tutor": "Tutor IA pessoal",
+          "studyPlans": "Planos de estudo automáticos",
           "mindMaps": "Mapas mentais automáticos",
-          "stats": "Estatísticas detalhadas",
-          "zenMode": "Modo Zen (sem distrações)",
+          "stats": "Estatísticas avançadas",
+          "zenMode": "Modo Zen",
           "sharedSpaces": "Espaços partilhados",
-          "pdfExport": "Exportação para PDF",
+          "pdfExport": "Exportação PDF",
           "earlyAccess": "Acesso antecipado"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "14,99€",
+        "period": "/mês",
+        "features": {
+          "allPremium": "Tudo do Premium +",
+          "classManagement": "Gestão de turmas",
+          "sharedLibrary": "Biblioteca partilhada",
+          "classDashboard": "Dashboard da turma",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Criar fichas de exercícios",
+          "quizzes": "Mini-testes automáticos",
+          "lessonPlans": "Planos de aula"
         }
       }
     }
@@ -802,90 +821,6 @@
         "xp": "+20+",
         "title": "Completar Sessão de Estudo",
         "description": "Estuda com flashcards e ganha +5 XP por cada acerto"
-      }
-    }
-  },
-  "subscription": {
-    "title": "O Teu Plano",
-    "subtitle": "Escolhe o plano ideal para os teus objetivos de estudo",
-    "currentUsage": "Utilização Atual",
-    "currentUsageSubtitle": "Progresso do plano Free este mês",
-    "uploads": "Uploads",
-    "chatMessages": "Mensagens de chat (hoje)",
-    "popular": "Mais Popular",
-    "currentPlan": "Plano Atual",
-    "active": "Ativo",
-    "free": "Grátis",
-    "upgrade": "Fazer Upgrade",
-    "activeSubscription": "Subscrição Ativa",
-    "activeSubscriptionSubtitle": "O teu plano {{planName}} está ativo e renovará automaticamente",
-    "nextRenewal": "Próxima renovação",
-    "toasts": {
-      "paymentSuccess": "✅ Pagamento Processado!",
-      "paymentSuccessMessage": "A tua subscrição será ativada em breve. Obrigado!",
-      "paymentCanceled": "Pagamento Cancelado",
-      "paymentCanceledMessage": "Podes tentar novamente quando quiseres.",
-      "checkoutError": "Erro",
-      "checkoutErrorMessage": "Não foi possível iniciar o processo de pagamento",
-      "noUrl": "URL de pagamento não recebido"
-    },
-    "plans": {
-      "free": {
-        "name": "Começa a Estudar",
-        "features": {
-          "uploads": "3 uploads por mês",
-          "summaries": "Resumos até 1.000 palavras",
-          "flashcards": "Flashcards simples",
-          "assistant": "Assistente IA (Modo Estudo)",
-          "chatLimit": "Limite de 10 mensagens/dia",
-          "workspace": "1 workspace"
-        }
-      },
-      "pro": {
-        "name": "Estuda Sem Limites",
-        "price": "6,19€",
-        "period": "/mês",
-        "features": {
-          "uploads": "Uploads ilimitados",
-          "summaries": "Resumos ilimitados",
-          "flashcards": "Flashcards inteligentes",
-          "assistant": "Assistente IA (Todos os modos)",
-          "chat": "Chat ilimitado",
-          "workspaces": "Workspaces ilimitados",
-          "dashboard": "Dashboard de progresso",
-          "backup": "Backup automático"
-        }
-      },
-      "premium": {
-        "name": "Alta Performance",
-        "price": "12,29€",
-        "period": "/mês",
-        "features": {
-          "allPro": "Tudo do Pro +",
-          "tutor": "Tutor IA pessoal",
-          "studyPlans": "Planos de estudo automáticos",
-          "mindMaps": "Mapas mentais automáticos",
-          "stats": "Estatísticas avançadas",
-          "zenMode": "Modo Zen",
-          "sharedSpaces": "Espaços partilhados",
-          "pdfExport": "Exportação PDF",
-          "earlyAccess": "Acesso antecipado"
-        }
-      },
-      "educational": {
-        "name": "AI Classroom Pro",
-        "price": "14,99€",
-        "period": "/mês",
-        "features": {
-          "allPremium": "Tudo do Premium +",
-          "classManagement": "Gestão de turmas",
-          "sharedLibrary": "Biblioteca partilhada",
-          "classDashboard": "Dashboard da turma",
-          "teacherAssistant": "AI Teacher Assistant",
-          "worksheets": "Criar fichas de exercícios",
-          "quizzes": "Mini-testes automáticos",
-          "lessonPlans": "Planos de aula"
-        }
       }
     }
   }

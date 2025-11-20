@@ -513,13 +513,13 @@
     "copyInviteCode": "Copy Code"
   },
   "subscription": {
-    "title": "Subscription",
-    "subtitle": "Choose the perfect plan for you",
+    "title": "Your Plan",
+    "subtitle": "Choose the ideal plan for your study goals",
     "currentPlan": "Current Plan",
     "upgrade": "Upgrade",
     "manage": "Manage Subscription",
     "free": "Free",
-    "popular": "Popular",
+    "popular": "Most Popular",
     "active": "Active",
     "billing": {
       "monthly": "Monthly",
@@ -530,11 +530,11 @@
       "saveMoney": "Save {{amount}}€"
     },
     "currentUsage": "Current Usage",
-    "currentUsageSubtitle": "Track your monthly usage",
+    "currentUsageSubtitle": "Free plan progress this month",
     "uploads": "Uploads",
-    "chatMessages": "Chat Messages",
+    "chatMessages": "Chat messages (today)",
     "activeSubscription": "Active Subscription",
-    "activeSubscriptionSubtitle": "You are subscribed to the {{planName}} plan",
+    "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",
     "nextRenewal": "Next renewal",
     "features": "Features",
     "uploadLimit": "{{count}} uploads per month",
@@ -546,51 +546,70 @@
     "studyPlans": "Study plans",
     "subscribe": "Subscribe",
     "toasts": {
-      "paymentSuccess": "Payment successful!",
-      "paymentSuccessMessage": "Your subscription has been activated.",
-      "paymentCanceled": "Payment canceled",
+      "paymentSuccess": "✅ Payment Processed!",
+      "paymentSuccessMessage": "Your subscription will be activated soon. Thank you!",
+      "paymentCanceled": "Payment Canceled",
       "paymentCanceledMessage": "You can try again whenever you want.",
-      "checkoutError": "Checkout error",
-      "checkoutErrorMessage": "Could not process payment.",
-      "noUrl": "Checkout URL not available"
+      "checkoutError": "Error",
+      "checkoutErrorMessage": "Could not start payment process",
+      "noUrl": "Payment URL not received"
     },
     "plans": {
       "free": {
-        "name": "Free",
+        "name": "Start Studying",
         "features": {
-          "uploads": "5 uploads per month",
-          "summaries": "Basic summaries",
-          "flashcards": "Basic flashcards",
-          "assistant": "Study assistant",
-          "chatLimit": "10 chat messages/day",
+          "uploads": "3 uploads per month",
+          "summaries": "Summaries up to 1,000 words",
+          "flashcards": "Simple flashcards",
+          "assistant": "AI Assistant (Study Mode)",
+          "chatLimit": "10 messages/day limit",
           "workspace": "1 workspace"
         }
       },
       "pro": {
-        "name": "Pro",
+        "name": "Study Without Limits",
+        "price": "$6.19",
+        "period": "/mo",
         "features": {
           "uploads": "Unlimited uploads",
-          "summaries": "Advanced summaries",
-          "flashcards": "Unlimited flashcards",
-          "assistant": "Full AI assistant",
+          "summaries": "Unlimited summaries",
+          "flashcards": "Smart flashcards",
+          "assistant": "AI Assistant (All modes)",
           "chat": "Unlimited chat",
           "workspaces": "Unlimited workspaces",
-          "dashboard": "Advanced dashboard",
+          "dashboard": "Progress dashboard",
           "backup": "Automatic backup"
         }
       },
       "premium": {
-        "name": "Premium",
+        "name": "High Performance",
+        "price": "$12.29",
+        "period": "/mo",
         "features": {
-          "allPro": "Everything from Pro +",
-          "tutor": "Personalized AI tutor",
-          "studyPlans": "Adaptive study plans",
+          "allPro": "Everything in Pro +",
+          "tutor": "Personal AI tutor",
+          "studyPlans": "Automatic study plans",
           "mindMaps": "Automatic mind maps",
-          "stats": "Detailed statistics",
-          "zenMode": "Zen mode (no distractions)",
+          "stats": "Advanced statistics",
+          "zenMode": "Zen Mode",
           "sharedSpaces": "Shared spaces",
           "pdfExport": "PDF export",
           "earlyAccess": "Early access"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "€14.99",
+        "period": "/mo",
+        "features": {
+          "allPremium": "Everything in Premium +",
+          "classManagement": "Class management",
+          "sharedLibrary": "Shared library",
+          "classDashboard": "Class dashboard",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Create worksheets",
+          "quizzes": "Automatic mini-quizzes",
+          "lessonPlans": "Lesson plans"
         }
       }
     }
@@ -811,90 +830,6 @@
         "xp": "+20+",
         "title": "Complete Study Session",
         "description": "Study with flashcards and earn +5 XP for each correct answer"
-      }
-    }
-  },
-  "subscription": {
-    "title": "Your Plan",
-    "subtitle": "Choose the ideal plan for your study goals",
-    "currentUsage": "Current Usage",
-    "currentUsageSubtitle": "Free plan progress this month",
-    "uploads": "Uploads",
-    "chatMessages": "Chat messages (today)",
-    "popular": "Most Popular",
-    "currentPlan": "Current Plan",
-    "active": "Active",
-    "free": "Free",
-    "upgrade": "Upgrade",
-    "activeSubscription": "Active Subscription",
-    "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",
-    "nextRenewal": "Next renewal",
-    "toasts": {
-      "paymentSuccess": "✅ Payment Processed!",
-      "paymentSuccessMessage": "Your subscription will be activated soon. Thank you!",
-      "paymentCanceled": "Payment Canceled",
-      "paymentCanceledMessage": "You can try again whenever you want.",
-      "checkoutError": "Error",
-      "checkoutErrorMessage": "Could not start payment process",
-      "noUrl": "Payment URL not received"
-    },
-    "plans": {
-      "free": {
-        "name": "Start Studying",
-        "features": {
-          "uploads": "3 uploads per month",
-          "summaries": "Summaries up to 1,000 words",
-          "flashcards": "Simple flashcards",
-          "assistant": "AI Assistant (Study Mode)",
-          "chatLimit": "10 messages/day limit",
-          "workspace": "1 workspace"
-        }
-      },
-      "pro": {
-        "name": "Study Without Limits",
-        "price": "$6.19",
-        "period": "/mo",
-        "features": {
-          "uploads": "Unlimited uploads",
-          "summaries": "Unlimited summaries",
-          "flashcards": "Smart flashcards",
-          "assistant": "AI Assistant (All modes)",
-          "chat": "Unlimited chat",
-          "workspaces": "Unlimited workspaces",
-          "dashboard": "Progress dashboard",
-          "backup": "Automatic backup"
-        }
-      },
-      "premium": {
-        "name": "High Performance",
-        "price": "$12.29",
-        "period": "/mo",
-        "features": {
-          "allPro": "Everything in Pro +",
-          "tutor": "Personal AI tutor",
-          "studyPlans": "Automatic study plans",
-          "mindMaps": "Automatic mind maps",
-          "stats": "Advanced statistics",
-          "zenMode": "Zen Mode",
-          "sharedSpaces": "Shared spaces",
-          "pdfExport": "PDF export",
-          "earlyAccess": "Early access"
-        }
-      },
-      "educational": {
-        "name": "AI Classroom Pro",
-        "price": "€14.99",
-        "period": "/mo",
-        "features": {
-          "allPremium": "Everything in Premium +",
-          "classManagement": "Class management",
-          "sharedLibrary": "Shared library",
-          "classDashboard": "Class dashboard",
-          "teacherAssistant": "AI Teacher Assistant",
-          "worksheets": "Create worksheets",
-          "quizzes": "Automatic mini-quizzes",
-          "lessonPlans": "Lesson plans"
-        }
       }
     }
   }

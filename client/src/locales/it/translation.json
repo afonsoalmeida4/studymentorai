@@ -430,13 +430,13 @@
     "copyInviteCode": "Copia Codice"
   },
   "subscription": {
-    "title": "Abbonamento",
-    "subtitle": "Scegli il piano perfetto per te",
+    "title": "Il Tuo Piano",
+    "subtitle": "Scegli il piano ideale per i tuoi obiettivi di studio",
     "currentPlan": "Piano Attuale",
-    "upgrade": "Aggiorna",
+    "upgrade": "Migliora Piano",
     "manage": "Gestisci Abbonamento",
-    "free": "Gratuito",
-    "popular": "Popolare",
+    "free": "Gratis",
+    "popular": "Più Popolare",
     "active": "Attivo",
     "billing": {
       "monthly": "Mensile",
@@ -446,12 +446,12 @@
       "save": "Risparmia 19%",
       "saveMoney": "Risparmia {{amount}}€"
     },
-    "currentUsage": "Uso Attuale",
-    "currentUsageSubtitle": "Monitora il tuo uso mensile",
+    "currentUsage": "Utilizzo Attuale",
+    "currentUsageSubtitle": "Progresso del piano Gratuito questo mese",
     "uploads": "Caricamenti",
-    "chatMessages": "Messaggi di Chat",
+    "chatMessages": "Messaggi chat (oggi)",
     "activeSubscription": "Abbonamento Attivo",
-    "activeSubscriptionSubtitle": "Sei abbonato al piano {{planName}}",
+    "activeSubscriptionSubtitle": "Il tuo piano {{planName}} è attivo e si rinnoverà automaticamente",
     "nextRenewal": "Prossimo rinnovo",
     "features": "Funzionalità",
     "uploadLimit": "{{count}} caricamenti al mese",
@@ -463,51 +463,70 @@
     "studyPlans": "Piani di studio",
     "subscribe": "Abbonati",
     "toasts": {
-      "paymentSuccess": "Pagamento riuscito!",
-      "paymentSuccessMessage": "Il tuo abbonamento è stato attivato.",
-      "paymentCanceled": "Pagamento annullato",
+      "paymentSuccess": "✅ Pagamento Elaborato!",
+      "paymentSuccessMessage": "Il tuo abbonamento sarà attivato presto. Grazie!",
+      "paymentCanceled": "Pagamento Annullato",
       "paymentCanceledMessage": "Puoi riprovare quando vuoi.",
-      "checkoutError": "Errore di pagamento",
-      "checkoutErrorMessage": "Impossibile elaborare il pagamento.",
-      "noUrl": "URL di pagamento non disponibile"
+      "checkoutError": "Errore",
+      "checkoutErrorMessage": "Impossibile avviare il processo di pagamento",
+      "noUrl": "URL di pagamento non ricevuto"
     },
     "plans": {
       "free": {
-        "name": "Gratuito",
+        "name": "Inizia a Studiare",
         "features": {
-          "uploads": "5 caricamenti al mese",
-          "summaries": "Riassunti base",
-          "flashcards": "Flashcard base",
-          "assistant": "Assistente di studio",
-          "chatLimit": "10 messaggi di chat/giorno",
+          "uploads": "3 caricamenti al mese",
+          "summaries": "Riassunti fino a 1.000 parole",
+          "flashcards": "Flashcard semplici",
+          "assistant": "Assistente IA (Modalità Studio)",
+          "chatLimit": "Limite di 10 messaggi/giorno",
           "workspace": "1 spazio di lavoro"
         }
       },
       "pro": {
-        "name": "Pro",
+        "name": "Studia Senza Limiti",
+        "price": "6,19€",
+        "period": "/mese",
         "features": {
           "uploads": "Caricamenti illimitati",
-          "summaries": "Riassunti avanzati",
-          "flashcards": "Flashcard illimitate",
-          "assistant": "Assistente IA completo",
+          "summaries": "Riassunti illimitati",
+          "flashcards": "Flashcard intelligenti",
+          "assistant": "Assistente IA (Tutte le modalità)",
           "chat": "Chat illimitata",
-          "workspaces": "Spazi illimitati",
-          "dashboard": "Dashboard avanzato",
+          "workspaces": "Spazi di lavoro illimitati",
+          "dashboard": "Pannello progressi",
           "backup": "Backup automatico"
         }
       },
       "premium": {
-        "name": "Premium",
+        "name": "Alta Performance",
+        "price": "12,29€",
+        "period": "/mese",
         "features": {
           "allPro": "Tutto di Pro +",
-          "tutor": "Tutor IA personalizzato",
-          "studyPlans": "Piani di studio adattivi",
+          "tutor": "Tutor IA personale",
+          "studyPlans": "Piani di studio automatici",
           "mindMaps": "Mappe mentali automatiche",
-          "stats": "Statistiche dettagliate",
-          "zenMode": "Modalità Zen (senza distrazioni)",
+          "stats": "Statistiche avanzate",
+          "zenMode": "Modalità Zen",
           "sharedSpaces": "Spazi condivisi",
           "pdfExport": "Esportazione PDF",
           "earlyAccess": "Accesso anticipato"
+        }
+      },
+      "educational": {
+        "name": "AI Classroom Pro",
+        "price": "14,99€",
+        "period": "/mese",
+        "features": {
+          "allPremium": "Tutto di Premium +",
+          "classManagement": "Gestione classi",
+          "sharedLibrary": "Biblioteca condivisa",
+          "classDashboard": "Pannello della classe",
+          "teacherAssistant": "AI Teacher Assistant",
+          "worksheets": "Crea fogli di esercizi",
+          "quizzes": "Mini-test automatici",
+          "lessonPlans": "Piani di lezione"
         }
       }
     }
@@ -819,90 +838,6 @@
         "xp": "+20+",
         "title": "Completa Sessione di Studio",
         "description": "Studia con le flashcard e guadagna +5 XP per ogni risposta corretta"
-      }
-    }
-  },
-  "subscription": {
-    "title": "Il Tuo Piano",
-    "subtitle": "Scegli il piano ideale per i tuoi obiettivi di studio",
-    "currentUsage": "Utilizzo Attuale",
-    "currentUsageSubtitle": "Progresso del piano Gratuito questo mese",
-    "uploads": "Caricamenti",
-    "chatMessages": "Messaggi chat (oggi)",
-    "popular": "Più Popolare",
-    "currentPlan": "Piano Attuale",
-    "active": "Attivo",
-    "free": "Gratis",
-    "upgrade": "Migliora Piano",
-    "activeSubscription": "Abbonamento Attivo",
-    "activeSubscriptionSubtitle": "Il tuo piano {{planName}} è attivo e si rinnoverà automaticamente",
-    "nextRenewal": "Prossimo rinnovo",
-    "toasts": {
-      "paymentSuccess": "✅ Pagamento Elaborato!",
-      "paymentSuccessMessage": "Il tuo abbonamento sarà attivato presto. Grazie!",
-      "paymentCanceled": "Pagamento Annullato",
-      "paymentCanceledMessage": "Puoi riprovare quando vuoi.",
-      "checkoutError": "Errore",
-      "checkoutErrorMessage": "Impossibile avviare il processo di pagamento",
-      "noUrl": "URL di pagamento non ricevuto"
-    },
-    "plans": {
-      "free": {
-        "name": "Inizia a Studiare",
-        "features": {
-          "uploads": "3 caricamenti al mese",
-          "summaries": "Riassunti fino a 1.000 parole",
-          "flashcards": "Flashcard semplici",
-          "assistant": "Assistente IA (Modalità Studio)",
-          "chatLimit": "Limite di 10 messaggi/giorno",
-          "workspace": "1 spazio di lavoro"
-        }
-      },
-      "pro": {
-        "name": "Studia Senza Limiti",
-        "price": "6,19€",
-        "period": "/mese",
-        "features": {
-          "uploads": "Caricamenti illimitati",
-          "summaries": "Riassunti illimitati",
-          "flashcards": "Flashcard intelligenti",
-          "assistant": "Assistente IA (Tutte le modalità)",
-          "chat": "Chat illimitata",
-          "workspaces": "Spazi di lavoro illimitati",
-          "dashboard": "Pannello progressi",
-          "backup": "Backup automatico"
-        }
-      },
-      "premium": {
-        "name": "Alta Performance",
-        "price": "12,29€",
-        "period": "/mese",
-        "features": {
-          "allPro": "Tutto di Pro +",
-          "tutor": "Tutor IA personale",
-          "studyPlans": "Piani di studio automatici",
-          "mindMaps": "Mappe mentali automatiche",
-          "stats": "Statistiche avanzate",
-          "zenMode": "Modalità Zen",
-          "sharedSpaces": "Spazi condivisi",
-          "pdfExport": "Esportazione PDF",
-          "earlyAccess": "Accesso anticipato"
-        }
-      },
-      "educational": {
-        "name": "AI Classroom Pro",
-        "price": "14,99€",
-        "period": "/mese",
-        "features": {
-          "allPremium": "Tutto di Premium +",
-          "classManagement": "Gestione classi",
-          "sharedLibrary": "Biblioteca condivisa",
-          "classDashboard": "Pannello della classe",
-          "teacherAssistant": "AI Teacher Assistant",
-          "worksheets": "Crea fogli di esercizi",
-          "quizzes": "Mini-test automatici",
-          "lessonPlans": "Piani di lezione"
-        }
       }
     }
   }
