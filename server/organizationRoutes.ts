@@ -494,13 +494,22 @@ export function registerOrganizationRoutes(app: Express) {
         });
       }
 
+      // Get user's subscription to check file size limits
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      const plan = subscription.plan as "free" | "pro" | "premium";
+
       const contentType = validateFileType(req.file.mimetype);
       if (!contentType) {
         return res.status(400).json({ success: false, error: "Tipo de ficheiro não suportado" });
       }
 
-      if (!isValidFileSize(req.file.size)) {
-        return res.status(400).json({ success: false, error: "Ficheiro demasiado grande (máx 10MB)" });
+      if (!isValidFileSize(req.file.size, plan)) {
+        const { getMaxFileSizeMB } = await import("./textExtractor");
+        const maxSize = getMaxFileSizeMB(plan);
+        return res.status(400).json({ 
+          success: false, 
+          error: `Ficheiro demasiado grande (máx ${maxSize}MB para o plano ${plan.toUpperCase()})` 
+        });
       }
 
       const extracted = await extractTextFromFile(req.file.buffer, contentType, req.file.mimetype);

@@ -77,7 +77,14 @@ export function validateFileType(mimetype: string): ContentType | null {
   return mimeToContentType[mimetype] || null;
 }
 
-export function isValidFileSize(sizeBytes: number, maxSizeMB: number = 10): boolean {
+export function isValidFileSize(sizeBytes: number, plan: "free" | "pro" | "premium" = "free"): boolean {
+  // FREE: 10MB limit
+  // PRO/PREMIUM: No limit (100MB practical limit)
+  const maxSizeMB = plan === "free" ? 10 : 100;
   const maxSizeBytes = maxSizeMB * 1024 * 1024;
   return sizeBytes <= maxSizeBytes;
+}
+
+export function getMaxFileSizeMB(plan: "free" | "pro" | "premium" = "free"): number {
+  return plan === "free" ? 10 : 100;
 }
