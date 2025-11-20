@@ -40,8 +40,10 @@ export default function ChatView() {
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
 
   const { subscription, isLoading: isLoadingSubscription } = useSubscription();
+  const subscriptionResolved = !isLoadingSubscription;
   const currentPlan = subscription?.plan || "free";
   const isExistentialLocked = currentPlan === "free";
+  const canUsePremiumFeatures = currentPlan !== "free";
 
   const { data: studyThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "study"],
@@ -51,7 +53,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.threads || [];
     },
-    enabled: subscription?.plan !== "free",
+    enabled: currentPlan !== "free",
   });
 
   const { data: existentialThreads = [] } = useQuery<ChatThread[]>({
@@ -62,7 +64,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.threads || [];
     },
-    enabled: subscription?.plan !== "free",
+    enabled: currentPlan !== "free",
   });
 
   const { data: topics = [] } = useQuery<Topic[]>({
@@ -73,7 +75,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.topics || [];
     },
-    enabled: subscription?.plan !== "free",
+    enabled: currentPlan !== "free",
   });
 
   const { data: currentThread } = useQuery<ThreadWithMessages>({
@@ -85,16 +87,16 @@ export default function ChatView() {
       const data = await res.json();
       return data.thread;
     },
-    enabled: !!selectedThreadId && subscription?.plan !== "free",
+    enabled: !!selectedThreadId && currentPlan !== "free",
   });
 
   useEffect(() => {
-    if (!isLoadingSubscription && subscription?.plan === "free") {
+    if (subscriptionResolved && currentPlan === "free") {
       setLocation("/subscription");
     }
-  }, [subscription, isLoadingSubscription, setLocation]);
+  }, [subscriptionResolved, currentPlan, setLocation]);
 
-  if (isLoadingSubscription || subscription?.plan === "free") {
+  if (!subscriptionResolved || currentPlan === "free") {
     return null;
   }
 
@@ -177,12 +179,22 @@ export default function ChatView() {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canUsePremiumFeatures) {
+      setUpgradeReason("chat");
+      setShowUpgradeDialog(true);
+      return;
+    }
     if (messageInput.trim() && selectedThreadId) {
       sendMessageMutation.mutate(messageInput.trim());
     }
   };
 
   const handleStartNewThread = () => {
+    if (!canUsePremiumFeatures) {
+      setUpgradeReason("features");
+      setShowUpgradeDialog(true);
+      return;
+    }
     if (activeMode === "existential" && isExistentialLocked) {
       setUpgradeReason("features");
       setShowUpgradeDialog(true);
@@ -207,6 +219,15 @@ export default function ChatView() {
     }
     setActiveMode(newMode as ChatMode);
     setSelectedThreadId(null);
+  };
+
+  const handleDeleteThread = (threadId: string) => {
+    if (!canUsePremiumFeatures) {
+      setUpgradeReason("features");
+      setShowUpgradeDialog(true);
+      return;
+    }
+    deleteThreadMutation.mutate(threadId);
   };
 
   useEffect(() => {
@@ -289,7 +310,7 @@ export default function ChatView() {
                   className="h-6 w-6 opacity-0 group-hover:opacity-100"
                   onClick={(e) => {
                     e.stopPropagation();
-                    deleteThreadMutation.mutate(thread.id);
+                    handleDeleteThread(thread.id);
                   }}
                   data-testid={`button-delete-thread-${thread.id}`}
                 >

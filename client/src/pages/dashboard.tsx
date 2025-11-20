@@ -56,24 +56,26 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const dateLocale = useMemo(() => getDateFnsLocale(i18n.language), [i18n.language]);
   const { subscription, isLoading: isLoadingSubscription } = useSubscription();
+  const subscriptionResolved = !isLoadingSubscription;
+  const currentPlan = subscription?.plan || "free";
 
   useEffect(() => {
-    if (!isLoadingSubscription && subscription?.plan === "free") {
+    if (subscriptionResolved && currentPlan === "free") {
       setLocation("/subscription");
     }
-  }, [subscription, isLoadingSubscription, setLocation]);
+  }, [subscriptionResolved, currentPlan, setLocation]);
 
   const { data: statsData, isLoading: statsLoading } = useQuery<GetDashboardStatsResponse>({
     queryKey: ["/api/dashboard-stats"],
-    enabled: subscription?.plan !== "free",
+    enabled: currentPlan !== "free",
   });
 
   const { data: reviewData, isLoading: reviewLoading } = useQuery<GetReviewPlanResponse>({
     queryKey: ["/api/review-plan"],
-    enabled: subscription?.plan !== "free",
+    enabled: currentPlan !== "free",
   });
 
-  if (isLoadingSubscription || subscription?.plan === "free") {
+  if (!subscriptionResolved || currentPlan === "free") {
     return null;
   }
 
