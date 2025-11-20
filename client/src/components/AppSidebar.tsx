@@ -58,7 +58,8 @@ export function AppSidebar() {
   });
 
   const { subscription, isLoading: isLoadingSubscription } = useSubscription();
-  const isPremiumUser = subscription?.plan === "pro" || subscription?.plan === "premium";
+  const hasProOrPremium = subscription?.plan === "pro" || subscription?.plan === "premium";
+  const isPremiumOnly = subscription?.plan === "premium";
 
   const createSubjectMutation = useMutation({
     mutationFn: async () => {
@@ -131,7 +132,7 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                {isPremiumUser && (
+                {hasProOrPremium && (
                   <>
                     <SidebarMenuItem>
                       <SidebarMenuButton
@@ -219,7 +220,7 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {isPremiumUser && (
+          {isPremiumOnly && (
             <SidebarGroup>
               <SidebarGroupLabel>{t('nav.tools')}</SidebarGroupLabel>
               <SidebarGroupContent>
