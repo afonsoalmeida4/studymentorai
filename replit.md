@@ -19,10 +19,11 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
     - Custom validation in `isValidFileSize(size, plan)` enforces plan-specific limits
     - Error messages now show plan-specific limits dynamically
   - **Learning Styles Filter**: Fixed hardcoded learning styles array to respect plan limits
-    - FREE users now only see "Conciso" available for summary generation
+    - FREE users now see "Conciso" and "Visual" available for summary generation
     - Pro/Premium users see all 4 learning styles (Visual, Auditivo, Lógico, Conciso)
     - Fixed in both: initial summary generation UI and "Generate More Styles" dialog
     - Uses `getMissingStyles()` which filters by `limits.allowedLearningStyles`
+    - Includes fallback UI when user has only non-allowed summaries (e.g., after downgrade)
   - Files affected: `server/textExtractor.ts`, `server/organizationRoutes.ts`, `client/src/pages/topic-view.tsx`
 - **Subscription Pricing Updated**: Final subscription prices across all platforms
   - Pro: 5.99€/month or 49.99€/year (~27% yearly savings)

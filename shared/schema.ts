@@ -76,7 +76,7 @@ export const planLimits = {
     maxSubjects: 5,
     maxTopics: 10,
     maxSummaryWords: 1000,
-    allowedLearningStyles: ["conciso"] as LearningStyle[],
+    allowedLearningStyles: ["conciso", "visual"] as LearningStyle[],
     advancedFlashcards: false,
     chatModes: [] as ChatMode[],
     dailyChatLimit: 0,
