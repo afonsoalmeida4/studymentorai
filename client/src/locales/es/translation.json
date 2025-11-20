@@ -257,11 +257,35 @@
     "upgradeButton": "Actualizar ({{price}}/mes)",
     "uploads": {
       "title": "Límite de Subidas Alcanzado",
-      "description": "Has alcanzado el límite de 3 subidas por mes del plan Free. ¡Actualiza para continuar subiendo documentos ilimitadamente!",
+      "description": "Has alcanzado el límite de 4 subidas por mes del plan Free. ¡Actualiza para continuar subiendo documentos ilimitadamente!",
       "benefit1": "Subidas ilimitadas de PDFs, Word y PowerPoint",
       "benefit2": "Resúmenes ilimitados con estilos de aprendizaje",
       "benefit3": "Tarjetas inteligentes con repetición espaciada",
       "benefit4": "Asistente IA disponible 24/7"
+    },
+    "subjects": {
+      "title": "Límite de Materias Alcanzado",
+      "description": "Has alcanzado el límite de 5 materias del plan Free. ¡Actualiza para crear materias ilimitadas!",
+      "benefit1": "Materias ilimitadas",
+      "benefit2": "Temas ilimitados",
+      "benefit3": "Todos los estilos de aprendizaje",
+      "benefit4": "Tarjetas con SM-2"
+    },
+    "topics": {
+      "title": "Límite de Temas Alcanzado",
+      "description": "Has alcanzado el límite de 10 temas del plan Free. ¡Actualiza para crear temas ilimitados!",
+      "benefit1": "Temas ilimitados",
+      "benefit2": "Todos los estilos de aprendizaje",
+      "benefit3": "Tarjetas con SM-2",
+      "benefit4": "Panel de progreso"
+    },
+    "learningStyles": {
+      "title": "Estilo de Aprendizaje Bloqueado",
+      "description": "El plan Free solo permite resúmenes en estilo 'Conciso'. ¡Actualiza para desbloquear Visual, Auditivo y Lógico!",
+      "benefit1": "Los 4 estilos de aprendizaje",
+      "benefit2": "Resúmenes ilimitados",
+      "benefit3": "Tarjetas con SM-2",
+      "benefit4": "Chat ilimitado"
     },
     "chat": {
       "title": "Límite de Chat Alcanzado",

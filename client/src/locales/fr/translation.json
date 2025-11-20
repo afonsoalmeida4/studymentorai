@@ -254,11 +254,35 @@
     "upgradeButton": "Mettre à Niveau ({{price}}/mois)",
     "uploads": {
       "title": "Limite de Téléchargements Atteinte",
-      "description": "Vous avez atteint la limite de 3 téléchargements par mois du plan Free. Mettez à niveau pour continuer à télécharger des documents de manière illimitée!",
+      "description": "Vous avez atteint la limite de 4 téléchargements par mois du plan Free. Mettez à niveau pour continuer à télécharger des documents de manière illimitée!",
       "benefit1": "Téléchargements illimités de PDFs, Word et PowerPoint",
       "benefit2": "Résumés illimités avec styles d'apprentissage",
       "benefit3": "Cartes intelligentes avec répétition espacée",
       "benefit4": "Assistant IA disponible 24/7"
+    },
+    "subjects": {
+      "title": "Limite de Matières Atteinte",
+      "description": "Vous avez atteint la limite de 5 matières du plan Free. Mettez à niveau pour créer des matières illimitées!",
+      "benefit1": "Matières illimitées",
+      "benefit2": "Sujets illimités",
+      "benefit3": "Tous les styles d'apprentissage",
+      "benefit4": "Cartes avec SM-2"
+    },
+    "topics": {
+      "title": "Limite de Sujets Atteinte",
+      "description": "Vous avez atteint la limite de 10 sujets du plan Free. Mettez à niveau pour créer des sujets illimités!",
+      "benefit1": "Sujets illimités",
+      "benefit2": "Tous les styles d'apprentissage",
+      "benefit3": "Cartes avec SM-2",
+      "benefit4": "Tableau de bord de progression"
+    },
+    "learningStyles": {
+      "title": "Style d'Apprentissage Verrouillé",
+      "description": "Le plan Free permet uniquement des résumés en style 'Concis'. Mettez à niveau pour débloquer Visuel, Auditif et Logique!",
+      "benefit1": "Les 4 styles d'apprentissage",
+      "benefit2": "Résumés illimités",
+      "benefit3": "Cartes avec SM-2",
+      "benefit4": "Chat illimité"
     },
     "chat": {
       "title": "Limite de Chat Atteinte",

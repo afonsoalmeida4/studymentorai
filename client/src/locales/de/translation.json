@@ -254,11 +254,35 @@
     "upgradeButton": "Upgrade ({{price}}/Monat)",
     "uploads": {
       "title": "Upload-Limit Erreicht",
-      "description": "Sie haben das Limit von 3 Uploads pro Monat des Free-Plans erreicht. Upgraden Sie, um unbegrenzt Dokumente hochzuladen!",
+      "description": "Sie haben das Limit von 4 Uploads pro Monat des Free-Plans erreicht. Upgraden Sie, um unbegrenzt Dokumente hochzuladen!",
       "benefit1": "Unbegrenzte Uploads von PDFs, Word und PowerPoint",
       "benefit2": "Unbegrenzte Zusammenfassungen mit Lernstilen",
       "benefit3": "Intelligente Karteikarten mit Spaced Repetition",
       "benefit4": "KI-Assistent verfügbar 24/7"
+    },
+    "subjects": {
+      "title": "Fächer-Limit Erreicht",
+      "description": "Sie haben das Limit von 5 Fächern des Free-Plans erreicht. Upgraden Sie, um unbegrenzt Fächer zu erstellen!",
+      "benefit1": "Unbegrenzte Fächer",
+      "benefit2": "Unbegrenzte Themen",
+      "benefit3": "Alle Lernstile",
+      "benefit4": "Karteikarten mit SM-2"
+    },
+    "topics": {
+      "title": "Themen-Limit Erreicht",
+      "description": "Sie haben das Limit von 10 Themen des Free-Plans erreicht. Upgraden Sie, um unbegrenzt Themen zu erstellen!",
+      "benefit1": "Unbegrenzte Themen",
+      "benefit2": "Alle Lernstile",
+      "benefit3": "Karteikarten mit SM-2",
+      "benefit4": "Fortschritts-Dashboard"
+    },
+    "learningStyles": {
+      "title": "Lernstil Gesperrt",
+      "description": "Der Free-Plan erlaubt nur Zusammenfassungen im Stil 'Prägnant'. Upgraden Sie, um Visuell, Auditiv und Logisch freizuschalten!",
+      "benefit1": "Alle 4 Lernstile",
+      "benefit2": "Unbegrenzte Zusammenfassungen",
+      "benefit3": "Karteikarten mit SM-2",
+      "benefit4": "Unbegrenzter Chat"
     },
     "chat": {
       "title": "Chat-Limit Erreicht",

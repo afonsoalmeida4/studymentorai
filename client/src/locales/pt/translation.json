@@ -252,11 +252,35 @@
     "upgradeButton": "Fazer Upgrade ({{price}}/mês)",
     "uploads": {
       "title": "Limite de Uploads Atingido",
-      "description": "Atingiste o limite de 3 uploads por mês do plano Free. Faz upgrade para continuar a carregar documentos ilimitadamente!",
+      "description": "Atingiste o limite de 4 uploads por mês do plano Free. Faz upgrade para continuar a carregar documentos ilimitadamente!",
       "benefit1": "Uploads ilimitados de PDFs, Word e PowerPoint",
       "benefit2": "Resumos ilimitados com estilos de aprendizagem",
       "benefit3": "Flashcards inteligentes com spaced repetition",
       "benefit4": "Assistente IA disponível 24/7"
+    },
+    "subjects": {
+      "title": "Limite de Matérias Atingido",
+      "description": "Atingiste o limite de 5 matérias do plano Free. Faz upgrade para criar matérias ilimitadas!",
+      "benefit1": "Matérias ilimitadas",
+      "benefit2": "Tópicos ilimitados",
+      "benefit3": "Todos os estilos de aprendizagem",
+      "benefit4": "Flashcards com SM-2"
+    },
+    "topics": {
+      "title": "Limite de Tópicos Atingido",
+      "description": "Atingiste o limite de 10 tópicos do plano Free. Faz upgrade para criar tópicos ilimitados!",
+      "benefit1": "Tópicos ilimitados",
+      "benefit2": "Todos os estilos de aprendizagem",
+      "benefit3": "Flashcards com SM-2",
+      "benefit4": "Dashboard de progresso"
+    },
+    "learningStyles": {
+      "title": "Estilo de Aprendizagem Bloqueado",
+      "description": "O plano Free só permite resumos no estilo 'Conciso'. Faz upgrade para desbloquear Visual, Auditivo e Lógico!",
+      "benefit1": "Todos os 4 estilos de aprendizagem",
+      "benefit2": "Resumos ilimitados",
+      "benefit3": "Flashcards com SM-2",
+      "benefit4": "Chat ilimitado"
     },
     "chat": {
       "title": "Limite de Chat Atingido",

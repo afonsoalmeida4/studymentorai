@@ -254,11 +254,35 @@
     "upgradeButton": "Aggiorna ({{price}}/mese)",
     "uploads": {
       "title": "Limite di Caricamenti Raggiunto",
-      "description": "Hai raggiunto il limite di 3 caricamenti al mese del piano Free. Aggiorna per continuare a caricare documenti illimitatamente!",
+      "description": "Hai raggiunto il limite di 4 caricamenti al mese del piano Free. Aggiorna per continuare a caricare documenti illimitatamente!",
       "benefit1": "Caricamenti illimitati di PDF, Word e PowerPoint",
       "benefit2": "Riassunti illimitati con stili di apprendimento",
       "benefit3": "Schede intelligenti con ripetizione spaziata",
       "benefit4": "Assistente IA disponibile 24/7"
+    },
+    "subjects": {
+      "title": "Limite di Materie Raggiunto",
+      "description": "Hai raggiunto il limite di 5 materie del piano Free. Aggiorna per creare materie illimitate!",
+      "benefit1": "Materie illimitate",
+      "benefit2": "Argomenti illimitati",
+      "benefit3": "Tutti gli stili di apprendimento",
+      "benefit4": "Schede con SM-2"
+    },
+    "topics": {
+      "title": "Limite di Argomenti Raggiunto",
+      "description": "Hai raggiunto il limite di 10 argomenti del piano Free. Aggiorna per creare argomenti illimitati!",
+      "benefit1": "Argomenti illimitati",
+      "benefit2": "Tutti gli stili di apprendimento",
+      "benefit3": "Schede con SM-2",
+      "benefit4": "Dashboard progressi"
+    },
+    "learningStyles": {
+      "title": "Stile di Apprendimento Bloccato",
+      "description": "Il piano Free consente solo riassunti in stile 'Conciso'. Aggiorna per sbloccare Visivo, Uditivo e Logico!",
+      "benefit1": "Tutti i 4 stili di apprendimento",
+      "benefit2": "Riassunti illimitati",
+      "benefit3": "Schede con SM-2",
+      "benefit4": "Chat illimitata"
     },
     "chat": {
       "title": "Limite di Chat Raggiunto",

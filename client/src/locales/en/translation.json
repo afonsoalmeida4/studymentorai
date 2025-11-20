@@ -257,11 +257,35 @@
     "upgradeButton": "Upgrade ({{price}}/month)",
     "uploads": {
       "title": "Upload Limit Reached",
-      "description": "You've reached the 3 uploads per month limit of the Free plan. Upgrade to continue uploading documents unlimited!",
+      "description": "You've reached the 4 uploads per month limit of the Free plan. Upgrade to continue uploading documents unlimited!",
       "benefit1": "Unlimited uploads of PDFs, Word and PowerPoint",
       "benefit2": "Unlimited summaries with learning styles",
       "benefit3": "Smart flashcards with spaced repetition",
       "benefit4": "AI assistant available 24/7"
+    },
+    "subjects": {
+      "title": "Subject Limit Reached",
+      "description": "You've reached the 5 subjects limit of the Free plan. Upgrade to create unlimited subjects!",
+      "benefit1": "Unlimited subjects",
+      "benefit2": "Unlimited topics",
+      "benefit3": "All learning styles",
+      "benefit4": "Flashcards with SM-2"
+    },
+    "topics": {
+      "title": "Topic Limit Reached",
+      "description": "You've reached the 10 topics limit of the Free plan. Upgrade to create unlimited topics!",
+      "benefit1": "Unlimited topics",
+      "benefit2": "All learning styles",
+      "benefit3": "Flashcards with SM-2",
+      "benefit4": "Progress dashboard"
+    },
+    "learningStyles": {
+      "title": "Learning Style Locked",
+      "description": "The Free plan only allows summaries in 'Concise' style. Upgrade to unlock Visual, Auditory and Logical!",
+      "benefit1": "All 4 learning styles",
+      "benefit2": "Unlimited summaries",
+      "benefit3": "Flashcards with SM-2",
+      "benefit4": "Unlimited chat"
     },
     "chat": {
       "title": "Chat Limit Reached",
