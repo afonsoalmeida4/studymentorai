@@ -799,7 +799,12 @@
       "studiedToday": "Estudiaste hoy",
       "notStudiedToday": "Aún no has estudiado hoy",
       "longestStreak": "Racha más larga",
-      "errorLoading": "Error al cargar estadísticas. Por favor, inténtalo de nuevo más tarde."
+      "errorLoading": "Error al cargar estadísticas. Por favor, inténtalo de nuevo más tarde.",
+      "emptySubjects": "Aún no hay asignaturas creadas",
+      "emptyStudyTime": "Aún no has estudiado esta semana",
+      "emptyTasks": "Aún no hay tareas creadas",
+      "emptyStreak": "Empieza tu racha hoy",
+      "createFirst": "Crear primera asignatura"
     },
     "premium": {
       "unlock": "Desbloquea Premium",

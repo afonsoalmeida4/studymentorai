@@ -156,6 +156,11 @@ export default function Dashboard() {
                 <Skeleton className="h-8 w-16" />
               ) : studyTimeError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (studyTimeData?.currentWeekMinutes || 0) === 0 && (studyTimeData?.previousWeekMinutes || 0) === 0 ? (
+                <>
+                  <div className="text-2xl font-bold text-muted-foreground" data-testid="kpi-weekly-hours">0.0h</div>
+                  <p className="text-xs text-muted-foreground mt-1">{t("dashboard.kpi.emptyStudyTime")}</p>
+                </>
               ) : (
                 <>
                   <div className="text-2xl font-bold" data-testid="kpi-weekly-hours">
@@ -190,19 +195,27 @@ export default function Dashboard() {
                 <Skeleton className="h-8 w-16" />
               ) : subjectProgressError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : !subjectProgressData?.subjects || subjectProgressData.subjects.length === 0 ? (
+                <>
+                  <div className="text-2xl font-bold text-muted-foreground" data-testid="kpi-subject-progress">0%</div>
+                  <p className="text-xs text-muted-foreground mt-1">{t("dashboard.kpi.emptySubjects")}</p>
+                  <Link href="/">
+                    <Button variant="ghost" size="sm" className="mt-2 h-7 text-xs" data-testid="button-create-subject">
+                      {t("dashboard.kpi.createFirst")}
+                    </Button>
+                  </Link>
+                </>
               ) : (
                 <>
                   <div className="text-2xl font-bold" data-testid="kpi-subject-progress">
-                    {subjectProgressData?.subjects?.[0]?.completionPercentage || 0}%
+                    {subjectProgressData.subjects[0].completionPercentage}%
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 truncate">
-                    {subjectProgressData?.subjects?.[0]?.subjectName || t("dashboard.kpi.noSubjects")}
+                    {subjectProgressData.subjects[0].subjectName}
                   </p>
-                  {subjectProgressData?.subjects?.[0] && (
-                    <p className="text-xs text-muted-foreground">
-                      {subjectProgressData.subjects[0].completedTopics}/{subjectProgressData.subjects[0].totalTopics} {t("dashboard.kpi.topicsCompleted")}
-                    </p>
-                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {subjectProgressData.subjects[0].completedTopics}/{subjectProgressData.subjects[0].totalTopics} {t("dashboard.kpi.topicsCompleted")}
+                  </p>
                 </>
               )}
             </CardContent>
@@ -219,16 +232,21 @@ export default function Dashboard() {
                 <Skeleton className="h-8 w-16" />
               ) : tasksError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (tasksData?.totalTasks || 0) === 0 ? (
+                <>
+                  <div className="text-2xl font-bold text-muted-foreground" data-testid="kpi-tasks-completed">0</div>
+                  <p className="text-xs text-muted-foreground mt-1">{t("dashboard.kpi.emptyTasks")}</p>
+                </>
               ) : (
                 <>
                   <div className="text-2xl font-bold" data-testid="kpi-tasks-completed">
-                    {tasksData?.completedToday || 0}
+                    {tasksData.completedToday}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {t("dashboard.kpi.tasksToday")}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
+                    {tasksData.completedThisWeek} {t("dashboard.kpi.tasksThisWeek")}
                   </p>
                 </>
               )}
@@ -246,18 +264,23 @@ export default function Dashboard() {
                 <Skeleton className="h-8 w-16" />
               ) : streakError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (streakData?.currentStreak || 0) === 0 && (streakData?.longestStreak || 0) === 0 ? (
+                <>
+                  <div className="text-2xl font-bold text-muted-foreground" data-testid="kpi-study-streak">0 {t("dashboard.kpi.days")}</div>
+                  <p className="text-xs text-muted-foreground mt-1">{t("dashboard.kpi.emptyStreak")}</p>
+                </>
               ) : (
                 <>
                   <div className="text-2xl font-bold" data-testid="kpi-study-streak">
-                    {streakData?.currentStreak || 0} {t("dashboard.kpi.days")}
+                    {streakData.currentStreak} {t("dashboard.kpi.days")}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {streakData?.hasStudiedToday 
+                    {streakData.hasStudiedToday 
                       ? `✓ ${t("dashboard.kpi.studiedToday")}` 
                       : t("dashboard.kpi.notStudiedToday")}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {t("dashboard.kpi.longestStreak")}: {streakData?.longestStreak || 0}
+                    {t("dashboard.kpi.longestStreak")}: {streakData.longestStreak}
                   </p>
                 </>
               )}

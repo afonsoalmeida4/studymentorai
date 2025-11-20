@@ -782,7 +782,12 @@
       "studiedToday": "Estudaste hoje",
       "notStudiedToday": "Ainda não estudaste hoje",
       "longestStreak": "Sequência máxima",
-      "errorLoading": "Erro ao carregar estatísticas. Por favor, tenta novamente mais tarde."
+      "errorLoading": "Erro ao carregar estatísticas. Por favor, tenta novamente mais tarde.",
+      "emptySubjects": "Sem matérias criadas ainda",
+      "emptyStudyTime": "Ainda não estudaste esta semana",
+      "emptyTasks": "Sem tarefas criadas ainda",
+      "emptyStreak": "Começa a tua sequência hoje",
+      "createFirst": "Criar primeira matéria"
     },
     "premium": {
       "unlock": "Desbloqueie o Premium",

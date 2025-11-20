@@ -300,9 +300,16 @@ export function registerStatsRoutes(app: Express) {
           eq(tasks.completed, false)
         ));
 
+      // Total tasks (all tasks regardless of completed status)
+      const totalResult = await db
+        .select({ count: countFn() })
+        .from(tasks)
+        .where(eq(tasks.userId, userId));
+
       const completedToday = Number(todayResult[0]?.count || 0);
       const completedThisWeek = Number(weekResult[0]?.count || 0);
       const pendingTasks = Number(pendingResult[0]?.count || 0);
+      const totalTasks = Number(totalResult[0]?.count || 0);
 
       // Simple status indicator: green if >= 2 tasks today, yellow if 1, red if 0
       const status = completedToday >= 2 ? 'green' : completedToday === 1 ? 'yellow' : 'red';
@@ -311,6 +318,7 @@ export function registerStatsRoutes(app: Express) {
         completedToday,
         completedThisWeek,
         pendingTasks,
+        totalTasks,
         status,
       });
     } catch (error) {

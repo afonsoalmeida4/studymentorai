@@ -799,7 +799,12 @@
       "studiedToday": "Heute gelernt",
       "notStudiedToday": "Heute noch nicht gelernt",
       "longestStreak": "Längste Serie",
-      "errorLoading": "Fehler beim Laden der Statistiken. Bitte versuchen Sie es später erneut."
+      "errorLoading": "Fehler beim Laden der Statistiken. Bitte versuchen Sie es später erneut.",
+      "emptySubjects": "Noch keine Fächer erstellt",
+      "emptyStudyTime": "Diese Woche noch nicht gelernt",
+      "emptyTasks": "Noch keine Aufgaben erstellt",
+      "emptyStreak": "Starte deine Serie heute",
+      "createFirst": "Erstes Fach erstellen"
     },
     "premium": {
       "unlock": "Premium Freischalten",

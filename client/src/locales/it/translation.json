@@ -799,7 +799,12 @@
       "studiedToday": "Studiato oggi",
       "notStudiedToday": "Non ancora studiato oggi",
       "longestStreak": "Serie più lunga",
-      "errorLoading": "Errore nel caricamento delle statistiche. Riprova più tardi."
+      "errorLoading": "Errore nel caricamento delle statistiche. Riprova più tardi.",
+      "emptySubjects": "Nessuna materia creata ancora",
+      "emptyStudyTime": "Non hai ancora studiato questa settimana",
+      "emptyTasks": "Nessuna attività creata ancora",
+      "emptyStreak": "Inizia la tua serie oggi",
+      "createFirst": "Crea prima materia"
     },
     "premium": {
       "unlock": "Sblocca Premium",

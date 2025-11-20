@@ -791,7 +791,12 @@
       "studiedToday": "Studied today",
       "notStudiedToday": "Not studied today",
       "longestStreak": "Longest streak",
-      "errorLoading": "Error loading statistics. Please try again later."
+      "errorLoading": "Error loading statistics. Please try again later.",
+      "emptySubjects": "No subjects created yet",
+      "emptyStudyTime": "Haven't studied this week yet",
+      "emptyTasks": "No tasks created yet",
+      "emptyStreak": "Start your streak today",
+      "createFirst": "Create first subject"
     },
     "premium": {
       "unlock": "Unlock Premium",
