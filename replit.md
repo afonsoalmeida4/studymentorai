@@ -32,6 +32,15 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
   - Dialog state managed via onSettled handler (prevents stuck dialog on error)
   - Full i18n support: translations added in all 6 languages (PT, EN, ES, FR, DE, IT)
   - Toast notifications for success/error feedback
+- **FREE Plan Restrictions Completed**: Implemented comprehensive access control to block FREE users from premium features
+  - **Sidebar Navigation**: Dashboard, Chat, and Ranking links completely hidden for FREE users
+  - **Page-Level Guards**: All premium pages (Dashboard, Chat, Ranking) redirect FREE users to /subscription
+  - **Query Guards**: All premium API queries use `enabled: currentPlan !== "free"` to prevent execution before redirect
+  - **Mutation Guards**: All premium mutations check `canUsePremiumFeatures = currentPlan !== "free"` and show upgrade dialog
+  - **Subscription Resolution**: Robust handling of null/undefined subscriptions with `currentPlan = subscription?.plan || "free"` default
+  - **Race Condition Prevention**: No premium API calls execute during loading or for FREE users at any time
+  - **TypeScript Safety**: All guards use `currentPlan` instead of `subscription.plan` to prevent undefined errors
+  - Files affected: `client/src/components/AppSidebar.tsx`, `client/src/pages/dashboard.tsx`, `client/src/pages/chat-view.tsx`
 
 ## System Architecture
 
