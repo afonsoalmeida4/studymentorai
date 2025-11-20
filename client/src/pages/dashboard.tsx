@@ -106,6 +106,7 @@ export default function Dashboard() {
     completedToday: number;
     completedThisWeek: number;
     pendingTasks: number;
+    totalTasks: number;
     status: string;
   }>({
     queryKey: ["/api/stats/tasks-summary"],
@@ -156,14 +157,9 @@ export default function Dashboard() {
                 <Skeleton className="h-8 w-16" />
               ) : studyTimeError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-              ) : (studyTimeData?.currentWeekMinutes || 0) === 0 && (studyTimeData?.previousWeekMinutes || 0) === 0 ? (
-                <>
-                  <div className="text-2xl font-bold text-muted-foreground" data-testid="kpi-weekly-hours">0.0h</div>
-                  <p className="text-xs text-muted-foreground mt-1">{t("dashboard.kpi.emptyStudyTime")}</p>
-                </>
               ) : (
                 <>
-                  <div className="text-2xl font-bold" data-testid="kpi-weekly-hours">
+                  <div className={`text-2xl font-bold ${(studyTimeData?.currentWeekMinutes || 0) === 0 ? 'text-muted-foreground' : ''}`} data-testid="kpi-weekly-hours">
                     {studyTimeData?.currentWeekHours || "0.0"}h
                   </div>
                   <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
@@ -172,13 +168,17 @@ export default function Dashboard() {
                       style={{ width: `${Math.min(100, studyTimeData?.progressPercentage || 0)}%` }}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes > 0 
-                      ? `+${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}` 
-                      : studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes < 0 
-                      ? `${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}`
-                      : t("dashboard.kpi.firstWeek")}
-                  </p>
+                  {(studyTimeData?.currentWeekMinutes || 0) === 0 ? (
+                    <p className="text-xs text-muted-foreground mt-1">{t("dashboard.kpi.emptyStudyTime")}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes > 0 
+                        ? `+${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}` 
+                        : studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes < 0 
+                        ? `${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}`
+                        : t("dashboard.kpi.firstWeek")}
+                    </p>
+                  )}
                 </>
               )}
             </CardContent>

@@ -793,7 +793,7 @@
       "longestStreak": "Longest streak",
       "errorLoading": "Error loading statistics. Please try again later.",
       "emptySubjects": "No subjects created yet",
-      "emptyStudyTime": "Haven't studied this week yet",
+      "emptyStudyTime": "Weekly goal: 10h",
       "emptyTasks": "No tasks created yet",
       "emptyStreak": "Start your streak today",
       "createFirst": "Create first subject"

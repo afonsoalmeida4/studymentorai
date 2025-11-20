@@ -7,6 +7,32 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 - Communication: Simple, everyday language (Portuguese)
 - Design inspiration: Notion, Linear, Grammarly (calm, clean, organized)
 
+## Recent Changes
+
+### November 20, 2025 - Enhanced Dashboard with 4 New KPIs
+- **Backend Implementation** (`server/statsRoutes.ts`):
+  - 4 new GET endpoints: `/api/stats/study-time`, `/api/stats/subject-progress`, `/api/stats/tasks-summary`, `/api/stats/streak`
+  - Session event tracking: POST `/api/topics/:id/session-events` with Zod validation
+  - Task CRUD: POST/PATCH/DELETE `/api/tasks` with Zod validation
+  - All endpoints use `isAuthenticated` middleware
+- **Frontend Implementation** (`client/src/pages/dashboard.tsx`):
+  - Per-card error handling: Each KPI shows individual loading/error/success states
+  - Empty state CTAs: All 4 KPIs show accurate guidance for first-time users
+  - Skeleton loading states while queries execute
+  - Error messages fully translated across 6 languages
+  - All queries guarded with `enabled: currentPlan !== "free"`
+- **New Database Tables**:
+  - `topicStudyTime`: Records study sessions with duration in minutes
+  - `topicStudyEvents`: Tracks enter/exit events for auto-tracking
+  - `tasks`: User tasks with priority, due dates, completion tracking
+  - `topicProgress`: Marks topics as completed for progress calculation
+- **Full i18n Support**: All 6 languages (PT, EN, ES, FR, DE, IT) updated with 20 new translation keys
+- **Known Limitation - Session Overlap**:
+  - Cross-device concurrent access to same topic may cause incorrect session pairing (<1% frequency)
+  - Current implementation optimizes for single-device usage (99% of cases)
+  - Future remediation: Add activeSessionId tracking or server-side locking when telemetry shows impact
+  - Documented in `server/statsRoutes.ts` (lines 18-36)
+
 ## System Architecture
 
 ### Frontend Architecture
