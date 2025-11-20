@@ -434,14 +434,28 @@
   },
   "subscription": {
     "title": "Suscripción",
+    "subtitle": "Elige el plan perfecto para ti",
     "currentPlan": "Plan Actual",
     "upgrade": "Actualizar",
     "manage": "Gestionar Suscripción",
-    "free": "Comienza a Estudiar",
-    "pro": "Estudia Sin Límites",
-    "premium": "Alto Rendimiento",
-    "educational": "IA Aula Pro",
-    "monthly": "mes",
+    "free": "Gratis",
+    "popular": "Popular",
+    "active": "Activo",
+    "billing": {
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "month": "mes",
+      "year": "año",
+      "save": "Ahorra 17%",
+      "saveMoney": "Ahorra {{amount}}€"
+    },
+    "currentUsage": "Uso Actual",
+    "currentUsageSubtitle": "Sigue tu uso mensual",
+    "uploads": "Subidas",
+    "chatMessages": "Mensajes de Chat",
+    "activeSubscription": "Suscripción Activa",
+    "activeSubscriptionSubtitle": "Estás suscrito al plan {{planName}}",
+    "nextRenewal": "Próxima renovación",
     "features": "Características",
     "uploadLimit": "{{count}} subidas por mes",
     "uploadUnlimited": "Subidas ilimitadas",
@@ -450,8 +464,56 @@
     "advancedFlashcards": "Tarjetas avanzadas",
     "existentialChat": "Chat existencial",
     "studyPlans": "Planes de estudio",
-    "classManagement": "Gestión de clases",
-    "subscribe": "Suscribirse"
+    "subscribe": "Suscribirse",
+    "toasts": {
+      "paymentSuccess": "¡Pago exitoso!",
+      "paymentSuccessMessage": "Tu suscripción ha sido activada.",
+      "paymentCanceled": "Pago cancelado",
+      "paymentCanceledMessage": "Puedes intentarlo de nuevo cuando quieras.",
+      "checkoutError": "Error en el pago",
+      "checkoutErrorMessage": "No se pudo procesar el pago.",
+      "noUrl": "URL de pago no disponible"
+    },
+    "plans": {
+      "free": {
+        "name": "Gratis",
+        "features": {
+          "uploads": "5 subidas por mes",
+          "summaries": "Resúmenes básicos",
+          "flashcards": "Tarjetas básicas",
+          "assistant": "Asistente de estudio",
+          "chatLimit": "10 mensajes de chat/día",
+          "workspace": "1 espacio de trabajo"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "uploads": "Subidas ilimitadas",
+          "summaries": "Resúmenes avanzados",
+          "flashcards": "Tarjetas ilimitadas",
+          "assistant": "Asistente IA completo",
+          "chat": "Chat ilimitado",
+          "workspaces": "Espacios ilimitados",
+          "dashboard": "Panel avanzado",
+          "backup": "Copia de seguridad automática"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "features": {
+          "allPro": "Todo de Pro +",
+          "tutor": "Tutor IA personalizado",
+          "studyPlans": "Planes de estudio adaptativos",
+          "mindMaps": "Mapas mentales automáticos",
+          "stats": "Estadísticas detalladas",
+          "zenMode": "Modo Zen (sin distracciones)",
+          "sharedSpaces": "Espacios compartidos",
+          "pdfExport": "Exportación a PDF",
+          "earlyAccess": "Acceso anticipado"
+        }
+      }
+    }
   },
   "settings": {
     "title": "Configuración",

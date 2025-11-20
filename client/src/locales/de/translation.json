@@ -431,14 +431,28 @@
   },
   "subscription": {
     "title": "Abonnement",
+    "subtitle": "Wähle den perfekten Plan für dich",
     "currentPlan": "Aktueller Plan",
     "upgrade": "Upgraden",
     "manage": "Abonnement verwalten",
-    "free": "Beginnen Sie zu lernen",
-    "pro": "Grenzenlos lernen",
-    "premium": "Hohe Leistung",
-    "educational": "KI-Klassenzimmer Pro",
-    "monthly": "Monat",
+    "free": "Kostenlos",
+    "popular": "Beliebt",
+    "active": "Aktiv",
+    "billing": {
+      "monthly": "Monatlich",
+      "yearly": "Jährlich",
+      "month": "Monat",
+      "year": "Jahr",
+      "save": "17% sparen",
+      "saveMoney": "Spare {{amount}}€"
+    },
+    "currentUsage": "Aktuelle Nutzung",
+    "currentUsageSubtitle": "Verfolge deine monatliche Nutzung",
+    "uploads": "Uploads",
+    "chatMessages": "Chat-Nachrichten",
+    "activeSubscription": "Aktives Abonnement",
+    "activeSubscriptionSubtitle": "Du hast den {{planName}}-Plan abonniert",
+    "nextRenewal": "Nächste Verlängerung",
     "features": "Funktionen",
     "uploadLimit": "{{count}} Uploads pro Monat",
     "uploadUnlimited": "Unbegrenzte Uploads",
@@ -447,8 +461,56 @@
     "advancedFlashcards": "Erweiterte Lernkarten",
     "existentialChat": "Existenzieller Chat",
     "studyPlans": "Lernpläne",
-    "classManagement": "Klassenverwaltung",
-    "subscribe": "Abonnieren"
+    "subscribe": "Abonnieren",
+    "toasts": {
+      "paymentSuccess": "Zahlung erfolgreich!",
+      "paymentSuccessMessage": "Dein Abonnement wurde aktiviert.",
+      "paymentCanceled": "Zahlung abgebrochen",
+      "paymentCanceledMessage": "Du kannst es jederzeit erneut versuchen.",
+      "checkoutError": "Zahlungsfehler",
+      "checkoutErrorMessage": "Zahlung konnte nicht verarbeitet werden.",
+      "noUrl": "Zahlungs-URL nicht verfügbar"
+    },
+    "plans": {
+      "free": {
+        "name": "Kostenlos",
+        "features": {
+          "uploads": "5 Uploads pro Monat",
+          "summaries": "Basis-Zusammenfassungen",
+          "flashcards": "Basis-Lernkarten",
+          "assistant": "Lernassistent",
+          "chatLimit": "10 Chat-Nachrichten/Tag",
+          "workspace": "1 Arbeitsbereich"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "uploads": "Unbegrenzte Uploads",
+          "summaries": "Erweiterte Zusammenfassungen",
+          "flashcards": "Unbegrenzte Lernkarten",
+          "assistant": "Vollständiger KI-Assistent",
+          "chat": "Unbegrenzter Chat",
+          "workspaces": "Unbegrenzte Arbeitsbereiche",
+          "dashboard": "Erweitertes Dashboard",
+          "backup": "Automatisches Backup"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "features": {
+          "allPro": "Alles von Pro +",
+          "tutor": "Personalisierter KI-Tutor",
+          "studyPlans": "Adaptive Lernpläne",
+          "mindMaps": "Automatische Mind-Maps",
+          "stats": "Detaillierte Statistiken",
+          "zenMode": "Zen-Modus (keine Ablenkungen)",
+          "sharedSpaces": "Gemeinsame Bereiche",
+          "pdfExport": "PDF-Export",
+          "earlyAccess": "Früher Zugang"
+        }
+      }
+    }
   },
   "settings": {
     "title": "Einstellungen",

@@ -9,7 +9,7 @@ import { Check, Crown, Zap, Rocket, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 
@@ -57,6 +57,7 @@ export default function SubscriptionPage() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const dateLocale = useMemo(() => getDateLocale(i18n.language), [i18n.language]);
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
 
   // Handle Stripe redirect callbacks
   useEffect(() => {
@@ -90,7 +91,10 @@ export default function SubscriptionPage() {
 
   const createCheckoutMutation = useMutation({
     mutationFn: async (plan: string) => {
-      return await apiRequest("POST", "/api/subscription/create-checkout", { plan });
+      return await apiRequest("POST", "/api/subscription/create-checkout", { 
+        plan,
+        billingPeriod 
+      });
     },
     onSuccess: (data) => {
       console.log("Checkout response:", data);
@@ -143,6 +147,30 @@ export default function SubscriptionPage() {
     ? 0 
     : (usage.chatMessagesCount / limits.dailyChatLimit) * 100;
 
+  // Pricing logic: yearly gets ~17% discount (2 months free)
+  const pricing = {
+    pro: {
+      monthly: 9.99,
+      yearly: 99,
+    },
+    premium: {
+      monthly: 19.99,
+      yearly: 199,
+    },
+  };
+
+  const getPrice = (planId: string) => {
+    if (planId === "free") return null;
+    const plan = pricing[planId as keyof typeof pricing];
+    return billingPeriod === "monthly" ? plan.monthly : plan.yearly;
+  };
+
+  const getSavings = (planId: string) => {
+    if (planId === "free" || billingPeriod === "monthly") return null;
+    const plan = pricing[planId as keyof typeof pricing];
+    return (plan.monthly * 12 - plan.yearly).toFixed(2);
+  };
+
   const plans = [
     {
       id: "free",
@@ -167,13 +195,41 @@ export default function SubscriptionPage() {
 
   return (
     <div className="container max-w-6xl mx-auto p-6 space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold" data-testid="text-subscription-title">
-          {t("subscription.title")}
-        </h1>
-        <p className="text-muted-foreground" data-testid="text-subscription-subtitle">
-          {t("subscription.subtitle")}
-        </p>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold" data-testid="text-subscription-title">
+            {t("subscription.title")}
+          </h1>
+          <p className="text-muted-foreground" data-testid="text-subscription-subtitle">
+            {t("subscription.subtitle")}
+          </p>
+        </div>
+
+        {/* Billing Period Toggle */}
+        <div className="flex items-center justify-center gap-3">
+          <span className={`text-sm font-medium ${billingPeriod === "monthly" ? "text-foreground" : "text-muted-foreground"}`}>
+            {t("subscription.billing.monthly")}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setBillingPeriod(billingPeriod === "monthly" ? "yearly" : "monthly")}
+            className="relative h-8 w-14 p-0"
+            data-testid="button-billing-toggle"
+          >
+            <div className={`absolute h-6 w-6 rounded-full bg-primary transition-all ${billingPeriod === "yearly" ? "left-7" : "left-1"}`} />
+          </Button>
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-medium ${billingPeriod === "yearly" ? "text-foreground" : "text-muted-foreground"}`}>
+              {t("subscription.billing.yearly")}
+            </span>
+            {billingPeriod === "yearly" && (
+              <Badge variant="default" className="bg-green-600 dark:bg-green-700 text-xs" data-testid="badge-save">
+                {t("subscription.billing.save")}
+              </Badge>
+            )}
+          </div>
+        </div>
       </div>
 
       {currentPlan === "free" && (
@@ -236,12 +292,24 @@ export default function SubscriptionPage() {
                   <Icon className={`h-6 w-6 ${plan.color}`} />
                   <CardTitle className="text-lg">{t(`subscription.plans.${plan.id}.name`)}</CardTitle>
                 </div>
-                <div className="mt-4">
-                  <span className="text-3xl font-bold">
-                    {plan.id === "free" ? t("subscription.free") : t(`subscription.plans.${plan.id}.price`)}
-                  </span>
-                  {plan.id !== "free" && (
-                    <span className="text-muted-foreground">{t(`subscription.plans.${plan.id}.period`)}</span>
+                <div className="mt-4 space-y-1">
+                  <div>
+                    <span className="text-3xl font-bold">
+                      {plan.id === "free" 
+                        ? t("subscription.free") 
+                        : `${getPrice(plan.id)}€`
+                      }
+                    </span>
+                    {plan.id !== "free" && (
+                      <span className="text-muted-foreground">
+                        /{billingPeriod === "monthly" ? t("subscription.billing.month") : t("subscription.billing.year")}
+                      </span>
+                    )}
+                  </div>
+                  {getSavings(plan.id) && (
+                    <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      {t("subscription.billing.saveMoney", { amount: getSavings(plan.id) })}
+                    </div>
                   )}
                 </div>
               </CardHeader>

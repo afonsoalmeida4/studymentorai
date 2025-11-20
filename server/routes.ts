@@ -992,11 +992,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { plan } = req.body;
+      const { plan, billingPeriod = "monthly" } = req.body;
 
-      if (!plan || !["pro", "premium", "educational"].includes(plan)) {
+      if (!plan || !["pro", "premium"].includes(plan)) {
         return res.status(400).json({
           error: "Plano inválido",
+        });
+      }
+
+      if (!["monthly", "yearly"].includes(billingPeriod)) {
+        return res.status(400).json({
+          error: "Período de faturação inválido",
         });
       }
 
@@ -1025,11 +1031,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const priceIds: Record<string, string> = {
-        pro: process.env.STRIPE_PRICE_ID_PRO || "",
-        premium: process.env.STRIPE_PRICE_ID_PREMIUM || "",
-        educational: process.env.STRIPE_PRICE_ID_EDUCATIONAL || "",
+      // Map plan + billing period to Stripe Price IDs
+      const priceIds: Record<string, Record<string, string>> = {
+        pro: {
+          monthly: process.env.STRIPE_PRICE_ID_PRO || "",
+          yearly: process.env.STRIPE_PRICE_ID_PRO_YEARLY || process.env.STRIPE_PRICE_ID_PRO || "",
+        },
+        premium: {
+          monthly: process.env.STRIPE_PRICE_ID_PREMIUM || "",
+          yearly: process.env.STRIPE_PRICE_ID_PREMIUM_YEARLY || process.env.STRIPE_PRICE_ID_PREMIUM || "",
+        },
       };
+
+      const priceId = priceIds[plan]?.[billingPeriod];
+      
+      if (!priceId) {
+        return res.status(400).json({
+          error: "Price ID não configurado para este plano",
+        });
+      }
 
       // Build URLs using the actual host from the request to avoid stale domains
       const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
@@ -1056,7 +1076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mode: "subscription",
         line_items: [
           {
-            price: priceIds[plan],
+            price: priceId,
             quantity: 1,
           },
         ],
@@ -1065,6 +1085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           userId,
           plan,
+          billingPeriod,
         },
       });
 

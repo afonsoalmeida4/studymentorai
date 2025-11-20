@@ -514,14 +514,28 @@
   },
   "subscription": {
     "title": "Subscription",
+    "subtitle": "Choose the perfect plan for you",
     "currentPlan": "Current Plan",
     "upgrade": "Upgrade",
     "manage": "Manage Subscription",
-    "free": "Start Studying",
-    "pro": "Study Without Limits",
-    "premium": "High Performance",
-    "educational": "AI Classroom Pro",
-    "monthly": "month",
+    "free": "Free",
+    "popular": "Popular",
+    "active": "Active",
+    "billing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "month": "month",
+      "year": "year",
+      "save": "Save 17%",
+      "saveMoney": "Save {{amount}}€"
+    },
+    "currentUsage": "Current Usage",
+    "currentUsageSubtitle": "Track your monthly usage",
+    "uploads": "Uploads",
+    "chatMessages": "Chat Messages",
+    "activeSubscription": "Active Subscription",
+    "activeSubscriptionSubtitle": "You are subscribed to the {{planName}} plan",
+    "nextRenewal": "Next renewal",
     "features": "Features",
     "uploadLimit": "{{count}} uploads per month",
     "uploadUnlimited": "Unlimited uploads",
@@ -530,8 +544,56 @@
     "advancedFlashcards": "Advanced flashcards",
     "existentialChat": "Existential chat",
     "studyPlans": "Study plans",
-    "classManagement": "Class management",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "toasts": {
+      "paymentSuccess": "Payment successful!",
+      "paymentSuccessMessage": "Your subscription has been activated.",
+      "paymentCanceled": "Payment canceled",
+      "paymentCanceledMessage": "You can try again whenever you want.",
+      "checkoutError": "Checkout error",
+      "checkoutErrorMessage": "Could not process payment.",
+      "noUrl": "Checkout URL not available"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "features": {
+          "uploads": "5 uploads per month",
+          "summaries": "Basic summaries",
+          "flashcards": "Basic flashcards",
+          "assistant": "Study assistant",
+          "chatLimit": "10 chat messages/day",
+          "workspace": "1 workspace"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "uploads": "Unlimited uploads",
+          "summaries": "Advanced summaries",
+          "flashcards": "Unlimited flashcards",
+          "assistant": "Full AI assistant",
+          "chat": "Unlimited chat",
+          "workspaces": "Unlimited workspaces",
+          "dashboard": "Advanced dashboard",
+          "backup": "Automatic backup"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "features": {
+          "allPro": "Everything from Pro +",
+          "tutor": "Personalized AI tutor",
+          "studyPlans": "Adaptive study plans",
+          "mindMaps": "Automatic mind maps",
+          "stats": "Detailed statistics",
+          "zenMode": "Zen mode (no distractions)",
+          "sharedSpaces": "Shared spaces",
+          "pdfExport": "PDF export",
+          "earlyAccess": "Early access"
+        }
+      }
+    }
   },
   "settings": {
     "title": "Settings",

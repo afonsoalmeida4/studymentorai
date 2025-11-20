@@ -431,14 +431,28 @@
   },
   "subscription": {
     "title": "Abonnement",
+    "subtitle": "Choisissez le plan parfait pour vous",
     "currentPlan": "Plan Actuel",
     "upgrade": "Mettre à Niveau",
     "manage": "Gérer l'Abonnement",
-    "free": "Commencer à Étudier",
-    "pro": "Étudier Sans Limites",
-    "premium": "Haute Performance",
-    "educational": "IA Classe Pro",
-    "monthly": "mois",
+    "free": "Gratuit",
+    "popular": "Populaire",
+    "active": "Actif",
+    "billing": {
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "month": "mois",
+      "year": "an",
+      "save": "Économise 17%",
+      "saveMoney": "Économise {{amount}}€"
+    },
+    "currentUsage": "Utilisation Actuelle",
+    "currentUsageSubtitle": "Suivez votre utilisation mensuelle",
+    "uploads": "Téléchargements",
+    "chatMessages": "Messages de Chat",
+    "activeSubscription": "Abonnement Actif",
+    "activeSubscriptionSubtitle": "Vous êtes abonné au plan {{planName}}",
+    "nextRenewal": "Prochain renouvellement",
     "features": "Fonctionnalités",
     "uploadLimit": "{{count}} téléchargements par mois",
     "uploadUnlimited": "Téléchargements illimités",
@@ -447,8 +461,56 @@
     "advancedFlashcards": "Cartes avancées",
     "existentialChat": "Chat existentiel",
     "studyPlans": "Plans d'étude",
-    "classManagement": "Gestion de classe",
-    "subscribe": "S'abonner"
+    "subscribe": "S'abonner",
+    "toasts": {
+      "paymentSuccess": "Paiement réussi !",
+      "paymentSuccessMessage": "Votre abonnement a été activé.",
+      "paymentCanceled": "Paiement annulé",
+      "paymentCanceledMessage": "Vous pouvez réessayer quand vous voulez.",
+      "checkoutError": "Erreur de paiement",
+      "checkoutErrorMessage": "Impossible de traiter le paiement.",
+      "noUrl": "URL de paiement non disponible"
+    },
+    "plans": {
+      "free": {
+        "name": "Gratuit",
+        "features": {
+          "uploads": "5 téléchargements par mois",
+          "summaries": "Résumés basiques",
+          "flashcards": "Cartes basiques",
+          "assistant": "Assistant d'étude",
+          "chatLimit": "10 messages de chat/jour",
+          "workspace": "1 espace de travail"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "features": {
+          "uploads": "Téléchargements illimités",
+          "summaries": "Résumés avancés",
+          "flashcards": "Cartes illimitées",
+          "assistant": "Assistant IA complet",
+          "chat": "Chat illimité",
+          "workspaces": "Espaces illimités",
+          "dashboard": "Tableau de bord avancé",
+          "backup": "Sauvegarde automatique"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "features": {
+          "allPro": "Tout de Pro +",
+          "tutor": "Tuteur IA personnalisé",
+          "studyPlans": "Plans d'étude adaptatifs",
+          "mindMaps": "Cartes mentales automatiques",
+          "stats": "Statistiques détaillées",
+          "zenMode": "Mode Zen (sans distractions)",
+          "sharedSpaces": "Espaces partagés",
+          "pdfExport": "Export PDF",
+          "earlyAccess": "Accès anticipé"
+        }
+      }
+    }
   },
   "settings": {
     "title": "Paramètres",
