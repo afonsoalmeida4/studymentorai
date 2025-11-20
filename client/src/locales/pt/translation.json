@@ -595,13 +595,14 @@
         "period": "/mês",
         "features": {
           "uploads": "Uploads ilimitados",
+          "subjects": "Disciplinas ilimitadas",
+          "topics": "Tópicos ilimitados",
           "summaries": "Resumos ilimitados",
-          "flashcards": "Flashcards inteligentes",
-          "assistant": "Assistente IA (Todos os modos)",
-          "chat": "Chat ilimitado",
-          "workspaces": "Workspaces ilimitados",
+          "learningStyles": "4 estilos de aprendizagem",
+          "flashcards": "Flashcards inteligentes (SM-2)",
+          "fileSize": "Ficheiros até 100MB",
           "dashboard": "Dashboard de progresso",
-          "backup": "Backup automático"
+          "ranking": "Ranking de XP"
         }
       },
       "premium": {

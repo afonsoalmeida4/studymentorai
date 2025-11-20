@@ -521,13 +521,14 @@
         "period": "/Monat",
         "features": {
           "uploads": "Unbegrenzte Uploads",
+          "subjects": "Unbegrenzte Fächer",
+          "topics": "Unbegrenzte Themen",
           "summaries": "Unbegrenzte Zusammenfassungen",
-          "flashcards": "Intelligente Karteikarten",
-          "assistant": "KI-Assistent (Alle Modi)",
-          "chat": "Unbegrenzter Chat",
-          "workspaces": "Unbegrenzte Arbeitsbereiche",
+          "learningStyles": "4 Lernstile",
+          "flashcards": "Intelligente Karteikarten (SM-2)",
+          "fileSize": "Dateien bis zu 100MB",
           "dashboard": "Fortschritts-Dashboard",
-          "backup": "Automatisches Backup"
+          "ranking": "XP-Rangliste"
         }
       },
       "premium": {

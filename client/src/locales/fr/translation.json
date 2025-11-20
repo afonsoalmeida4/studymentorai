@@ -521,13 +521,14 @@
         "period": "/mois",
         "features": {
           "uploads": "Téléchargements illimités",
+          "subjects": "Matières illimitées",
+          "topics": "Sujets illimités",
           "summaries": "Résumés illimités",
-          "flashcards": "Cartes intelligentes",
-          "assistant": "Assistant IA (Tous les modes)",
-          "chat": "Chat illimité",
-          "workspaces": "Espaces de travail illimités",
+          "learningStyles": "4 styles d'apprentissage",
+          "flashcards": "Cartes intelligentes (SM-2)",
+          "fileSize": "Fichiers jusqu'à 100Mo",
           "dashboard": "Tableau de bord de progrès",
-          "backup": "Sauvegarde automatique"
+          "ranking": "Classement XP"
         }
       },
       "premium": {

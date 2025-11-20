@@ -604,13 +604,14 @@
         "period": "/mo",
         "features": {
           "uploads": "Unlimited uploads",
+          "subjects": "Unlimited subjects",
+          "topics": "Unlimited topics",
           "summaries": "Unlimited summaries",
-          "flashcards": "Smart flashcards",
-          "assistant": "AI Assistant (All modes)",
-          "chat": "Unlimited chat",
-          "workspaces": "Unlimited workspaces",
+          "learningStyles": "4 learning styles",
+          "flashcards": "Smart flashcards (SM-2)",
+          "fileSize": "Files up to 100MB",
           "dashboard": "Progress dashboard",
-          "backup": "Automatic backup"
+          "ranking": "XP ranking"
         }
       },
       "premium": {

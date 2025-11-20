@@ -521,13 +521,14 @@
         "period": "/mese",
         "features": {
           "uploads": "Caricamenti illimitati",
+          "subjects": "Materie illimitate",
+          "topics": "Argomenti illimitati",
           "summaries": "Riassunti illimitati",
-          "flashcards": "Flashcard intelligenti",
-          "assistant": "Assistente IA (Tutte le modalità)",
-          "chat": "Chat illimitata",
-          "workspaces": "Spazi di lavoro illimitati",
+          "learningStyles": "4 stili di apprendimento",
+          "flashcards": "Flashcard intelligenti (SM-2)",
+          "fileSize": "File fino a 100MB",
           "dashboard": "Pannello progressi",
-          "backup": "Backup automatico"
+          "ranking": "Classifica XP"
         }
       },
       "premium": {
