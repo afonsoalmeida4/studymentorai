@@ -184,7 +184,7 @@ export default function SubscriptionPage() {
       id: "free",
       icon: Zap,
       color: "text-muted-foreground",
-      featureKeys: ["uploads", "summaries", "flashcards", "assistant", "chatLimit", "workspace"],
+      featureKeys: ["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "fileSize"],
     },
     {
       id: "pro",

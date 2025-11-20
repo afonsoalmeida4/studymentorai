@@ -589,12 +589,13 @@
       "free": {
         "name": "Start Studying",
         "features": {
-          "uploads": "3 uploads per month",
+          "uploads": "4 uploads per month",
+          "subjects": "Up to 5 subjects",
+          "topics": "Up to 10 topics",
           "summaries": "Summaries up to 1,000 words",
-          "flashcards": "Simple flashcards",
-          "assistant": "AI Assistant (Study Mode)",
-          "chatLimit": "10 messages/day limit",
-          "workspace": "1 workspace"
+          "learningStyles": "2 learning styles",
+          "flashcards": "Basic flashcards",
+          "fileSize": "Files up to 10MB"
         }
       },
       "pro": {

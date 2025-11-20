@@ -506,12 +506,13 @@
       "free": {
         "name": "Beginnen Sie zu Lernen",
         "features": {
-          "uploads": "3 Uploads pro Monat",
+          "uploads": "4 Uploads pro Monat",
+          "subjects": "Bis zu 5 Fächer",
+          "topics": "Bis zu 10 Themen",
           "summaries": "Zusammenfassungen bis zu 1.000 Wörter",
-          "flashcards": "Einfache Karteikarten",
-          "assistant": "KI-Assistent (Lernmodus)",
-          "chatLimit": "Limit von 10 Nachrichten/Tag",
-          "workspace": "1 Arbeitsbereich"
+          "learningStyles": "2 Lernstile",
+          "flashcards": "Basis-Karteikarten",
+          "fileSize": "Dateien bis zu 10MB"
         }
       },
       "pro": {

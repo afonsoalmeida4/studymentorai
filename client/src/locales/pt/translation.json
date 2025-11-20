@@ -580,12 +580,13 @@
       "free": {
         "name": "Começa a Estudar",
         "features": {
-          "uploads": "3 uploads por mês",
+          "uploads": "4 uploads por mês",
+          "subjects": "Até 5 disciplinas",
+          "topics": "Até 10 tópicos",
           "summaries": "Resumos até 1.000 palavras",
-          "flashcards": "Flashcards simples",
-          "assistant": "Assistente IA (Modo Estudo)",
-          "chatLimit": "Limite de 10 mensagens/dia",
-          "workspace": "1 workspace"
+          "learningStyles": "2 estilos de aprendizagem",
+          "flashcards": "Flashcards básicos",
+          "fileSize": "Ficheiros até 10MB"
         }
       },
       "pro": {

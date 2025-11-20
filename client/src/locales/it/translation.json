@@ -506,12 +506,13 @@
       "free": {
         "name": "Inizia a Studiare",
         "features": {
-          "uploads": "3 caricamenti al mese",
+          "uploads": "4 caricamenti al mese",
+          "subjects": "Fino a 5 materie",
+          "topics": "Fino a 10 argomenti",
           "summaries": "Riassunti fino a 1.000 parole",
-          "flashcards": "Flashcard semplici",
-          "assistant": "Assistente IA (Modalità Studio)",
-          "chatLimit": "Limite di 10 messaggi/giorno",
-          "workspace": "1 spazio di lavoro"
+          "learningStyles": "2 stili di apprendimento",
+          "flashcards": "Flashcard base",
+          "fileSize": "File fino a 10MB"
         }
       },
       "pro": {

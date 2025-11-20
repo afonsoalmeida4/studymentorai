@@ -506,12 +506,13 @@
       "free": {
         "name": "Commencer à Étudier",
         "features": {
-          "uploads": "3 téléchargements par mois",
+          "uploads": "4 téléchargements par mois",
+          "subjects": "Jusqu'à 5 matières",
+          "topics": "Jusqu'à 10 sujets",
           "summaries": "Résumés jusqu'à 1 000 mots",
-          "flashcards": "Cartes simples",
-          "assistant": "Assistant IA (Mode Étude)",
-          "chatLimit": "Limite de 10 messages/jour",
-          "workspace": "1 espace de travail"
+          "learningStyles": "2 styles d'apprentissage",
+          "flashcards": "Cartes de base",
+          "fileSize": "Fichiers jusqu'à 10Mo"
         }
       },
       "pro": {
