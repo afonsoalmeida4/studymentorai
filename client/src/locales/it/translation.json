@@ -627,7 +627,8 @@
     "limit": "Limite raggiunto. Aggiorna il tuo piano per continuare.",
     "upload": "Errore durante il caricamento del file. Controlla formato e dimensioni.",
     "generateSummaries": "Errore durante la generazione dei riassunti",
-    "tryAgain": "Impossibile completare l'operazione. Per favore riprova."
+    "tryAgain": "Impossibile completare l'operazione. Per favore riprova.",
+    "loadSubscription": "Impossibile caricare le informazioni sull'abbonamento"
   },
   "myClasses": {
     "title": "Le Mie Classi",
@@ -825,5 +826,39 @@
         "description": "Studia con le flashcard e guadagna +5 XP per ogni risposta corretta"
       }
     }
+  },
+  "limits": {
+    "uploadLimit": {
+      "title": "Limite di Caricamenti Raggiunto",
+      "message": "Hai raggiunto il limite di {{limit}} caricamenti al mese del piano {{planName}}.",
+      "upgrade": "Effettua l'upgrade per caricamenti illimitati!"
+    },
+    "chatLimit": {
+      "title": "Limite di Chat Raggiunto",
+      "message": "Hai raggiunto il limite di {{limit}} messaggi al giorno del piano {{planName}}.",
+      "upgrade": "Effettua l'upgrade per chat illimitata!"
+    },
+    "summaryLimit": {
+      "title": "Limite di Riassunto Raggiunto",
+      "message": "Il riassunto ha {{actual}} parole, ma il piano {{planName}} consente fino a {{limit}} parole.",
+      "upgrade": "Effettua l'upgrade per riassunti più lunghi!"
+    },
+    "featureLimit": {
+      "existentialMode": "La Modalità Esistenziale è disponibile solo nei piani Pro e Premium.",
+      "advancedFlashcards": "Le flashcard avanzate sono disponibili solo nei piani Pro e Premium.",
+      "advancedStats": "Le statistiche avanzate sono disponibili solo nel piano Premium.",
+      "studyPlans": "I piani di studio sono disponibili solo nel piano Premium.",
+      "mindMaps": "Le mappe mentali sono disponibili solo nel piano Premium.",
+      "sharedSpaces": "Gli spazi condivisi sono disponibili solo nel piano Premium.",
+      "exportPdf": "L'esportazione PDF è disponibile solo nel piano Premium."
+    },
+    "usage": {
+      "uploads": "{{used}} di {{limit}} caricamenti questo mese",
+      "uploadsUnlimited": "{{used}} caricamenti questo mese (illimitato)",
+      "chatMessages": "{{used}} di {{limit}} messaggi oggi",
+      "chatUnlimited": "{{used}} messaggi oggi (illimitato)",
+      "summaries": "{{used}} riassunti generati questo mese"
+    },
+    "upgradeButton": "Effettua l'Upgrade"
   }
 }

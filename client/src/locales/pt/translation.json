@@ -610,7 +610,8 @@
     "limit": "Limite atingido. Atualiza o teu plano para continuar.",
     "upload": "Erro ao carregar ficheiro. Verifica o formato e tamanho.",
     "generateSummaries": "Erro ao gerar resumos",
-    "tryAgain": "Não foi possível completar a operação. Tente novamente."
+    "tryAgain": "Não foi possível completar a operação. Tente novamente.",
+    "loadSubscription": "Não foi possível carregar informações de subscrição"
   },
   "myClasses": {
     "title": "As Minhas Turmas",
@@ -808,5 +809,39 @@
         "description": "Estuda com flashcards e ganha +5 XP por cada acerto"
       }
     }
+  },
+  "limits": {
+    "uploadLimit": {
+      "title": "Limite de Uploads Atingido",
+      "message": "Atingiste o limite de {{limit}} uploads por mês do plano {{planName}}.",
+      "upgrade": "Faz upgrade para uploads ilimitados!"
+    },
+    "chatLimit": {
+      "title": "Limite de Chat Atingido",
+      "message": "Atingiste o limite de {{limit}} mensagens por dia do plano {{planName}}.",
+      "upgrade": "Faz upgrade para chat ilimitado!"
+    },
+    "summaryLimit": {
+      "title": "Limite de Resumo Atingido",
+      "message": "O resumo tem {{actual}} palavras, mas o plano {{planName}} permite até {{limit}} palavras.",
+      "upgrade": "Faz upgrade para resumos maiores!"
+    },
+    "featureLimit": {
+      "existentialMode": "O Modo Existencial está disponível apenas nos planos Pro e Premium.",
+      "advancedFlashcards": "Flashcards avançados estão disponíveis apenas nos planos Pro e Premium.",
+      "advancedStats": "Estatísticas avançadas estão disponíveis apenas no plano Premium.",
+      "studyPlans": "Planos de estudo estão disponíveis apenas no plano Premium.",
+      "mindMaps": "Mapas mentais estão disponíveis apenas no plano Premium.",
+      "sharedSpaces": "Espaços partilhados estão disponíveis apenas no plano Premium.",
+      "exportPdf": "Exportação PDF está disponível apenas no plano Premium."
+    },
+    "usage": {
+      "uploads": "{{used}} de {{limit}} uploads este mês",
+      "uploadsUnlimited": "{{used}} uploads este mês (ilimitado)",
+      "chatMessages": "{{used}} de {{limit}} mensagens hoje",
+      "chatUnlimited": "{{used}} mensagens hoje (ilimitado)",
+      "summaries": "{{used}} resumos gerados este mês"
+    },
+    "upgradeButton": "Fazer Upgrade"
   }
 }

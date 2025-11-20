@@ -627,7 +627,8 @@
     "limit": "Limit erreicht. Aktualisieren Sie Ihren Plan, um fortzufahren.",
     "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe.",
     "generateSummaries": "Fehler beim Generieren der Zusammenfassungen",
-    "tryAgain": "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut."
+    "tryAgain": "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+    "loadSubscription": "Abonnementinformationen konnten nicht geladen werden"
   },
   "myClasses": {
     "title": "Meine Klassen",
@@ -825,5 +826,39 @@
         "description": "Lernen Sie mit Karteikarten und verdienen Sie +5 XP pro richtiger Antwort"
       }
     }
+  },
+  "limits": {
+    "uploadLimit": {
+      "title": "Upload-Limit Erreicht",
+      "message": "Sie haben das Limit von {{limit}} Uploads pro Monat für den {{planName}}-Plan erreicht.",
+      "upgrade": "Upgraden Sie für unbegrenzte Uploads!"
+    },
+    "chatLimit": {
+      "title": "Chat-Limit Erreicht",
+      "message": "Sie haben das Limit von {{limit}} Nachrichten pro Tag für den {{planName}}-Plan erreicht.",
+      "upgrade": "Upgraden Sie für unbegrenzten Chat!"
+    },
+    "summaryLimit": {
+      "title": "Zusammenfassungs-Limit Erreicht",
+      "message": "Die Zusammenfassung hat {{actual}} Wörter, aber der {{planName}}-Plan erlaubt bis zu {{limit}} Wörter.",
+      "upgrade": "Upgraden Sie für längere Zusammenfassungen!"
+    },
+    "featureLimit": {
+      "existentialMode": "Der Existenzielle Modus ist nur in den Pro- und Premium-Plänen verfügbar.",
+      "advancedFlashcards": "Erweiterte Karteikarten sind nur in den Pro- und Premium-Plänen verfügbar.",
+      "advancedStats": "Erweiterte Statistiken sind nur im Premium-Plan verfügbar.",
+      "studyPlans": "Lernpläne sind nur im Premium-Plan verfügbar.",
+      "mindMaps": "Mind Maps sind nur im Premium-Plan verfügbar.",
+      "sharedSpaces": "Geteilte Bereiche sind nur im Premium-Plan verfügbar.",
+      "exportPdf": "PDF-Export ist nur im Premium-Plan verfügbar."
+    },
+    "usage": {
+      "uploads": "{{used}} von {{limit}} Uploads diesen Monat",
+      "uploadsUnlimited": "{{used}} Uploads diesen Monat (unbegrenzt)",
+      "chatMessages": "{{used}} von {{limit}} Nachrichten heute",
+      "chatUnlimited": "{{used}} Nachrichten heute (unbegrenzt)",
+      "summaries": "{{used}} Zusammenfassungen diesen Monat generiert"
+    },
+    "upgradeButton": "Jetzt Upgraden"
   }
 }

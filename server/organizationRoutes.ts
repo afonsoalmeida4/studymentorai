@@ -446,6 +446,16 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(403).json({ success: false, error: "Tópico não encontrado ou sem permissão" });
       }
 
+      // Check subscription upload limit
+      const uploadCheck = await subscriptionService.canUpload(userId);
+      if (!uploadCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: uploadCheck.reason,
+          upgradeRequired: true,
+        });
+      }
+
       const contentType = validateFileType(req.file.mimetype);
       if (!contentType) {
         return res.status(400).json({ success: false, error: "Tipo de ficheiro não suportado" });
@@ -541,6 +551,9 @@ export function registerOrganizationRoutes(app: Express) {
       });
 
       await awardXP(userId, "upload_pdf", { fileName: req.file.originalname });
+
+      // Increment upload count only after all operations succeed
+      await subscriptionService.incrementUploadCount(userId);
 
       res.json({ success: true, contentItem: contentItem[0] });
     } catch (error) {

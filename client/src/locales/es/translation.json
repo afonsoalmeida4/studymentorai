@@ -627,7 +627,8 @@
     "limit": "Límite alcanzado. Actualice su plan para continuar.",
     "upload": "Error al cargar archivo. Verifique el formato y tamaño.",
     "generateSummaries": "Error al generar resúmenes",
-    "tryAgain": "No se pudo completar la operación. Inténtelo de nuevo."
+    "tryAgain": "No se pudo completar la operación. Inténtelo de nuevo.",
+    "loadSubscription": "No se pudo cargar la información de suscripción"
   },
   "myClasses": {
     "title": "Mis Clases",
@@ -825,5 +826,39 @@
         "description": "Estudia con flashcards y gana +5 XP por cada acierto"
       }
     }
+  },
+  "limits": {
+    "uploadLimit": {
+      "title": "Límite de Subidas Alcanzado",
+      "message": "Has alcanzado el límite de {{limit}} subidas por mes del plan {{planName}}.",
+      "upgrade": "¡Mejora para subidas ilimitadas!"
+    },
+    "chatLimit": {
+      "title": "Límite de Chat Alcanzado",
+      "message": "Has alcanzado el límite de {{limit}} mensajes por día del plan {{planName}}.",
+      "upgrade": "¡Mejora para chat ilimitado!"
+    },
+    "summaryLimit": {
+      "title": "Límite de Resumen Alcanzado",
+      "message": "El resumen tiene {{actual}} palabras, pero el plan {{planName}} permite hasta {{limit}} palabras.",
+      "upgrade": "¡Mejora para resúmenes más grandes!"
+    },
+    "featureLimit": {
+      "existentialMode": "El Modo Existencial solo está disponible en los planes Pro y Premium.",
+      "advancedFlashcards": "Las flashcards avanzadas solo están disponibles en los planes Pro y Premium.",
+      "advancedStats": "Las estadísticas avanzadas solo están disponibles en el plan Premium.",
+      "studyPlans": "Los planes de estudio solo están disponibles en el plan Premium.",
+      "mindMaps": "Los mapas mentales solo están disponibles en el plan Premium.",
+      "sharedSpaces": "Los espacios compartidos solo están disponibles en el plan Premium.",
+      "exportPdf": "La exportación PDF solo está disponible en el plan Premium."
+    },
+    "usage": {
+      "uploads": "{{used}} de {{limit}} subidas este mes",
+      "uploadsUnlimited": "{{used}} subidas este mes (ilimitado)",
+      "chatMessages": "{{used}} de {{limit}} mensajes hoy",
+      "chatUnlimited": "{{used}} mensajes hoy (ilimitado)",
+      "summaries": "{{used}} resúmenes generados este mes"
+    },
+    "upgradeButton": "Mejorar Ahora"
   }
 }

@@ -627,7 +627,8 @@
     "limit": "Limite atteinte. Mettez à niveau votre plan pour continuer.",
     "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille.",
     "generateSummaries": "Erreur lors de la génération des résumés",
-    "tryAgain": "Impossible de terminer l'opération. Veuillez réessayer."
+    "tryAgain": "Impossible de terminer l'opération. Veuillez réessayer.",
+    "loadSubscription": "Impossible de charger les informations d'abonnement"
   },
   "myClasses": {
     "title": "Mes Classes",
@@ -825,5 +826,39 @@
         "description": "Étudiez avec des cartes et gagnez +5 XP par bonne réponse"
       }
     }
+  },
+  "limits": {
+    "uploadLimit": {
+      "title": "Limite de Téléchargements Atteinte",
+      "message": "Vous avez atteint la limite de {{limit}} téléchargements par mois du plan {{planName}}.",
+      "upgrade": "Passez à Premium pour des téléchargements illimités !"
+    },
+    "chatLimit": {
+      "title": "Limite de Chat Atteinte",
+      "message": "Vous avez atteint la limite de {{limit}} messages par jour du plan {{planName}}.",
+      "upgrade": "Passez à Premium pour un chat illimité !"
+    },
+    "summaryLimit": {
+      "title": "Limite de Résumé Atteinte",
+      "message": "Le résumé contient {{actual}} mots, mais le plan {{planName}} permet jusqu'à {{limit}} mots.",
+      "upgrade": "Passez à Premium pour des résumés plus longs !"
+    },
+    "featureLimit": {
+      "existentialMode": "Le Mode Existentiel n'est disponible que dans les plans Pro et Premium.",
+      "advancedFlashcards": "Les cartes avancées ne sont disponibles que dans les plans Pro et Premium.",
+      "advancedStats": "Les statistiques avancées ne sont disponibles que dans le plan Premium.",
+      "studyPlans": "Les plans d'étude ne sont disponibles que dans le plan Premium.",
+      "mindMaps": "Les cartes mentales ne sont disponibles que dans le plan Premium.",
+      "sharedSpaces": "Les espaces partagés ne sont disponibles que dans le plan Premium.",
+      "exportPdf": "L'exportation PDF n'est disponible que dans le plan Premium."
+    },
+    "usage": {
+      "uploads": "{{used}} sur {{limit}} téléchargements ce mois",
+      "uploadsUnlimited": "{{used}} téléchargements ce mois (illimité)",
+      "chatMessages": "{{used}} sur {{limit}} messages aujourd'hui",
+      "chatUnlimited": "{{used}} messages aujourd'hui (illimité)",
+      "summaries": "{{used}} résumés générés ce mois"
+    },
+    "upgradeButton": "Passer à Premium"
   }
 }

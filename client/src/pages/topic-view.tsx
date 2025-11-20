@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { useSubscription } from "@/hooks/useSubscription";
 import SummaryStudySection from "@/components/SummaryStudySection";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { Button } from "@/components/ui/button";
@@ -73,11 +74,17 @@ export default function TopicView() {
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("uploads");
   const [styleToRegenerate, setStyleToRegenerate] = useState<LearningStyle | null>(null);
 
-  const { data: subscriptionData } = useQuery<any>({
-    queryKey: ["/api/subscription"],
-  });
+  const {
+    subscription,
+    usage,
+    limits,
+    isLoading: subscriptionLoading,
+    error: subscriptionError,
+    isUploadLimitReached,
+    getUploadUsageText,
+  } = useSubscription();
 
-  const currentPlan = subscriptionData?.subscription?.plan || "free";
+  const currentPlan = subscription?.plan || "free";
 
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
@@ -167,7 +174,10 @@ export default function TopicView() {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || "Upload failed");
+        throw Object.assign(new Error(error.error || "Upload failed"), { 
+          status: res.status,
+          upgradeRequired: error.upgradeRequired 
+        });
       }
 
       return res.json();
@@ -286,13 +296,41 @@ export default function TopicView() {
           )}
         </div>
 
+        {subscriptionError && (
+          <Card className="mb-4 bg-destructive/10 border-destructive/20">
+            <CardContent className="p-4">
+              <p className="text-sm text-destructive">
+                {t('common.error')}: {t('errors.loadSubscription')}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {!subscriptionLoading && !subscriptionError && limits && usage && (
+          <Card className="mb-4 bg-muted/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                {getUploadUsageText(t)}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex items-center gap-2 mb-6">
           <Button
-            onClick={() => setIsUploadDialogOpen(true)}
+            onClick={() => {
+              if (subscriptionError || (!subscriptionLoading && limits && usage && isUploadLimitReached())) {
+                setUpgradeReason("uploads");
+                setShowUpgradeDialog(true);
+              } else if (!subscriptionLoading && limits && usage) {
+                setIsUploadDialogOpen(true);
+              }
+            }}
+            disabled={subscriptionLoading || !!subscriptionError || isUploadLimitReached()}
             data-testid="button-upload-file"
           >
             <Upload className="w-4 h-4 mr-2" />
-            {t('topicView.uploadFile')}
+            {subscriptionLoading ? t('common.loading') : t('topicView.uploadFile')}
           </Button>
           <Button
             variant="outline"

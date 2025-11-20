@@ -619,7 +619,8 @@
     "limit": "Limit reached. Upgrade your plan to continue.",
     "upload": "Error uploading file. Check format and size.",
     "generateSummaries": "Error generating summaries",
-    "tryAgain": "Could not complete the operation. Please try again."
+    "tryAgain": "Could not complete the operation. Please try again.",
+    "loadSubscription": "Could not load subscription information"
   },
   "myClasses": {
     "title": "My Classes",
@@ -817,5 +818,39 @@
         "description": "Study with flashcards and earn +5 XP for each correct answer"
       }
     }
+  },
+  "limits": {
+    "uploadLimit": {
+      "title": "Upload Limit Reached",
+      "message": "You've reached the limit of {{limit}} uploads per month for the {{planName}} plan.",
+      "upgrade": "Upgrade for unlimited uploads!"
+    },
+    "chatLimit": {
+      "title": "Chat Limit Reached",
+      "message": "You've reached the limit of {{limit}} messages per day for the {{planName}} plan.",
+      "upgrade": "Upgrade for unlimited chat!"
+    },
+    "summaryLimit": {
+      "title": "Summary Limit Reached",
+      "message": "The summary has {{actual}} words, but the {{planName}} plan allows up to {{limit}} words.",
+      "upgrade": "Upgrade for larger summaries!"
+    },
+    "featureLimit": {
+      "existentialMode": "Existential Mode is only available in Pro and Premium plans.",
+      "advancedFlashcards": "Advanced flashcards are only available in Pro and Premium plans.",
+      "advancedStats": "Advanced statistics are only available in the Premium plan.",
+      "studyPlans": "Study plans are only available in the Premium plan.",
+      "mindMaps": "Mind maps are only available in the Premium plan.",
+      "sharedSpaces": "Shared spaces are only available in the Premium plan.",
+      "exportPdf": "PDF export is only available in the Premium plan."
+    },
+    "usage": {
+      "uploads": "{{used}} of {{limit}} uploads this month",
+      "uploadsUnlimited": "{{used}} uploads this month (unlimited)",
+      "chatMessages": "{{used}} of {{limit}} messages today",
+      "chatUnlimited": "{{used}} messages today (unlimited)",
+      "summaries": "{{used}} summaries generated this month"
+    },
+    "upgradeButton": "Upgrade Now"
   }
 }
