@@ -443,7 +443,7 @@
       "yearly": "Annuale",
       "month": "mese",
       "year": "anno",
-      "save": "Risparmia 19%",
+      "save": "Risparmia {{percent}}%",
       "saveMoney": "Risparmia {{amount}}€"
     },
     "currentUsage": "Utilizzo Attuale",

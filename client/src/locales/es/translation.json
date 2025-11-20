@@ -446,7 +446,7 @@
       "yearly": "Anual",
       "month": "mes",
       "year": "año",
-      "save": "Ahorra 19%",
+      "save": "Ahorra {{percent}}%",
       "saveMoney": "Ahorra {{amount}}€"
     },
     "currentUsage": "Uso Actual",

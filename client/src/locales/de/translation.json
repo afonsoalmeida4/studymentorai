@@ -443,7 +443,7 @@
       "yearly": "Jährlich",
       "month": "Monat",
       "year": "Jahr",
-      "save": "19% sparen",
+      "save": "{{percent}}% sparen",
       "saveMoney": "Spare {{amount}}€"
     },
     "currentUsage": "Aktuelle Nutzung",

@@ -517,7 +517,7 @@
       "yearly": "Anual",
       "month": "mês",
       "year": "ano",
-      "save": "Poupa 19%",
+      "save": "Poupa {{percent}}%",
       "saveMoney": "Poupa {{amount}}€"
     },
     "currentUsage": "Utilização Atual",

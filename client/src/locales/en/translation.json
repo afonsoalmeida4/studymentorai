@@ -526,7 +526,7 @@
       "yearly": "Yearly",
       "month": "month",
       "year": "year",
-      "save": "Save 19%",
+      "save": "Save {{percent}}%",
       "saveMoney": "Save {{amount}}€"
     },
     "currentUsage": "Current Usage",
