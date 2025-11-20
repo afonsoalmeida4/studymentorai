@@ -517,7 +517,7 @@
       "yearly": "Anual",
       "month": "mês",
       "year": "ano",
-      "save": "Poupa 17%",
+      "save": "Poupa 19%",
       "saveMoney": "Poupa {{amount}}€"
     },
     "currentUsage": "Uso Atual",
@@ -843,7 +843,7 @@
       },
       "pro": {
         "name": "Estuda Sem Limites",
-        "price": "7,99€",
+        "price": "6,19€",
         "period": "/mês",
         "features": {
           "uploads": "Uploads ilimitados",
@@ -858,7 +858,7 @@
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "18,99€",
+        "price": "12,29€",
         "period": "/mês",
         "features": {
           "allPro": "Tudo do Pro +",

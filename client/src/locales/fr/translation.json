@@ -443,7 +443,7 @@
       "yearly": "Annuel",
       "month": "mois",
       "year": "an",
-      "save": "Économise 17%",
+      "save": "Économise 19%",
       "saveMoney": "Économise {{amount}}€"
     },
     "currentUsage": "Utilisation Actuelle",
@@ -860,7 +860,7 @@
       },
       "pro": {
         "name": "Étudiez Sans Limites",
-        "price": "7,99€",
+        "price": "6,19€",
         "period": "/mois",
         "features": {
           "uploads": "Téléchargements illimités",
@@ -875,7 +875,7 @@
       },
       "premium": {
         "name": "Haute Performance",
-        "price": "18,99€",
+        "price": "12,29€",
         "period": "/mois",
         "features": {
           "allPro": "Tout de Pro +",

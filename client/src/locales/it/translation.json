@@ -443,7 +443,7 @@
       "yearly": "Annuale",
       "month": "mese",
       "year": "anno",
-      "save": "Risparmia 17%",
+      "save": "Risparmia 19%",
       "saveMoney": "Risparmia {{amount}}€"
     },
     "currentUsage": "Uso Attuale",
@@ -860,7 +860,7 @@
       },
       "pro": {
         "name": "Studia Senza Limiti",
-        "price": "7,99€",
+        "price": "6,19€",
         "period": "/mese",
         "features": {
           "uploads": "Caricamenti illimitati",
@@ -875,7 +875,7 @@
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "18,99€",
+        "price": "12,29€",
         "period": "/mese",
         "features": {
           "allPro": "Tutto di Pro +",

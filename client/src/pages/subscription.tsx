@@ -147,15 +147,15 @@ export default function SubscriptionPage() {
     ? 0 
     : (usage.chatMessagesCount / limits.dailyChatLimit) * 100;
 
-  // Pricing logic: yearly gets ~17% discount (2 months free)
+  // Pricing logic: yearly gets ~19% discount
   const pricing = {
     pro: {
-      monthly: 9.99,
-      yearly: 99,
+      monthly: 6.19,
+      yearly: 59.99,
     },
     premium: {
-      monthly: 19.99,
-      yearly: 199,
+      monthly: 12.29,
+      yearly: 119.99,
     },
   };
 

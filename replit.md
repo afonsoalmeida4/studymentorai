@@ -1,7 +1,7 @@
 # AI Study Mentor
 
 ## Overview
-AI Study Mentor is a Notion-style knowledge organization platform designed to help users structure, process, and study academic materials with integrated AI support. It enables the creation of hierarchical knowledge structures (Subjects → Topics → Content Items), supports uploads of various document types (PDF, Word, PowerPoint), and allows for the addition of external links. Key features include personalized AI summaries with multiple learning styles, a dual-mode AI assistant for academic and existential support, Anki-style flashcards with SM-2 spaced repetition, gamification with XP and levels, and a tiered subscription model (Free, Pro, Premium). The platform aims to provide a calm and clean interface inspired by Notion, Linear, and Grammarly, combining hierarchical organization with generative AI.
+AI Study Mentor is a Notion-style knowledge organization platform designed to help users structure, process, and study academic materials with integrated AI support. It enables the creation of hierarchical knowledge structures (Subjects → Topics → Content Items), supports uploads of various document types (PDF, Word, PowerPoint), and allows for the addition of external links. Key features include personalized AI summaries with multiple learning styles, a dual-mode AI assistant for academic and existential support, Anki-style flashcards with SM-2 spaced repetition, gamification with XP and levels, and a tiered subscription model (Free, Pro at 6.19€/month or 59.99€/year, Premium at 12.29€/month or 119.99€/year with ~19% yearly savings). The platform aims to provide a calm and clean interface inspired by Notion, Linear, and Grammarly, combining hierarchical organization with generative AI.
 
 ## User Preferences
 - Communication: Simple, everyday language (Portuguese)
@@ -10,6 +10,12 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 ## Recent Changes
 
 ### November 20, 2025
+- **Subscription Pricing Corrected**: Updated subscription prices across all platforms
+  - Pro: 6.19€/month or 59.99€/year (~19% discount)
+  - Premium: 12.29€/month or 119.99€/year (~19% discount)
+  - Added monthly/yearly billing toggle on subscription page
+  - Backend accepts `billingPeriod` parameter for Stripe checkout
+  - Translations updated in all 6 languages (PT, EN, ES, FR, DE, IT)
 - **Class Management System Removed**: Completely removed teacher/student class management functionality to simplify the platform
   - Removed database tables: `classes`, `classEnrollments`, `classInvites`
   - Removed `role` column from `users` table (all users are now students by default)

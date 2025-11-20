@@ -443,7 +443,7 @@
       "yearly": "Jährlich",
       "month": "Monat",
       "year": "Jahr",
-      "save": "17% sparen",
+      "save": "19% sparen",
       "saveMoney": "Spare {{amount}}€"
     },
     "currentUsage": "Aktuelle Nutzung",
@@ -860,7 +860,7 @@
       },
       "pro": {
         "name": "Grenzenlos Lernen",
-        "price": "7,99€",
+        "price": "6,19€",
         "period": "/Monat",
         "features": {
           "uploads": "Unbegrenzte Uploads",
@@ -875,7 +875,7 @@
       },
       "premium": {
         "name": "Hohe Leistung",
-        "price": "18,99€",
+        "price": "12,29€",
         "period": "/Monat",
         "features": {
           "allPro": "Alles von Pro +",

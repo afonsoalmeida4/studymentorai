@@ -526,7 +526,7 @@
       "yearly": "Yearly",
       "month": "month",
       "year": "year",
-      "save": "Save 17%",
+      "save": "Save 19%",
       "saveMoney": "Save {{amount}}€"
     },
     "currentUsage": "Current Usage",
@@ -852,7 +852,7 @@
       },
       "pro": {
         "name": "Study Without Limits",
-        "price": "€7.99",
+        "price": "$6.19",
         "period": "/mo",
         "features": {
           "uploads": "Unlimited uploads",
@@ -867,7 +867,7 @@
       },
       "premium": {
         "name": "High Performance",
-        "price": "€18.99",
+        "price": "$12.29",
         "period": "/mo",
         "features": {
           "allPro": "Everything in Pro +",
