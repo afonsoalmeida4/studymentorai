@@ -790,7 +790,8 @@
       "days": "days",
       "studiedToday": "Studied today",
       "notStudiedToday": "Not studied today",
-      "longestStreak": "Longest streak"
+      "longestStreak": "Longest streak",
+      "errorLoading": "Error loading statistics. Please try again later."
     },
     "premium": {
       "unlock": "Unlock Premium",

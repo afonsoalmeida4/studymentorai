@@ -76,7 +76,7 @@ export default function Dashboard() {
   });
 
   // New KPI queries
-  const { data: studyTimeData, isLoading: studyTimeLoading } = useQuery<{
+  const { data: studyTimeData, isLoading: studyTimeLoading, isError: studyTimeError } = useQuery<{
     currentWeekMinutes: number;
     currentWeekHours: string;
     previousWeekMinutes: number;
@@ -88,7 +88,7 @@ export default function Dashboard() {
     enabled: currentPlan !== "free",
   });
 
-  const { data: subjectProgressData, isLoading: subjectProgressLoading } = useQuery<{
+  const { data: subjectProgressData, isLoading: subjectProgressLoading, isError: subjectProgressError } = useQuery<{
     subjects: Array<{
       subjectId: string;
       subjectName: string;
@@ -102,23 +102,17 @@ export default function Dashboard() {
     enabled: currentPlan !== "free",
   });
 
-  const { data: tasksData, isLoading: tasksLoading } = useQuery<{
-    tasks: Array<{
-      id: string;
-      title: string;
-      description: string | null;
-      completed: boolean;
-      priority: string;
-      dueDate: string | null;
-    }>;
-    dailyCompleted: number;
-    weeklyCompleted: number;
+  const { data: tasksData, isLoading: tasksLoading, isError: tasksError } = useQuery<{
+    completedToday: number;
+    completedThisWeek: number;
+    pendingTasks: number;
+    status: string;
   }>({
-    queryKey: ["/api/stats/tasks"],
+    queryKey: ["/api/stats/tasks-summary"],
     enabled: currentPlan !== "free",
   });
 
-  const { data: streakData, isLoading: streakLoading } = useQuery<{
+  const { data: streakData, isLoading: streakLoading, isError: streakError } = useQuery<{
     currentStreak: number;
     longestStreak: number;
     todayMinutes: number;
@@ -127,6 +121,8 @@ export default function Dashboard() {
     queryKey: ["/api/stats/streak"],
     enabled: currentPlan !== "free",
   });
+
+  const hasAnyKpiError = studyTimeError || subjectProgressError || tasksError || streakError;
 
   if (!subscriptionResolved || currentPlan === "free") {
     return null;
@@ -161,6 +157,14 @@ export default function Dashboard() {
               </Card>
             ))}
           </div>
+        ) : hasAnyKpiError ? (
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              <p className="text-center text-muted-foreground">
+                {t("dashboard.kpi.errorLoading")}
+              </p>
+            </CardContent>
+          </Card>
         ) : (
           <>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -219,13 +223,13 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold" data-testid="kpi-tasks-completed">
-                    {tasksData?.dailyCompleted || 0}
+                    {tasksData?.completedToday || 0}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {t("dashboard.kpi.tasksToday")}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {tasksData?.weeklyCompleted || 0} {t("dashboard.kpi.tasksThisWeek")}
+                    {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
                   </p>
                 </CardContent>
               </Card>

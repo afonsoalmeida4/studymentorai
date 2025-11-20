@@ -36,31 +36,40 @@ export function registerStatsRoutes(app: Express) {
 
       // If exit event, calculate duration and create study time entry
       if (eventType === 'exit') {
-        const lastEnter = await db
+        // Find most recent unmatched 'enter' event (sessionId is null)
+        const lastUnmatchedEnter = await db
           .select()
           .from(topicStudyEvents)
           .where(and(
             eq(topicStudyEvents.userId, userId),
             eq(topicStudyEvents.topicId, topicId),
-            eq(topicStudyEvents.eventType, 'enter')
+            eq(topicStudyEvents.eventType, 'enter'),
+            sql`${topicStudyEvents.sessionId} IS NULL`
           ))
           .orderBy(desc(topicStudyEvents.timestamp))
           .limit(1);
 
-        if (lastEnter.length > 0) {
-          const startTime = new Date(lastEnter[0].timestamp);
+        if (lastUnmatchedEnter.length > 0) {
+          const startTime = new Date(lastUnmatchedEnter[0].timestamp);
           const endTime = new Date();
           const durationMinutes = Math.floor((endTime.getTime() - startTime.getTime()) / 60000);
 
           if (durationMinutes > 0) {
-            await db.insert(topicStudyTime).values({
+            // Create study time entry
+            const [studySession] = await db.insert(topicStudyTime).values({
               userId,
               topicId,
               startedAt: startTime,
               endedAt: endTime,
               durationMinutes,
               source: 'auto',
-            });
+            }).returning();
+
+            // Mark the enter event as matched by linking to session
+            await db
+              .update(topicStudyEvents)
+              .set({ sessionId: studySession.id })
+              .where(eq(topicStudyEvents.id, lastUnmatchedEnter[0].id));
           }
         }
       }

@@ -784,6 +784,23 @@
       "keepGoing": "Continuez ainsi !",
       "startToday": "Commencez aujourd'hui !"
     },
+    "kpi": {
+      "weeklyHours": "Heures Hebdomadaires",
+      "subjectProgress": "Progrès de Matière",
+      "tasksCompleted": "Tâches Complétées",
+      "studyStreak": "Jours Consécutifs",
+      "vsLastWeek": "vs semaine dernière",
+      "firstWeek": "Première semaine",
+      "noSubjects": "Aucune matière",
+      "topicsCompleted": "sujets complétés",
+      "tasksToday": "Aujourd'hui",
+      "tasksThisWeek": "cette semaine",
+      "days": "jours",
+      "studiedToday": "Étudié aujourd'hui",
+      "notStudiedToday": "Pas encore étudié aujourd'hui",
+      "longestStreak": "Série la plus longue",
+      "errorLoading": "Erreur de chargement des statistiques. Veuillez réessayer plus tard."
+    },
     "premium": {
       "unlock": "Débloquer Premium",
       "description": "Accès exclusif au Mentor IA, résumés illimités et thème doré",

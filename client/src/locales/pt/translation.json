@@ -781,7 +781,8 @@
       "days": "dias",
       "studiedToday": "Estudaste hoje",
       "notStudiedToday": "Ainda não estudaste hoje",
-      "longestStreak": "Sequência máxima"
+      "longestStreak": "Sequência máxima",
+      "errorLoading": "Erro ao carregar estatísticas. Por favor, tenta novamente mais tarde."
     },
     "premium": {
       "unlock": "Desbloqueie o Premium",

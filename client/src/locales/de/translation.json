@@ -784,6 +784,23 @@
       "keepGoing": "Weiter so!",
       "startToday": "Beginnen Sie heute!"
     },
+    "kpi": {
+      "weeklyHours": "Wöchentliche Stunden",
+      "subjectProgress": "Fach-Fortschritt",
+      "tasksCompleted": "Aufgaben Abgeschlossen",
+      "studyStreak": "Aufeinanderfolgende Tage",
+      "vsLastWeek": "vs letzte Woche",
+      "firstWeek": "Erste Woche",
+      "noSubjects": "Keine Fächer",
+      "topicsCompleted": "Themen abgeschlossen",
+      "tasksToday": "Heute",
+      "tasksThisWeek": "diese Woche",
+      "days": "Tage",
+      "studiedToday": "Heute gelernt",
+      "notStudiedToday": "Heute noch nicht gelernt",
+      "longestStreak": "Längste Serie",
+      "errorLoading": "Fehler beim Laden der Statistiken. Bitte versuchen Sie es später erneut."
+    },
     "premium": {
       "unlock": "Premium Freischalten",
       "description": "Exklusiver Zugang zu KI-Mentor, unbegrenzte Zusammenfassungen und goldenem Design",

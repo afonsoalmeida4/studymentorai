@@ -784,6 +784,23 @@
       "keepGoing": "Continua così!",
       "startToday": "Inizia oggi!"
     },
+    "kpi": {
+      "weeklyHours": "Ore Settimanali",
+      "subjectProgress": "Progresso Materia",
+      "tasksCompleted": "Compiti Completati",
+      "studyStreak": "Giorni Consecutivi",
+      "vsLastWeek": "vs settimana scorsa",
+      "firstWeek": "Prima settimana",
+      "noSubjects": "Nessuna materia",
+      "topicsCompleted": "argomenti completati",
+      "tasksToday": "Oggi",
+      "tasksThisWeek": "questa settimana",
+      "days": "giorni",
+      "studiedToday": "Studiato oggi",
+      "notStudiedToday": "Non ancora studiato oggi",
+      "longestStreak": "Serie più lunga",
+      "errorLoading": "Errore nel caricamento delle statistiche. Riprova più tardi."
+    },
     "premium": {
       "unlock": "Sblocca Premium",
       "description": "Accesso esclusivo a Mentor IA, riassunti illimitati e tema dorato",
