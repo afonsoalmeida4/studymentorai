@@ -69,6 +69,20 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
     - Before: `${count} ${t('...successMultiple')}`
     - After: `t('...successMultiple', { count })` with `{{count}}` placeholder in translations
   - Files affected: All 6 translation files, `client/src/pages/topic-view.tsx`
+- **FREE Plan Card Information Updated**: Corrected subscription page to display accurate FREE plan features
+  - **Updated features across all 6 languages** (PT, EN, ES, FR, DE, IT):
+    - ❌ REMOVED: "3 uploads por mês" → ✅ CORRECTED: "4 uploads por mês"
+    - ❌ REMOVED: "Assistente IA (Modo Estudo)" (FREE has no chat access)
+    - ❌ REMOVED: "Limite de 10 mensagens/dia" (FREE has 0 chat messages)
+    - ❌ REMOVED: "1 workspace"
+    - ✅ ADDED: "Até 5 disciplinas/subjects/matières/asignaturas/Fächer/materie"
+    - ✅ ADDED: "Até 10 tópicos/topics/sujets/temas/Themen/argomenti"
+    - ✅ ADDED: "2 estilos de aprendizagem" (conciso + visual)
+    - ✅ ADDED: "Ficheiros até 10MB/Files up to 10MB/Fichiers jusqu'à 10Mo"
+    - ✅ KEPT: "Resumos até 1.000 palavras" and "Flashcards básicos"
+  - **subscription.tsx featureKeys updated**: Changed from `["uploads", "summaries", "flashcards", "assistant", "chatLimit", "workspace"]` to `["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "fileSize"]`
+  - All features now match actual FREE plan limits from `shared/schema.ts`
+  - Files affected: All 6 translation files, `client/src/pages/subscription.tsx`
 
 ## System Architecture
 
