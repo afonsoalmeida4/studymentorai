@@ -144,37 +144,20 @@ export default function Dashboard() {
           <GamificationHeader />
         </div>
 
-        {studyTimeLoading || subjectProgressLoading || tasksLoading || streakLoading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-4 w-24" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : hasAnyKpiError ? (
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                {t("dashboard.kpi.errorLoading")}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-              {/* Weekly Study Hours KPI */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.weeklyHours")}</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          {/* Weekly Study Hours KPI */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.weeklyHours")}</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {studyTimeLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : studyTimeError ? (
+                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (
+                <>
                   <div className="text-2xl font-bold" data-testid="kpi-weekly-hours">
                     {studyTimeData?.currentWeekHours || "0.0"}h
                   </div>
@@ -191,16 +174,24 @@ export default function Dashboard() {
                       ? `${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}`
                       : t("dashboard.kpi.firstWeek")}
                   </p>
-                </CardContent>
-              </Card>
+                </>
+              )}
+            </CardContent>
+          </Card>
 
-              {/* Subject Progress KPI */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
+          {/* Subject Progress KPI */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {subjectProgressLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : subjectProgressError ? (
+                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (
+                <>
                   <div className="text-2xl font-bold" data-testid="kpi-subject-progress">
                     {subjectProgressData?.subjects?.[0]?.completionPercentage || 0}%
                   </div>
@@ -212,16 +203,24 @@ export default function Dashboard() {
                       {subjectProgressData.subjects[0].completedTopics}/{subjectProgressData.subjects[0].totalTopics} {t("dashboard.kpi.topicsCompleted")}
                     </p>
                   )}
-                </CardContent>
-              </Card>
+                </>
+              )}
+            </CardContent>
+          </Card>
 
-              {/* Tasks Completed KPI */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
-                  <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
+          {/* Tasks Completed KPI */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
+              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {tasksLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : tasksError ? (
+                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (
+                <>
                   <div className="text-2xl font-bold" data-testid="kpi-tasks-completed">
                     {tasksData?.completedToday || 0}
                   </div>
@@ -231,16 +230,24 @@ export default function Dashboard() {
                   <p className="text-xs text-muted-foreground">
                     {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
                   </p>
-                </CardContent>
-              </Card>
+                </>
+              )}
+            </CardContent>
+          </Card>
 
-              {/* Study Streak KPI */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.studyStreak")}</CardTitle>
-                  <Flame className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
+          {/* Study Streak KPI */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.studyStreak")}</CardTitle>
+              <Flame className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {streakLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : streakError ? (
+                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+              ) : (
+                <>
                   <div className="text-2xl font-bold" data-testid="kpi-study-streak">
                     {streakData?.currentStreak || 0} {t("dashboard.kpi.days")}
                   </div>
@@ -252,9 +259,11 @@ export default function Dashboard() {
                   <p className="text-xs text-muted-foreground">
                     {t("dashboard.kpi.longestStreak")}: {streakData?.longestStreak || 0}
                   </p>
-                </CardContent>
-              </Card>
-            </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
             {stats?.recentSessions && stats.recentSessions.length > 0 && (
               <Card className="mb-8">
@@ -379,8 +388,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
-          </>
-        )}
 
         {reviewLoading ? (
           <Card>
