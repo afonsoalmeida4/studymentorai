@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Flame, Target, TrendingUp, FileText, Clock, CheckCircle2, Crown } from "lucide-react";
+import { BookOpen, Flame, Target, TrendingUp, FileText, Clock, CheckCircle2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { GetDashboardStatsResponse, GetReviewPlanResponse } from "@shared/schema";
 import { Link } from "wouter";
@@ -64,27 +64,6 @@ export default function Dashboard() {
   const stats = statsData?.stats;
   const reviewPlan = reviewData?.reviewPlan || [];
   const aiRecommendation = reviewData?.aiRecommendation;
-
-  const activatePremiumMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/premium/activate");
-    },
-    onSuccess: () => {
-      toast({
-        title: t("dashboard.premium.activatedTitle"),
-        description: t("dashboard.premium.activatedMessage"),
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/gamification/profile"] });
-    },
-    onError: () => {
-      toast({
-        title: t("dashboard.premium.errorTitle"),
-        description: t("dashboard.premium.errorMessage"),
-        variant: "destructive",
-      });
-    },
-  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -159,31 +138,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
-
-            {/* Premium Upgrade Card */}
-            <Card className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/20 dark:to-amber-900/20 border-amber-200 dark:border-amber-800" data-testid="card-premium-upgrade">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Crown className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                  <CardTitle className="text-amber-900 dark:text-amber-100">
-                    {t("dashboard.premium.unlock")}
-                  </CardTitle>
-                </div>
-                <CardDescription className="text-amber-800 dark:text-amber-300">
-                  {t("dashboard.premium.description")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={() => activatePremiumMutation.mutate()}
-                  disabled={activatePremiumMutation.isPending}
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                  data-testid="button-activate-premium"
-                >
-                  {activatePremiumMutation.isPending ? t("dashboard.premium.activating") : t("dashboard.premium.activate")}
-                </Button>
-              </CardContent>
-            </Card>
 
             {stats?.recentSessions && stats.recentSessions.length > 0 && (
               <Card className="mb-8">
