@@ -97,6 +97,7 @@
       "title": "Zusammenfassung & Lernen",
       "description": "Generieren Sie Zusammenfassungen, die an Ihren Lernstil angepasst sind, und erstellen Sie Lernkarten zum Lernen",
       "generateMore": "Mehr Stile Generieren",
+      "regenerate": "Neu generieren",
       "allGenerated": "Alle Lernstile wurden generiert!",
       "noContent": "Kein Inhalt zum Zusammenfassen",
       "noContentDescription": "Fügen Sie Dateien oder Links zum Thema hinzu, um Zusammenfassungen zu generieren.",
@@ -116,6 +117,11 @@
         "title": "Prägnante Zusammenfassung",
         "description": "Direkte Zusammenfassung, ohne Schnörkel"
       }
+    },
+    "regenerateDialog": {
+      "title": "Zusammenfassung Neu Generieren",
+      "description": "Sind Sie sicher, dass Sie die {{style}}-Zusammenfassung neu generieren möchten? Die aktuelle Zusammenfassung wird ersetzt.",
+      "confirm": "Neu generieren"
     },
     "uploadDialog": {
       "title": "Datei Hochladen",

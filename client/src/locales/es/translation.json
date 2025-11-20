@@ -100,6 +100,7 @@
       "title": "Resumen y Estudio",
       "description": "Genera resúmenes adaptados a tu estilo de aprendizaje y crea tarjetas para estudiar",
       "generateMore": "Generar Más Estilos",
+      "regenerate": "Regenerar",
       "allGenerated": "¡Todos los estilos de aprendizaje ya han sido generados!",
       "noContent": "Sin Contenido para Resumir",
       "noContentDescription": "Añade archivos o enlaces al tema para generar resúmenes.",
@@ -119,6 +120,11 @@
         "title": "Resumen Conciso",
         "description": "Resumen directo al grano, sin florituras"
       }
+    },
+    "regenerateDialog": {
+      "title": "Regenerar Resumen",
+      "description": "¿Estás seguro de que quieres regenerar el resumen {{style}}? El resumen actual será reemplazado.",
+      "confirm": "Regenerar"
     },
     "uploadDialog": {
       "title": "Subir Archivo",

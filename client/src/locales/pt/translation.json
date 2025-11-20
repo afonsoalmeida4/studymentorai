@@ -100,6 +100,7 @@
       "title": "Resumo & Estudo",
       "description": "Gere resumos adaptados ao teu estilo de aprendizagem e cria flashcards para estudar",
       "generateMore": "Gerar Mais Estilos",
+      "regenerate": "Regenerar",
       "allGenerated": "Todos os estilos de aprendizagem já foram gerados!",
       "noContent": "Sem Conteúdo para Resumir",
       "noContentDescription": "Adicione ficheiros ou links ao tópico para gerar resumos.",
@@ -119,6 +120,11 @@
         "title": "Resumo Conciso",
         "description": "Resumo direto ao ponto, sem floreados"
       }
+    },
+    "regenerateDialog": {
+      "title": "Regenerar Resumo",
+      "description": "Tens a certeza que queres regenerar o resumo {{style}}? O resumo atual será substituído.",
+      "confirm": "Regenerar"
     },
     "uploadDialog": {
       "title": "Carregar Ficheiro",

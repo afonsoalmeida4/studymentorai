@@ -97,6 +97,7 @@
       "title": "Résumé et Étude",
       "description": "Générez des résumés adaptés à votre style d'apprentissage et créez des flashcards pour étudier",
       "generateMore": "Générer Plus de Styles",
+      "regenerate": "Régénérer",
       "allGenerated": "Tous les styles d'apprentissage ont été générés!",
       "noContent": "Aucun Contenu à Résumer",
       "noContentDescription": "Ajoutez des fichiers ou des liens au sujet pour générer des résumés.",
@@ -116,6 +117,11 @@
         "title": "Résumé Concis",
         "description": "Résumé direct, sans fioritures"
       }
+    },
+    "regenerateDialog": {
+      "title": "Régénérer le Résumé",
+      "description": "Êtes-vous sûr de vouloir régénérer le résumé {{style}} ? Le résumé actuel sera remplacé.",
+      "confirm": "Régénérer"
     },
     "uploadDialog": {
       "title": "Télécharger un Fichier",

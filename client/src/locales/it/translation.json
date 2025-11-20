@@ -97,6 +97,7 @@
       "title": "Riassunto e Studio",
       "description": "Genera riassunti adattati al tuo stile di apprendimento e crea flashcard per studiare",
       "generateMore": "Genera Altri Stili",
+      "regenerate": "Rigenera",
       "allGenerated": "Tutti gli stili di apprendimento sono stati generati!",
       "noContent": "Nessun Contenuto da Riassumere",
       "noContentDescription": "Aggiungi file o link all'argomento per generare riassunti.",
@@ -116,6 +117,11 @@
         "title": "Riassunto Conciso",
         "description": "Riassunto diretto al punto, senza fronzoli"
       }
+    },
+    "regenerateDialog": {
+      "title": "Rigenera Riassunto",
+      "description": "Sei sicuro di voler rigenerare il riassunto {{style}}? Il riassunto attuale sarà sostituito.",
+      "confirm": "Rigenera"
     },
     "uploadDialog": {
       "title": "Carica File",

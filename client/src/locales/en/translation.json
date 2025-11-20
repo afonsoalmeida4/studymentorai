@@ -100,6 +100,7 @@
       "title": "Summary & Study",
       "description": "Generate summaries adapted to your learning style and create flashcards to study",
       "generateMore": "Generate More Styles",
+      "regenerate": "Regenerate",
       "allGenerated": "All learning styles have been generated!",
       "noContent": "No Content to Summarize",
       "noContentDescription": "Add files or links to the topic to generate summaries.",
@@ -119,6 +120,11 @@
         "title": "Concise Summary",
         "description": "Straight to the point summary, no frills"
       }
+    },
+    "regenerateDialog": {
+      "title": "Regenerate Summary",
+      "description": "Are you sure you want to regenerate the {{style}} summary? The current summary will be replaced.",
+      "confirm": "Regenerate"
     },
     "uploadDialog": {
       "title": "Upload File",

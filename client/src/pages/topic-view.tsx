@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "wouter";
-import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink } from "lucide-react";
+import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -61,6 +71,7 @@ export default function TopicView() {
   const [isGenerateStylesDialogOpen, setIsGenerateStylesDialogOpen] = useState(false);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("uploads");
+  const [styleToRegenerate, setStyleToRegenerate] = useState<LearningStyle | null>(null);
 
   const { data: subscriptionData } = useQuery<any>({
     queryKey: ["/api/subscription"],
@@ -133,6 +144,10 @@ export default function TopicView() {
           variant: "destructive",
         });
       }
+    },
+    onSettled: () => {
+      // Clear regeneration dialog state on success or error
+      setStyleToRegenerate(null);
     },
   });
 
@@ -253,6 +268,12 @@ export default function TopicView() {
     const existing = new Set(Object.keys(topicSummariesData?.summaries || {}) as LearningStyle[]);
     const allStyles: LearningStyle[] = ["visual", "auditivo", "logico", "conciso"];
     return allStyles.filter(style => !existing.has(style));
+  };
+
+  const confirmRegenerate = () => {
+    if (styleToRegenerate) {
+      generateSummariesMutation.mutate([styleToRegenerate]);
+    }
   };
 
   return (
@@ -492,7 +513,20 @@ export default function TopicView() {
                       <TabsContent value="visual" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
+                            <div className="flex items-center justify-between gap-4">
+                              <CardTitle className="text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setStyleToRegenerate("visual")}
+                                disabled={generateSummariesMutation.isPending}
+                                data-testid="button-regenerate-visual"
+                                className="gap-2"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                                {t('topicView.summarySection.regenerate')}
+                              </Button>
+                            </div>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -517,7 +551,20 @@ export default function TopicView() {
                       <TabsContent value="auditivo" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
+                            <div className="flex items-center justify-between gap-4">
+                              <CardTitle className="text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setStyleToRegenerate("auditivo")}
+                                disabled={generateSummariesMutation.isPending}
+                                data-testid="button-regenerate-auditivo"
+                                className="gap-2"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                                {t('topicView.summarySection.regenerate')}
+                              </Button>
+                            </div>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -542,7 +589,20 @@ export default function TopicView() {
                       <TabsContent value="logico" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
+                            <div className="flex items-center justify-between gap-4">
+                              <CardTitle className="text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setStyleToRegenerate("logico")}
+                                disabled={generateSummariesMutation.isPending}
+                                data-testid="button-regenerate-logico"
+                                className="gap-2"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                                {t('topicView.summarySection.regenerate')}
+                              </Button>
+                            </div>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -567,7 +627,20 @@ export default function TopicView() {
                       <TabsContent value="conciso" className="mt-6 space-y-6">
                         <Card>
                           <CardHeader>
-                            <CardTitle className="text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
+                            <div className="flex items-center justify-between gap-4">
+                              <CardTitle className="text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setStyleToRegenerate("conciso")}
+                                disabled={generateSummariesMutation.isPending}
+                                data-testid="button-regenerate-conciso"
+                                className="gap-2"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                                {t('topicView.summarySection.regenerate')}
+                              </Button>
+                            </div>
                           </CardHeader>
                           <CardContent>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
@@ -817,6 +890,28 @@ export default function TopicView() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={styleToRegenerate !== null} onOpenChange={() => setStyleToRegenerate(null)}>
+        <AlertDialogContent data-testid="dialog-confirm-regenerate">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('topicView.regenerateDialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('topicView.regenerateDialog.description', { style: styleToRegenerate })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-regenerate">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRegenerate}
+              data-testid="button-confirm-regenerate"
+            >
+              {t('topicView.regenerateDialog.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <UpgradeDialog
         open={showUpgradeDialog}

@@ -141,11 +141,12 @@ async function generateTopicSummaries(
           .values({
             topicId,
             learningStyle: style,
+            language: userLanguage,
             summary: result.summary,
             motivationalMessage: result.motivationalMessage,
           })
           .onConflictDoUpdate({
-            target: [topicSummaries.topicId, topicSummaries.learningStyle],
+            target: [topicSummaries.topicId, topicSummaries.learningStyle, topicSummaries.language],
             set: {
               summary: result.summary,
               motivationalMessage: result.motivationalMessage,
