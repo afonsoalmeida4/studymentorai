@@ -83,6 +83,20 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
   - **subscription.tsx featureKeys updated**: Changed from `["uploads", "summaries", "flashcards", "assistant", "chatLimit", "workspace"]` to `["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "fileSize"]`
   - All features now match actual FREE plan limits from `shared/schema.ts`
   - Files affected: All 6 translation files, `client/src/pages/subscription.tsx`
+- **PRO Plan Card Information Updated**: Enhanced subscription page with detailed and descriptive PRO plan features
+  - **subscription.tsx featureKeys updated**: Changed from `["uploads", "summaries", "flashcards", "assistant", "chat", "workspaces", "dashboard", "backup"]` to `["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "dashboard", "ranking", "sync"]`
+  - **Updated features across all 6 languages** (PT, EN, ES, FR, DE, IT) with more descriptive copy:
+    - ✅ **uploads**: "Uploads ilimitados de PDF, Word, PPT e links" (more detailed)
+    - ✅ **subjects**: "Pastas ilimitadas" (renamed from "Disciplinas" for clarity)
+    - ✅ **topics**: "Subpastas ilimitadas" (renamed from "Tópicos" for clarity)
+    - ✅ **summaries**: "Resumos avançados ilimitados" (more descriptive)
+    - ✅ **learningStyles**: "Estilo personalizado de aprendizagem" (benefit-focused)
+    - ✅ **flashcards**: "Flashcards inteligentes com repetição espaçada" (detailed explanation)
+    - ✅ **dashboard**: "Dashboard simples de progresso"
+    - ✅ **ranking**: "Ranking de XP"
+    - ✅ **sync**: "Sincronização entre dispositivos" (NEW feature)
+  - PRO plan now displays 9 comprehensive features that clearly communicate value proposition
+  - Files affected: All 6 translation files, `client/src/pages/subscription.tsx`
 
 ## System Architecture
 
