@@ -11,7 +11,6 @@ import {
   FileText,
   Heart,
   BookOpen,
-  Users,
   Trophy,
   Target,
 } from "lucide-react";
@@ -168,20 +167,6 @@ export default function Landing() {
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {t('landing.features.flashcards.description')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover-elevate">
-              <CardContent className="p-8">
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
-                  <Users className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">
-                  {t('landing.features.classes.title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.features.classes.description')}
                 </p>
               </CardContent>
             </Card>

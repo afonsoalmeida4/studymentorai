@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Check, Crown, Zap, Rocket, GraduationCap, ArrowRight } from "lucide-react";
+import { Check, Crown, Zap, Rocket, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
@@ -120,8 +120,8 @@ export default function SubscriptionPage() {
     return (
       <div className="container max-w-6xl mx-auto p-6 space-y-6">
         <Skeleton className="h-12 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-96" />
           ))}
         </div>
@@ -162,12 +162,6 @@ export default function SubscriptionPage() {
       icon: Rocket,
       color: "text-purple-600 dark:text-purple-400",
       featureKeys: ["allPro", "tutor", "studyPlans", "mindMaps", "stats", "zenMode", "sharedSpaces", "pdfExport", "earlyAccess"],
-    },
-    {
-      id: "educational",
-      icon: GraduationCap,
-      color: "text-green-600 dark:text-green-400",
-      featureKeys: ["allPremium", "classManagement", "sharedLibrary", "classDashboard", "teacherAssistant", "worksheets", "quizzes", "lessonPlans"],
     },
   ];
 
@@ -211,7 +205,7 @@ export default function SubscriptionPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => {
           const Icon = plan.icon;
           const isCurrent = plan.id === currentPlan;
