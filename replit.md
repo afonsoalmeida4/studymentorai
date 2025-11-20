@@ -7,6 +7,16 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 - Communication: Simple, everyday language (Portuguese)
 - Design inspiration: Notion, Linear, Grammarly (calm, clean, organized)
 
+## Recent Changes
+
+### November 20, 2025
+- **Database Constraint Fix**: Fixed summary generation error by ensuring `language` field is included in both INSERT values and onConflict target to match the UNIQUE(topic_id, learning_style, language) constraint
+- **Summary Regeneration Feature**: Implemented "Regenerate" button on each summary card with AlertDialog confirmation, allowing users to regenerate summaries in the same learning style
+  - Buttons only appear when summary exists (conditional rendering)
+  - Dialog state managed via onSettled handler (prevents stuck dialog on error)
+  - Full i18n support: translations added in all 6 languages (PT, EN, ES, FR, DE, IT)
+  - Toast notifications for success/error feedback
+
 ## System Architecture
 
 ### Frontend Architecture
