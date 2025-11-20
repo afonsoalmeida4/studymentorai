@@ -523,15 +523,15 @@
         "price": "5,99€",
         "period": "/mes",
         "features": {
-          "uploads": "Subidas ilimitadas",
-          "subjects": "Asignaturas ilimitadas",
-          "topics": "Temas ilimitados",
-          "summaries": "Resúmenes ilimitados",
-          "learningStyles": "4 estilos de aprendizaje",
-          "flashcards": "Flashcards inteligentes (SM-2)",
-          "fileSize": "Archivos hasta 100MB",
-          "dashboard": "Panel de progreso",
-          "ranking": "Ranking de XP"
+          "uploads": "Subidas ilimitadas de PDF, Word, PPT y enlaces",
+          "subjects": "Carpetas ilimitadas",
+          "topics": "Subcarpetas ilimitadas",
+          "summaries": "Resúmenes avanzados ilimitados",
+          "learningStyles": "Estilo de aprendizaje personalizado",
+          "flashcards": "Flashcards inteligentes con repetición espaciada",
+          "dashboard": "Panel simple de progreso",
+          "ranking": "Ranking de XP",
+          "sync": "Sincronización entre dispositivos"
         }
       },
       "premium": {

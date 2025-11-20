@@ -520,15 +520,15 @@
         "price": "5,99€",
         "period": "/mese",
         "features": {
-          "uploads": "Caricamenti illimitati",
-          "subjects": "Materie illimitate",
-          "topics": "Argomenti illimitati",
-          "summaries": "Riassunti illimitati",
-          "learningStyles": "4 stili di apprendimento",
-          "flashcards": "Flashcard intelligenti (SM-2)",
-          "fileSize": "File fino a 100MB",
-          "dashboard": "Pannello progressi",
-          "ranking": "Classifica XP"
+          "uploads": "Caricamenti illimitati di PDF, Word, PPT e link",
+          "subjects": "Cartelle illimitate",
+          "topics": "Sottocartelle illimitate",
+          "summaries": "Riassunti avanzati illimitati",
+          "learningStyles": "Stile di apprendimento personalizzato",
+          "flashcards": "Flashcard intelligenti con ripetizione dilazionata",
+          "dashboard": "Pannello semplice dei progressi",
+          "ranking": "Classifica XP",
+          "sync": "Sincronizzazione tra dispositivi"
         }
       },
       "premium": {

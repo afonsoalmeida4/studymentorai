@@ -520,15 +520,15 @@
         "price": "5,99€",
         "period": "/Monat",
         "features": {
-          "uploads": "Unbegrenzte Uploads",
-          "subjects": "Unbegrenzte Fächer",
-          "topics": "Unbegrenzte Themen",
-          "summaries": "Unbegrenzte Zusammenfassungen",
-          "learningStyles": "4 Lernstile",
-          "flashcards": "Intelligente Karteikarten (SM-2)",
-          "fileSize": "Dateien bis zu 100MB",
-          "dashboard": "Fortschritts-Dashboard",
-          "ranking": "XP-Rangliste"
+          "uploads": "Unbegrenzte Uploads von PDF, Word, PPT und Links",
+          "subjects": "Unbegrenzte Ordner",
+          "topics": "Unbegrenzte Unterordner",
+          "summaries": "Unbegrenzte erweiterte Zusammenfassungen",
+          "learningStyles": "Personalisierter Lernstil",
+          "flashcards": "Intelligente Karteikarten mit verteilter Wiederholung",
+          "dashboard": "Einfaches Fortschritts-Dashboard",
+          "ranking": "XP-Rangliste",
+          "sync": "Geräteübergreifende Synchronisation"
         }
       },
       "premium": {

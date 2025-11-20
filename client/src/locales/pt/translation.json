@@ -594,15 +594,15 @@
         "price": "5,99€",
         "period": "/mês",
         "features": {
-          "uploads": "Uploads ilimitados",
-          "subjects": "Disciplinas ilimitadas",
-          "topics": "Tópicos ilimitados",
-          "summaries": "Resumos ilimitados",
-          "learningStyles": "4 estilos de aprendizagem",
-          "flashcards": "Flashcards inteligentes (SM-2)",
-          "fileSize": "Ficheiros até 100MB",
-          "dashboard": "Dashboard de progresso",
-          "ranking": "Ranking de XP"
+          "uploads": "Uploads ilimitados de PDF, Word, PPT e links",
+          "subjects": "Pastas ilimitadas",
+          "topics": "Subpastas ilimitadas",
+          "summaries": "Resumos avançados ilimitados",
+          "learningStyles": "Estilo personalizado de aprendizagem",
+          "flashcards": "Flashcards inteligentes com repetição espaçada",
+          "dashboard": "Dashboard simples de progresso",
+          "ranking": "Ranking de XP",
+          "sync": "Sincronização entre dispositivos"
         }
       },
       "premium": {

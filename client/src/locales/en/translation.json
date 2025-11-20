@@ -603,15 +603,15 @@
         "price": "$5.99",
         "period": "/mo",
         "features": {
-          "uploads": "Unlimited uploads",
-          "subjects": "Unlimited subjects",
-          "topics": "Unlimited topics",
-          "summaries": "Unlimited summaries",
-          "learningStyles": "4 learning styles",
-          "flashcards": "Smart flashcards (SM-2)",
-          "fileSize": "Files up to 100MB",
-          "dashboard": "Progress dashboard",
-          "ranking": "XP ranking"
+          "uploads": "Unlimited uploads of PDF, Word, PPT and links",
+          "subjects": "Unlimited folders",
+          "topics": "Unlimited subfolders",
+          "summaries": "Unlimited advanced summaries",
+          "learningStyles": "Personalized learning style",
+          "flashcards": "Smart flashcards with spaced repetition",
+          "dashboard": "Simple progress dashboard",
+          "ranking": "XP ranking",
+          "sync": "Cross-device synchronization"
         }
       },
       "premium": {

@@ -520,15 +520,15 @@
         "price": "5,99€",
         "period": "/mois",
         "features": {
-          "uploads": "Téléchargements illimités",
-          "subjects": "Matières illimitées",
-          "topics": "Sujets illimités",
-          "summaries": "Résumés illimités",
-          "learningStyles": "4 styles d'apprentissage",
-          "flashcards": "Cartes intelligentes (SM-2)",
-          "fileSize": "Fichiers jusqu'à 100Mo",
-          "dashboard": "Tableau de bord de progrès",
-          "ranking": "Classement XP"
+          "uploads": "Téléchargements illimités de PDF, Word, PPT et liens",
+          "subjects": "Dossiers illimités",
+          "topics": "Sous-dossiers illimités",
+          "summaries": "Résumés avancés illimités",
+          "learningStyles": "Style d'apprentissage personnalisé",
+          "flashcards": "Cartes intelligentes avec répétition espacée",
+          "dashboard": "Tableau de bord simple de progrès",
+          "ranking": "Classement XP",
+          "sync": "Synchronisation entre appareils"
         }
       },
       "premium": {
