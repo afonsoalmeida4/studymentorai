@@ -197,7 +197,7 @@ export default function SubscriptionPage() {
       id: "premium",
       icon: Rocket,
       color: "text-purple-600 dark:text-purple-400",
-      featureKeys: ["allPro", "tutor", "studyPlans", "mindMaps", "stats", "zenMode", "sharedSpaces", "pdfExport", "earlyAccess"],
+      featureKeys: ["allPro", "aiAssistant", "aiSupport", "pdfExport", "deepStats"],
     },
   ];
 

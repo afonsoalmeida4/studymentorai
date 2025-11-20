@@ -537,14 +537,10 @@
         "period": "/Monat",
         "features": {
           "allPro": "Alles von Pro +",
-          "tutor": "Persönlicher KI-Tutor",
-          "studyPlans": "Automatische Lernpläne",
-          "mindMaps": "Automatische Mind Maps",
-          "stats": "Erweiterte Statistiken",
-          "zenMode": "Zen-Modus",
-          "sharedSpaces": "Gemeinsame Bereiche",
-          "pdfExport": "PDF-Export",
-          "earlyAccess": "Frühzeitiger Zugang"
+          "aiAssistant": "Unbegrenzter KI-Assistent in Lern- und Existenzmodi",
+          "aiSupport": "Emotionale Unterstützung: Motivation, Fokus und Angstbewältigung",
+          "pdfExport": "Zusammenfassungen als PDF exportieren",
+          "deepStats": "Tiefgehende Statistiken: Zeit pro Fach, Auswendiglernen und wöchentliche Entwicklung"
         }
       }
     }

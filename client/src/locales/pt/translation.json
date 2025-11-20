@@ -611,14 +611,10 @@
         "period": "/mês",
         "features": {
           "allPro": "Tudo do Pro +",
-          "tutor": "Tutor IA pessoal",
-          "studyPlans": "Planos de estudo automáticos",
-          "mindMaps": "Mapas mentais automáticos",
-          "stats": "Estatísticas avançadas",
-          "zenMode": "Modo Zen",
-          "sharedSpaces": "Espaços partilhados",
-          "pdfExport": "Exportação PDF",
-          "earlyAccess": "Acesso antecipado"
+          "aiAssistant": "Assistente IA ilimitado nos modos Estudo e Existencial",
+          "aiSupport": "Apoio emocional: motivação, foco e gestão de ansiedade",
+          "pdfExport": "Exportar resumos em PDF",
+          "deepStats": "Estatísticas profundas: tempo por disciplina, memorização e evolução semanal"
         }
       }
     }

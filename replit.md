@@ -97,6 +97,17 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
     - ✅ **sync**: "Sincronização entre dispositivos" (NEW feature)
   - PRO plan now displays 9 comprehensive features that clearly communicate value proposition
   - Files affected: All 6 translation files, `client/src/pages/subscription.tsx`
+- **PREMIUM Plan Card Information Updated**: Completely redesigned PREMIUM plan features to focus on AI assistant and deep analytics
+  - **subscription.tsx featureKeys updated**: Changed from `["allPro", "tutor", "studyPlans", "mindMaps", "stats", "zenMode", "sharedSpaces", "pdfExport", "earlyAccess"]` to `["allPro", "aiAssistant", "aiSupport", "pdfExport", "deepStats"]`
+  - **Updated features across all 6 languages** (PT, EN, ES, FR, DE, IT) with focused value proposition:
+    - ✅ **allPro**: "Tudo do Pro +" (Everything from PRO plan)
+    - ✅ **aiAssistant**: "Assistente IA ilimitado nos modos Estudo e Existencial" (Unlimited AI assistant in Study and Existential modes)
+    - ✅ **aiSupport**: "Apoio emocional: motivação, foco e gestão de ansiedade" (Emotional support: motivation, focus and anxiety management)
+    - ✅ **pdfExport**: "Exportar resumos em PDF" (Export summaries to PDF)
+    - ✅ **deepStats**: "Estatísticas profundas: tempo por disciplina, memorização e evolução semanal" (Deep statistics: time per subject, memorization and weekly evolution)
+  - PREMIUM plan now displays 5 clear features focusing on AI-powered assistance and advanced analytics
+  - Removed generic features like "automatic study plans", "mind maps", "zen mode", "shared spaces", "early access"
+  - Files affected: All 6 translation files, `client/src/pages/subscription.tsx`
 
 ## System Architecture
 

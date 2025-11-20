@@ -537,14 +537,10 @@
         "period": "/mese",
         "features": {
           "allPro": "Tutto di Pro +",
-          "tutor": "Tutor IA personale",
-          "studyPlans": "Piani di studio automatici",
-          "mindMaps": "Mappe mentali automatiche",
-          "stats": "Statistiche avanzate",
-          "zenMode": "Modalità Zen",
-          "sharedSpaces": "Spazi condivisi",
-          "pdfExport": "Esportazione PDF",
-          "earlyAccess": "Accesso anticipato"
+          "aiAssistant": "Assistente IA illimitato in modalità Studio ed Esistenziale",
+          "aiSupport": "Supporto emotivo: motivazione, concentrazione e gestione dell'ansia",
+          "pdfExport": "Esportare riassunti in PDF",
+          "deepStats": "Statistiche approfondite: tempo per materia, memorizzazione ed evoluzione settimanale"
         }
       }
     }

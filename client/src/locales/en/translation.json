@@ -620,14 +620,10 @@
         "period": "/mo",
         "features": {
           "allPro": "Everything in Pro +",
-          "tutor": "Personal AI tutor",
-          "studyPlans": "Automatic study plans",
-          "mindMaps": "Automatic mind maps",
-          "stats": "Advanced statistics",
-          "zenMode": "Zen Mode",
-          "sharedSpaces": "Shared spaces",
-          "pdfExport": "PDF export",
-          "earlyAccess": "Early access"
+          "aiAssistant": "Unlimited AI assistant in Study and Existential modes",
+          "aiSupport": "Emotional support: motivation, focus and anxiety management",
+          "pdfExport": "Export summaries to PDF",
+          "deepStats": "Deep statistics: time per subject, memorization and weekly evolution"
         }
       }
     }
