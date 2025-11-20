@@ -77,6 +77,48 @@ export class SubscriptionService {
   }
 
   /**
+   * Check if user can create a subject
+   */
+  async canCreateSubject(userId: string, currentCount: number): Promise<{ allowed: boolean; reason?: string }> {
+    const subscription = await this.getOrCreateSubscription(userId);
+    const limits = planLimits[subscription.plan as SubscriptionPlan];
+
+    if (limits.maxSubjects === -1) {
+      return { allowed: true };
+    }
+
+    if (currentCount >= limits.maxSubjects) {
+      return {
+        allowed: false,
+        reason: `Atingiste o limite de ${limits.maxSubjects} pastas do plano ${limits.name}. Faz upgrade para criar mais pastas!`,
+      };
+    }
+
+    return { allowed: true };
+  }
+
+  /**
+   * Check if user can create a topic
+   */
+  async canCreateTopic(userId: string, currentCount: number): Promise<{ allowed: boolean; reason?: string }> {
+    const subscription = await this.getOrCreateSubscription(userId);
+    const limits = planLimits[subscription.plan as SubscriptionPlan];
+
+    if (limits.maxTopics === -1) {
+      return { allowed: true };
+    }
+
+    if (currentCount >= limits.maxTopics) {
+      return {
+        allowed: false,
+        reason: `Atingiste o limite de ${limits.maxTopics} subpastas do plano ${limits.name}. Faz upgrade para criar mais subpastas!`,
+      };
+    }
+
+    return { allowed: true };
+  }
+
+  /**
    * Check if user can perform an upload
    */
   async canUpload(userId: string): Promise<{ allowed: boolean; reason?: string }> {
@@ -175,6 +217,23 @@ export class SubscriptionService {
           updatedAt: new Date(),
         },
       });
+  }
+
+  /**
+   * Check if user can use a learning style
+   */
+  async canUseLearningStyle(userId: string, learningStyle: string): Promise<{ allowed: boolean; reason?: string }> {
+    const subscription = await this.getOrCreateSubscription(userId);
+    const limits = planLimits[subscription.plan as SubscriptionPlan];
+
+    if (!limits.allowedLearningStyles.includes(learningStyle as any)) {
+      return {
+        allowed: false,
+        reason: `O estilo "${learningStyle}" não está disponível no plano ${limits.name}. Faz upgrade para aceder a todos os estilos de aprendizagem!`,
+      };
+    }
+
+    return { allowed: true };
   }
 
   /**

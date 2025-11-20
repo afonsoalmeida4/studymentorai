@@ -167,6 +167,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { learningStyle } = parseResult.data;
 
+      // Check if learningStyle is allowed for this user's plan
+      const styleCheck = await subscriptionService.canUseLearningStyle(userId, learningStyle);
+      if (!styleCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: styleCheck.reason,
+          upgradeRequired: true,
+        } as GenerateSummaryResponse);
+      }
+
       // Extract text from PDF
       let pdfText: string;
       try {
@@ -682,6 +692,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Check if user has advanced flashcards (SM-2 algorithm)
+      const hasAdvancedFlashcards = await subscriptionService.hasFeatureAccess(userId, 'advancedFlashcards');
+      
+      if (!hasAdvancedFlashcards) {
+        // FREE plan: basic flashcards only (no SM-2 tracking)
+        // Return success but don't save attempt or calculate next review
+        return res.json({
+          success: true,
+          message: "Resposta registada (plano FREE não tem repetição espaçada)",
+          basicMode: true,
+        });
+      }
+
+      // PRO/PREMIUM: Use SM-2 algorithm for spaced repetition
       // Resolve base flashcard ID for SM-2 progress sharing across languages
       const baseFlashcardId = await resolveBaseFlashcardId(flashcardId);
 

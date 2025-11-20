@@ -3,7 +3,7 @@ import multer from "multer";
 import { z } from "zod";
 import { db } from "./db";
 import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema, topicSummaries, learningStyles } from "@shared/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { isAuthenticated } from "./replitAuth";
 import { extractTextFromFile, validateFileType, isValidFileSize } from "./textExtractor";
 import { generateSummary } from "./openai";
@@ -111,8 +111,16 @@ async function generateTopicSummaries(
     const userLanguage = await getUserLanguage(userId);
     console.log(`[TopicSummary] Using language: ${userLanguage}`);
 
+    // Get allowed learning styles for user's plan
+    const subscription = await subscriptionService.getUserSubscription(userId);
+    const planLimits = subscriptionService.getPlanLimits(subscription?.plan || "free");
+    const allowedStyles = planLimits.allowedLearningStyles;
+
     // If a specific style is requested, generate only that one
-    const stylesToGenerate = specificStyle ? [specificStyle] : learningStyles;
+    // Otherwise, generate all styles allowed by the user's plan
+    const stylesToGenerate = specificStyle 
+      ? [specificStyle] 
+      : learningStyles.filter(style => allowedStyles.includes(style));
 
     const generatedStyles: string[] = [];
     const failedStyles: Array<{ style: string; reason: string }> = [];
@@ -211,6 +219,21 @@ export function registerOrganizationRoutes(app: Express) {
   app.post("/api/subjects", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      
+      // Check subject limit
+      const [{ count: currentCount }] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(subjects)
+        .where(eq(subjects.userId, userId));
+      
+      const limitCheck = await subscriptionService.canCreateSubject(userId, currentCount);
+      if (!limitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: limitCheck.reason,
+          upgradeRequired: true,
+        });
+      }
       
       const validatedData = insertSubjectSchema.parse({
         ...req.body,
@@ -325,6 +348,21 @@ export function registerOrganizationRoutes(app: Express) {
 
       if (!subject) {
         return res.status(403).json({ success: false, error: "Disciplina não encontrada ou sem permissão" });
+      }
+
+      // Check topic limit
+      const [{ count: currentCount }] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(topics)
+        .where(eq(topics.userId, userId));
+      
+      const limitCheck = await subscriptionService.canCreateTopic(userId, currentCount);
+      if (!limitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: limitCheck.reason,
+          upgradeRequired: true,
+        });
       }
 
       const topic = await db.insert(topics).values(validatedData).returning();
@@ -640,6 +678,18 @@ export function registerOrganizationRoutes(app: Express) {
 
       if (!topic) {
         return res.status(404).json({ success: false, error: "Tópico não encontrado" });
+      }
+
+      // Check if learningStyle is allowed for this user's plan (if specified)
+      if (learningStyle) {
+        const styleCheck = await subscriptionService.canUseLearningStyle(userId, learningStyle);
+        if (!styleCheck.allowed) {
+          return res.status(403).json({
+            success: false,
+            error: styleCheck.reason,
+            upgradeRequired: true,
+          });
+        }
       }
 
       const result = await generateTopicSummaries(id, userId, learningStyle);
