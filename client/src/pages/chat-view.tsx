@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "wouter";
 import type { ChatThread, ChatMessage, Topic } from "@shared/schema";
 
 type ChatMode = "study" | "existential";
@@ -29,6 +30,7 @@ interface ThreadWithMessages extends ChatThread {
 export default function ChatView() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [activeMode, setActiveMode] = useState<ChatMode>("study");
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export default function ChatView() {
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
 
-  const { subscription } = useSubscription();
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
   const currentPlan = subscription?.plan || "free";
   const isExistentialLocked = currentPlan === "free";
 
@@ -49,6 +51,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.threads || [];
     },
+    enabled: subscription?.plan !== "free",
   });
 
   const { data: existentialThreads = [] } = useQuery<ChatThread[]>({
@@ -59,6 +62,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.threads || [];
     },
+    enabled: subscription?.plan !== "free",
   });
 
   const { data: topics = [] } = useQuery<Topic[]>({
@@ -69,6 +73,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.topics || [];
     },
+    enabled: subscription?.plan !== "free",
   });
 
   const { data: currentThread } = useQuery<ThreadWithMessages>({
@@ -80,8 +85,18 @@ export default function ChatView() {
       const data = await res.json();
       return data.thread;
     },
-    enabled: !!selectedThreadId,
+    enabled: !!selectedThreadId && subscription?.plan !== "free",
   });
+
+  useEffect(() => {
+    if (!isLoadingSubscription && subscription?.plan === "free") {
+      setLocation("/subscription");
+    }
+  }, [subscription, isLoadingSubscription, setLocation]);
+
+  if (isLoadingSubscription || subscription?.plan === "free") {
+    return null;
+  }
 
   const createThreadMutation = useMutation({
     mutationFn: async (mode: ChatMode) => {
