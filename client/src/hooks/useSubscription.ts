@@ -11,6 +11,9 @@ interface SubscriptionDetails {
 export function useSubscription() {
   const { data, isLoading, error, refetch } = useQuery<SubscriptionDetails>({
     queryKey: ["/api/subscription"],
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 30000,
   });
 
   const canUpload = () => {

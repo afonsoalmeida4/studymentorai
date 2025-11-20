@@ -532,7 +532,7 @@
       "saveMoney": "Save {{amount}}€"
     },
     "currentUsage": "Current Usage",
-    "currentUsageSubtitle": "Free plan progress this month",
+    "currentUsageSubtitle": "{{planName}} plan progress this month",
     "uploads": "Uploads",
     "chatMessages": "Chat messages (today)",
     "activeSubscription": "Active Subscription",

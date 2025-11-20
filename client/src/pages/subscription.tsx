@@ -244,7 +244,7 @@ export default function SubscriptionPage() {
         <Card className="border-primary/50">
           <CardHeader>
             <CardTitle>{t("subscription.currentUsage")}</CardTitle>
-            <CardDescription>{t("subscription.currentUsageSubtitle")}</CardDescription>
+            <CardDescription>{t("subscription.currentUsageSubtitle", { planName: t(`subscription.plans.${currentPlan}.name`) })}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">

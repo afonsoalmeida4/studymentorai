@@ -523,7 +523,7 @@
       "saveMoney": "Poupa {{amount}}€"
     },
     "currentUsage": "Utilização Atual",
-    "currentUsageSubtitle": "Progresso do plano Free este mês",
+    "currentUsageSubtitle": "Progresso do plano {{planName}} este mês",
     "uploads": "Uploads",
     "chatMessages": "Mensagens de chat (hoje)",
     "activeSubscription": "Subscrição Ativa",
