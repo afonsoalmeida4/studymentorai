@@ -10,6 +10,20 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 ## Recent Changes
 
 ### November 20, 2025
+- **File Upload Fixes & FREE Plan Learning Styles**: Fixed critical bugs in file upload and learning style selection
+  - **PDF Upload Error**: Fixed `pdfParse is not a function` error by correcting pdf-parse module import with fallback (pdfParseModule.default || pdfParseModule)
+  - **File Size Limits by Plan**: Implemented plan-based file size limits with dynamic validation
+    - FREE: 10MB maximum per file
+    - Pro/Premium: 100MB maximum per file
+    - Multer middleware updated to allow 100MB uploads (was 50MB)
+    - Custom validation in `isValidFileSize(size, plan)` enforces plan-specific limits
+    - Error messages now show plan-specific limits dynamically
+  - **Learning Styles Filter**: Fixed hardcoded learning styles array to respect plan limits
+    - FREE users now only see "Conciso" available for summary generation
+    - Pro/Premium users see all 4 learning styles (Visual, Auditivo, Lógico, Conciso)
+    - Fixed in both: initial summary generation UI and "Generate More Styles" dialog
+    - Uses `getMissingStyles()` which filters by `limits.allowedLearningStyles`
+  - Files affected: `server/textExtractor.ts`, `server/organizationRoutes.ts`, `client/src/pages/topic-view.tsx`
 - **Subscription Pricing Updated**: Final subscription prices across all platforms
   - Pro: 5.99€/month or 49.99€/year (~27% yearly savings)
   - Premium: 11.99€/month or 99.99€/year (~27% yearly savings)
