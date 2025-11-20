@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "wouter";
 import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -68,7 +68,7 @@ export default function TopicView() {
   const [generateSummary, setGenerateSummary] = useState(true);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
-  const [selectedLearningStyles, setSelectedLearningStyles] = useState<LearningStyle[]>(["visual"]);
+  const [selectedLearningStyles, setSelectedLearningStyles] = useState<LearningStyle[]>(["conciso"]);
   const [isGenerateStylesDialogOpen, setIsGenerateStylesDialogOpen] = useState(false);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("uploads");
@@ -85,6 +85,13 @@ export default function TopicView() {
   } = useSubscription();
 
   const currentPlan = subscription?.plan || "free";
+
+  // Sync selectedLearningStyles with limits when they load
+  useEffect(() => {
+    if (limits?.allowedLearningStyles && limits.allowedLearningStyles.length > 0) {
+      setSelectedLearningStyles([limits.allowedLearningStyles[0]]);
+    }
+  }, [limits]);
 
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
@@ -276,9 +283,10 @@ export default function TopicView() {
   };
 
   const getMissingStyles = (): LearningStyle[] => {
+    if (!limits) return []; // Don't show any styles until limits are loaded
     const existing = new Set(Object.keys(topicSummariesData?.summaries || {}) as LearningStyle[]);
     const allStyles: LearningStyle[] = ["visual", "auditivo", "logico", "conciso"];
-    const allowedStyles = limits?.allowedLearningStyles || ["conciso"];
+    const allowedStyles = limits.allowedLearningStyles || ["conciso"];
     return allStyles.filter(style => !existing.has(style) && allowedStyles.includes(style));
   };
 

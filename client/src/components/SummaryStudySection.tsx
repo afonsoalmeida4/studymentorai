@@ -135,8 +135,8 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   </CardDescription>
                 </div>
               </div>
-              {hasAdvancedFlashcards ? (
-                <div className="flex gap-2">
+              <div className="flex gap-2">
+                {hasAdvancedFlashcards && (
                   <Button
                     variant={studyMode === "spaced" ? "default" : "outline"}
                     size="sm"
@@ -147,28 +147,18 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                     <Calendar className="w-4 h-4" />
                     {t('summaryStudy.modeAnki')}
                   </Button>
-                  <Button
-                    variant={studyMode === "practice" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStudyMode("practice")}
-                    data-testid="button-mode-practice"
-                    className="gap-2"
-                  >
-                    <Dumbbell className="w-4 h-4" />
-                    {t('summaryStudy.modePractice')}
-                  </Button>
-                </div>
-              ) : (
+                )}
                 <Button
-                  variant="default"
+                  variant={hasAdvancedFlashcards ? (studyMode === "practice" ? "default" : "outline") : "default"}
                   size="sm"
+                  onClick={() => setStudyMode("practice")}
                   data-testid="button-mode-practice"
                   className="gap-2"
                 >
                   <Dumbbell className="w-4 h-4" />
                   {t('summaryStudy.modePractice')}
                 </Button>
-              )}
+              </div>
             </div>
           </CardHeader>
           <CardContent>
