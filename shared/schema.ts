@@ -25,8 +25,8 @@ export type XpAction = typeof xpActions[number];
 export const userLevels = ["iniciante", "explorador", "mentor", "mestre"] as const;
 export type UserLevel = typeof userLevels[number];
 
-// User Roles enum
-export const userRoles = ["student", "teacher"] as const;
+// User Roles enum (simplified - all users are students)
+export const userRoles = ["student"] as const;
 export type UserRole = typeof userRoles[number];
 
 // Supported Languages enum
@@ -60,7 +60,7 @@ export const chatModes = ["study", "existential"] as const;
 export type ChatMode = typeof chatModes[number];
 
 // Subscription Plan enum
-export const subscriptionPlans = ["free", "pro", "premium", "educational"] as const;
+export const subscriptionPlans = ["free", "pro", "premium"] as const;
 export type SubscriptionPlan = typeof subscriptionPlans[number];
 
 // Subscription Status enum
@@ -114,23 +114,6 @@ export const planLimits = {
     sharedSpaces: true,
     exportPdf: true,
   },
-  educational: {
-    name: "AI Classroom Pro",
-    price: 14.99, // professor individual
-    uploadsPerMonth: -1,
-    maxSummaryWords: -1,
-    advancedFlashcards: true,
-    chatModes: ["study", "existential"] as ChatMode[],
-    dailyChatLimit: -1,
-    workspaces: -1,
-    advancedStats: true,
-    studyPlans: true,
-    mindMaps: true,
-    sharedSpaces: true,
-    exportPdf: true,
-    teacherFeatures: true,
-    classManagement: true,
-  },
 } as const;
 
 // Session storage table (mandatory for Replit Auth)
@@ -151,8 +134,6 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  // Role field (nullable until user selects during onboarding)
-  role: varchar("role", { length: 20 }),
   // Language preference (defaults to Portuguese)
   language: varchar("language", { length: 5 }).default("pt").notNull(),
   // Gamification fields (displayName nullable until user sets it)
@@ -467,8 +448,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   subjects: many(subjects),
   topics: many(topics),
   contentItems: many(contentItems),
-  teacherClasses: many(classes),
-  studentEnrollments: many(classEnrollments),
 }));
 
 export const summariesRelations = relations(summaries, ({ one, many }) => ({
@@ -734,78 +713,6 @@ export type XpEvent = typeof xpEvents.$inferSelect;
 export const xpEventsRelations = relations(xpEvents, ({ one }) => ({
   user: one(users, {
     fields: [xpEvents.userId],
-    references: [users.id],
-  }),
-}));
-
-// Classes table (Turmas para professores)
-export const classes = pgTable(
-  "classes",
-  {
-    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-    teacherId: varchar("teacher_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    description: text("description"),
-    inviteCode: varchar("invite_code", { length: 10 }).unique().notNull(),
-    isActive: boolean("is_active").default(true).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  },
-  (table) => [
-    index("idx_classes_teacher_id").on(table.teacherId),
-    index("idx_classes_invite_code").on(table.inviteCode),
-  ],
-);
-
-export const insertClassSchema = createInsertSchema(classes).omit({
-  id: true,
-  inviteCode: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type InsertClass = z.infer<typeof insertClassSchema>;
-export type Class = typeof classes.$inferSelect;
-
-// Class Enrollments table (Matrículas de alunos em turmas)
-export const classEnrollments = pgTable(
-  "class_enrollments",
-  {
-    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-    classId: varchar("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
-    studentId: varchar("student_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-    enrolledAt: timestamp("enrolled_at").defaultNow().notNull(),
-  },
-  (table) => [
-    index("idx_class_enrollments_class_id").on(table.classId),
-    index("idx_class_enrollments_student_id").on(table.studentId),
-    uniqueIndex("idx_class_enrollments_unique").on(table.classId, table.studentId),
-  ],
-);
-
-export const insertClassEnrollmentSchema = createInsertSchema(classEnrollments).omit({
-  id: true,
-  enrolledAt: true,
-});
-
-export type InsertClassEnrollment = z.infer<typeof insertClassEnrollmentSchema>;
-export type ClassEnrollment = typeof classEnrollments.$inferSelect;
-
-export const classesRelations = relations(classes, ({ one, many }) => ({
-  teacher: one(users, {
-    fields: [classes.teacherId],
-    references: [users.id],
-  }),
-  enrollments: many(classEnrollments),
-}));
-
-export const classEnrollmentsRelations = relations(classEnrollments, ({ one }) => ({
-  class: one(classes, {
-    fields: [classEnrollments.classId],
-    references: [classes.id],
-  }),
-  student: one(users, {
-    fields: [classEnrollments.studentId],
     references: [users.id],
   }),
 }));

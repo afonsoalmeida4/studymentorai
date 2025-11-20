@@ -15,9 +15,6 @@ import TopicView from "@/pages/topic-view";
 import ChatView from "@/pages/chat-view";
 import Dashboard from "@/pages/dashboard";
 import Ranking from "@/pages/ranking";
-import RoleSelection from "@/pages/role-selection";
-import MyClasses from "@/pages/my-classes";
-import StudentClasses from "@/pages/student-classes";
 import SubscriptionPage from "@/pages/subscription";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
@@ -33,10 +30,6 @@ function AuthenticatedRouter() {
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "3rem",
   };
-
-  if (typedUser && !typedUser.role) {
-    return <RoleSelection />;
-  }
 
   return (
     <SidebarProvider style={style as React.CSSProperties}>
@@ -55,7 +48,6 @@ function AuthenticatedRouter() {
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/ranking" component={Ranking} />
               <Route path="/subscription" component={SubscriptionPage} />
-              <Route path="/classes" component={typedUser?.role === "teacher" ? MyClasses : StudentClasses} />
               <Route path="/subjects" component={SubjectView} />
               <Route path="/subject/:id" component={SubjectView} />
               <Route path="/topic/:id" component={TopicView} />

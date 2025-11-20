@@ -34,18 +34,13 @@
     "chat": "AI Mentor",
     "profile": "Perfil",
     "settings": "Definições",
-    "classes": "Turmas",
     "subscription": "Plano",
     "logout": "Sair"
   },
   "auth": {
     "login": "Entrar",
     "logout": "Sair",
-    "welcome": "Bem-vindo",
-    "selectRole": "Selecionar Papel",
-    "student": "Estudante",
-    "teacher": "Professor",
-    "chooseRole": "Escolhe o teu papel para começar"
+    "welcome": "Bem-vindo"
   },
   "subjects": {
     "title": "As Minhas Matérias",
@@ -371,10 +366,6 @@
       "flashcards": {
         "title": "Flashcards Inteligentes",
         "description": "Sistema de repetição espaçada SM-2 (estilo Anki) para memorização eficaz e duradoura."
-      },
-      "classes": {
-        "title": "Turmas & Professores",
-        "description": "Professores podem criar turmas e acompanhar o progresso dos alunos em tempo real."
       },
       "gamification": {
         "title": "Gamificação & Ranking",
