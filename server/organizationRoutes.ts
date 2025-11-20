@@ -17,7 +17,7 @@ import type { SupportedLanguage } from "@shared/schema";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 50 * 1024 * 1024,
+    fileSize: 100 * 1024 * 1024, // 100MB max (plan-specific limits checked in route)
   },
   fileFilter: (req, file, cb) => {
     const validType = validateFileType(file.mimetype);
