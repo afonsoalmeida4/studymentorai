@@ -165,7 +165,7 @@
       "generating": "Generando...",
       "generate": "Generar Resúmenes",
       "successOne": "¡Resumen generado!",
-      "successMultiple": "resúmenes generados!",
+      "successMultiple": "{{count}} resúmenes generados!",
       "successDescriptionOne": "El resumen del tema ha sido creado en el estilo seleccionado.",
       "successDescriptionMultiple": "Los resúmenes han sido creados en los estilos seleccionados."
     },
@@ -196,6 +196,9 @@
     "title": "Resúmenes",
     "generate": "Generar Resúmenes",
     "generating": "Generando resúmenes...",
+    "generatingSummary": "Generando resumen...",
+    "generatingWait": "Esto puede tardar 1-2 minutos.",
+    "loading": "Cargando resúmenes...",
     "learningStyle": "Estilo de Aprendizaje",
     "visual": "Visual",
     "auditory": "Auditivo",

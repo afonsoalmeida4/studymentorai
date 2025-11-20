@@ -56,6 +56,19 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
   - **Race Condition Prevention**: No premium API calls execute during loading or for FREE users at any time
   - **TypeScript Safety**: All guards use `currentPlan` instead of `subscription.plan` to prevent undefined errors
   - Files affected: `client/src/components/AppSidebar.tsx`, `client/src/pages/dashboard.tsx`, `client/src/pages/chat-view.tsx`
+- **French Translation Fix**: Corrected hardcoded Portuguese strings appearing in French language mode
+  - **New translation keys added** to all 6 languages (PT, EN, ES, FR, DE, IT):
+    - `summaries.generatingSummary`: Loading state for single summary generation
+    - `summaries.generatingWait`: Wait time message during generation
+    - `summaries.loading`: Loading state for summaries list
+  - **Hardcoded strings replaced** in `client/src/pages/topic-view.tsx`:
+    - "A gerar resumo..." → `{t('summaries.generatingSummary')}`
+    - "Isto pode demorar 1-2 minutos." → `{t('summaries.generatingWait')}`
+    - "A carregar resumos..." → `{t('summaries.loading')}`
+  - **i18n interpolation fixed**: Changed from string concatenation to proper placeholder usage
+    - Before: `${count} ${t('...successMultiple')}`
+    - After: `t('...successMultiple', { count })` with `{{count}}` placeholder in translations
+  - Files affected: All 6 translation files, `client/src/pages/topic-view.tsx`
 
 ## System Architecture
 

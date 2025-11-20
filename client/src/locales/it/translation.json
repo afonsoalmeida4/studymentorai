@@ -162,7 +162,7 @@
       "generating": "Generazione...",
       "generate": "Genera Riassunti",
       "successOne": "Riassunto generato!",
-      "successMultiple": "riassunti generati!",
+      "successMultiple": "{{count}} riassunti generati!",
       "successDescriptionOne": "Il riassunto dell'argomento è stato creato nello stile selezionato.",
       "successDescriptionMultiple": "I riassunti sono stati creati negli stili selezionati."
     },
@@ -193,6 +193,9 @@
     "title": "Riassunti",
     "generate": "Genera Riassunti",
     "generating": "Generazione riassunti...",
+    "generatingSummary": "Generazione riassunto...",
+    "generatingWait": "Questo può richiedere 1-2 minuti.",
+    "loading": "Caricamento riassunti...",
     "learningStyle": "Stile di Apprendimento",
     "visual": "Visivo",
     "auditory": "Uditivo",

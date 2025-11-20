@@ -137,7 +137,9 @@ export default function TopicView() {
     onSuccess: (_data, variables) => {
       const count = variables.length;
       toast({
-        title: count === 1 ? t('topicView.generateStylesDialog.successOne') : `${count} ${t('topicView.generateStylesDialog.successMultiple')}`,
+        title: count === 1 
+          ? t('topicView.generateStylesDialog.successOne') 
+          : t('topicView.generateStylesDialog.successMultiple', { count }),
         description: count === 1 
           ? t('topicView.generateStylesDialog.successDescriptionOne')
           : t('topicView.generateStylesDialog.successDescriptionMultiple'),
@@ -490,14 +492,14 @@ export default function TopicView() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
-                  <p className="text-muted-foreground">A gerar resumo...</p>
-                  <p className="text-xs text-muted-foreground mt-2">Isto pode demorar 1-2 minutos.</p>
+                  <p className="text-muted-foreground">{t('summaries.generatingSummary')}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{t('summaries.generatingWait')}</p>
                 </CardContent>
               </Card>
             ) : topicSummariesLoading ? (
               <Card>
                 <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">A carregar resumos...</p>
+                  <p className="text-muted-foreground">{t('summaries.loading')}</p>
                 </CardContent>
               </Card>
             ) : topicSummariesData?.summaries && Object.keys(topicSummariesData.summaries).length > 0 ? (

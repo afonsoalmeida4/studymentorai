@@ -162,7 +162,7 @@
       "generating": "Génération...",
       "generate": "Générer des Résumés",
       "successOne": "Résumé généré!",
-      "successMultiple": "résumés générés!",
+      "successMultiple": "{{count}} résumés générés!",
       "successDescriptionOne": "Le résumé du sujet a été créé dans le style sélectionné.",
       "successDescriptionMultiple": "Les résumés ont été créés dans les styles sélectionnés."
     },
@@ -193,6 +193,9 @@
     "title": "Résumés",
     "generate": "Générer des Résumés",
     "generating": "Génération de résumés...",
+    "generatingSummary": "Génération du résumé...",
+    "generatingWait": "Cela peut prendre 1-2 minutes.",
+    "loading": "Chargement des résumés...",
     "learningStyle": "Style d'Apprentissage",
     "visual": "Visuel",
     "auditory": "Auditif",

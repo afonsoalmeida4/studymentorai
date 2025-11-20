@@ -162,7 +162,7 @@
       "generating": "Generieren...",
       "generate": "Zusammenfassungen Generieren",
       "successOne": "Zusammenfassung generiert!",
-      "successMultiple": "Zusammenfassungen generiert!",
+      "successMultiple": "{{count}} Zusammenfassungen generiert!",
       "successDescriptionOne": "Die Themenzusammenfassung wurde im ausgewählten Stil erstellt.",
       "successDescriptionMultiple": "Die Zusammenfassungen wurden in den ausgewählten Stilen erstellt."
     },
@@ -193,6 +193,9 @@
     "title": "Zusammenfassungen",
     "generate": "Zusammenfassungen erstellen",
     "generating": "Erstelle Zusammenfassungen...",
+    "generatingSummary": "Erstelle Zusammenfassung...",
+    "generatingWait": "Dies kann 1-2 Minuten dauern.",
+    "loading": "Lade Zusammenfassungen...",
     "learningStyle": "Lernstil",
     "visual": "Visuell",
     "auditory": "Auditiv",

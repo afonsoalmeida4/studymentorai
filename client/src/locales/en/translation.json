@@ -165,7 +165,7 @@
       "generating": "Generating...",
       "generate": "Generate Summaries",
       "successOne": "Summary generated!",
-      "successMultiple": "summaries generated!",
+      "successMultiple": "{{count}} summaries generated!",
       "successDescriptionOne": "The topic summary has been created in the selected style.",
       "successDescriptionMultiple": "The summaries have been created in the selected styles."
     },
@@ -196,6 +196,9 @@
     "title": "Summaries",
     "generate": "Generate Summaries",
     "generating": "Generating summaries...",
+    "generatingSummary": "Generating summary...",
+    "generatingWait": "This may take 1-2 minutes.",
+    "loading": "Loading summaries...",
     "learningStyle": "Learning Style",
     "visual": "Visual",
     "auditory": "Auditory",
