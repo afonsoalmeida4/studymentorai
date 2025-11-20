@@ -171,6 +171,14 @@ export default function SubscriptionPage() {
     return (plan.monthly * 12 - plan.yearly).toFixed(2);
   };
 
+  const getSavingsPercent = () => {
+    // Calculate average savings percentage across both plans
+    const proSavings = ((pricing.pro.monthly * 12 - pricing.pro.yearly) / (pricing.pro.monthly * 12)) * 100;
+    const premiumSavings = ((pricing.premium.monthly * 12 - pricing.premium.yearly) / (pricing.premium.monthly * 12)) * 100;
+    const avgSavings = (proSavings + premiumSavings) / 2;
+    return Math.round(avgSavings);
+  };
+
   const plans = [
     {
       id: "free",
@@ -225,7 +233,7 @@ export default function SubscriptionPage() {
             </span>
             {billingPeriod === "yearly" && (
               <Badge variant="default" className="bg-green-600 dark:bg-green-700 text-xs" data-testid="badge-save">
-                {t("subscription.billing.save")}
+                {t("subscription.billing.save", { percent: getSavingsPercent() })}
               </Badge>
             )}
           </div>
