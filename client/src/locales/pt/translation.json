@@ -559,7 +559,7 @@
       },
       "pro": {
         "name": "Estuda Sem Limites",
-        "price": "6,19€",
+        "price": "5,99€",
         "period": "/mês",
         "features": {
           "uploads": "Uploads ilimitados",
@@ -574,7 +574,7 @@
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "12,29€",
+        "price": "11,99€",
         "period": "/mês",
         "features": {
           "allPro": "Tudo do Pro +",
@@ -586,21 +586,6 @@
           "sharedSpaces": "Espaços partilhados",
           "pdfExport": "Exportação PDF",
           "earlyAccess": "Acesso antecipado"
-        }
-      },
-      "educational": {
-        "name": "AI Classroom Pro",
-        "price": "14,99€",
-        "period": "/mês",
-        "features": {
-          "allPremium": "Tudo do Premium +",
-          "classManagement": "Gestão de turmas",
-          "sharedLibrary": "Biblioteca partilhada",
-          "classDashboard": "Dashboard da turma",
-          "teacherAssistant": "AI Teacher Assistant",
-          "worksheets": "Criar fichas de exercícios",
-          "quizzes": "Mini-testes automáticos",
-          "lessonPlans": "Planos de aula"
         }
       }
     }

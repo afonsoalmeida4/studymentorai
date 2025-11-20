@@ -568,7 +568,7 @@
       },
       "pro": {
         "name": "Study Without Limits",
-        "price": "$6.19",
+        "price": "$5.99",
         "period": "/mo",
         "features": {
           "uploads": "Unlimited uploads",
@@ -583,7 +583,7 @@
       },
       "premium": {
         "name": "High Performance",
-        "price": "$12.29",
+        "price": "$11.99",
         "period": "/mo",
         "features": {
           "allPro": "Everything in Pro +",
@@ -595,21 +595,6 @@
           "sharedSpaces": "Shared spaces",
           "pdfExport": "PDF export",
           "earlyAccess": "Early access"
-        }
-      },
-      "educational": {
-        "name": "AI Classroom Pro",
-        "price": "€14.99",
-        "period": "/mo",
-        "features": {
-          "allPremium": "Everything in Premium +",
-          "classManagement": "Class management",
-          "sharedLibrary": "Shared library",
-          "classDashboard": "Class dashboard",
-          "teacherAssistant": "AI Teacher Assistant",
-          "worksheets": "Create worksheets",
-          "quizzes": "Automatic mini-quizzes",
-          "lessonPlans": "Lesson plans"
         }
       }
     }

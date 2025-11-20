@@ -485,7 +485,7 @@
       },
       "pro": {
         "name": "Grenzenlos Lernen",
-        "price": "6,19€",
+        "price": "5,99€",
         "period": "/Monat",
         "features": {
           "uploads": "Unbegrenzte Uploads",
@@ -500,7 +500,7 @@
       },
       "premium": {
         "name": "Hohe Leistung",
-        "price": "12,29€",
+        "price": "11,99€",
         "period": "/Monat",
         "features": {
           "allPro": "Alles von Pro +",
@@ -512,21 +512,6 @@
           "sharedSpaces": "Gemeinsame Bereiche",
           "pdfExport": "PDF-Export",
           "earlyAccess": "Frühzeitiger Zugang"
-        }
-      },
-      "educational": {
-        "name": "AI Classroom Pro",
-        "price": "14,99€",
-        "period": "/Monat",
-        "features": {
-          "allPremium": "Alles von Premium +",
-          "classManagement": "Klassenverwaltung",
-          "sharedLibrary": "Gemeinsame Bibliothek",
-          "classDashboard": "Klassen-Dashboard",
-          "teacherAssistant": "AI Teacher Assistant",
-          "worksheets": "Arbeitsblätter erstellen",
-          "quizzes": "Automatische Mini-Tests",
-          "lessonPlans": "Unterrichtspläne"
         }
       }
     }
