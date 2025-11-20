@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useSubscription } from "@/hooks/useSubscription";
 import type { GenerateFlashcardsResponse } from "@shared/schema";
 import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
 import { Loader2, Brain, Sparkles, Calendar, Dumbbell } from "lucide-react";
@@ -16,7 +17,10 @@ interface SummaryStudySectionProps {
 export default function SummaryStudySection({ summaryId }: SummaryStudySectionProps) {
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
-  const [studyMode, setStudyMode] = useState<"spaced" | "practice">("spaced");
+  const { subscription } = useSubscription();
+  const currentPlan = subscription?.plan || "free";
+  const hasAdvancedFlashcards = currentPlan !== "free";
+  const [studyMode, setStudyMode] = useState<"spaced" | "practice">(hasAdvancedFlashcards ? "spaced" : "practice");
 
   // Fetch existing flashcards
   const { data: flashcardsData, isLoading } = useQuery<GenerateFlashcardsResponse>({
@@ -131,28 +135,40 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   </CardDescription>
                 </div>
               </div>
-              <div className="flex gap-2">
+              {hasAdvancedFlashcards ? (
+                <div className="flex gap-2">
+                  <Button
+                    variant={studyMode === "spaced" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setStudyMode("spaced")}
+                    data-testid="button-mode-spaced"
+                    className="gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    {t('summaryStudy.modeAnki')}
+                  </Button>
+                  <Button
+                    variant={studyMode === "practice" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setStudyMode("practice")}
+                    data-testid="button-mode-practice"
+                    className="gap-2"
+                  >
+                    <Dumbbell className="w-4 h-4" />
+                    {t('summaryStudy.modePractice')}
+                  </Button>
+                </div>
+              ) : (
                 <Button
-                  variant={studyMode === "spaced" ? "default" : "outline"}
+                  variant="default"
                   size="sm"
-                  onClick={() => setStudyMode("spaced")}
-                  data-testid="button-mode-spaced"
-                  className="gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  {t('summaryStudy.modeAnki')}
-                </Button>
-                <Button
-                  variant={studyMode === "practice" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStudyMode("practice")}
                   data-testid="button-mode-practice"
                   className="gap-2"
                 >
                   <Dumbbell className="w-4 h-4" />
                   {t('summaryStudy.modePractice')}
                 </Button>
-              </div>
+              )}
             </div>
           </CardHeader>
           <CardContent>

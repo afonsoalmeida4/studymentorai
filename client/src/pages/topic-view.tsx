@@ -184,6 +184,7 @@ export default function TopicView() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/content", topicId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
       setIsUploadDialogOpen(false);
       setSelectedFile(null);
       setGenerateSummary(true);
@@ -277,7 +278,8 @@ export default function TopicView() {
   const getMissingStyles = (): LearningStyle[] => {
     const existing = new Set(Object.keys(topicSummariesData?.summaries || {}) as LearningStyle[]);
     const allStyles: LearningStyle[] = ["visual", "auditivo", "logico", "conciso"];
-    return allStyles.filter(style => !existing.has(style));
+    const allowedStyles = limits?.allowedLearningStyles || ["conciso"];
+    return allStyles.filter(style => !existing.has(style) && allowedStyles.includes(style));
   };
 
   const confirmRegenerate = () => {
