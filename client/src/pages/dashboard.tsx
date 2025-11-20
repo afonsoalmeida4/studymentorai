@@ -75,6 +75,59 @@ export default function Dashboard() {
     enabled: currentPlan !== "free",
   });
 
+  // New KPI queries
+  const { data: studyTimeData, isLoading: studyTimeLoading } = useQuery<{
+    currentWeekMinutes: number;
+    currentWeekHours: string;
+    previousWeekMinutes: number;
+    deltaMinutes: number;
+    weeklyGoalMinutes: number;
+    progressPercentage: number;
+  }>({
+    queryKey: ["/api/stats/study-time"],
+    enabled: currentPlan !== "free",
+  });
+
+  const { data: subjectProgressData, isLoading: subjectProgressLoading } = useQuery<{
+    subjects: Array<{
+      subjectId: string;
+      subjectName: string;
+      subjectColor: string | null;
+      totalTopics: number;
+      completedTopics: number;
+      completionPercentage: number;
+    }>;
+  }>({
+    queryKey: ["/api/stats/subject-progress"],
+    enabled: currentPlan !== "free",
+  });
+
+  const { data: tasksData, isLoading: tasksLoading } = useQuery<{
+    tasks: Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      completed: boolean;
+      priority: string;
+      dueDate: string | null;
+    }>;
+    dailyCompleted: number;
+    weeklyCompleted: number;
+  }>({
+    queryKey: ["/api/stats/tasks"],
+    enabled: currentPlan !== "free",
+  });
+
+  const { data: streakData, isLoading: streakLoading } = useQuery<{
+    currentStreak: number;
+    longestStreak: number;
+    todayMinutes: number;
+    hasStudiedToday: boolean;
+  }>({
+    queryKey: ["/api/stats/streak"],
+    enabled: currentPlan !== "free",
+  });
+
   if (!subscriptionResolved || currentPlan === "free") {
     return null;
   }
@@ -95,7 +148,7 @@ export default function Dashboard() {
           <GamificationHeader />
         </div>
 
-        {statsLoading ? (
+        {studyTimeLoading || subjectProgressLoading || tasksLoading || streakLoading ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
             {[...Array(4)].map((_, i) => (
               <Card key={i}>
@@ -111,48 +164,90 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+              {/* Weekly Study Hours KPI */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.pdfsStudied")}</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.weeklyHours")}</CardTitle>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold" data-testid="stat-pdfs-studied">{stats?.totalPDFsStudied || 0}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.flashcardsCompleted")}</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold" data-testid="stat-flashcards-completed">{stats?.totalFlashcardsCompleted || 0}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.studyStreak")}</CardTitle>
-                  <Flame className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold" data-testid="stat-study-streak">{stats?.studyStreak || 0}</div>
+                  <div className="text-2xl font-bold" data-testid="kpi-weekly-hours">
+                    {studyTimeData?.currentWeekHours || "0.0"}h
+                  </div>
+                  <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all" 
+                      style={{ width: `${Math.min(100, studyTimeData?.progressPercentage || 0)}%` }}
+                    />
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {stats?.studyStreak && stats.studyStreak > 0 ? t("dashboard.stats.keepGoing") : t("dashboard.stats.startToday")}
+                    {studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes > 0 
+                      ? `+${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}` 
+                      : studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes < 0 
+                      ? `${(studyTimeData.deltaMinutes / 60).toFixed(1)}h ${t("dashboard.kpi.vsLastWeek")}`
+                      : t("dashboard.kpi.firstWeek")}
                   </p>
                 </CardContent>
               </Card>
 
+              {/* Subject Progress KPI */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("dashboard.stats.averageAccuracy")}</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
+                  <Target className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold" data-testid="stat-average-accuracy">
-                    {stats?.averageAccuracy ? `${stats.averageAccuracy.toFixed(1)}%` : "0%"}
+                  <div className="text-2xl font-bold" data-testid="kpi-subject-progress">
+                    {subjectProgressData?.subjects?.[0]?.completionPercentage || 0}%
                   </div>
+                  <p className="text-xs text-muted-foreground mt-1 truncate">
+                    {subjectProgressData?.subjects?.[0]?.subjectName || t("dashboard.kpi.noSubjects")}
+                  </p>
+                  {subjectProgressData?.subjects?.[0] && (
+                    <p className="text-xs text-muted-foreground">
+                      {subjectProgressData.subjects[0].completedTopics}/{subjectProgressData.subjects[0].totalTopics} {t("dashboard.kpi.topicsCompleted")}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Tasks Completed KPI */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
+                  <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" data-testid="kpi-tasks-completed">
+                    {tasksData?.dailyCompleted || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t("dashboard.kpi.tasksToday")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {tasksData?.weeklyCompleted || 0} {t("dashboard.kpi.tasksThisWeek")}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Study Streak KPI */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t("dashboard.kpi.studyStreak")}</CardTitle>
+                  <Flame className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" data-testid="kpi-study-streak">
+                    {streakData?.currentStreak || 0} {t("dashboard.kpi.days")}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {streakData?.hasStudiedToday 
+                      ? `✓ ${t("dashboard.kpi.studiedToday")}` 
+                      : t("dashboard.kpi.notStudiedToday")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("dashboard.kpi.longestStreak")}: {streakData?.longestStreak || 0}
+                  </p>
                 </CardContent>
               </Card>
             </div>

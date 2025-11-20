@@ -767,6 +767,22 @@
       "keepGoing": "Continue assim!",
       "startToday": "Comece hoje!"
     },
+    "kpi": {
+      "weeklyHours": "Horas Semanais",
+      "subjectProgress": "Progresso da Matéria",
+      "tasksCompleted": "Tarefas Concluídas",
+      "studyStreak": "Dias Consecutivos",
+      "vsLastWeek": "vs semana passada",
+      "firstWeek": "Primeira semana",
+      "noSubjects": "Sem matérias",
+      "topicsCompleted": "tópicos concluídos",
+      "tasksToday": "Hoje",
+      "tasksThisWeek": "esta semana",
+      "days": "dias",
+      "studiedToday": "Estudaste hoje",
+      "notStudiedToday": "Ainda não estudaste hoje",
+      "longestStreak": "Sequência máxima"
+    },
     "premium": {
       "unlock": "Desbloqueie o Premium",
       "description": "Acesso exclusivo ao Mentor IA, resumos ilimitados, e tema dourado",

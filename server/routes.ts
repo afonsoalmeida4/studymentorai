@@ -25,6 +25,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { awardXP, getGamificationProfile, getLeaderboard, activatePremium } from "./gamificationService";
 import { registerOrganizationRoutes } from "./organizationRoutes";
 import { registerChatRoutes } from "./chatRoutes";
+import { registerStatsRoutes } from "./statsRoutes";
 import { calculateNextReview } from "./flashcardScheduler";
 import { db } from "./db";
 import { and, eq, sql, gt, asc } from "drizzle-orm";
@@ -1203,6 +1204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   registerOrganizationRoutes(app);
   registerChatRoutes(app);
+  registerStatsRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

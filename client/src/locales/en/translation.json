@@ -776,6 +776,22 @@
       "keepGoing": "Keep going!",
       "startToday": "Start today!"
     },
+    "kpi": {
+      "weeklyHours": "Weekly Hours",
+      "subjectProgress": "Subject Progress",
+      "tasksCompleted": "Tasks Completed",
+      "studyStreak": "Study Streak",
+      "vsLastWeek": "vs last week",
+      "firstWeek": "First week",
+      "noSubjects": "No subjects",
+      "topicsCompleted": "topics completed",
+      "tasksToday": "Today",
+      "tasksThisWeek": "this week",
+      "days": "days",
+      "studiedToday": "Studied today",
+      "notStudiedToday": "Not studied today",
+      "longestStreak": "Longest streak"
+    },
     "premium": {
       "unlock": "Unlock Premium",
       "description": "Exclusive access to AI Mentor, unlimited summaries, and golden theme",

@@ -872,6 +872,126 @@ export const recordStudySessionResponseSchema = z.object({
 
 export type RecordStudySessionResponse = z.infer<typeof recordStudySessionResponseSchema>;
 
+// Topic Study Time table (tracks time spent on topics for dashboard KPI)
+export const topicStudyTime = pgTable(
+  "topic_study_time",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
+    startedAt: timestamp("started_at").notNull(),
+    endedAt: timestamp("ended_at"),
+    durationMinutes: integer("duration_minutes").default(0).notNull(),
+    source: varchar("source", { length: 10 }).default("auto").notNull(), // 'auto' or 'manual'
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_topic_study_time_user_id").on(table.userId),
+    index("idx_topic_study_time_topic_id").on(table.topicId),
+    index("idx_topic_study_time_user_started_at").on(table.userId, table.startedAt),
+  ],
+);
+
+export const insertTopicStudyTimeSchema = createInsertSchema(topicStudyTime).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTopicStudyTime = z.infer<typeof insertTopicStudyTimeSchema>;
+export type TopicStudyTime = typeof topicStudyTime.$inferSelect;
+
+// Topic Study Events table (enter/exit logs for resilience)
+export const topicStudyEvents = pgTable(
+  "topic_study_events",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
+    sessionId: varchar("session_id").references(() => topicStudyTime.id, { onDelete: "set null" }),
+    eventType: varchar("event_type", { length: 10 }).notNull(), // 'enter' or 'exit'
+    timestamp: timestamp("timestamp").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_topic_study_events_user_id").on(table.userId),
+    index("idx_topic_study_events_topic_id").on(table.topicId),
+    index("idx_topic_study_events_session_id").on(table.sessionId),
+    index("idx_topic_study_events_timestamp").on(table.timestamp),
+  ],
+);
+
+export const insertTopicStudyEventSchema = createInsertSchema(topicStudyEvents).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertTopicStudyEvent = z.infer<typeof insertTopicStudyEventSchema>;
+export type TopicStudyEvent = typeof topicStudyEvents.$inferSelect;
+
+// Tasks table (user-created tasks)
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    subjectId: varchar("subject_id").references(() => subjects.id, { onDelete: "set null" }),
+    topicId: varchar("topic_id").references(() => topics.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    dueDate: timestamp("due_date"),
+    priority: varchar("priority", { length: 10 }).default("medium").notNull(), // 'low', 'medium', 'high'
+    completed: boolean("completed").default(false).notNull(),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_tasks_user_id").on(table.userId),
+    index("idx_tasks_subject_id").on(table.subjectId),
+    index("idx_tasks_topic_id").on(table.topicId),
+    index("idx_tasks_user_completed_at").on(table.userId, table.completedAt),
+    index("idx_tasks_due_date").on(table.dueDate),
+  ],
+);
+
+export const insertTaskSchema = createInsertSchema(tasks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type Task = typeof tasks.$inferSelect;
+
+// Topic Progress table (tracks completed topics)
+export const topicProgress = pgTable(
+  "topic_progress",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
+    subjectId: varchar("subject_id").notNull().references(() => subjects.id, { onDelete: "cascade" }),
+    completed: boolean("completed").default(false).notNull(),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_topic_progress_user_id").on(table.userId),
+    index("idx_topic_progress_topic_id").on(table.topicId),
+    index("idx_topic_progress_subject_id").on(table.subjectId),
+    uniqueIndex("idx_topic_progress_unique").on(table.userId, table.topicId),
+  ],
+);
+
+export const insertTopicProgressSchema = createInsertSchema(topicProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTopicProgress = z.infer<typeof insertTopicProgressSchema>;
+export type TopicProgress = typeof topicProgress.$inferSelect;
+
 // Dashboard Stats API types
 export const dashboardStatsSchema = z.object({
   totalPDFsStudied: z.number().int(),
