@@ -5,7 +5,7 @@ import Stripe from "stripe";
 import PDFDocument from "pdfkit";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
 import { getUserLanguage } from "./languageHelper";
-import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards } from "./translationService";
+import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards, createManualFlashcardWithTranslations } from "./translationService";
 import { 
   generateSummaryRequestSchema, 
   generateFlashcardsRequestSchema,
@@ -621,12 +621,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[GET /api/flashcards/user] Filters:`, filters);
 
+      // Remove language filter to get ALL flashcards (we'll translate them)
+      delete filters.language;
       const flashcards = await storage.getUserFlashcards(userId, filters);
-      console.log(`[GET /api/flashcards/user] Found ${flashcards.length} flashcards`);
+      console.log(`[GET /api/flashcards/user] Found ${flashcards.length} flashcards (before translation)`);
+
+      // Get user language preference
+      const user = await storage.getUser(userId);
+      const userLanguage = getUserLanguage(user?.language);
+      console.log(`[GET /api/flashcards/user] User language: ${userLanguage}`);
+
+      // Get flashcard IDs for this user to filter translations
+      const userFlashcardIds = flashcards.map(fc => fc.id);
+
+      // Build translation maps ONLY for this user's flashcards
+      // Map 1: baseFlashcardId -> { language -> translatedFlashcardId }
+      const translationMap = new Map<string, Map<string, string>>();
+      // Map 2: translatedFlashcardId -> baseFlashcardId (reverse index for O(1) lookup)
+      const reverseMap = new Map<string, string>();
+
+      if (userFlashcardIds.length > 0) {
+        // Get translations where base OR translated flashcard belongs to this user
+        const userTranslations = await db
+          .select()
+          .from(flashcardTranslations)
+          .where(
+            or(
+              inArray(flashcardTranslations.baseFlashcardId, userFlashcardIds),
+              inArray(flashcardTranslations.translatedFlashcardId, userFlashcardIds)
+            )
+          );
+
+        for (const trans of userTranslations) {
+          if (!translationMap.has(trans.baseFlashcardId)) {
+            translationMap.set(trans.baseFlashcardId, new Map());
+          }
+          translationMap.get(trans.baseFlashcardId)!.set(trans.targetLanguage, trans.translatedFlashcardId);
+          reverseMap.set(trans.translatedFlashcardId, trans.baseFlashcardId);
+        }
+      }
+
+      // Create a map of all flashcards for O(1) lookup
+      const allFlashcardsMap = new Map(flashcards.map(f => [f.id, f]));
+
+      // Translate flashcards to user's language
+      const translatedFlashcards = await Promise.all(
+        flashcards.map(async (fc) => {
+          // If flashcard is already in user's language, return as is
+          if (fc.language === userLanguage) {
+            return fc;
+          }
+
+          // Find base flashcard ID using reverse index (O(1))
+          const baseFlashcardId = reverseMap.get(fc.id) || fc.id;
+
+          // Look for translation in user's language
+          const languageMap = translationMap.get(baseFlashcardId);
+          if (languageMap) {
+            const translatedId = languageMap.get(userLanguage);
+            if (translatedId) {
+              // First check if already in result set
+              const translated = allFlashcardsMap.get(translatedId);
+              if (translated) return translated;
+              
+              // If not, fetch from DB with userId filter for security
+              const [fetchedTranslation] = await db
+                .select()
+                .from(flashcards)
+                .where(and(eq(flashcards.id, translatedId), eq(flashcards.userId, userId)))
+                .limit(1);
+              if (fetchedTranslation) return fetchedTranslation;
+            }
+          }
+
+          // No translation found, return original flashcard
+          return fc;
+        })
+      );
+
+      const validFlashcards = translatedFlashcards.filter(fc => fc !== undefined);
+      console.log(`[GET /api/flashcards/user] Returning ${validFlashcards.length} flashcards in ${userLanguage}`);
 
       return res.json({
         success: true,
-        flashcards: flashcards.map(fc => ({
+        flashcards: validFlashcards.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
           updatedAt: fc.updatedAt?.toISOString() || new Date().toISOString(),
@@ -726,14 +804,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         flashcardData.language = userLanguage;
       }
 
-      const flashcard = await storage.createFlashcard(flashcardData);
+      // Create flashcard with automatic translations to all supported languages
+      const { baseFlashcard } = await createManualFlashcardWithTranslations({
+        question: flashcardData.question,
+        answer: flashcardData.answer,
+        language: flashcardData.language,
+        userId: flashcardData.userId,
+        subjectId: flashcardData.subjectId || null,
+        topicId: flashcardData.topicId || null,
+      });
 
       return res.json({
         success: true,
         flashcard: {
-          ...flashcard,
-          createdAt: flashcard.createdAt?.toISOString() || new Date().toISOString(),
-          updatedAt: flashcard.updatedAt?.toISOString() || new Date().toISOString(),
+          ...baseFlashcard,
+          createdAt: baseFlashcard.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: baseFlashcard.updatedAt?.toISOString() || new Date().toISOString(),
         },
       });
     } catch (error) {

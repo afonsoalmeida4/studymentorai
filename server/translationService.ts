@@ -372,3 +372,95 @@ Respond ONLY with a JSON object in this exact format:
     throw new Error(`Failed to translate flashcards: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+export async function createManualFlashcardWithTranslations(flashcardData: {
+  question: string;
+  answer: string;
+  language: SupportedLanguage;
+  userId: string;
+  subjectId: string | null;
+  topicId: string | null;
+}): Promise<{ baseFlashcard: Flashcard; translations: Flashcard[] }> {
+  console.log(`[createManualFlashcardWithTranslations] Creating manual flashcard in ${flashcardData.language}`);
+  
+  // First, translate all flashcards BEFORE starting DB transaction (to fail fast)
+  const allLanguages: SupportedLanguage[] = ["pt", "en", "es", "fr", "de", "it"];
+  const targetLanguages = allLanguages.filter(lang => lang !== flashcardData.language);
+  
+  const translationsData: Array<{ language: SupportedLanguage; question: string; answer: string }> = [];
+  
+  for (const targetLang of targetLanguages) {
+    console.log(`[createManualFlashcardWithTranslations] Translating to ${targetLang}...`);
+    const translatedData = await translateFlashcardsText(
+      [{ question: flashcardData.question, answer: flashcardData.answer }],
+      flashcardData.language,
+      targetLang
+    );
+    translationsData.push({
+      language: targetLang,
+      question: translatedData[0].question,
+      answer: translatedData[0].answer,
+    });
+  }
+  
+  console.log(`[createManualFlashcardWithTranslations] All translations completed successfully`);
+
+  // Now wrap DB operations in a transaction for atomicity
+  return await db.transaction(async (tx) => {
+    // Create base flashcard
+    const [baseFlashcard] = await tx
+      .insert(flashcards)
+      .values({
+        userId: flashcardData.userId,
+        question: flashcardData.question,
+        answer: flashcardData.answer,
+        language: flashcardData.language,
+        isManual: true,
+        subjectId: flashcardData.subjectId,
+        topicId: flashcardData.topicId,
+        summaryId: null,
+        topicSummaryId: null,
+      })
+      .returning();
+
+    console.log(`[createManualFlashcardWithTranslations] Base flashcard created: ${baseFlashcard.id}`);
+
+    const translatedFlashcards: Flashcard[] = [];
+    const translationMappings: Array<{ baseFlashcardId: string; translatedFlashcardId: string; targetLanguage: SupportedLanguage }> = [];
+
+    // Create all translated flashcards
+    for (const translation of translationsData) {
+      const [translatedFlashcard] = await tx
+        .insert(flashcards)
+        .values({
+          userId: flashcardData.userId,
+          question: translation.question,
+          answer: translation.answer,
+          language: translation.language,
+          isManual: true,
+          subjectId: flashcardData.subjectId,
+          topicId: flashcardData.topicId,
+          summaryId: null,
+          topicSummaryId: null,
+        })
+        .returning();
+
+      translatedFlashcards.push(translatedFlashcard);
+      translationMappings.push({
+        baseFlashcardId: baseFlashcard.id,
+        translatedFlashcardId: translatedFlashcard.id,
+        targetLanguage: translation.language,
+      });
+
+      console.log(`[createManualFlashcardWithTranslations] Translation created for ${translation.language}: ${translatedFlashcard.id}`);
+    }
+
+    // Create translation mappings
+    if (translationMappings.length > 0) {
+      await tx.insert(flashcardTranslations).values(translationMappings);
+      console.log(`[createManualFlashcardWithTranslations] Created ${translationMappings.length} translation mappings`);
+    }
+
+    return { baseFlashcard, translations: translatedFlashcards };
+  });
+}
