@@ -1093,3 +1093,43 @@ export const getReviewPlanResponseSchema = z.object({
 });
 
 export type GetReviewPlanResponse = z.infer<typeof getReviewPlanResponseSchema>;
+
+// Calendar Event Type enum
+export const eventTypes = ["exam", "assignment"] as const;
+export type EventType = typeof eventTypes[number];
+
+// Calendar Events table
+export const calendarEvents = pgTable(
+  "calendar_events",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    subjectId: varchar("subject_id").references(() => subjects.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").references(() => topics.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    eventType: varchar("event_type", { length: 20 }).notNull(),
+    eventDate: timestamp("event_date").notNull(),
+    completed: boolean("completed").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_calendar_events_user_id").on(table.userId),
+    index("idx_calendar_events_subject_id").on(table.subjectId),
+    index("idx_calendar_events_date").on(table.eventDate),
+    index("idx_calendar_events_user_date").on(table.userId, table.eventDate),
+  ],
+);
+
+export const insertCalendarEventSchema = createInsertSchema(calendarEvents, {
+  eventType: z.enum(eventTypes),
+  eventDate: z.coerce.date(),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
+export type CalendarEvent = typeof calendarEvents.$inferSelect;

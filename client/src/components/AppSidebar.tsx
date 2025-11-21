@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -180,6 +180,21 @@ export function AppSidebar() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </>
+                )}
+                {isPremiumOnly && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location === "/calendar"}
+                      data-testid="button-calendar"
+                    >
+                      <Link href="/calendar">
+                        <CalendarDays className="w-4 h-4" />
+                        <span>{t('nav.calendar')}</span>
+                        <Badge variant="secondary" className="ml-auto text-xs">Premium</Badge>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 )}
                 <SidebarMenuItem>
                   <SidebarMenuButton

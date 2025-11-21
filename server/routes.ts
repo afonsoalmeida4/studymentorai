@@ -25,6 +25,9 @@ import {
   topics,
   subjects,
   users,
+  calendarEvents,
+  insertCalendarEventSchema,
+  type CalendarEvent,
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -1909,6 +1912,231 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Migration failed",
         details: error instanceof Error ? error.message : "Unknown error",
       });
+    }
+  });
+
+  // ==================== CALENDAR EVENTS ROUTES (Premium Only) ====================
+
+  // Get all calendar events for user
+  app.get("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Check Premium access
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      if (subscription.plan !== "premium") {
+        return res.status(403).json({
+          success: false,
+          errorCode: "PREMIUM_REQUIRED",
+          error: "Calendar feature is only available for Premium users",
+        });
+      }
+
+      const events = await db
+        .select()
+        .from(calendarEvents)
+        .where(eq(calendarEvents.userId, userId))
+        .orderBy(asc(calendarEvents.eventDate));
+
+      return res.json({ success: true, events });
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      return res.status(500).json({ success: false, error: "Failed to fetch events" });
+    }
+  });
+
+  // Create calendar event
+  app.post("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Check Premium access
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      if (subscription.plan !== "premium") {
+        return res.status(403).json({
+          success: false,
+          errorCode: "PREMIUM_REQUIRED",
+          error: "Calendar feature is only available for Premium users",
+        });
+      }
+
+      const validatedData = insertCalendarEventSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      // Validate subject ownership if provided
+      if (validatedData.subjectId) {
+        const [subject] = await db
+          .select()
+          .from(subjects)
+          .where(and(eq(subjects.id, validatedData.subjectId), eq(subjects.userId, userId)));
+        if (!subject) {
+          return res.status(404).json({ success: false, errorCode: "SUBJECT_NOT_FOUND", error: "Subject not found" });
+        }
+      }
+
+      // Validate topic ownership if provided
+      if (validatedData.topicId) {
+        const [topic] = await db
+          .select()
+          .from(topics)
+          .where(and(eq(topics.id, validatedData.topicId), eq(topics.userId, userId)));
+        if (!topic) {
+          return res.status(404).json({ success: false, errorCode: "TOPIC_NOT_FOUND", error: "Topic not found" });
+        }
+      }
+
+      const [newEvent] = await db
+        .insert(calendarEvents)
+        .values(validatedData)
+        .returning();
+
+      return res.json({ success: true, event: newEvent });
+    } catch (error: any) {
+      console.error("Error creating calendar event:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ success: false, error: "Invalid event data", details: error.errors });
+      }
+      return res.status(500).json({ success: false, error: "Failed to create event" });
+    }
+  });
+
+  // Update calendar event
+  app.patch("/api/calendar/events/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const eventId = req.params.id;
+
+      // Check Premium access
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      if (subscription.plan !== "premium") {
+        return res.status(403).json({
+          success: false,
+          errorCode: "PREMIUM_REQUIRED",
+          error: "Calendar feature is only available for Premium users",
+        });
+      }
+
+      // Verify event ownership
+      const [existingEvent] = await db
+        .select()
+        .from(calendarEvents)
+        .where(and(eq(calendarEvents.id, eventId), eq(calendarEvents.userId, userId)));
+
+      if (!existingEvent) {
+        return res.status(404).json({ success: false, errorCode: "EVENT_NOT_FOUND", error: "Event not found" });
+      }
+
+      const updateData = insertCalendarEventSchema.partial().parse(req.body);
+
+      // Validate subject ownership if being updated
+      if (updateData.subjectId) {
+        const [subject] = await db
+          .select()
+          .from(subjects)
+          .where(and(eq(subjects.id, updateData.subjectId), eq(subjects.userId, userId)));
+        if (!subject) {
+          return res.status(404).json({ success: false, errorCode: "SUBJECT_NOT_FOUND", error: "Subject not found" });
+        }
+      }
+
+      // Validate topic ownership if being updated
+      if (updateData.topicId) {
+        const [topic] = await db
+          .select()
+          .from(topics)
+          .where(and(eq(topics.id, updateData.topicId), eq(topics.userId, userId)));
+        if (!topic) {
+          return res.status(404).json({ success: false, errorCode: "TOPIC_NOT_FOUND", error: "Topic not found" });
+        }
+      }
+
+      const [updatedEvent] = await db
+        .update(calendarEvents)
+        .set({ ...updateData, updatedAt: new Date() })
+        .where(and(eq(calendarEvents.id, eventId), eq(calendarEvents.userId, userId)))
+        .returning();
+
+      return res.json({ success: true, event: updatedEvent });
+    } catch (error: any) {
+      console.error("Error updating calendar event:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ success: false, error: "Invalid event data", details: error.errors });
+      }
+      return res.status(500).json({ success: false, error: "Failed to update event" });
+    }
+  });
+
+  // Toggle event completion status
+  app.patch("/api/calendar/events/:id/toggle", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const eventId = req.params.id;
+
+      // Check Premium access
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      if (subscription.plan !== "premium") {
+        return res.status(403).json({
+          success: false,
+          errorCode: "PREMIUM_REQUIRED",
+          error: "Calendar feature is only available for Premium users",
+        });
+      }
+
+      // Verify event ownership
+      const [existingEvent] = await db
+        .select()
+        .from(calendarEvents)
+        .where(and(eq(calendarEvents.id, eventId), eq(calendarEvents.userId, userId)));
+
+      if (!existingEvent) {
+        return res.status(404).json({ success: false, errorCode: "EVENT_NOT_FOUND", error: "Event not found" });
+      }
+
+      const [updatedEvent] = await db
+        .update(calendarEvents)
+        .set({ completed: !existingEvent.completed, updatedAt: new Date() })
+        .where(and(eq(calendarEvents.id, eventId), eq(calendarEvents.userId, userId)))
+        .returning();
+
+      return res.json({ success: true, event: updatedEvent });
+    } catch (error) {
+      console.error("Error toggling event completion:", error);
+      return res.status(500).json({ success: false, error: "Failed to toggle event" });
+    }
+  });
+
+  // Delete calendar event
+  app.delete("/api/calendar/events/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const eventId = req.params.id;
+
+      // Check Premium access
+      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      if (subscription.plan !== "premium") {
+        return res.status(403).json({
+          success: false,
+          errorCode: "PREMIUM_REQUIRED",
+          error: "Calendar feature is only available for Premium users",
+        });
+      }
+
+      // Verify event ownership and delete
+      const [deletedEvent] = await db
+        .delete(calendarEvents)
+        .where(and(eq(calendarEvents.id, eventId), eq(calendarEvents.userId, userId)))
+        .returning();
+
+      if (!deletedEvent) {
+        return res.status(404).json({ success: false, errorCode: "EVENT_NOT_FOUND", error: "Event not found" });
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting calendar event:", error);
+      return res.status(500).json({ success: false, error: "Failed to delete event" });
     }
   });
 
