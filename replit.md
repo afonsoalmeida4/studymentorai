@@ -7,136 +7,6 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 - Communication: Simple, everyday language (Portuguese)
 - Design inspiration: Notion, Linear, Grammarly (calm, clean, organized)
 
-## Recent Changes
-
-### November 21, 2025 - Manual Flashcard Management System (PRO/PREMIUM Feature)
-- **Backend Implementation**:
-  - Schema updated: Added `userId`, `isManual`, `subjectId`, `topicId`, `updatedAt` to `flashcards` table
-  - CRUD endpoints: POST `/api/flashcards/manual`, GET `/api/flashcards/user`, PATCH `/api/flashcards/:id`, DELETE `/api/flashcards/:id`
-  - PRO/PREMIUM validation via `subscriptionService.canCreateManualFlashcard()`
-  - Ownership validation: PATCH/DELETE return 404 (not found) or 403 (unauthorized) instead of silent failures
-  - Hierarchy validation: Ensures `topicId` belongs to specified `subjectId` (returns 400 if mismatch)
-  - Language default sync: Cards inherit user's language preference instead of hardcoded "pt"
-- **Anki Integration** (`server/storage.ts`):
-  - New method `getDueManualFlashcards(userId, filters?)` for SM-2 scheduling
-  - New endpoint GET `/api/flashcards/manual/due` returns due manual cards for review
-  - Manual cards now fully integrated with existing SM-2 spaced repetition system
-  - Review attempts work identically for manual and auto-generated cards
-- **Frontend Implementation** (`client/src/pages/flashcards.tsx`):
-  - Full management page at `/flashcards` with list, filters, and CRUD dialogs
-  - Filters: Type (all/manual/auto), Subject, Topic
-  - Create/Edit/Delete dialogs with form validation
-  - UpgradeDialog integration for FREE users
-  - PRO/PREMIUM gate on page access and creation
-  - Test IDs: `button-create-manual`, `input-question`, `input-answer`, `button-edit-{id}`, `button-delete-{id}`
-- **Sidebar Integration** (`client/src/components/AppSidebar.tsx`):
-  - "Flashcards" link visible only for PRO/PREMIUM users
-  - Positioned under "AI Mentor" in Tools section
-- **i18n Support**: Full translations added for PT and EN (36+ new translation keys)
-- **Security**: All endpoints validate ownership (userId matching), no data leakage via response semantics
-- **Known Limitation**: e2e tests require Stripe testing secrets (not a code issue, environment limitation)
-
-### November 21, 2025 - PDF Export Feature for Summaries (Premium-only)
-- **Backend Implementation**:
-  - Added GET `/api/topic-summaries/:id/export-pdf` endpoint in `server/routes.ts`
-  - Premium plan verification using `subscriptionService.getUserSubscription()`
-  - Full ownership validation chain: summary → topic → subject (all verify userId)
-  - PDF generation using PDFKit with professional formatting (A4, proper margins, fonts)
-  - Streams PDF directly to response (no memory buffering)
-  - Includes: app branding, subject/topic/learning style metadata, summary content, motivational message, generation timestamp
-  - Response headers: `Content-Type: application/pdf`, `Content-Disposition: attachment; filename="..."`
-  - Error handling with `!res.headersSent` guard to prevent double responses
-- **Frontend Implementation** (`client/src/pages/topic-view.tsx`):
-  - Export button in each learning style tab (visual, auditivo, logico, conciso)
-  - Frontend Premium check: shows upgrade dialog for non-Premium users
-  - Loading state `isExportingPdf` disables button during export
-  - Automatic download using Blob API and `window.URL.createObjectURL()`
-  - Filename extraction from `Content-Disposition` header with fallback
-  - Proper resource cleanup (revokeObjectURL, removeChild)
-  - Success/error toast notifications with i18n support
-  - Test IDs: `button-export-pdf-visual`, `button-export-pdf-auditivo`, `button-export-pdf-logico`, `button-export-pdf-conciso`
-- **Full i18n Support**: Added 4 new translation keys across all 6 languages (PT, EN, ES, FR, DE, IT):
-  - `topicView.pdfExport.button`, `topicView.pdfExport.success`, `topicView.pdfExport.successMessage`, `topicView.pdfExport.error`
-- **UX Design**: Each learning style tab has its own export button, no separate selection dialog needed
-- **Security**: Triple ownership validation (summary belongs to user's topic belongs to user's subject)
-
-### November 21, 2025 - Full Error Message Internationalization
-- **Backend Refactoring**:
-  - All subscription limit methods now return structured `{ errorCode, params }` instead of hardcoded Portuguese messages
-  - Updated methods: `canCreateSubject()`, `canCreateTopic()`, `canUpload()`, `canSendChatMessage()`, `canUseLearningStyle()`, `canGenerateSummary()`, `canUseChatMode()`
-  - API error responses include `errorCode` and `params` fields for client-side translation
-  - Modified routes in `server/organizationRoutes.ts` and `server/routes.ts` to return structured errors
-- **Frontend Implementation**:
-  - Created `translateError()` helper in `client/src/lib/errorTranslation.ts` to translate backend errors using errorCode + params
-  - Updated error handling in: `topic-view.tsx` (uploads), `chat-view.tsx` (chat messages), `AppSidebar.tsx` (subjects), `subject-view.tsx` (topics)
-  - All error toasts now display properly translated messages in user's selected language
-- **i18n Translations**: Added 7 comprehensive error translation keys across all 6 languages (PT, EN, ES, FR, DE, IT):
-  - `errors.SUBJECT_LIMIT_REACHED`, `errors.TOPIC_LIMIT_REACHED`, `errors.UPLOAD_LIMIT_REACHED`
-  - `errors.CHAT_LIMIT_REACHED`, `errors.CHAT_MODE_NOT_AVAILABLE`
-  - `errors.LEARNING_STYLE_NOT_AVAILABLE`, `errors.SUMMARY_WORD_LIMIT_EXCEEDED`
-  - All keys support interpolation ({{limit}}, {{planName}}, {{wordCount}}, {{learningStyle}}, {{mode}})
-- **User Experience**: Error messages now respect user's language preference and include dynamic values (limits, plan names)
-
-### November 21, 2025 - Subscription Cancellation Feature
-- **Backend Implementation**:
-  - Modified `cancelSubscription()` method in `server/subscriptionService.ts` to immediately downgrade to free plan
-  - Clears all Stripe metadata (customerId, subscriptionId, priceId, period dates)
-  - Added POST `/api/subscription/cancel` endpoint in `server/routes.ts`
-  - Error handling for edge cases (no subscription, already on free plan)
-- **Frontend Implementation** (`client/src/pages/subscription.tsx`):
-  - Added `cancelSubscriptionMutation` with query invalidation
-  - Cancel button only visible when `currentPlan !== "free"`
-  - Native browser confirmation dialog before cancellation
-  - Success/error toast notifications with proper i18n
-  - Button test-id: `button-cancel-subscription`
-- **Full i18n Support**: Added 7 new translation keys across all 6 languages:
-  - `cancelButton`, `canceling`, `cancelConfirmation`
-  - `toasts.cancelSuccess`, `toasts.cancelSuccessMessage`
-  - `toasts.cancelError`, `toasts.cancelErrorMessage`
-- **User Experience**: Immediate cancellation with instant return to free plan (no end-of-period grace)
-
-### November 21, 2025 - Dashboard Visual/UX Enhancements
-- **8 Visual Improvements Implemented**:
-  1. **Contextual Colors**: Green/yellow/red system based on performance deltas and progress percentages
-  2. **Visual Hierarchy**: All 4 KPIs with distinct colored left borders (blue/green/purple/orange)
-  3. **Larger Icons**: Upgraded from h-4 to h-6 with thematic colors matching card identity
-  4. **Gradient Progress Bars**: Dynamic red→yellow→green gradients showing goal proximity
-  5. **Animated Elements**: Smooth transitions (duration-300/500), fade-ins, pulse effects on empty states
-  6. **Interactive Tooltips**: Info icons with contextual details (goals, remaining time, records)
-  7. **Enhanced Empty States**: Larger animated numbers (animate-pulse), improved CTAs
-  8. **Hover Effects**: Card elevation (hover-elevate) + visual feedback on all KPI cards
-- **Design Improvements**:
-  - Weekly Hours: ArrowUp/ArrowDown delta indicators, tooltip showing remaining hours to goal
-  - Subject Progress: Color-coded percentages, gradient progress bar, subject name in tooltip
-  - Tasks Completed: Purple theme, Badge component for weekly count, total/pending in tooltip
-  - Study Streak: Orange flame theme, green Badge for "studied today", record display in tooltip
-- **Typography**: Upgraded from text-2xl to text-3xl for better readability and hierarchy
-- **Accessibility**: All interactive elements include aria labels via tooltip system
-
-### November 20, 2025 - Enhanced Dashboard with 4 New KPIs
-- **Backend Implementation** (`server/statsRoutes.ts`):
-  - 4 new GET endpoints: `/api/stats/study-time`, `/api/stats/subject-progress`, `/api/stats/tasks-summary`, `/api/stats/streak`
-  - Session event tracking: POST `/api/topics/:id/session-events` with Zod validation
-  - Task CRUD: POST/PATCH/DELETE `/api/tasks` with Zod validation
-  - All endpoints use `isAuthenticated` middleware
-- **Frontend Implementation** (`client/src/pages/dashboard.tsx`):
-  - Per-card error handling: Each KPI shows individual loading/error/success states
-  - Empty state CTAs: All 4 KPIs show accurate guidance for first-time users
-  - Skeleton loading states while queries execute
-  - Error messages fully translated across 6 languages
-  - All queries guarded with `enabled: currentPlan !== "free"`
-- **New Database Tables**:
-  - `topicStudyTime`: Records study sessions with duration in minutes
-  - `topicStudyEvents`: Tracks enter/exit events for auto-tracking
-  - `tasks`: User tasks with priority, due dates, completion tracking
-  - `topicProgress`: Marks topics as completed for progress calculation
-- **Full i18n Support**: All 6 languages (PT, EN, ES, FR, DE, IT) updated with 20 new translation keys
-- **Known Limitation - Session Overlap**:
-  - Cross-device concurrent access to same topic may cause incorrect session pairing (<1% frequency)
-  - Current implementation optimizes for single-device usage (99% of cases)
-  - Future remediation: Add activeSessionId tracking or server-side locking when telemetry shows impact
-  - Documented in `server/statsRoutes.ts` (lines 18-36)
-
 ## System Architecture
 
 ### Frontend Architecture
@@ -150,6 +20,13 @@ PostgreSQL (Neon) is the primary database, managed with Drizzle ORM. The schema 
 
 ### Authentication & Authorization
 Authentication uses Replit OIDC with session-based authentication via `express-session`. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
+
+### Key Features
+- **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering.
+- **PDF Export**: Premium-only feature allowing export of AI-generated summaries to professionally formatted PDFs, including app branding and metadata.
+- **Internationalized Error Messages**: Backend returns structured error codes and parameters for client-side translation, providing dynamic and language-sensitive error messages.
+- **Subscription Management**: Users can cancel subscriptions, immediately reverting to the free plan.
+- **Dashboard KPIs**: Enhanced dashboard with 4 new key performance indicators (Study Time, Subject Progress, Tasks Completed, Study Streak) with visual enhancements including contextual colors, larger icons, gradient progress bars, animations, tooltips, and improved empty states.
 
 ## External Dependencies
 - **AI Services:** OpenAI API (GPT-4) for summarization, flashcard generation, and dual-mode chat.
