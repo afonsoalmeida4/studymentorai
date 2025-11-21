@@ -191,7 +191,6 @@ export function AppSidebar() {
                       <Link href="/calendar">
                         <CalendarDays className="w-4 h-4" />
                         <span>{t('nav.calendar')}</span>
-                        <Badge variant="secondary" className="ml-auto text-xs">Premium</Badge>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
