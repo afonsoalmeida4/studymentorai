@@ -18,9 +18,18 @@ export function XPProgressBar({
   const xpInCurrentLevel = currentXp - currentLevelXp;
   const xpNeededForNextLevel = nextLevelXp - currentLevelXp;
   
+  console.log("XP Progress Debug:", {
+    currentXp,
+    currentLevelXp,
+    nextLevelXp,
+    progress,
+    xpInCurrentLevel,
+    xpNeededForNextLevel,
+  });
+  
   return (
     <div className="w-full space-y-1" data-testid="xp-progress-bar">
-      <Progress value={progress} className="h-2" />
+      <Progress value={Math.round(progress * 100) / 100} className="h-2" />
       {showLabel && (
         <div className="flex justify-between text-xs text-muted-foreground">
           <span data-testid="text-min-xp">{currentLevelXp} XP</span>
