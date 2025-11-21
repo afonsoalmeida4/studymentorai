@@ -58,7 +58,7 @@ export function GamificationHeader() {
             nextLevelXp={levelInfo.nextLevelXp}
             currentLevelXp={levelInfo.currentLevelXp}
             progress={levelInfo.progress}
-            showLabel={false}
+            showLabel={true}
           />
         </div>
         
