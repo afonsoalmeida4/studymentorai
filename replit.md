@@ -9,6 +9,30 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 
 ## Recent Changes
 
+### November 21, 2025 - PDF Export Feature for Summaries (Premium-only)
+- **Backend Implementation**:
+  - Added GET `/api/topic-summaries/:id/export-pdf` endpoint in `server/routes.ts`
+  - Premium plan verification using `subscriptionService.getUserSubscription()`
+  - Full ownership validation chain: summary → topic → subject (all verify userId)
+  - PDF generation using PDFKit with professional formatting (A4, proper margins, fonts)
+  - Streams PDF directly to response (no memory buffering)
+  - Includes: app branding, subject/topic/learning style metadata, summary content, motivational message, generation timestamp
+  - Response headers: `Content-Type: application/pdf`, `Content-Disposition: attachment; filename="..."`
+  - Error handling with `!res.headersSent` guard to prevent double responses
+- **Frontend Implementation** (`client/src/pages/topic-view.tsx`):
+  - Export button in each learning style tab (visual, auditivo, logico, conciso)
+  - Frontend Premium check: shows upgrade dialog for non-Premium users
+  - Loading state `isExportingPdf` disables button during export
+  - Automatic download using Blob API and `window.URL.createObjectURL()`
+  - Filename extraction from `Content-Disposition` header with fallback
+  - Proper resource cleanup (revokeObjectURL, removeChild)
+  - Success/error toast notifications with i18n support
+  - Test IDs: `button-export-pdf-visual`, `button-export-pdf-auditivo`, `button-export-pdf-logico`, `button-export-pdf-conciso`
+- **Full i18n Support**: Added 4 new translation keys across all 6 languages (PT, EN, ES, FR, DE, IT):
+  - `topicView.pdfExport.button`, `topicView.pdfExport.success`, `topicView.pdfExport.successMessage`, `topicView.pdfExport.error`
+- **UX Design**: Each learning style tab has its own export button, no separate selection dialog needed
+- **Security**: Triple ownership validation (summary belongs to user's topic belongs to user's subject)
+
 ### November 21, 2025 - Full Error Message Internationalization
 - **Backend Refactoring**:
   - All subscription limit methods now return structured `{ errorCode, params }` instead of hardcoded Portuguese messages
