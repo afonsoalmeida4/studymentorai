@@ -67,20 +67,16 @@ export default function FlashcardsPage() {
   });
 
   const hasProOrPremium = subscription?.plan === "pro" || subscription?.plan === "premium";
-  
-  // Get user language reactively - will update when user loads
-  const userLanguage = (user as any)?.language || "pt";
 
-  // Fetch all user flashcards
+  // Fetch all user flashcards (with translations)
   const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
-    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic, userLanguage],
+    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterType === "manual") params.set("isManual", "true");
       if (filterType === "auto") params.set("isManual", "false");
       if (filterSubject && filterSubject !== "_all") params.set("subjectId", filterSubject);
       if (filterTopic && filterTopic !== "_all") params.set("topicId", filterTopic);
-      params.set("language", userLanguage);
       
       const response = await fetch(`/api/flashcards/user?${params.toString()}`, {
         credentials: "include",
@@ -88,7 +84,7 @@ export default function FlashcardsPage() {
       if (!response.ok) throw new Error("Failed to fetch flashcards");
       return response.json();
     },
-    enabled: hasProOrPremium && !!user,
+    enabled: hasProOrPremium,
   });
 
   // Fetch subjects for filter
