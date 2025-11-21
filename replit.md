@@ -9,6 +9,33 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 
 ## Recent Changes
 
+### November 21, 2025 - Manual Flashcard Management System (PRO/PREMIUM Feature)
+- **Backend Implementation**:
+  - Schema updated: Added `userId`, `isManual`, `subjectId`, `topicId`, `updatedAt` to `flashcards` table
+  - CRUD endpoints: POST `/api/flashcards/manual`, GET `/api/flashcards/user`, PATCH `/api/flashcards/:id`, DELETE `/api/flashcards/:id`
+  - PRO/PREMIUM validation via `subscriptionService.canCreateManualFlashcard()`
+  - Ownership validation: PATCH/DELETE return 404 (not found) or 403 (unauthorized) instead of silent failures
+  - Hierarchy validation: Ensures `topicId` belongs to specified `subjectId` (returns 400 if mismatch)
+  - Language default sync: Cards inherit user's language preference instead of hardcoded "pt"
+- **Anki Integration** (`server/storage.ts`):
+  - New method `getDueManualFlashcards(userId, filters?)` for SM-2 scheduling
+  - New endpoint GET `/api/flashcards/manual/due` returns due manual cards for review
+  - Manual cards now fully integrated with existing SM-2 spaced repetition system
+  - Review attempts work identically for manual and auto-generated cards
+- **Frontend Implementation** (`client/src/pages/flashcards.tsx`):
+  - Full management page at `/flashcards` with list, filters, and CRUD dialogs
+  - Filters: Type (all/manual/auto), Subject, Topic
+  - Create/Edit/Delete dialogs with form validation
+  - UpgradeDialog integration for FREE users
+  - PRO/PREMIUM gate on page access and creation
+  - Test IDs: `button-create-manual`, `input-question`, `input-answer`, `button-edit-{id}`, `button-delete-{id}`
+- **Sidebar Integration** (`client/src/components/AppSidebar.tsx`):
+  - "Flashcards" link visible only for PRO/PREMIUM users
+  - Positioned under "AI Mentor" in Tools section
+- **i18n Support**: Full translations added for PT and EN (36+ new translation keys)
+- **Security**: All endpoints validate ownership (userId matching), no data leakage via response semantics
+- **Known Limitation**: e2e tests require Stripe testing secrets (not a code issue, environment limitation)
+
 ### November 21, 2025 - PDF Export Feature for Summaries (Premium-only)
 - **Backend Implementation**:
   - Added GET `/api/topic-summaries/:id/export-pdf` endpoint in `server/routes.ts`
