@@ -942,6 +942,7 @@
     "allTopics": "Todos los Temas",
     "selectSubject": "Selecciona una materia",
     "selectTopic": "Selecciona un tema",
+    "selectSubjectFirst": "Selecciona una materia primero",
     "createSuccess": "¡Flashcard creada!",
     "createSuccessMessage": "Tu flashcard fue creada con éxito.",
     "updateSuccess": "¡Flashcard actualizada!",

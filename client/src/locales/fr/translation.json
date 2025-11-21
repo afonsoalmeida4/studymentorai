@@ -390,6 +390,7 @@
     "studyMode": "Étude",
     "existentialMode": "Vie",
     "selectTopic": "Sélectionner un sujet",
+    "selectSubjectFirst": "Sélectionnez une matière d'abord",
     "selectTopicDescription": "Pour le Mode Étude, vous devez sélectionner un sujet.",
     "upgrade": "Passez à Pro pour débloquer le chat existentiel"
   },
@@ -942,6 +943,7 @@
     "allTopics": "Tous les Sujets",
     "selectSubject": "Sélectionnez une matière",
     "selectTopic": "Sélectionnez un sujet",
+    "selectSubjectFirst": "Sélectionnez une matière d'abord",
     "createSuccess": "Carte créée !",
     "createSuccessMessage": "Votre carte a été créée avec succès.",
     "updateSuccess": "Carte mise à jour !",

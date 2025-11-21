@@ -390,6 +390,7 @@
     "studyMode": "Studio",
     "existentialMode": "Vita",
     "selectTopic": "Seleziona un argomento",
+    "selectSubjectFirst": "Seleziona prima una materia",
     "selectTopicDescription": "Per la Modalità Studio, devi selezionare un argomento.",
     "upgrade": "Aggiorna a Pro per sbloccare la chat esistenziale"
   },
@@ -942,6 +943,7 @@
     "allTopics": "Tutti gli Argomenti",
     "selectSubject": "Seleziona una materia",
     "selectTopic": "Seleziona un argomento",
+    "selectSubjectFirst": "Seleziona prima una materia",
     "createSuccess": "Flashcard creata!",
     "createSuccessMessage": "La tua flashcard è stata creata con successo.",
     "updateSuccess": "Flashcard aggiornata!",

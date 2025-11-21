@@ -390,6 +390,7 @@
     "studyMode": "Lernen",
     "existentialMode": "Leben",
     "selectTopic": "Wählen Sie ein Thema",
+    "selectSubjectFirst": "Wählen Sie zuerst ein Fach aus",
     "selectTopicDescription": "Für den Lernmodus müssen Sie ein Thema auswählen.",
     "upgrade": "Upgrade auf Pro für existenziellen Chat"
   },
@@ -942,6 +943,7 @@
     "allTopics": "Alle Themen",
     "selectSubject": "Wählen Sie ein Fach",
     "selectTopic": "Wählen Sie ein Thema",
+    "selectSubjectFirst": "Wählen Sie zuerst ein Fach aus",
     "createSuccess": "Lernkarte erstellt!",
     "createSuccessMessage": "Ihre Lernkarte wurde erfolgreich erstellt.",
     "updateSuccess": "Lernkarte aktualisiert!",
