@@ -1021,6 +1021,7 @@
     "selectEventType": "Seleziona il tipo di evento",
     "eventDate": "Data dell'Evento",
     "selectDate": "Seleziona una data",
+    "subject": "Materia",
     "optionalSubject": "Materia (Opzionale)",
     "optionalTopic": "Argomento (Opzionale)",
     "selectSubject": "Seleziona una materia",

@@ -1104,7 +1104,7 @@ export const calendarEvents = pgTable(
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-    subjectId: varchar("subject_id").references(() => subjects.id, { onDelete: "cascade" }),
+    subjectId: varchar("subject_id").notNull().references(() => subjects.id, { onDelete: "cascade" }),
     topicId: varchar("topic_id").references(() => topics.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     description: text("description"),

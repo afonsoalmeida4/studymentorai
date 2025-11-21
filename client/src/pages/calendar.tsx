@@ -473,14 +473,14 @@ function EventForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !eventDate) return;
+    if (!title || !eventDate || !subjectId) return;
 
     onSubmit({
       title,
       description: description || null,
       eventType,
       eventDate: eventDate.toISOString(),
-      subjectId: subjectId || null,
+      subjectId,
       topicId: null,
     });
   };
@@ -519,39 +519,38 @@ function EventForm({
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="eventType">{t("calendar.eventType")}</Label>
-            <Select value={eventType} onValueChange={(value: any) => setEventType(value)}>
-              <SelectTrigger id="eventType" data-testid="select-event-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="exam">{t("calendar.exam")}</SelectItem>
-                <SelectItem value="assignment">{t("calendar.assignment")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="eventType">{t("calendar.eventType")}</Label>
+          <Select value={eventType} onValueChange={(value: any) => setEventType(value)}>
+            <SelectTrigger id="eventType" data-testid="select-event-type">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="exam">{t("calendar.exam")}</SelectItem>
+              <SelectItem value="assignment">{t("calendar.assignment")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="space-y-2">
-            <Label>{t("calendar.eventDate")}</Label>
+        <div className="space-y-2">
+          <Label>{t("calendar.eventDate")}</Label>
+          <div className="overflow-x-auto">
             <Calendar
               mode="single"
               selected={eventDate}
               onSelect={setEventDate}
-              className="rounded-md border w-full"
+              className="rounded-md border"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subject">{t("calendar.optionalSubject")}</Label>
-          <Select value={subjectId} onValueChange={setSubjectId}>
+          <Label htmlFor="subject">{t("calendar.subject")}</Label>
+          <Select value={subjectId} onValueChange={setSubjectId} required>
             <SelectTrigger id="subject" data-testid="select-subject">
               <SelectValue placeholder={t("calendar.selectSubject")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">{t("calendar.noSubject")}</SelectItem>
               {subjects.map((subject) => (
                 <SelectItem key={subject.id} value={subject.id}>
                   {subject.name}
@@ -563,7 +562,7 @@ function EventForm({
       </div>
 
       <DialogFooter>
-        <Button type="submit" disabled={isPending || !title || !eventDate} data-testid="button-submit-event">
+        <Button type="submit" disabled={isPending || !title || !eventDate || !subjectId} data-testid="button-submit-event">
           {isPending ? t("calendar.creating") : event ? t("calendar.save") : t("calendar.createEvent")}
         </Button>
       </DialogFooter>

@@ -1014,6 +1014,7 @@
     "selectEventType": "Select event type",
     "eventDate": "Event Date",
     "selectDate": "Select a date",
+    "subject": "Subject",
     "optionalSubject": "Subject (Optional)",
     "optionalTopic": "Topic (Optional)",
     "selectSubject": "Select a subject",
