@@ -181,6 +181,8 @@
     },
     "pdfExport": {
       "button": "Exportar",
+      "exportPdf": "Exportar PDF",
+      "exportDocx": "Exportar DOCX",
       "success": "¡Exportado con éxito!",
       "successMessage": "El resumen ha sido exportado correctamente.",
       "error": "No se pudo exportar el resumen."

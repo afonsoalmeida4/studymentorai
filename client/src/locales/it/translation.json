@@ -178,6 +178,8 @@
     },
     "pdfExport": {
       "button": "Esporta",
+      "exportPdf": "Esporta PDF",
+      "exportDocx": "Esporta DOCX",
       "success": "Esportato con successo!",
       "successMessage": "Il riassunto è stato esportato con successo.",
       "error": "Impossibile esportare il riassunto."

@@ -719,10 +719,10 @@ export default function TopicView() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem onClick={() => handleExport(visual.id, 'pdf')} data-testid="menu-export-pdf-visual">
-                                      Exportar PDF
+                                      {t('topicView.pdfExport.exportPdf')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExport(visual.id, 'docx')} data-testid="menu-export-docx-visual">
-                                      Exportar DOCX
+                                      {t('topicView.pdfExport.exportDocx')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -781,10 +781,10 @@ export default function TopicView() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem onClick={() => handleExport(auditivo.id, 'pdf')} data-testid="menu-export-pdf-auditivo">
-                                      Exportar PDF
+                                      {t('topicView.pdfExport.exportPdf')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExport(auditivo.id, 'docx')} data-testid="menu-export-docx-auditivo">
-                                      Exportar DOCX
+                                      {t('topicView.pdfExport.exportDocx')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -843,10 +843,10 @@ export default function TopicView() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem onClick={() => handleExport(logico.id, 'pdf')} data-testid="menu-export-pdf-logico">
-                                      Exportar PDF
+                                      {t('topicView.pdfExport.exportPdf')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExport(logico.id, 'docx')} data-testid="menu-export-docx-logico">
-                                      Exportar DOCX
+                                      {t('topicView.pdfExport.exportDocx')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -905,10 +905,10 @@ export default function TopicView() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem onClick={() => handleExport(conciso.id, 'pdf')} data-testid="menu-export-pdf-conciso">
-                                      Exportar PDF
+                                      {t('topicView.pdfExport.exportPdf')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExport(conciso.id, 'docx')} data-testid="menu-export-docx-conciso">
-                                      Exportar DOCX
+                                      {t('topicView.pdfExport.exportDocx')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>

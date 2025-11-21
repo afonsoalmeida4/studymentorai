@@ -183,6 +183,8 @@
     },
     "pdfExport": {
       "button": "Export",
+      "exportPdf": "Export PDF",
+      "exportDocx": "Export DOCX",
       "success": "Exported successfully!",
       "successMessage": "The summary has been successfully exported.",
       "error": "Unable to export summary."

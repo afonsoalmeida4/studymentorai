@@ -178,6 +178,8 @@
     },
     "pdfExport": {
       "button": "Exportieren",
+      "exportPdf": "PDF exportieren",
+      "exportDocx": "DOCX exportieren",
       "success": "Erfolgreich exportiert!",
       "successMessage": "Die Zusammenfassung wurde erfolgreich exportiert.",
       "error": "Zusammenfassung konnte nicht exportiert werden."
