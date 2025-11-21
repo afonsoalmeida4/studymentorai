@@ -15,9 +15,30 @@ import {
   Target,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
+import { useEffect } from "react";
 
 export default function Landing() {
   const { t } = useTranslation();
+  const { user, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Redirect authenticated users to home instead of showing landing
+  useEffect(() => {
+    if (!isLoading && user) {
+      setLocation("/");
+    }
+  }, [user, isLoading, setLocation]);
+
+  const handleLogin = () => {
+    // If already authenticated, go to home instead of forcing OAuth again
+    if (user) {
+      setLocation("/");
+    } else {
+      window.location.href = "/api/login";
+    }
+  };
   
   return (
     <div className="min-h-screen bg-background">
@@ -56,8 +77,9 @@ export default function Landing() {
             <Button
               size="lg"
               className="px-8 text-lg font-semibold"
-              onClick={() => window.location.href = "/api/login"}
+              onClick={handleLogin}
               data-testid="button-login"
+              disabled={isLoading}
             >
               <Sparkles className="w-5 h-5 mr-2" />
               {t('landing.hero.cta')}

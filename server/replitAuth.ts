@@ -162,8 +162,8 @@ export async function setupAuth(app: Express) {
           return res.redirect("/api/login");
         }
         
-        console.log("[AUTH] Login successful, redirecting to /");
-        return res.redirect("/");
+        console.log("[AUTH] Login successful, redirecting to /?auth=success");
+        return res.redirect("/?auth=success");
       });
     })(req, res, next);
   });

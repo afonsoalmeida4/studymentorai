@@ -112,6 +112,32 @@ export default function ChatView() {
     ),
   });
 
+  // CRITICAL: Clean up state for FREE users to prevent OAuth loop
+  // This runs AFTER subscription resolves to prevent FREE users from loading existential threads
+  useEffect(() => {
+    if (!subscriptionResolved) return;
+    
+    if (currentPlan === "free") {
+      // Force FREE users to study mode
+      if (activeMode === "existential") {
+        console.log("[CHAT] FREE user - forcing study mode from existential");
+        setActiveMode("study");
+      }
+      
+      // Clear selectedThreadId if it matches an existential thread
+      // Note: existentialThreads array will be empty for FREE users, so we check study threads instead
+      // If selectedThreadId is not in studyThreads and not null, assume it's existential and clear it
+      if (selectedThreadId) {
+        const isStudyThread = studyThreads.some(t => t.id === selectedThreadId);
+        if (!isStudyThread && studyThreads.length > 0) {
+          // Thread ID doesn't match any study thread, likely existential - clear it
+          console.log("[CHAT] FREE user - clearing non-study thread selection:", selectedThreadId);
+          setSelectedThreadId(null);
+        }
+      }
+    }
+  }, [subscriptionResolved, currentPlan, activeMode, selectedThreadId, studyThreads]);
+
   const createThreadMutation = useMutation({
     mutationFn: async (mode: ChatMode) => {
       return apiRequest("POST", "/api/chat/threads", {
