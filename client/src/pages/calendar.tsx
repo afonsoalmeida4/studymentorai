@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { format, isAfter, isBefore, isToday, differenceInDays, startOfDay } from "date-fns";
+import { pt, enUS, es, fr, de, it, type Locale } from "date-fns/locale";
 import { Calendar as CalendarIcon, Plus, Trash2, Edit, Check, X, CalendarDays, ListTodo, BookOpen } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ type ViewMode = "month" | "list";
 type FilterType = "all" | "exam" | "assignment" | "upcoming" | "past" | "completed";
 
 export default function CalendarPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [filterType, setFilterType] = useState<FilterType>("upcoming");
@@ -52,6 +53,18 @@ export default function CalendarPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
+
+  const dateLocale = useMemo(() => {
+    const localeMap: Record<string, Locale> = {
+      pt: pt,
+      en: enUS,
+      es: es,
+      fr: fr,
+      de: de,
+      it: it,
+    };
+    return localeMap[i18n.language] || pt;
+  }, [i18n.language]);
 
   const { data: eventsData, isLoading } = useQuery<{ success: boolean; events: CalendarEvent[] }>({
     queryKey: ["/api/calendar/events"],
@@ -241,6 +254,7 @@ export default function CalendarPage() {
                   subjects={subjects}
                   onSubmit={(data) => createEvent.mutate(data)}
                   isPending={createEvent.isPending}
+                  locale={dateLocale}
                 />
               </DialogContent>
             </Dialog>
@@ -258,6 +272,7 @@ export default function CalendarPage() {
                   selected={selectedDate}
                   onSelect={setSelectedDate}
                   className="rounded-md"
+                  locale={dateLocale}
                   modifiers={{
                     hasEvent: events.map((e) => new Date(e.eventDate)),
                   }}
@@ -273,7 +288,7 @@ export default function CalendarPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CalendarIcon className="h-5 w-5" />
-                    {selectedDate ? format(selectedDate, "MMMM d, yyyy") : t("calendar.selectDate")}
+                    {selectedDate ? format(selectedDate, "MMMM d, yyyy", { locale: dateLocale }) : t("calendar.selectDate")}
                   </CardTitle>
                   <CardDescription>
                     {selectedDate && getEventsForDate(selectedDate).length > 0
@@ -341,6 +356,7 @@ export default function CalendarPage() {
               subjects={subjects}
               onSubmit={(data) => updateEvent.mutate({ id: editingEvent.id, data })}
               isPending={updateEvent.isPending}
+              locale={dateLocale}
             />
           )}
         </DialogContent>
@@ -458,11 +474,13 @@ function EventForm({
   subjects,
   onSubmit,
   isPending,
+  locale,
 }: {
   event?: CalendarEvent;
   subjects: any[];
   onSubmit: (data: any) => void;
   isPending: boolean;
+  locale: Locale;
 }) {
   const { t } = useTranslation();
   const [title, setTitle] = useState(event?.title || "");
@@ -542,6 +560,7 @@ function EventForm({
               selected={eventDate}
               onSelect={setEventDate}
               className="rounded-md border"
+              locale={locale}
             />
           </div>
         </div>
