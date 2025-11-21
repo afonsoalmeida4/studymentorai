@@ -41,6 +41,9 @@ export function calculateNextReview(
     }
   }
 
+  // Guard against negative or zero intervals
+  intervalDays = Math.max(1, intervalDays);
+
   const nextReviewDate = new Date(now);
   nextReviewDate.setDate(nextReviewDate.getDate() + intervalDays);
 

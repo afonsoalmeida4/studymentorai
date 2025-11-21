@@ -42,8 +42,18 @@ export default function ChatView() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
+  const subscriptionResolved = !isLoadingSubscription;
+  const currentPlan = subscription?.plan || "free";
+  const isExistentialLocked = currentPlan === "free";
+  const canUsePremiumFeatures = currentPlan !== "free";
+  
+  // Internal state for active mode (may be overridden for FREE users)
   const [activeMode, setActiveMode] = useState<ChatMode>("study");
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  
+  // Safe active mode: FREE users ALWAYS use study mode, regardless of internal state
+  const safeActiveMode: ChatMode = currentPlan === "free" ? "study" : activeMode;
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -51,12 +61,6 @@ export default function ChatView() {
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
-
-  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
-  const subscriptionResolved = !isLoadingSubscription;
-  const currentPlan = subscription?.plan || "free";
-  const isExistentialLocked = currentPlan === "free";
-  const canUsePremiumFeatures = currentPlan !== "free";
 
   const { data: studyThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "study"],
@@ -66,7 +70,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.threads || [];
     },
-    enabled: currentPlan !== "free",
+    // Study mode is available for all users (free, pro, premium)
   });
 
   const { data: existentialThreads = [] } = useQuery<ChatThread[]>({
@@ -77,6 +81,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.threads || [];
     },
+    // Existential mode requires Pro+ plan
     enabled: currentPlan !== "free",
   });
 
@@ -88,7 +93,7 @@ export default function ChatView() {
       const data = await res.json();
       return data.topics || [];
     },
-    enabled: currentPlan !== "free",
+    // Topics are available for all users
   });
 
   const { data: currentThread } = useQuery<ThreadWithMessages>({
@@ -100,7 +105,11 @@ export default function ChatView() {
       const data = await res.json();
       return data.thread;
     },
-    enabled: !!selectedThreadId && currentPlan !== "free",
+    // Fetch thread when selected
+    // If user is FREE and safeActiveMode is study, only fetch if it's a study thread
+    enabled: !!selectedThreadId && subscriptionResolved && (
+      currentPlan !== "free" || safeActiveMode === "study"
+    ),
   });
 
   const createThreadMutation = useMutation({
@@ -215,11 +224,20 @@ export default function ChatView() {
     },
   });
 
+  // Force FREE users to study mode and clear any existential thread selection
   useEffect(() => {
     if (subscriptionResolved && currentPlan === "free") {
-      setLocation("/subscription");
+      // If somehow in existential mode, switch to study
+      if (activeMode === "existential") {
+        setActiveMode("study");
+        setSelectedThreadId(null);
+      }
+      // If a thread is selected but it's existential, clear it
+      if (selectedThreadId && currentThread && currentThread.mode === "existential") {
+        setSelectedThreadId(null);
+      }
     }
-  }, [subscriptionResolved, currentPlan, setLocation]);
+  }, [subscriptionResolved, currentPlan, activeMode, selectedThreadId, currentThread]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -227,13 +245,21 @@ export default function ChatView() {
     }
   }, [currentThread?.messages]);
 
-  if (!subscriptionResolved || currentPlan === "free") {
-    return null;
+  // Show loading state while subscription is resolving to prevent FREE users from seeing blocked UI
+  if (!subscriptionResolved) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <div className="text-muted-foreground">A carregar...</div>
+        </div>
+      </div>
+    );
   }
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canUsePremiumFeatures) {
+    // Existential mode requires Pro+
+    if (safeActiveMode === "existential" && !canUsePremiumFeatures) {
       setUpgradeReason("chat");
       setShowUpgradeDialog(true);
       return;
@@ -244,17 +270,13 @@ export default function ChatView() {
   };
 
   const handleStartNewThread = () => {
-    if (!canUsePremiumFeatures) {
+    // Existential mode requires Pro+
+    if (safeActiveMode === "existential" && isExistentialLocked) {
       setUpgradeReason("features");
       setShowUpgradeDialog(true);
       return;
     }
-    if (activeMode === "existential" && isExistentialLocked) {
-      setUpgradeReason("features");
-      setShowUpgradeDialog(true);
-      return;
-    }
-    if (activeMode === "study" && !selectedTopicId) {
+    if (safeActiveMode === "study" && !selectedTopicId) {
       toast({
         variant: "destructive",
         title: t('chat.selectTopic'),
@@ -262,7 +284,7 @@ export default function ChatView() {
       });
       return;
     }
-    createThreadMutation.mutate(activeMode);
+    createThreadMutation.mutate(safeActiveMode);
   };
 
   const handleModeChange = (newMode: string) => {
@@ -276,11 +298,7 @@ export default function ChatView() {
   };
 
   const handleDeleteThread = (threadId: string) => {
-    if (!canUsePremiumFeatures) {
-      setUpgradeReason("features");
-      setShowUpgradeDialog(true);
-      return;
-    }
+    // Delete is available for all users
     deleteThreadMutation.mutate(threadId);
   };
 
@@ -302,13 +320,13 @@ export default function ChatView() {
     setEditingTitle("");
   };
 
-  const currentThreads = activeMode === "study" ? studyThreads : existentialThreads;
+  const currentThreads = safeActiveMode === "study" ? studyThreads : existentialThreads;
 
   return (
     <div className="flex h-full">
       <div className="w-64 border-r flex flex-col">
         <div className="p-4 border-b">
-          <Tabs value={activeMode} onValueChange={handleModeChange}>
+          <Tabs value={safeActiveMode} onValueChange={handleModeChange}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="study" data-testid="tab-study-mode">
                 <Brain className="w-4 h-4 mr-2" />
@@ -327,7 +345,7 @@ export default function ChatView() {
           </Tabs>
         </div>
 
-        {activeMode === "study" && (
+        {safeActiveMode === "study" && (
           <div className="p-4 border-b">
             <Select value={selectedTopicId || ""} onValueChange={setSelectedTopicId}>
               <SelectTrigger data-testid="select-topic">
@@ -406,7 +424,7 @@ export default function ChatView() {
         {!selectedThreadId ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center max-w-md">
-              {activeMode === "study" ? (
+              {safeActiveMode === "study" ? (
                 <>
                   <Brain className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                   <h2 className="text-2xl font-semibold mb-2">Study Mode</h2>
@@ -468,7 +486,7 @@ export default function ChatView() {
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder={
-                    activeMode === "study"
+                    safeActiveMode === "study"
                       ? "Faça uma pergunta sobre o conteúdo..."
                       : "Como te posso ajudar hoje?"
                   }

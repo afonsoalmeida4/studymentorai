@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import Stripe from "stripe";
+import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel } from "docx";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
@@ -40,6 +41,35 @@ import { calculateNextReview } from "./flashcardScheduler";
 import { db } from "./db";
 import { and, eq, sql, gt, asc, or, inArray } from "drizzle-orm";
 import { subscriptionService } from "./subscriptionService";
+
+async function requirePremium(req: any, res: any, next: any) {
+  try {
+    const userId = req.user.claims.sub;
+    const subscription = await subscriptionService.getOrCreateSubscription(userId);
+    
+    if (subscription.plan === "free") {
+      return res.status(403).json({
+        success: false,
+        error: "PREMIUM_REQUIRED",
+        message: "Esta funcionalidade está disponível apenas para utilizadores Premium.",
+        upgradeRequired: true,
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error("Error checking premium status:", error);
+    res.status(500).json({ success: false, error: "Erro ao verificar subscrição" });
+  }
+}
+
+const exportLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 exports per window
+  message: { error: "Demasiados pedidos de export. Tente novamente mais tarde." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
@@ -336,19 +366,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Export topic summary as PDF (Premium only)
-  app.get("/api/topic-summaries/:id/export-pdf", isAuthenticated, async (req: any, res) => {
+  app.get("/api/topic-summaries/:id/export-pdf", isAuthenticated, requirePremium, exportLimiter, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const summaryId = req.params.id;
-      
-      // Check if user has Premium plan
-      const subscription = await subscriptionService.getUserSubscription(userId);
-      if (!subscription || subscription.plan !== 'premium') {
-        return res.status(403).json({ 
-          error: "Esta funcionalidade está disponível apenas no plano Premium",
-          errorCode: "PREMIUM_REQUIRED"
-        });
-      }
       
       // Get topic summary
       const summary = await storage.getTopicSummary(summaryId, userId);
@@ -441,19 +462,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Export topic summary as DOCX (Premium only)
-  app.get("/api/topic-summaries/:id/export-docx", isAuthenticated, async (req: any, res) => {
+  app.get("/api/topic-summaries/:id/export-docx", isAuthenticated, requirePremium, exportLimiter, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const summaryId = req.params.id;
-      
-      // Check if user has Premium plan
-      const subscription = await subscriptionService.getUserSubscription(userId);
-      if (!subscription || subscription.plan !== 'premium') {
-        return res.status(403).json({ 
-          error: "Esta funcionalidade está disponível apenas no plano Premium",
-          errorCode: "PREMIUM_REQUIRED"
-        });
-      }
       
       // Get topic summary
       const summary = await storage.getTopicSummary(summaryId, userId);
@@ -2063,19 +2075,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== CALENDAR EVENTS ROUTES (Premium Only) ====================
 
   // Get all calendar events for user
-  app.get("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+  app.get("/api/calendar/events", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-
-      // Check Premium access
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
-      if (subscription.plan !== "premium") {
-        return res.status(403).json({
-          success: false,
-          errorCode: "PREMIUM_REQUIRED",
-          error: "Calendar feature is only available for Premium users",
-        });
-      }
 
       const events = await db
         .select()
@@ -2091,19 +2093,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create calendar event
-  app.post("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+  app.post("/api/calendar/events", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-
-      // Check Premium access
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
-      if (subscription.plan !== "premium") {
-        return res.status(403).json({
-          success: false,
-          errorCode: "PREMIUM_REQUIRED",
-          error: "Calendar feature is only available for Premium users",
-        });
-      }
 
       const validatedData = insertCalendarEventSchema.parse({
         ...req.body,
@@ -2148,20 +2140,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update calendar event
-  app.patch("/api/calendar/events/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/calendar/events/:id", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const eventId = req.params.id;
-
-      // Check Premium access
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
-      if (subscription.plan !== "premium") {
-        return res.status(403).json({
-          success: false,
-          errorCode: "PREMIUM_REQUIRED",
-          error: "Calendar feature is only available for Premium users",
-        });
-      }
 
       // Verify event ownership
       const [existingEvent] = await db
@@ -2214,20 +2196,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Toggle event completion status
-  app.patch("/api/calendar/events/:id/toggle", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/calendar/events/:id/toggle", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const eventId = req.params.id;
-
-      // Check Premium access
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
-      if (subscription.plan !== "premium") {
-        return res.status(403).json({
-          success: false,
-          errorCode: "PREMIUM_REQUIRED",
-          error: "Calendar feature is only available for Premium users",
-        });
-      }
 
       // Verify event ownership
       const [existingEvent] = await db
@@ -2253,20 +2225,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete calendar event
-  app.delete("/api/calendar/events/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/calendar/events/:id", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const eventId = req.params.id;
-
-      // Check Premium access
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
-      if (subscription.plan !== "premium") {
-        return res.status(403).json({
-          success: false,
-          errorCode: "PREMIUM_REQUIRED",
-          error: "Calendar feature is only available for Premium users",
-        });
-      }
 
       // Verify event ownership and delete
       const [deletedEvent] = await db

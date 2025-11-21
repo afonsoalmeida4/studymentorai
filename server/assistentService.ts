@@ -5,7 +5,11 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { normalizeLanguage } from "./languageHelper";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY,
+  timeout: 60000, // 60 second timeout
+  maxRetries: 2, // Retry twice on temporary failures
+});
 
 const STUDY_MODE_PROMPTS: Record<string, string> = {
   pt: `És um assistente de estudo inteligente e paciente. O teu objetivo é ajudar o utilizador a compreender melhor os seus materiais de estudo.
