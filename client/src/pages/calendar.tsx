@@ -469,7 +469,9 @@ function EventForm({
   const [description, setDescription] = useState(event?.description || "");
   const [eventType, setEventType] = useState<"exam" | "assignment">(event?.eventType as any || "exam");
   const [eventDate, setEventDate] = useState<Date | undefined>(event ? new Date(event.eventDate) : new Date());
-  const [subjectId, setSubjectId] = useState<string | undefined>(event?.subjectId || undefined);
+  const [subjectId, setSubjectId] = useState<string | undefined>(
+    event?.subjectId || (subjects.length > 0 ? subjects[0].id : undefined)
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
