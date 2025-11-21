@@ -91,16 +91,6 @@ export default function ChatView() {
     enabled: !!selectedThreadId && currentPlan !== "free",
   });
 
-  useEffect(() => {
-    if (subscriptionResolved && currentPlan === "free") {
-      setLocation("/subscription");
-    }
-  }, [subscriptionResolved, currentPlan, setLocation]);
-
-  if (!subscriptionResolved || currentPlan === "free") {
-    return null;
-  }
-
   const createThreadMutation = useMutation({
     mutationFn: async (mode: ChatMode) => {
       return apiRequest("POST", "/api/chat/threads", {
@@ -190,6 +180,16 @@ export default function ChatView() {
       });
     },
   });
+
+  useEffect(() => {
+    if (subscriptionResolved && currentPlan === "free") {
+      setLocation("/subscription");
+    }
+  }, [subscriptionResolved, currentPlan, setLocation]);
+
+  if (!subscriptionResolved || currentPlan === "free") {
+    return null;
+  }
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
