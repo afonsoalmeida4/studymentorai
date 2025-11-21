@@ -43,7 +43,7 @@ type FlashcardWithMetadata = Flashcard & {
 };
 
 export default function FlashcardsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const { subscription } = useSubscription();
@@ -70,13 +70,14 @@ export default function FlashcardsPage() {
 
   // Fetch all user flashcards (with translations)
   const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
-    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic],
+    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic, i18n.language],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterType === "manual") params.set("isManual", "true");
       if (filterType === "auto") params.set("isManual", "false");
       if (filterSubject && filterSubject !== "_all") params.set("subjectId", filterSubject);
       if (filterTopic && filterTopic !== "_all") params.set("topicId", filterTopic);
+      params.set("language", i18n.language);
       
       const response = await fetch(`/api/flashcards/user?${params.toString()}`, {
         credentials: "include",
