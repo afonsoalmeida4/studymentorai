@@ -177,10 +177,10 @@
       "successDescription": "Der Inhalt wurde aus dem Thema entfernt."
     },
     "pdfExport": {
-      "button": "PDF Exportieren",
-      "success": "PDF exportiert!",
+      "button": "Exportieren",
+      "success": "Erfolgreich exportiert!",
       "successMessage": "Die Zusammenfassung wurde erfolgreich exportiert.",
-      "error": "PDF konnte nicht exportiert werden."
+      "error": "Zusammenfassung konnte nicht exportiert werden."
     }
   },
   "content": {

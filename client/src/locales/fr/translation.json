@@ -177,10 +177,10 @@
       "successDescription": "Le contenu a été retiré du sujet."
     },
     "pdfExport": {
-      "button": "Exporter PDF",
-      "success": "PDF exporté!",
+      "button": "Exporter",
+      "success": "Exporté avec succès!",
       "successMessage": "Le résumé a été exporté avec succès.",
-      "error": "Impossible d'exporter le PDF."
+      "error": "Impossible d'exporter le résumé."
     }
   },
   "content": {

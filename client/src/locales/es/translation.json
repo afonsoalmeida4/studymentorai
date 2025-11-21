@@ -180,10 +180,10 @@
       "successDescription": "El contenido ha sido eliminado del tema."
     },
     "pdfExport": {
-      "button": "Exportar PDF",
-      "success": "¡PDF exportado!",
+      "button": "Exportar",
+      "success": "¡Exportado con éxito!",
       "successMessage": "El resumen ha sido exportado correctamente.",
-      "error": "No se pudo exportar el PDF."
+      "error": "No se pudo exportar el resumen."
     }
   },
   "content": {

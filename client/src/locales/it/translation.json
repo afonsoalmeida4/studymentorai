@@ -177,10 +177,10 @@
       "successDescription": "Il contenuto è stato rimosso dall'argomento."
     },
     "pdfExport": {
-      "button": "Esporta PDF",
-      "success": "PDF esportato!",
+      "button": "Esporta",
+      "success": "Esportato con successo!",
       "successMessage": "Il riassunto è stato esportato con successo.",
-      "error": "Impossibile esportare il PDF."
+      "error": "Impossibile esportare il riassunto."
     }
   },
   "content": {

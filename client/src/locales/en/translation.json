@@ -182,10 +182,10 @@
       "successDescription": "The content has been removed from the topic."
     },
     "pdfExport": {
-      "button": "Export PDF",
-      "success": "PDF exported!",
+      "button": "Export",
+      "success": "Exported successfully!",
       "successMessage": "The summary has been successfully exported.",
-      "error": "Unable to export PDF."
+      "error": "Unable to export summary."
     }
   },
   "content": {
