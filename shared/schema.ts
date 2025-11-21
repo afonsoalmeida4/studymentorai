@@ -573,8 +573,8 @@ export const insertManualFlashcardSchema = insertFlashcardSchema.extend({
   question: z.string().min(1, "Question is required").max(1000, "Question too long"),
   answer: z.string().min(1, "Answer is required").max(2000, "Answer too long"),
   language: z.enum(supportedLanguages),
-  subjectId: z.string().optional(),
-  topicId: z.string().optional(),
+  subjectId: z.string().nullable().optional(),
+  topicId: z.string().nullable().optional(),
   summaryId: z.literal(null).optional(),
   topicSummaryId: z.literal(null).optional(),
 });

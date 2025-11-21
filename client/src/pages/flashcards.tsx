@@ -108,6 +108,22 @@ export default function FlashcardsPage() {
     enabled: !!filterSubject && filterSubject !== "_all",
   });
 
+  // Fetch topics for form (based on selected subject in form or selected flashcard)
+  const formSubjectId = formData.subjectId || selectedFlashcard?.subjectId || "";
+  const { data: formTopics = [] } = useQuery<Topic[]>({
+    queryKey: ["/api/topics/form", formSubjectId],
+    queryFn: async () => {
+      if (!formSubjectId || formSubjectId === "_none") return [];
+      const response = await fetch(`/api/subjects/${formSubjectId}/topics`, {
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to fetch topics");
+      const data = await response.json();
+      return data.topics || [];
+    },
+    enabled: !!formSubjectId && formSubjectId !== "_none",
+  });
+
   const flashcards = flashcardsData?.flashcards || [];
 
   // Create flashcard mutation
@@ -464,7 +480,7 @@ export default function FlashcardsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="_none">{t('common.none')}</SelectItem>
-                        {topics.map(topic => (
+                        {formTopics.map(topic => (
                           <SelectItem key={topic.id} value={topic.id}>
                             {topic.name}
                           </SelectItem>
