@@ -1000,7 +1000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get user language preference for default
       const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
-      const userLanguage = currentUser?.language || "pt";
+      const userLanguage = (currentUser?.language || "pt") as "pt" | "en" | "es" | "fr" | "de" | "it";
       
       // Override language if not explicitly provided
       if (!flashcardData.language) {
