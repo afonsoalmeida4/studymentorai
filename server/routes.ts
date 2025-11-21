@@ -24,6 +24,7 @@ import {
   flashcardTranslations,
   topics,
   subjects,
+  users,
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -1031,9 +1032,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { subjectId, topicId, isManual, language } = req.query;
 
-      // Verify PRO/PREMIUM access
+      // Verify PRO/PREMIUM access for manual flashcards only
       const hasAdvancedFlashcards = await subscriptionService.hasFeatureAccess(userId, 'advancedFlashcards');
-      if (!hasAdvancedFlashcards) {
+      
+      // If user doesn't have advanced flashcards and is trying to view manual ones, deny
+      // But allow viewing auto-generated flashcards for FREE users
+      if (!hasAdvancedFlashcards && isManual === 'true') {
         return res.status(403).json({
           success: false,
           error: "Manual flashcards require PRO or PREMIUM plan",
@@ -1072,6 +1076,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (topicId) filters.topicId = topicId as string;
       if (isManual !== undefined) filters.isManual = isManual === 'true';
       if (language) filters.language = language as string;
+
+      // For FREE users, force filter to auto-generated only (unless already filtered)
+      if (!hasAdvancedFlashcards && isManual === undefined) {
+        filters.isManual = false;
+      }
 
       const flashcards = await storage.getUserFlashcards(userId, filters);
 
