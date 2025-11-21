@@ -98,7 +98,7 @@ export default function FlashcardsPage() {
     queryKey: ["/api/topics", filterSubject],
     queryFn: async () => {
       if (!filterSubject || filterSubject === "_all") return [];
-      const response = await fetch(`/api/subjects/${filterSubject}/topics`, {
+      const response = await fetch(`/api/topics?subjectId=${filterSubject}`, {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch topics");
@@ -114,7 +114,7 @@ export default function FlashcardsPage() {
     queryKey: ["/api/topics/form", formSubjectId],
     queryFn: async () => {
       if (!formSubjectId || formSubjectId === "_none") return [];
-      const response = await fetch(`/api/subjects/${formSubjectId}/topics`, {
+      const response = await fetch(`/api/topics?subjectId=${formSubjectId}`, {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch topics");
