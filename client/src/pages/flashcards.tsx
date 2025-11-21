@@ -75,8 +75,8 @@ export default function FlashcardsPage() {
       const params = new URLSearchParams();
       if (filterType === "manual") params.set("isManual", "true");
       if (filterType === "auto") params.set("isManual", "false");
-      if (filterSubject) params.set("subjectId", filterSubject);
-      if (filterTopic) params.set("topicId", filterTopic);
+      if (filterSubject && filterSubject !== "_all") params.set("subjectId", filterSubject);
+      if (filterTopic && filterTopic !== "_all") params.set("topicId", filterTopic);
       
       const response = await fetch(`/api/flashcards/user?${params.toString()}`, {
         credentials: "include",
@@ -97,7 +97,7 @@ export default function FlashcardsPage() {
   const { data: topics = [] } = useQuery<Topic[]>({
     queryKey: ["/api/topics", filterSubject],
     queryFn: async () => {
-      if (!filterSubject) return [];
+      if (!filterSubject || filterSubject === "_all") return [];
       const response = await fetch(`/api/subjects/${filterSubject}/topics`, {
         credentials: "include",
       });
@@ -105,7 +105,7 @@ export default function FlashcardsPage() {
       const data = await response.json();
       return data.topics || [];
     },
-    enabled: !!filterSubject,
+    enabled: !!filterSubject && filterSubject !== "_all",
   });
 
   const flashcards = flashcardsData?.flashcards || [];
@@ -117,8 +117,8 @@ export default function FlashcardsPage() {
         question: data.question,
         answer: data.answer,
         language: data.language,
-        subjectId: data.subjectId || null,
-        topicId: data.topicId || null,
+        subjectId: (data.subjectId && data.subjectId !== "_none") ? data.subjectId : null,
+        topicId: (data.topicId && data.topicId !== "_none") ? data.topicId : null,
       });
     },
     onSuccess: () => {
@@ -305,7 +305,7 @@ export default function FlashcardsPage() {
               <SelectValue placeholder={t('flashcards.filterBySubject')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">{t('flashcards.allSubjects')}</SelectItem>
+              <SelectItem value="_all">{t('flashcards.allSubjects')}</SelectItem>
               {subjects.map(subject => (
                 <SelectItem key={subject.id} value={subject.id}>
                   {subject.name}
@@ -314,13 +314,13 @@ export default function FlashcardsPage() {
             </SelectContent>
           </Select>
 
-          {filterSubject && (
+          {filterSubject && filterSubject !== "_all" && (
             <Select value={filterTopic} onValueChange={setFilterTopic}>
               <SelectTrigger className="w-48" data-testid="select-filter-topic">
                 <SelectValue placeholder={t('flashcards.filterByTopic')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t('flashcards.allTopics')}</SelectItem>
+                <SelectItem value="_all">{t('flashcards.allTopics')}</SelectItem>
                 {topics.map(topic => (
                   <SelectItem key={topic.id} value={topic.id}>
                     {topic.name}
@@ -446,7 +446,7 @@ export default function FlashcardsPage() {
                       <SelectValue placeholder={t('flashcards.selectSubject')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{t('common.none')}</SelectItem>
+                      <SelectItem value="_none">{t('common.none')}</SelectItem>
                       {subjects.map(subject => (
                         <SelectItem key={subject.id} value={subject.id}>
                           {subject.name}
@@ -455,7 +455,7 @@ export default function FlashcardsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                {formData.subjectId && (
+                {formData.subjectId && formData.subjectId !== "_none" && (
                   <div>
                     <Label htmlFor="topic">{t('flashcards.topic')} ({t('common.optional')})</Label>
                     <Select value={formData.topicId} onValueChange={(value) => setFormData({ ...formData, topicId: value })}>
@@ -463,7 +463,7 @@ export default function FlashcardsPage() {
                         <SelectValue placeholder={t('flashcards.selectTopic')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t('common.none')}</SelectItem>
+                        <SelectItem value="_none">{t('common.none')}</SelectItem>
                         {topics.map(topic => (
                           <SelectItem key={topic.id} value={topic.id}>
                             {topic.name}
