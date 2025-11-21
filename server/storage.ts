@@ -223,7 +223,7 @@ export class DatabaseStorage implements IStorage {
   async updateFlashcard(
     id: string,
     userId: string,
-    data: { question?: string; answer?: string }
+    data: { question?: string; answer?: string; subjectId?: string | null; topicId?: string | null }
   ): Promise<Flashcard | null> {
     const [updated] = await db
       .update(flashcards)

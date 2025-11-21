@@ -162,8 +162,8 @@ export default function FlashcardsPage() {
 
   // Update flashcard mutation
   const updateFlashcardMutation = useMutation({
-    mutationFn: async ({ id, question, answer }: { id: string; question: string; answer: string }) => {
-      return await apiRequest("PATCH", `/api/flashcards/${id}`, { question, answer });
+    mutationFn: async ({ id, question, answer, subjectId, topicId }: { id: string; question: string; answer: string; subjectId: string | null; topicId: string | null }) => {
+      return await apiRequest("PATCH", `/api/flashcards/${id}`, { question, answer, subjectId, topicId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"] });
@@ -222,6 +222,8 @@ export default function FlashcardsPage() {
       id: selectedFlashcard.id,
       question: formData.question,
       answer: formData.answer,
+      subjectId: (formData.subjectId && formData.subjectId !== "_none") ? formData.subjectId : null,
+      topicId: (formData.topicId && formData.topicId !== "_none") ? formData.topicId : null,
     });
   };
 
@@ -535,6 +537,48 @@ export default function FlashcardsPage() {
                   rows={4}
                   data-testid="input-edit-answer"
                 />
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-subject">{t('flashcards.subject')} ({t('common.optional')})</Label>
+                  <Select
+                    value={formData.subjectId}
+                    onValueChange={(value) => setFormData({ ...formData, subjectId: value, topicId: "" })}
+                  >
+                    <SelectTrigger id="edit-subject" data-testid="select-edit-subject">
+                      <SelectValue placeholder={t('flashcards.selectSubject')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_none">{t('common.none')}</SelectItem>
+                      {subjects.map(subject => (
+                        <SelectItem key={subject.id} value={subject.id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {formData.subjectId && formData.subjectId !== "_none" && (
+                  <div>
+                    <Label htmlFor="edit-topic">{t('flashcards.topic')} ({t('common.optional')})</Label>
+                    <Select
+                      value={formData.topicId}
+                      onValueChange={(value) => setFormData({ ...formData, topicId: value })}
+                    >
+                      <SelectTrigger id="edit-topic" data-testid="select-edit-topic">
+                        <SelectValue placeholder={t('flashcards.selectTopic')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none">{t('common.none')}</SelectItem>
+                        {formTopics.map(topic => (
+                          <SelectItem key={topic.id} value={topic.id}>
+                            {topic.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
             <DialogFooter>

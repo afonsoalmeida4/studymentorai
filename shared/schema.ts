@@ -583,6 +583,8 @@ export const insertManualFlashcardSchema = insertFlashcardSchema.extend({
 export const updateFlashcardSchema = z.object({
   question: z.string().min(1).max(1000).optional(),
   answer: z.string().min(1).max(2000).optional(),
+  subjectId: z.string().nullable().optional(),
+  topicId: z.string().nullable().optional(),
 });
 
 export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
