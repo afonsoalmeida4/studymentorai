@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import Stripe from "stripe";
 import PDFDocument from "pdfkit";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel } from "docx";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
 import { getUserLanguage } from "./languageHelper";
 import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards, createManualFlashcardWithTranslations } from "./translationService";
@@ -435,6 +436,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error exporting PDF:", error);
       if (!res.headersSent) {
         res.status(500).json({ error: "Erro ao exportar PDF" });
+      }
+    }
+  });
+
+  // Export topic summary as DOCX (Premium only)
+  app.get("/api/topic-summaries/:id/export-docx", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.id;
+      
+      // Check if user has Premium plan
+      const subscription = await subscriptionService.getUserSubscription(userId);
+      if (!subscription || subscription.plan !== 'premium') {
+        return res.status(403).json({ 
+          error: "Esta funcionalidade está disponível apenas no plano Premium",
+          errorCode: "PREMIUM_REQUIRED"
+        });
+      }
+      
+      // Get topic summary
+      const summary = await storage.getTopicSummary(summaryId, userId);
+      if (!summary) {
+        return res.status(404).json({ error: "Resumo não encontrado" });
+      }
+      
+      // Get topic and subject for context
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, summary.topicId), eq(topics.userId, userId)),
+      });
+      if (!topic) {
+        return res.status(404).json({ error: "Tópico não encontrado" });
+      }
+      
+      const subject = await db.query.subjects.findFirst({
+        where: and(eq(subjects.id, topic.subjectId), eq(subjects.userId, userId)),
+      });
+      if (!subject) {
+        return res.status(404).json({ error: "Disciplina não encontrada" });
+      }
+      
+      // Create DOCX document
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            // Header
+            new Paragraph({
+              text: "AI Study Mentor",
+              heading: HeadingLevel.HEADING_1,
+              alignment: AlignmentType.CENTER,
+            }),
+            new Paragraph({
+              text: subject.name,
+              heading: HeadingLevel.HEADING_2,
+              alignment: AlignmentType.CENTER,
+            }),
+            new Paragraph({
+              text: topic.name,
+              heading: HeadingLevel.HEADING_3,
+              alignment: AlignmentType.CENTER,
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Estilo de Aprendizagem: ${summary.learningStyle}`,
+                  italics: true,
+                  size: 20,
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 },
+            }),
+            // Summary content
+            ...summary.summary.split('\n').map(line => 
+              new Paragraph({
+                text: line,
+                spacing: { after: 120 },
+                alignment: AlignmentType.JUSTIFIED,
+              })
+            ),
+            // Motivational message if exists
+            ...(summary.motivationalMessage ? [
+              new Paragraph({
+                text: "",
+                spacing: { before: 400 },
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "💡 Mensagem Motivacional",
+                    bold: true,
+                    italics: true,
+                  }),
+                ],
+                spacing: { after: 200 },
+              }),
+              ...summary.motivationalMessage.split('\n').map(line =>
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: line,
+                      italics: true,
+                      size: 20,
+                    }),
+                  ],
+                  spacing: { after: 120 },
+                  alignment: AlignmentType.JUSTIFIED,
+                })
+              ),
+            ] : []),
+            // Footer
+            new Paragraph({
+              text: "",
+              spacing: { before: 400 },
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Gerado em ${new Date().toLocaleDateString('pt-PT')} via AI Study Mentor`,
+                  size: 16,
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+            }),
+          ],
+        }],
+      });
+      
+      // Generate DOCX buffer
+      const buffer = await Packer.toBuffer(doc);
+      
+      // Set response headers
+      const fileName = `${subject.name}-${topic.name}-${summary.learningStyle}.docx`;
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      res.setHeader('Content-Length', buffer.length);
+      
+      // Send buffer
+      res.send(buffer);
+      
+    } catch (error) {
+      console.error("Error exporting DOCX:", error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: "Erro ao exportar DOCX" });
       }
     }
   });

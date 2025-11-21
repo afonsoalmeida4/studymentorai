@@ -40,6 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Topic, ContentItem } from "@shared/schema";
 
 type LearningStyle = "visual" | "auditivo" | "logico" | "conciso";
@@ -315,8 +321,8 @@ export default function TopicView() {
     }
   };
 
-  // Export summary as PDF (Premium only)
-  const handleExportPdf = async (summaryId: string) => {
+  // Export summary as PDF or DOCX (Premium only)
+  const handleExport = async (summaryId: string, format: 'pdf' | 'docx') => {
     // Check if user has Premium plan
     if (currentPlan !== 'premium') {
       setUpgradeReason('features');
@@ -326,7 +332,11 @@ export default function TopicView() {
 
     setIsExportingPdf(true);
     try {
-      const response = await fetch(`/api/topic-summaries/${summaryId}/export-pdf`);
+      const endpoint = format === 'pdf' 
+        ? `/api/topic-summaries/${summaryId}/export-pdf`
+        : `/api/topic-summaries/${summaryId}/export-docx`;
+      
+      const response = await fetch(endpoint);
       
       if (!response.ok) {
         const error = await response.json();
@@ -335,15 +345,15 @@ export default function TopicView() {
           setShowUpgradeDialog(true);
           return;
         }
-        throw new Error(error.error || 'Erro ao exportar PDF');
+        throw new Error(error.error || `Erro ao exportar ${format.toUpperCase()}`);
       }
 
       // Get filename from response headers or use default
       const contentDisposition = response.headers.get('Content-Disposition');
       const filenameMatch = contentDisposition?.match(/filename="?(.+?)"?$/);
-      const filename = filenameMatch?.[1] ? decodeURIComponent(filenameMatch[1]) : 'resumo.pdf';
+      const filename = filenameMatch?.[1] ? decodeURIComponent(filenameMatch[1]) : `resumo.${format}`;
 
-      // Download PDF
+      // Download file
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -359,7 +369,7 @@ export default function TopicView() {
         description: t('topicView.pdfExport.successMessage'),
       });
     } catch (error: any) {
-      console.error('Error exporting PDF:', error);
+      console.error(`Error exporting ${format}:`, error);
       toast({
         variant: 'destructive',
         title: t('common.error'),
@@ -694,17 +704,28 @@ export default function TopicView() {
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
                               <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleExportPdf(visual.id)}
-                                  disabled={isExportingPdf || currentPlan !== 'premium'}
-                                  data-testid="button-export-pdf-visual"
-                                  className="gap-2"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  {t('topicView.pdfExport.button')}
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={isExportingPdf || currentPlan !== 'premium'}
+                                      data-testid="button-export-visual"
+                                      className="gap-2"
+                                    >
+                                      <Download className="w-4 h-4" />
+                                      {t('topicView.pdfExport.button')}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => handleExport(visual.id, 'pdf')} data-testid="menu-export-pdf-visual">
+                                      Exportar PDF
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport(visual.id, 'docx')} data-testid="menu-export-docx-visual">
+                                      Exportar DOCX
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -745,17 +766,28 @@ export default function TopicView() {
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
                               <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleExportPdf(auditivo.id)}
-                                  disabled={isExportingPdf || currentPlan !== 'premium'}
-                                  data-testid="button-export-pdf-auditivo"
-                                  className="gap-2"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  {t('topicView.pdfExport.button')}
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={isExportingPdf || currentPlan !== 'premium'}
+                                      data-testid="button-export-auditivo"
+                                      className="gap-2"
+                                    >
+                                      <Download className="w-4 h-4" />
+                                      {t('topicView.pdfExport.button')}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => handleExport(auditivo.id, 'pdf')} data-testid="menu-export-pdf-auditivo">
+                                      Exportar PDF
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport(auditivo.id, 'docx')} data-testid="menu-export-docx-auditivo">
+                                      Exportar DOCX
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -796,17 +828,28 @@ export default function TopicView() {
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
                               <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleExportPdf(logico.id)}
-                                  disabled={isExportingPdf || currentPlan !== 'premium'}
-                                  data-testid="button-export-pdf-logico"
-                                  className="gap-2"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  {t('topicView.pdfExport.button')}
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={isExportingPdf || currentPlan !== 'premium'}
+                                      data-testid="button-export-logico"
+                                      className="gap-2"
+                                    >
+                                      <Download className="w-4 h-4" />
+                                      {t('topicView.pdfExport.button')}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => handleExport(logico.id, 'pdf')} data-testid="menu-export-pdf-logico">
+                                      Exportar PDF
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport(logico.id, 'docx')} data-testid="menu-export-docx-logico">
+                                      Exportar DOCX
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -847,17 +890,28 @@ export default function TopicView() {
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
                               <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleExportPdf(conciso.id)}
-                                  disabled={isExportingPdf || currentPlan !== 'premium'}
-                                  data-testid="button-export-pdf-conciso"
-                                  className="gap-2"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  {t('topicView.pdfExport.button')}
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={isExportingPdf || currentPlan !== 'premium'}
+                                      data-testid="button-export-conciso"
+                                      className="gap-2"
+                                    >
+                                      <Download className="w-4 h-4" />
+                                      {t('topicView.pdfExport.button')}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => handleExport(conciso.id, 'pdf')} data-testid="menu-export-pdf-conciso">
+                                      Exportar PDF
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport(conciso.id, 'docx')} data-testid="menu-export-docx-conciso">
+                                      Exportar DOCX
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 <Button
                                   variant="outline"
                                   size="sm"
