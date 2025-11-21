@@ -21,6 +21,14 @@ PostgreSQL (Neon) is the primary database, managed with Drizzle ORM. The schema 
 ### Authentication & Authorization
 Authentication uses Replit OIDC with session-based authentication via `express-session`. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
 
+**OAuth Loop Fix**: Prevents authentication loops when FREE users have existential chat threads in browser history (Safari iOS cookie blocking issue). Solution implements localStorage-based thread persistence with plan-specific hydration:
+1. Landing page auth check before forcing OAuth redirect
+2. Post-OAuth `?auth=success` callback param with automatic cleanup
+3. **localStorage metadata map**: Stores threadId → mode mapping for PRO/PREMIUM users
+4. **Plan-specific hydration**: FREE users NEVER hydrate from localStorage (always start with selectedThreadId=null), preventing existential thread restoration
+5. **PRO/PREMIUM preservation**: Paid users restore last selected thread (study or existential) on page reload
+6. In-memory selection: FREE users can select study threads within session but never persist to localStorage, eliminating OAuth loop vector
+
 ### Key Features
 - **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering. SM-2 scheduler includes guards against negative intervals (minimum 1 day).
 - **Automatic Flashcard Translation**: All flashcards (manual and auto-generated) are automatically translated to all 6 supported languages using GPT-4 with educational-focused prompts. Translations are created at flashcard creation time and stored in the `flashcard_translations` table, enabling seamless language switching while preserving SM-2 progress across all languages.

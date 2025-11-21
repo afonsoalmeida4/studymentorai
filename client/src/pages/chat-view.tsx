@@ -38,6 +38,58 @@ interface ThreadWithMessages extends ChatThread {
   messages?: ChatMessage[];
 }
 
+type ThreadMetadataMap = Record<string, ChatMode>;
+
+const THREAD_METADATA_KEY = "ai-study-mentor-thread-modes";
+const SELECTED_THREAD_KEY = "ai-study-mentor-selected-thread";
+
+function saveThreadMode(threadId: string, mode: ChatMode): void {
+  try {
+    const map = loadThreadModes();
+    map[threadId] = mode;
+    localStorage.setItem(THREAD_METADATA_KEY, JSON.stringify(map));
+  } catch (error) {
+    console.error("[THREAD_METADATA] Failed to save mode:", error);
+  }
+}
+
+function loadThreadModes(): ThreadMetadataMap {
+  try {
+    const stored = localStorage.getItem(THREAD_METADATA_KEY);
+    if (!stored) return {};
+    return JSON.parse(stored) as ThreadMetadataMap;
+  } catch (error) {
+    console.error("[THREAD_METADATA] Failed to load modes:", error);
+    return {};
+  }
+}
+
+function getThreadMode(threadId: string): ChatMode | null {
+  const map = loadThreadModes();
+  return map[threadId] || null;
+}
+
+function saveSelectedThread(threadId: string | null): void {
+  try {
+    if (threadId) {
+      localStorage.setItem(SELECTED_THREAD_KEY, threadId);
+    } else {
+      localStorage.removeItem(SELECTED_THREAD_KEY);
+    }
+  } catch (error) {
+    console.error("[THREAD_METADATA] Failed to save selection:", error);
+  }
+}
+
+function loadSelectedThread(): string | null {
+  try {
+    return localStorage.getItem(SELECTED_THREAD_KEY);
+  } catch (error) {
+    console.error("[THREAD_METADATA] Failed to load selection:", error);
+    return null;
+  }
+}
+
 export default function ChatView() {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -61,6 +113,52 @@ export default function ChatView() {
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+
+  // CRITICAL: Hydrate thread selection from localStorage on mount
+  // FREE users NEVER hydrate to prevent OAuth loops - always start fresh
+  // PRO/PREMIUM users can restore their last selected thread (study or existential)
+  useEffect(() => {
+    if (!subscriptionResolved) return;
+    
+    // FREE users: never hydrate, always start with null
+    if (currentPlan === "free") {
+      console.log("[THREAD_METADATA] FREE user - skipping hydration, starting fresh");
+      saveSelectedThread(null); // Clear any stale data
+      return;
+    }
+    
+    // PRO/PREMIUM users: hydrate last selected thread
+    const threadId = loadSelectedThread();
+    if (!threadId) return;
+    
+    const mode = getThreadMode(threadId);
+    if (mode) {
+      console.log("[THREAD_METADATA] Hydrating thread:", threadId, "mode:", mode);
+      setSelectedThreadId(threadId);
+      setActiveMode(mode);
+    } else {
+      // No mode metadata - still hydrate but default to study mode
+      console.log("[THREAD_METADATA] Hydrating thread without mode:", threadId);
+      setSelectedThreadId(threadId);
+    }
+  }, [subscriptionResolved, currentPlan]);
+
+  // Save thread metadata to localStorage (only for PRO/PREMIUM users)
+  // FREE users keep selection in-memory only to prevent OAuth loop vectors
+  useEffect(() => {
+    // FREE users: don't persist selection
+    if (currentPlan === "free") return;
+    
+    // PRO/PREMIUM users: persist selection and mode
+    if (!selectedThreadId) {
+      saveSelectedThread(null);
+      return;
+    }
+    
+    saveThreadMode(selectedThreadId, activeMode);
+    saveSelectedThread(selectedThreadId);
+    console.log("[THREAD_METADATA] Saved:", selectedThreadId, "mode:", activeMode);
+  }, [selectedThreadId, activeMode, currentPlan]);
 
   const { data: studyThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "study"],
@@ -106,37 +204,11 @@ export default function ChatView() {
       return data.thread;
     },
     // Fetch thread when selected
-    // If user is FREE and safeActiveMode is study, only fetch if it's a study thread
-    enabled: !!selectedThreadId && subscriptionResolved && (
-      currentPlan !== "free" || safeActiveMode === "study"
-    ),
+    // CRITICAL: localStorage metadata ensures FREE users never select existential threads
+    // Hydration effect clears existential threads before this query can mount
+    enabled: !!selectedThreadId && subscriptionResolved,
   });
 
-  // CRITICAL: Clean up state for FREE users to prevent OAuth loop
-  // This runs AFTER subscription resolves to prevent FREE users from loading existential threads
-  useEffect(() => {
-    if (!subscriptionResolved) return;
-    
-    if (currentPlan === "free") {
-      // Force FREE users to study mode
-      if (activeMode === "existential") {
-        console.log("[CHAT] FREE user - forcing study mode from existential");
-        setActiveMode("study");
-      }
-      
-      // Clear selectedThreadId if it matches an existential thread
-      // Note: existentialThreads array will be empty for FREE users, so we check study threads instead
-      // If selectedThreadId is not in studyThreads and not null, assume it's existential and clear it
-      if (selectedThreadId) {
-        const isStudyThread = studyThreads.some(t => t.id === selectedThreadId);
-        if (!isStudyThread && studyThreads.length > 0) {
-          // Thread ID doesn't match any study thread, likely existential - clear it
-          console.log("[CHAT] FREE user - clearing non-study thread selection:", selectedThreadId);
-          setSelectedThreadId(null);
-        }
-      }
-    }
-  }, [subscriptionResolved, currentPlan, activeMode, selectedThreadId, studyThreads]);
 
   const createThreadMutation = useMutation({
     mutationFn: async (mode: ChatMode) => {
@@ -249,21 +321,6 @@ export default function ChatView() {
       });
     },
   });
-
-  // Force FREE users to study mode and clear any existential thread selection
-  useEffect(() => {
-    if (subscriptionResolved && currentPlan === "free") {
-      // If somehow in existential mode, switch to study
-      if (activeMode === "existential") {
-        setActiveMode("study");
-        setSelectedThreadId(null);
-      }
-      // If a thread is selected but it's existential, clear it
-      if (selectedThreadId && currentThread && currentThread.mode === "existential") {
-        setSelectedThreadId(null);
-      }
-    }
-  }, [subscriptionResolved, currentPlan, activeMode, selectedThreadId, currentThread]);
 
   useEffect(() => {
     if (scrollRef.current) {
