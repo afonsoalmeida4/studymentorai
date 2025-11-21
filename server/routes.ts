@@ -1032,8 +1032,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { subjectId, topicId, isManual, language } = req.query;
 
+      console.log(`[GET /api/flashcards/user] Query params:`, { subjectId, topicId, isManual, language });
+
       // Verify PRO/PREMIUM access for manual flashcards only
       const hasAdvancedFlashcards = await subscriptionService.hasFeatureAccess(userId, 'advancedFlashcards');
+      console.log(`[GET /api/flashcards/user] Has advanced flashcards:`, hasAdvancedFlashcards);
       
       // If user doesn't have advanced flashcards and is trying to view manual ones, deny
       // But allow viewing auto-generated flashcards for FREE users
@@ -1051,6 +1054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .from(subjects)
           .where(and(eq(subjects.id, subjectId as string), eq(subjects.userId, userId)));
         if (!subject) {
+          console.log(`[GET /api/flashcards/user] Subject not found:`, subjectId);
           return res.status(404).json({
             success: false,
             error: "Matéria não encontrada",
@@ -1064,6 +1068,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .from(topics)
           .where(and(eq(topics.id, topicId as string), eq(topics.userId, userId)));
         if (!topic) {
+          console.log(`[GET /api/flashcards/user] Topic not found:`, topicId);
           return res.status(404).json({
             success: false,
             error: "Tópico não encontrado",
@@ -1082,7 +1087,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filters.isManual = false;
       }
 
+      console.log(`[GET /api/flashcards/user] Filters:`, filters);
+
       const flashcards = await storage.getUserFlashcards(userId, filters);
+      console.log(`[GET /api/flashcards/user] Found ${flashcards.length} flashcards`);
 
       return res.json({
         success: true,
