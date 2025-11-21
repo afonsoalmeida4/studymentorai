@@ -230,8 +230,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Subject Progress KPI */}
-          <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-green-500">
+          {/* Subject Progress KPI - Premium only */}
+          {currentPlan === "premium" && (
+            <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-green-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
               <TooltipProvider>
@@ -290,10 +291,12 @@ export default function Dashboard() {
                 </>
               )}
             </CardContent>
-          </Card>
+            </Card>
+          )}
 
-          {/* Tasks Completed KPI */}
-          <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-purple-500">
+          {/* Tasks Completed KPI - Premium only */}
+          {currentPlan === "premium" && (
+            <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-purple-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
               <TooltipProvider>
@@ -343,7 +346,8 @@ export default function Dashboard() {
                 </>
               )}
             </CardContent>
-          </Card>
+            </Card>
+          )}
 
           {/* Study Streak KPI */}
           <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-orange-500">
