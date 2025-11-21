@@ -538,25 +538,56 @@ export const flashcards = pgTable(
   "flashcards",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     summaryId: varchar("summary_id").references(() => summaries.id, { onDelete: "cascade" }),
     topicSummaryId: varchar("topic_summary_id").references(() => topicSummaries.id, { onDelete: "cascade" }),
+    subjectId: varchar("subject_id").references(() => subjects.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").references(() => topics.id, { onDelete: "cascade" }),
+    isManual: boolean("is_manual").default(false).notNull(),
     language: varchar("language", { length: 5 }).default("pt").notNull(),
     question: text("question").notNull(),
     answer: text("answer").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
+    index("idx_flashcards_user_id").on(table.userId),
     index("idx_flashcards_summary_id").on(table.summaryId),
     index("idx_flashcards_topic_summary_id").on(table.topicSummaryId),
+    index("idx_flashcards_subject_id").on(table.subjectId),
+    index("idx_flashcards_topic_id").on(table.topicId),
+    index("idx_flashcards_is_manual").on(table.isManual),
   ],
 );
 
 export const insertFlashcardSchema = createInsertSchema(flashcards).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+// Schema for manual flashcard creation (PRO/PREMIUM only)
+export const insertManualFlashcardSchema = insertFlashcardSchema.extend({
+  isManual: z.literal(true),
+  userId: z.string(),
+  question: z.string().min(1, "Question is required").max(1000, "Question too long"),
+  answer: z.string().min(1, "Answer is required").max(2000, "Answer too long"),
+  language: z.enum(supportedLanguages),
+  subjectId: z.string().optional(),
+  topicId: z.string().optional(),
+  summaryId: z.literal(null).optional(),
+  topicSummaryId: z.literal(null).optional(),
+});
+
+// Schema for updating any flashcard (manual or auto-generated)
+export const updateFlashcardSchema = z.object({
+  question: z.string().min(1).max(1000).optional(),
+  answer: z.string().min(1).max(2000).optional(),
 });
 
 export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
+export type InsertManualFlashcard = z.infer<typeof insertManualFlashcardSchema>;
+export type UpdateFlashcard = z.infer<typeof updateFlashcardSchema>;
 export type Flashcard = typeof flashcards.$inferSelect;
 
 export const flashcardsRelations = relations(flashcards, ({ one, many }) => ({

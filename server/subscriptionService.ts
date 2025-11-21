@@ -232,6 +232,22 @@ export class SubscriptionService {
   /**
    * Check if user can use a learning style
    */
+  async canCreateManualFlashcard(userId: string): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
+    const subscription = await this.getOrCreateSubscription(userId);
+    const plan = subscription.plan as SubscriptionPlan;
+
+    if (plan === 'free') {
+      return {
+        allowed: false,
+        errorCode: 'MANUAL_FLASHCARD_NOT_AVAILABLE',
+        params: { planName: planLimits.free.name },
+        reason: 'Manual flashcard creation requires PRO or PREMIUM plan',
+      };
+    }
+
+    return { allowed: true };
+  }
+
   async canUseLearningStyle(userId: string, learningStyle: string): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];

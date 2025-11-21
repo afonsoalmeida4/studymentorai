@@ -15,6 +15,7 @@ import TopicView from "@/pages/topic-view";
 import ChatView from "@/pages/chat-view";
 import Dashboard from "@/pages/dashboard";
 import Ranking from "@/pages/ranking";
+import FlashcardsPage from "@/pages/flashcards";
 import SubscriptionPage from "@/pages/subscription";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
@@ -47,6 +48,7 @@ function AuthenticatedRouter() {
               <Route path="/" component={Home} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/ranking" component={Ranking} />
+              <Route path="/flashcards" component={FlashcardsPage} />
               <Route path="/subscription" component={SubscriptionPage} />
               <Route path="/subjects" component={SubjectView} />
               <Route path="/subject/:id" component={SubjectView} />

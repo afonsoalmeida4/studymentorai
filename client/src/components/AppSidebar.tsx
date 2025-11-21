@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -164,6 +164,18 @@ export function AppSidebar() {
                         <Link href="/ranking">
                           <Trophy className="w-4 h-4" />
                           <span>{t('nav.ranking')}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location === "/flashcards"}
+                        data-testid="button-flashcards"
+                      >
+                        <Link href="/flashcards">
+                          <CreditCard className="w-4 h-4" />
+                          <span>{t('nav.flashcards')}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -11,6 +11,8 @@ import {
   generateFlashcardsRequestSchema,
   recordStudySessionRequestSchema,
   recordAttemptSchema,
+  insertManualFlashcardSchema,
+  updateFlashcardSchema,
   type GenerateSummaryResponse,
   type GenerateFlashcardsResponse,
   type RecordStudySessionResponse,
@@ -487,10 +489,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         summaryText = topicSummary.summary;
         flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
+          userId,
           topicSummaryId,
+          isManual: false,
           language: userLanguage,
           question: fc.question,
           answer: fc.answer,
+          summaryId: null,
+          subjectId: null,
+          topicId: null,
         }));
       } else {
         const summary = await storage.getSummary(summaryId);
@@ -514,10 +521,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         summaryText = summary.summary;
         flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
+          userId,
           summaryId,
+          isManual: false,
           language: userLanguage,
           question: fc.question,
           answer: fc.answer,
+          topicSummaryId: null,
+          subjectId: null,
+          topicId: null,
         }));
       }
 
@@ -904,6 +916,311 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro ao registar sessão de estudo",
       } as RecordStudySessionResponse);
+    }
+  });
+
+  // === MANUAL FLASHCARD MANAGEMENT (PRO/PREMIUM) ===
+
+  // Create manual flashcard
+  app.post("/api/flashcards/manual", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Check PRO/PREMIUM plan requirement
+      const permissionCheck = await subscriptionService.canCreateManualFlashcard(userId);
+      if (!permissionCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          errorCode: permissionCheck.errorCode,
+          params: permissionCheck.params,
+          error: permissionCheck.reason,
+        });
+      }
+
+      // Validate request body
+      const parseResult = insertManualFlashcardSchema.safeParse({
+        ...req.body,
+        userId,
+        isManual: true,
+      });
+
+      if (!parseResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+          details: parseResult.error.errors,
+        });
+      }
+
+      const flashcardData = parseResult.data;
+
+      // If subjectId provided, verify ownership
+      if (flashcardData.subjectId) {
+        const [subject] = await db
+          .select()
+          .from(subjects)
+          .where(and(eq(subjects.id, flashcardData.subjectId), eq(subjects.userId, userId)));
+
+        if (!subject) {
+          return res.status(404).json({
+            success: false,
+            error: "Matéria não encontrada",
+          });
+        }
+      }
+
+      // If topicId provided, verify ownership AND hierarchy
+      if (flashcardData.topicId) {
+        const [topic] = await db
+          .select()
+          .from(topics)
+          .where(and(eq(topics.id, flashcardData.topicId), eq(topics.userId, userId)));
+
+        if (!topic) {
+          return res.status(404).json({
+            success: false,
+            error: "Tópico não encontrado",
+          });
+        }
+
+        // CRITICAL: Ensure topic belongs to specified subject
+        if (flashcardData.subjectId && topic.subjectId !== flashcardData.subjectId) {
+          return res.status(400).json({
+            success: false,
+            error: "O tópico selecionado não pertence à matéria especificada",
+          });
+        }
+
+        // If topic provided but no subject, auto-fill subject from topic
+        if (!flashcardData.subjectId) {
+          flashcardData.subjectId = topic.subjectId;
+        }
+      }
+
+      // Get user language preference for default
+      const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
+      const userLanguage = currentUser?.language || "pt";
+      
+      // Override language if not explicitly provided
+      if (!flashcardData.language) {
+        flashcardData.language = userLanguage;
+      }
+
+      const flashcard = await storage.createFlashcard(flashcardData);
+
+      return res.json({
+        success: true,
+        flashcard: {
+          ...flashcard,
+          createdAt: flashcard.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: flashcard.updatedAt?.toISOString() || new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.error("Error creating manual flashcard:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao criar flashcard",
+      });
+    }
+  });
+
+  // Get all user flashcards with filters
+  app.get("/api/flashcards/user", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { subjectId, topicId, isManual, language } = req.query;
+
+      // Verify PRO/PREMIUM access
+      const hasAdvancedFlashcards = await subscriptionService.hasFeatureAccess(userId, 'advancedFlashcards');
+      if (!hasAdvancedFlashcards) {
+        return res.status(403).json({
+          success: false,
+          error: "Manual flashcards require PRO or PREMIUM plan",
+        });
+      }
+
+      // Verify ownership of filtered subject/topic if provided
+      if (subjectId) {
+        const [subject] = await db
+          .select()
+          .from(subjects)
+          .where(and(eq(subjects.id, subjectId as string), eq(subjects.userId, userId)));
+        if (!subject) {
+          return res.status(404).json({
+            success: false,
+            error: "Matéria não encontrada",
+          });
+        }
+      }
+
+      if (topicId) {
+        const [topic] = await db
+          .select()
+          .from(topics)
+          .where(and(eq(topics.id, topicId as string), eq(topics.userId, userId)));
+        if (!topic) {
+          return res.status(404).json({
+            success: false,
+            error: "Tópico não encontrado",
+          });
+        }
+      }
+
+      const filters: any = {};
+      if (subjectId) filters.subjectId = subjectId as string;
+      if (topicId) filters.topicId = topicId as string;
+      if (isManual !== undefined) filters.isManual = isManual === 'true';
+      if (language) filters.language = language as string;
+
+      const flashcards = await storage.getUserFlashcards(userId, filters);
+
+      return res.json({
+        success: true,
+        flashcards: flashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: fc.updatedAt?.toISOString() || new Date().toISOString(),
+        })),
+      });
+    } catch (error) {
+      console.error("Error fetching user flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards",
+      });
+    }
+  });
+
+  // Update flashcard (manual or auto-generated)
+  app.patch("/api/flashcards/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const flashcardId = req.params.id;
+
+      // Validate request body
+      const parseResult = updateFlashcardSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+          details: parseResult.error.errors,
+        });
+      }
+
+      // Verify flashcard exists and belongs to user BEFORE attempting update
+      const flashcard = await storage.getFlashcard(flashcardId);
+      if (!flashcard) {
+        return res.status(404).json({
+          success: false,
+          error: "Flashcard não encontrado",
+        });
+      }
+
+      if (flashcard.userId !== userId) {
+        return res.status(403).json({
+          success: false,
+          error: "Sem permissão para editar este flashcard",
+        });
+      }
+
+      const updated = await storage.updateFlashcard(flashcardId, userId, parseResult.data);
+
+      // This should never be null due to prior validation, but defensive check
+      if (!updated) {
+        return res.status(500).json({
+          success: false,
+          error: "Erro inesperado ao atualizar flashcard",
+        });
+      }
+
+      return res.json({
+        success: true,
+        flashcard: {
+          ...updated,
+          createdAt: updated.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: updated.updatedAt?.toISOString() || new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.error("Error updating flashcard:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao atualizar flashcard",
+      });
+    }
+  });
+
+  // Delete flashcard
+  app.delete("/api/flashcards/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const flashcardId = req.params.id;
+
+      // Verify flashcard exists and belongs to user BEFORE attempting delete
+      const flashcard = await storage.getFlashcard(flashcardId);
+      if (!flashcard) {
+        return res.status(404).json({
+          success: false,
+          error: "Flashcard não encontrado",
+        });
+      }
+
+      if (flashcard.userId !== userId) {
+        return res.status(403).json({
+          success: false,
+          error: "Sem permissão para eliminar este flashcard",
+        });
+      }
+
+      const deleted = await storage.deleteFlashcard(flashcardId, userId);
+
+      // This should never be false due to prior validation, but defensive check
+      if (!deleted) {
+        return res.status(500).json({
+          success: false,
+          error: "Erro inesperado ao eliminar flashcard",
+        });
+      }
+
+      return res.json({
+        success: true,
+      });
+    } catch (error) {
+      console.error("Error deleting flashcard:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao deletar flashcard",
+      });
+    }
+  });
+
+  // Get due manual flashcards for review (SM-2 scheduler)
+  app.get("/api/flashcards/manual/due", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { subjectId, topicId } = req.query;
+
+      const filters: any = {};
+      if (subjectId) filters.subjectId = subjectId as string;
+      if (topicId) filters.topicId = topicId as string;
+
+      const dueFlashcards = await storage.getDueManualFlashcards(userId, filters);
+
+      return res.json({
+        success: true,
+        flashcards: dueFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: fc.updatedAt?.toISOString() || new Date().toISOString(),
+        })),
+      });
+    } catch (error) {
+      console.error("Error fetching due manual flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards para revisão",
+      });
     }
   });
 

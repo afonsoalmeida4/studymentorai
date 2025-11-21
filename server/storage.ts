@@ -39,10 +39,20 @@ export interface IStorage {
   
   // Flashcard operations
   createFlashcards(flashcardsData: InsertFlashcard[]): Promise<Flashcard[]>;
+  createFlashcard(flashcardData: InsertFlashcard): Promise<Flashcard>;
+  getUserFlashcards(userId: string, filters?: {
+    subjectId?: string;
+    topicId?: string;
+    isManual?: boolean;
+    language?: string;
+  }): Promise<Flashcard[]>;
   getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]>;
   getFlashcardsByTopicSummary(topicSummaryId: string): Promise<Flashcard[]>;
   getFlashcard(id: string): Promise<Flashcard | undefined>;
+  updateFlashcard(id: string, userId: string, data: { question?: string; answer?: string }): Promise<Flashcard | null>;
+  deleteFlashcard(id: string, userId: string): Promise<boolean>;
   getDueFlashcards(userId: string, summaryId: string): Promise<Flashcard[]>;
+  getDueManualFlashcards(userId: string, filters?: { subjectId?: string; topicId?: string }): Promise<Flashcard[]>;
   
   // Flashcard attempt operations (Anki-style)
   createFlashcardAttempt(attempt: InsertFlashcardAttempt): Promise<FlashcardAttempt>;
@@ -171,6 +181,71 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async createFlashcard(flashcardData: InsertFlashcard): Promise<Flashcard> {
+    const [flashcard] = await db
+      .insert(flashcards)
+      .values(flashcardData)
+      .returning();
+    return flashcard;
+  }
+
+  async getUserFlashcards(
+    userId: string,
+    filters?: {
+      subjectId?: string;
+      topicId?: string;
+      isManual?: boolean;
+      language?: string;
+    }
+  ): Promise<Flashcard[]> {
+    const conditions = [eq(flashcards.userId, userId)];
+
+    if (filters?.subjectId) {
+      conditions.push(eq(flashcards.subjectId, filters.subjectId));
+    }
+    if (filters?.topicId) {
+      conditions.push(eq(flashcards.topicId, filters.topicId));
+    }
+    if (filters?.isManual !== undefined) {
+      conditions.push(eq(flashcards.isManual, filters.isManual));
+    }
+    if (filters?.language) {
+      conditions.push(eq(flashcards.language, filters.language));
+    }
+
+    return await db
+      .select()
+      .from(flashcards)
+      .where(and(...conditions))
+      .orderBy(desc(flashcards.createdAt));
+  }
+
+  async updateFlashcard(
+    id: string,
+    userId: string,
+    data: { question?: string; answer?: string }
+  ): Promise<Flashcard | null> {
+    const [updated] = await db
+      .update(flashcards)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(flashcards.id, id), eq(flashcards.userId, userId)))
+      .returning();
+
+    return updated || null;
+  }
+
+  async deleteFlashcard(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(flashcards)
+      .where(and(eq(flashcards.id, id), eq(flashcards.userId, userId)))
+      .returning();
+
+    return result.length > 0;
+  }
+
   async getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]> {
     return await db
       .select()
@@ -236,6 +311,60 @@ export class DatabaseStorage implements IStorage {
     });
 
     console.log("[getDueFlashcards] Due flashcards:", dueCards.length);
+    return dueCards.map(row => row.flashcard);
+  }
+
+  async getDueManualFlashcards(
+    userId: string,
+    filters?: { subjectId?: string; topicId?: string }
+  ): Promise<Flashcard[]> {
+    const now = new Date();
+    
+    console.log("[getDueManualFlashcards] userId:", userId, "filters:", filters);
+    
+    // Build WHERE conditions for manual flashcards
+    const whereConditions = [
+      eq(flashcards.userId, userId),
+      eq(flashcards.isManual, true),
+    ];
+    
+    if (filters?.subjectId) {
+      whereConditions.push(eq(flashcards.subjectId, filters.subjectId));
+    }
+    
+    if (filters?.topicId) {
+      whereConditions.push(eq(flashcards.topicId, filters.topicId));
+    }
+    
+    const result = await db
+      .select({
+        flashcard: flashcards,
+        attempt: flashcardAttempts,
+      })
+      .from(flashcards)
+      .leftJoin(
+        flashcardAttempts,
+        and(
+          eq(flashcards.id, flashcardAttempts.flashcardId),
+          eq(flashcardAttempts.userId, userId)
+        )
+      )
+      .where(and(...whereConditions))
+      .orderBy(flashcardAttempts.nextReviewDate);
+
+    console.log("[getDueManualFlashcards] Total manual flashcards found:", result.length);
+    
+    const dueCards = result.filter(row => {
+      if (!row.attempt || !row.attempt.id) {
+        console.log("[getDueManualFlashcards] Manual flashcard without attempt (NEW):", row.flashcard.id);
+        return true;
+      }
+      const isDue = row.attempt.nextReviewDate && row.attempt.nextReviewDate <= now;
+      console.log("[getDueManualFlashcards] Manual flashcard with attempt:", row.flashcard.id, "isDue:", isDue);
+      return isDue;
+    });
+
+    console.log("[getDueManualFlashcards] Due manual flashcards:", dueCards.length);
     return dueCards.map(row => row.flashcard);
   }
 
