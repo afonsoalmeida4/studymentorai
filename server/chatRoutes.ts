@@ -7,6 +7,7 @@ import {
   sendMessage,
   getUserThreads,
   deleteThread,
+  updateChatThreadTitle,
 } from "./assistentService";
 import { chatModes } from "@shared/schema";
 import { subscriptionService } from "./subscriptionService";
@@ -119,6 +120,25 @@ export function registerChatRoutes(app: Express) {
     } catch (error) {
       console.error("Error sending message:", error);
       res.status(500).json({ success: false, error: "Erro ao enviar mensagem" });
+    }
+  });
+
+  app.patch("/api/chat/threads/:threadId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { threadId } = req.params;
+      const { title } = req.body;
+
+      if (!title || typeof title !== 'string' || title.trim().length === 0) {
+        return res.status(400).json({ success: false, error: "Título é obrigatório" });
+      }
+
+      const thread = await updateChatThreadTitle(threadId, userId, title.trim());
+
+      res.json({ success: true, thread });
+    } catch (error) {
+      console.error("Error updating thread title:", error);
+      res.status(404).json({ success: false, error: "Conversa não encontrada" });
     }
   });
 

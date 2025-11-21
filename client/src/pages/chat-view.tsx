@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Brain, Sparkles, Trash2, Plus, Lock } from "lucide-react";
+import { Send, Brain, Sparkles, Trash2, Plus, Lock, Pencil } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +21,16 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 import type { ChatThread, ChatMessage, Topic } from "@shared/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type ChatMode = "study" | "existential";
 
@@ -39,6 +49,8 @@ export default function ChatView() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("chat");
+  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
 
   const { subscription, isLoading: isLoadingSubscription } = useSubscription();
   const subscriptionResolved = !isLoadingSubscription;
@@ -181,6 +193,28 @@ export default function ChatView() {
     },
   });
 
+  const updateThreadTitleMutation = useMutation({
+    mutationFn: async ({ threadId, title }: { threadId: string; title: string }) => {
+      return apiRequest("PATCH", `/api/chat/threads/${threadId}`, { title });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chat/threads"] });
+      setEditingThreadId(null);
+      setEditingTitle("");
+      toast({
+        title: "Nome atualizado!",
+        description: "O nome da conversa foi atualizado com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível atualizar o nome.",
+      });
+    },
+  });
+
   useEffect(() => {
     if (subscriptionResolved && currentPlan === "free") {
       setLocation("/subscription");
@@ -250,6 +284,24 @@ export default function ChatView() {
     deleteThreadMutation.mutate(threadId);
   };
 
+  const handleStartEditTitle = (threadId: string, currentTitle: string) => {
+    setEditingThreadId(threadId);
+    setEditingTitle(currentTitle);
+  };
+
+  const handleSaveTitle = () => {
+    if (!editingThreadId || !editingTitle.trim()) return;
+    updateThreadTitleMutation.mutate({
+      threadId: editingThreadId,
+      title: editingTitle.trim(),
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingThreadId(null);
+    setEditingTitle("");
+  };
+
   const currentThreads = activeMode === "study" ? studyThreads : existentialThreads;
 
   return (
@@ -309,7 +361,7 @@ export default function ChatView() {
             {currentThreads.map((thread) => (
               <div
                 key={thread.id}
-                className={`group p-2 rounded hover-elevate cursor-pointer flex items-center justify-between ${
+                className={`group p-2 rounded hover-elevate cursor-pointer flex items-center gap-2 ${
                   selectedThreadId === thread.id ? "bg-accent" : ""
                 }`}
                 onClick={() => setSelectedThreadId(thread.id)}
@@ -318,18 +370,32 @@ export default function ChatView() {
                 <span className="text-sm truncate flex-1">
                   {thread.title || "Nova conversa"}
                 </span>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteThread(thread.id);
-                  }}
-                  data-testid={`button-delete-thread-${thread.id}`}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartEditTitle(thread.id, thread.title || "");
+                    }}
+                    data-testid={`button-edit-thread-${thread.id}`}
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteThread(thread.id);
+                    }}
+                    data-testid={`button-delete-thread-${thread.id}`}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -429,6 +495,51 @@ export default function ChatView() {
           </>
         )}
       </div>
+
+      <Dialog open={!!editingThreadId} onOpenChange={(open) => !open && handleCancelEdit()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Nome da Conversa</DialogTitle>
+            <DialogDescription>
+              Escolha um nome descritivo para esta conversa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="thread-title">Nome</Label>
+              <Input
+                id="thread-title"
+                value={editingTitle}
+                onChange={(e) => setEditingTitle(e.target.value)}
+                placeholder="Nome da conversa"
+                data-testid="input-thread-title"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSaveTitle();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCancelEdit}
+              data-testid="button-cancel-edit"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSaveTitle}
+              disabled={!editingTitle.trim() || updateThreadTitleMutation.isPending}
+              data-testid="button-save-title"
+            >
+              Guardar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <UpgradeDialog
         open={showUpgradeDialog}

@@ -207,18 +207,52 @@ export async function createChatThread(options: CreateThreadOptions) {
   const modeSchema = z.enum(chatModes);
   const validatedMode = modeSchema.parse(mode);
 
+  let threadTitle = title;
+  
+  if (!threadTitle && topicId && validatedMode === "study") {
+    const topic = await db.query.topics.findFirst({
+      where: and(eq(topics.id, topicId), eq(topics.userId, userId)),
+    });
+    
+    if (topic) {
+      threadTitle = topic.name;
+    }
+  }
+  
+  if (!threadTitle) {
+    threadTitle = validatedMode === "study" ? "Nova Conversa - Estudo" : "Nova Conversa - Reflexão";
+  }
+
   const thread = await db
     .insert(chatThreads)
     .values({
       userId,
       mode: validatedMode,
       topicId: topicId || null,
-      title: title || (validatedMode === "study" ? "Nova Conversa - Estudo" : "Nova Conversa - Reflexão"),
+      title: threadTitle,
       isActive: true,
     })
     .returning();
 
   return thread[0];
+}
+
+export async function updateChatThreadTitle(threadId: string, userId: string, newTitle: string) {
+  const thread = await db.query.chatThreads.findFirst({
+    where: and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)),
+  });
+
+  if (!thread) {
+    throw new Error("Thread não encontrado");
+  }
+
+  const updated = await db
+    .update(chatThreads)
+    .set({ title: newTitle })
+    .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)))
+    .returning();
+
+  return updated[0];
 }
 
 export async function getChatHistory(threadId: string, userId: string) {
