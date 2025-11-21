@@ -804,7 +804,16 @@
       "emptyStudyTime": "Wochenziel: 10h",
       "emptyTasks": "Noch keine Aufgaben erstellt",
       "emptyStreak": "Starte deine Serie heute",
-      "createFirst": "Erstes Fach erstellen"
+      "createFirst": "Erstes Fach erstellen",
+      "tooltipWeeklyGoal": "Wochenziel",
+      "tooltipRemaining": "Verbleibend",
+      "tooltipSubjectDetails": "Themen",
+      "tooltipTotalTasks": "Gesamt Aufgaben",
+      "tooltipPendingTasks": "Ausstehend",
+      "tooltipCurrentStreak": "Aktuelle Serie",
+      "tooltipRecord": "Rekord",
+      "tooltipToday": "Heute",
+      "tooltipBeyondGoal": "über das Ziel hinaus"
     },
     "premium": {
       "unlock": "Premium Freischalten",

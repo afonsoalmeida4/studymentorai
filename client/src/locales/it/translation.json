@@ -804,7 +804,16 @@
       "emptyStudyTime": "Obiettivo settimanale: 10h",
       "emptyTasks": "Nessuna attività creata ancora",
       "emptyStreak": "Inizia la tua serie oggi",
-      "createFirst": "Crea prima materia"
+      "createFirst": "Crea prima materia",
+      "tooltipWeeklyGoal": "Obiettivo settimanale",
+      "tooltipRemaining": "Rimanente",
+      "tooltipSubjectDetails": "argomenti",
+      "tooltipTotalTasks": "Totale attività",
+      "tooltipPendingTasks": "In sospeso",
+      "tooltipCurrentStreak": "Serie attuale",
+      "tooltipRecord": "Record",
+      "tooltipToday": "Oggi",
+      "tooltipBeyondGoal": "oltre l'obiettivo"
     },
     "premium": {
       "unlock": "Sblocca Premium",

@@ -787,7 +787,16 @@
       "emptyStudyTime": "Meta semanal: 10h",
       "emptyTasks": "Sem tarefas criadas ainda",
       "emptyStreak": "Começa a tua sequência hoje",
-      "createFirst": "Criar primeira matéria"
+      "createFirst": "Criar primeira matéria",
+      "tooltipWeeklyGoal": "Meta semanal",
+      "tooltipRemaining": "Faltam",
+      "tooltipSubjectDetails": "tópicos",
+      "tooltipTotalTasks": "Total de tarefas",
+      "tooltipPendingTasks": "Pendentes",
+      "tooltipCurrentStreak": "Sequência atual",
+      "tooltipRecord": "Record",
+      "tooltipToday": "Hoje",
+      "tooltipBeyondGoal": "além da meta"
     },
     "premium": {
       "unlock": "Desbloqueie o Premium",

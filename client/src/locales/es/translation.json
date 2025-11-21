@@ -804,7 +804,16 @@
       "emptyStudyTime": "Meta semanal: 10h",
       "emptyTasks": "Aún no hay tareas creadas",
       "emptyStreak": "Empieza tu racha hoy",
-      "createFirst": "Crear primera asignatura"
+      "createFirst": "Crear primera asignatura",
+      "tooltipWeeklyGoal": "Meta semanal",
+      "tooltipRemaining": "Restantes",
+      "tooltipSubjectDetails": "temas",
+      "tooltipTotalTasks": "Total de tareas",
+      "tooltipPendingTasks": "Pendientes",
+      "tooltipCurrentStreak": "Racha actual",
+      "tooltipRecord": "Récord",
+      "tooltipToday": "Hoy",
+      "tooltipBeyondGoal": "más allá de la meta"
     },
     "premium": {
       "unlock": "Desbloquea Premium",

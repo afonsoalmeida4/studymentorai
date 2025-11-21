@@ -804,7 +804,16 @@
       "emptyStudyTime": "Objectif hebdomadaire: 10h",
       "emptyTasks": "Aucune tâche créée pour le moment",
       "emptyStreak": "Commencez votre série aujourd'hui",
-      "createFirst": "Créer première matière"
+      "createFirst": "Créer première matière",
+      "tooltipWeeklyGoal": "Objectif hebdomadaire",
+      "tooltipRemaining": "Restant",
+      "tooltipSubjectDetails": "sujets",
+      "tooltipTotalTasks": "Total des tâches",
+      "tooltipPendingTasks": "En attente",
+      "tooltipCurrentStreak": "Série actuelle",
+      "tooltipRecord": "Record",
+      "tooltipToday": "Aujourd'hui",
+      "tooltipBeyondGoal": "au-delà de l'objectif"
     },
     "premium": {
       "unlock": "Débloquer Premium",

@@ -796,7 +796,16 @@
       "emptyStudyTime": "Weekly goal: 10h",
       "emptyTasks": "No tasks created yet",
       "emptyStreak": "Start your streak today",
-      "createFirst": "Create first subject"
+      "createFirst": "Create first subject",
+      "tooltipWeeklyGoal": "Weekly goal",
+      "tooltipRemaining": "Remaining",
+      "tooltipSubjectDetails": "topics",
+      "tooltipTotalTasks": "Total tasks",
+      "tooltipPendingTasks": "Pending",
+      "tooltipCurrentStreak": "Current streak",
+      "tooltipRecord": "Record",
+      "tooltipToday": "Today",
+      "tooltipBeyondGoal": "beyond goal"
     },
     "premium": {
       "unlock": "Unlock Premium",

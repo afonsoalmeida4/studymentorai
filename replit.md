@@ -9,6 +9,24 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 
 ## Recent Changes
 
+### November 21, 2025 - Dashboard Visual/UX Enhancements
+- **8 Visual Improvements Implemented**:
+  1. **Contextual Colors**: Green/yellow/red system based on performance deltas and progress percentages
+  2. **Visual Hierarchy**: All 4 KPIs with distinct colored left borders (blue/green/purple/orange)
+  3. **Larger Icons**: Upgraded from h-4 to h-6 with thematic colors matching card identity
+  4. **Gradient Progress Bars**: Dynamic red→yellow→green gradients showing goal proximity
+  5. **Animated Elements**: Smooth transitions (duration-300/500), fade-ins, pulse effects on empty states
+  6. **Interactive Tooltips**: Info icons with contextual details (goals, remaining time, records)
+  7. **Enhanced Empty States**: Larger animated numbers (animate-pulse), improved CTAs
+  8. **Hover Effects**: Card elevation (hover-elevate) + visual feedback on all KPI cards
+- **Design Improvements**:
+  - Weekly Hours: ArrowUp/ArrowDown delta indicators, tooltip showing remaining hours to goal
+  - Subject Progress: Color-coded percentages, gradient progress bar, subject name in tooltip
+  - Tasks Completed: Purple theme, Badge component for weekly count, total/pending in tooltip
+  - Study Streak: Orange flame theme, green Badge for "studied today", record display in tooltip
+- **Typography**: Upgraded from text-2xl to text-3xl for better readability and hierarchy
+- **Accessibility**: All interactive elements include aria labels via tooltip system
+
 ### November 20, 2025 - Enhanced Dashboard with 4 New KPIs
 - **Backend Implementation** (`server/statsRoutes.ts`):
   - 4 new GET endpoints: `/api/stats/study-time`, `/api/stats/subject-progress`, `/api/stats/tasks-summary`, `/api/stats/streak`
