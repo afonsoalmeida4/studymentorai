@@ -9,6 +9,23 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 
 ## Recent Changes
 
+### November 21, 2025 - Full Error Message Internationalization
+- **Backend Refactoring**:
+  - All subscription limit methods now return structured `{ errorCode, params }` instead of hardcoded Portuguese messages
+  - Updated methods: `canCreateSubject()`, `canCreateTopic()`, `canUpload()`, `canSendChatMessage()`, `canUseLearningStyle()`, `canGenerateSummary()`, `canUseChatMode()`
+  - API error responses include `errorCode` and `params` fields for client-side translation
+  - Modified routes in `server/organizationRoutes.ts` and `server/routes.ts` to return structured errors
+- **Frontend Implementation**:
+  - Created `translateError()` helper in `client/src/lib/errorTranslation.ts` to translate backend errors using errorCode + params
+  - Updated error handling in: `topic-view.tsx` (uploads), `chat-view.tsx` (chat messages), `AppSidebar.tsx` (subjects), `subject-view.tsx` (topics)
+  - All error toasts now display properly translated messages in user's selected language
+- **i18n Translations**: Added 7 comprehensive error translation keys across all 6 languages (PT, EN, ES, FR, DE, IT):
+  - `errors.SUBJECT_LIMIT_REACHED`, `errors.TOPIC_LIMIT_REACHED`, `errors.UPLOAD_LIMIT_REACHED`
+  - `errors.CHAT_LIMIT_REACHED`, `errors.CHAT_MODE_NOT_AVAILABLE`
+  - `errors.LEARNING_STYLE_NOT_AVAILABLE`, `errors.SUMMARY_WORD_LIMIT_EXCEEDED`
+  - All keys support interpolation ({{limit}}, {{planName}}, {{wordCount}}, {{learningStyle}}, {{mode}})
+- **User Experience**: Error messages now respect user's language preference and include dynamic values (limits, plan names)
+
 ### November 21, 2025 - Subscription Cancellation Feature
 - **Backend Implementation**:
   - Modified `cancelSubscription()` method in `server/subscriptionService.ts` to immediately downgrade to free plan

@@ -570,7 +570,14 @@
     "unauthorized": "Non autorizzato. Accedi nuovamente.",
     "notFound": "Non trovato.",
     "limit": "Limite raggiunto. Aggiorna il tuo piano per continuare.",
-    "upload": "Errore nel caricamento del file. Controlla formato e dimensione."
+    "upload": "Errore nel caricamento del file. Controlla formato e dimensione.",
+    "SUBJECT_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} cartelle del piano {{planName}}. Aggiorna per creare più cartelle!",
+    "TOPIC_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} sottocartelle del piano {{planName}}. Aggiorna per creare più sottocartelle!",
+    "UPLOAD_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} caricamenti al mese del piano {{planName}}. Aggiorna per continuare!",
+    "CHAT_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} messaggi al giorno del piano {{planName}}. Aggiorna per chat illimitata!",
+    "CHAT_MODE_NOT_AVAILABLE": "La modalità {{mode}} non è disponibile nel piano {{planName}}. Aggiorna per sbloccarla!",
+    "LEARNING_STYLE_NOT_AVAILABLE": "Lo stile \"{{learningStyle}}\" non è disponibile nel piano {{planName}}. Aggiorna per accedere a tutti gli stili!",
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "Il riassunto ha {{wordCount}} parole, ma il piano {{planName}} consente fino a {{limit}} parole. Aggiorna per riassunti più grandi!"
   },
   "app": {
     "tagline": "Organizza. Bilancia."

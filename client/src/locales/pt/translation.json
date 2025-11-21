@@ -647,7 +647,14 @@
     "upload": "Erro ao carregar ficheiro. Verifica o formato e tamanho.",
     "generateSummaries": "Erro ao gerar resumos",
     "tryAgain": "Não foi possível completar a operação. Tente novamente.",
-    "loadSubscription": "Não foi possível carregar informações de subscrição"
+    "loadSubscription": "Não foi possível carregar informações de subscrição",
+    "SUBJECT_LIMIT_REACHED": "Atingiste o limite de {{limit}} pastas do plano {{planName}}. Faz upgrade para criar mais pastas!",
+    "TOPIC_LIMIT_REACHED": "Atingiste o limite de {{limit}} subpastas do plano {{planName}}. Faz upgrade para criar mais subpastas!",
+    "UPLOAD_LIMIT_REACHED": "Atingiste o limite de {{limit}} uploads por mês do plano {{planName}}. Faz upgrade para continuar!",
+    "CHAT_LIMIT_REACHED": "Atingiste o limite de {{limit}} mensagens por dia do plano {{planName}}. Faz upgrade para chat ilimitado!",
+    "CHAT_MODE_NOT_AVAILABLE": "O modo {{mode}} não está disponível no plano {{planName}}. Faz upgrade para desbloquear!",
+    "LEARNING_STYLE_NOT_AVAILABLE": "O estilo \"{{learningStyle}}\" não está disponível no plano {{planName}}. Faz upgrade para aceder a todos os estilos!",
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "O resumo tem {{wordCount}} palavras, mas o plano {{planName}} permite até {{limit}} palavras. Faz upgrade para resumos maiores!"
   },
   "myClasses": {
     "title": "As Minhas Turmas",

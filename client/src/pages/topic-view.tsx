@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/hooks/useSubscription";
 import SummaryStudySection from "@/components/SummaryStudySection";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
+import { translateError } from "@/lib/errorTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -185,7 +186,9 @@ export default function TopicView() {
         const error = await res.json();
         throw Object.assign(new Error(error.error || "Upload failed"), { 
           status: res.status,
-          upgradeRequired: error.upgradeRequired 
+          upgradeRequired: error.upgradeRequired,
+          errorCode: error.errorCode,
+          params: error.params
         });
       }
 
@@ -206,6 +209,19 @@ export default function TopicView() {
       if (error.status === 403) {
         setUpgradeReason("uploads");
         setShowUpgradeDialog(true);
+        
+        // Show translated error message in toast
+        const translatedError = translateError(t, {
+          errorCode: error.errorCode,
+          params: error.params,
+          error: error.message
+        });
+        
+        toast({
+          variant: "destructive",
+          title: t('topicView.uploadDialog.error'),
+          description: translatedError,
+        });
       } else {
         toast({
           variant: "destructive",

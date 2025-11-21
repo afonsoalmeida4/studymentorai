@@ -231,6 +231,8 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(403).json({
           success: false,
           error: limitCheck.reason,
+          errorCode: limitCheck.errorCode,
+          params: limitCheck.params,
           upgradeRequired: true,
         });
       }
@@ -361,6 +363,8 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(403).json({
           success: false,
           error: limitCheck.reason,
+          errorCode: limitCheck.errorCode,
+          params: limitCheck.params,
           upgradeRequired: true,
         });
       }
@@ -490,6 +494,8 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(403).json({
           success: false,
           error: uploadCheck.reason,
+          errorCode: uploadCheck.errorCode,
+          params: uploadCheck.params,
           upgradeRequired: true,
         });
       }

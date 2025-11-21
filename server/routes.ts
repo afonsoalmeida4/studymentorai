@@ -142,6 +142,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({
           success: false,
           error: uploadCheck.reason,
+          errorCode: uploadCheck.errorCode,
+          params: uploadCheck.params,
           upgradeRequired: true,
         } as GenerateSummaryResponse);
       }

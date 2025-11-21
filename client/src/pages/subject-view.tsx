@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { translateError } from "@/lib/errorTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import {
@@ -69,11 +70,18 @@ export default function SubjectView() {
         description: t('subjectView.topicCreatedDescription'),
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      // Translate error message using errorCode if available
+      const translatedError = translateError(t, {
+        errorCode: error?.errorCode,
+        params: error?.params,
+        error: error?.message
+      });
+      
       toast({
         variant: "destructive",
         title: t('common.error'),
-        description: t('subjectView.errorCreatingTopic'),
+        description: translatedError || t('subjectView.errorCreatingTopic'),
       });
     },
   });

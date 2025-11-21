@@ -573,7 +573,14 @@
     "unauthorized": "No autorizado. Por favor, inicia sesión nuevamente.",
     "notFound": "No encontrado.",
     "limit": "Límite alcanzado. Actualiza tu plan para continuar.",
-    "upload": "Error al subir archivo. Verifica el formato y tamaño."
+    "upload": "Error al subir archivo. Verifica el formato y tamaño.",
+    "SUBJECT_LIMIT_REACHED": "Has alcanzado el límite de {{limit}} carpetas del plan {{planName}}. ¡Actualiza para crear más carpetas!",
+    "TOPIC_LIMIT_REACHED": "Has alcanzado el límite de {{limit}} subcarpetas del plan {{planName}}. ¡Actualiza para crear más subcarpetas!",
+    "UPLOAD_LIMIT_REACHED": "Has alcanzado el límite de {{limit}} subidas por mes del plan {{planName}}. ¡Actualiza para continuar!",
+    "CHAT_LIMIT_REACHED": "Has alcanzado el límite de {{limit}} mensajes por día del plan {{planName}}. ¡Actualiza para chat ilimitado!",
+    "CHAT_MODE_NOT_AVAILABLE": "El modo {{mode}} no está disponible en el plan {{planName}}. ¡Actualiza para desbloquear!",
+    "LEARNING_STYLE_NOT_AVAILABLE": "El estilo \"{{learningStyle}}\" no está disponible en el plan {{planName}}. ¡Actualiza para acceder a todos los estilos!",
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "El resumen tiene {{wordCount}} palabras, pero el plan {{planName}} permite hasta {{limit}} palabras. ¡Actualiza para resúmenes más grandes!"
   },
   "landing": {
     "hero": {

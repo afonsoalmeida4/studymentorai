@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { translateError } from "@/lib/errorTranslation";
 import type { Subject, User, Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -87,10 +88,18 @@ export function AppSidebar() {
     },
     onError: (error: any) => {
       console.error("Error creating subject:", error);
+      
+      // Translate error message using errorCode if available
+      const translatedError = translateError(t, {
+        errorCode: error?.errorCode,
+        params: error?.params,
+        error: error?.message
+      });
+      
       toast({
         variant: "destructive",
         title: t('common.error'),
-        description: error?.message || t('subjects.createError'),
+        description: translatedError || t('subjects.createError'),
       });
     },
   });

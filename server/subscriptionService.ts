@@ -79,7 +79,7 @@ export class SubscriptionService {
   /**
    * Check if user can create a subject
    */
-  async canCreateSubject(userId: string, currentCount: number): Promise<{ allowed: boolean; reason?: string }> {
+  async canCreateSubject(userId: string, currentCount: number): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];
 
@@ -90,7 +90,9 @@ export class SubscriptionService {
     if (currentCount >= limits.maxSubjects) {
       return {
         allowed: false,
-        reason: `Atingiste o limite de ${limits.maxSubjects} pastas do plano ${limits.name}. Faz upgrade para criar mais pastas!`,
+        errorCode: 'SUBJECT_LIMIT_REACHED',
+        params: { limit: limits.maxSubjects, planName: limits.name },
+        reason: `Subject limit reached: ${limits.maxSubjects}`,
       };
     }
 
@@ -100,7 +102,7 @@ export class SubscriptionService {
   /**
    * Check if user can create a topic
    */
-  async canCreateTopic(userId: string, currentCount: number): Promise<{ allowed: boolean; reason?: string }> {
+  async canCreateTopic(userId: string, currentCount: number): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];
 
@@ -111,7 +113,9 @@ export class SubscriptionService {
     if (currentCount >= limits.maxTopics) {
       return {
         allowed: false,
-        reason: `Atingiste o limite de ${limits.maxTopics} subpastas do plano ${limits.name}. Faz upgrade para criar mais subpastas!`,
+        errorCode: 'TOPIC_LIMIT_REACHED',
+        params: { limit: limits.maxTopics, planName: limits.name },
+        reason: `Topic limit reached: ${limits.maxTopics}`,
       };
     }
 
@@ -121,7 +125,7 @@ export class SubscriptionService {
   /**
    * Check if user can perform an upload
    */
-  async canUpload(userId: string): Promise<{ allowed: boolean; reason?: string }> {
+  async canUpload(userId: string): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const usage = await this.getUserUsage(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];
@@ -133,7 +137,9 @@ export class SubscriptionService {
     if (usage.uploadsCount >= limits.uploadsPerMonth) {
       return {
         allowed: false,
-        reason: `Atingiste o limite de ${limits.uploadsPerMonth} uploads por mês do plano ${limits.name}. Faz upgrade para continuar!`,
+        errorCode: 'UPLOAD_LIMIT_REACHED',
+        params: { limit: limits.uploadsPerMonth, planName: limits.name },
+        reason: `Upload limit reached: ${limits.uploadsPerMonth}`,
       };
     }
 
@@ -167,7 +173,7 @@ export class SubscriptionService {
   /**
    * Check if user can send chat message
    */
-  async canSendChatMessage(userId: string, mode: ChatMode): Promise<{ allowed: boolean; reason?: string }> {
+  async canSendChatMessage(userId: string, mode: ChatMode): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const usage = await this.getUserUsage(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];
@@ -176,7 +182,9 @@ export class SubscriptionService {
     if (!limits.chatModes.includes(mode)) {
       return {
         allowed: false,
-        reason: `O modo ${mode === "existential" ? "Existencial" : "Estudo"} não está disponível no plano ${limits.name}. Faz upgrade para desbloquear!`,
+        errorCode: 'CHAT_MODE_NOT_AVAILABLE',
+        params: { mode, planName: limits.name },
+        reason: `Chat mode not available: ${mode}`,
       };
     }
 
@@ -188,7 +196,9 @@ export class SubscriptionService {
     if (usage.chatMessagesCount >= limits.dailyChatLimit) {
       return {
         allowed: false,
-        reason: `Atingiste o limite de ${limits.dailyChatLimit} mensagens por dia do plano ${limits.name}. Faz upgrade para chat ilimitado!`,
+        errorCode: 'CHAT_LIMIT_REACHED',
+        params: { limit: limits.dailyChatLimit, planName: limits.name },
+        reason: `Chat limit reached: ${limits.dailyChatLimit}`,
       };
     }
 
@@ -222,14 +232,16 @@ export class SubscriptionService {
   /**
    * Check if user can use a learning style
    */
-  async canUseLearningStyle(userId: string, learningStyle: string): Promise<{ allowed: boolean; reason?: string }> {
+  async canUseLearningStyle(userId: string, learningStyle: string): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];
 
     if (!limits.allowedLearningStyles.includes(learningStyle as any)) {
       return {
         allowed: false,
-        reason: `O estilo "${learningStyle}" não está disponível no plano ${limits.name}. Faz upgrade para aceder a todos os estilos de aprendizagem!`,
+        errorCode: 'LEARNING_STYLE_NOT_AVAILABLE',
+        params: { learningStyle, planName: limits.name },
+        reason: `Learning style not available: ${learningStyle}`,
       };
     }
 
@@ -239,7 +251,7 @@ export class SubscriptionService {
   /**
    * Check if user can generate summary
    */
-  async canGenerateSummary(userId: string, wordCount: number): Promise<{ allowed: boolean; reason?: string }> {
+  async canGenerateSummary(userId: string, wordCount: number): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const limits = planLimits[subscription.plan as SubscriptionPlan];
 
@@ -250,7 +262,9 @@ export class SubscriptionService {
     if (wordCount > limits.maxSummaryWords) {
       return {
         allowed: false,
-        reason: `O resumo tem ${wordCount} palavras, mas o plano ${limits.name} permite até ${limits.maxSummaryWords} palavras. Faz upgrade para resumos maiores!`,
+        errorCode: 'SUMMARY_WORD_LIMIT_EXCEEDED',
+        params: { wordCount, limit: limits.maxSummaryWords, planName: limits.name },
+        reason: `Summary word limit exceeded: ${wordCount}/${limits.maxSummaryWords}`,
       };
     }
 

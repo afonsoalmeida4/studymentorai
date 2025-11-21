@@ -570,7 +570,14 @@
     "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
     "notFound": "Non trouvé.",
     "limit": "Limite atteinte. Mettez à niveau votre plan pour continuer.",
-    "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille."
+    "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille.",
+    "SUBJECT_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} dossiers du plan {{planName}}. Mettez à niveau pour créer plus de dossiers !",
+    "TOPIC_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} sous-dossiers du plan {{planName}}. Mettez à niveau pour créer plus de sous-dossiers !",
+    "UPLOAD_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} téléchargements par mois du plan {{planName}}. Mettez à niveau pour continuer !",
+    "CHAT_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} messages par jour du plan {{planName}}. Mettez à niveau pour chat illimité !",
+    "CHAT_MODE_NOT_AVAILABLE": "Le mode {{mode}} n'est pas disponible dans le plan {{planName}}. Mettez à niveau pour débloquer !",
+    "LEARNING_STYLE_NOT_AVAILABLE": "Le style \"{{learningStyle}}\" n'est pas disponible dans le plan {{planName}}. Mettez à niveau pour accéder à tous les styles !",
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "Le résumé contient {{wordCount}} mots, mais le plan {{planName}} permet jusqu'à {{limit}} mots. Mettez à niveau pour des résumés plus grands !"
   },
   "app": {
     "tagline": "Organise. Équilibre."

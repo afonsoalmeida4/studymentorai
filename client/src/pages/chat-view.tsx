@@ -5,6 +5,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
+import { translateError } from "@/lib/errorTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -146,11 +147,24 @@ export default function ChatView() {
       if (error.status === 403) {
         setUpgradeReason("chat");
         setShowUpgradeDialog(true);
+        
+        // Show translated error message in toast
+        const translatedError = translateError(t, {
+          errorCode: error.errorCode,
+          params: error.params,
+          error: error.message
+        });
+        
+        toast({
+          variant: "destructive",
+          title: t('common.error'),
+          description: translatedError,
+        });
       } else {
         toast({
           variant: "destructive",
-          title: "Erro",
-          description: error.message || "Não foi possível enviar a mensagem.",
+          title: t('common.error'),
+          description: error.message || t('errors.tryAgain'),
         });
       }
     },

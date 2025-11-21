@@ -656,7 +656,14 @@
     "upload": "Error uploading file. Check format and size.",
     "generateSummaries": "Error generating summaries",
     "tryAgain": "Could not complete the operation. Please try again.",
-    "loadSubscription": "Could not load subscription information"
+    "loadSubscription": "Could not load subscription information",
+    "SUBJECT_LIMIT_REACHED": "You've reached the limit of {{limit}} folders in the {{planName}} plan. Upgrade to create more folders!",
+    "TOPIC_LIMIT_REACHED": "You've reached the limit of {{limit}} subfolders in the {{planName}} plan. Upgrade to create more subfolders!",
+    "UPLOAD_LIMIT_REACHED": "You've reached the limit of {{limit}} uploads per month in the {{planName}} plan. Upgrade to continue!",
+    "CHAT_LIMIT_REACHED": "You've reached the limit of {{limit}} messages per day in the {{planName}} plan. Upgrade for unlimited chat!",
+    "CHAT_MODE_NOT_AVAILABLE": "The {{mode}} mode is not available in the {{planName}} plan. Upgrade to unlock!",
+    "LEARNING_STYLE_NOT_AVAILABLE": "The \"{{learningStyle}}\" style is not available in the {{planName}} plan. Upgrade to access all styles!",
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "The summary has {{wordCount}} words, but the {{planName}} plan allows up to {{limit}} words. Upgrade for larger summaries!"
   },
   "myClasses": {
     "title": "My Classes",

@@ -570,7 +570,14 @@
     "unauthorized": "Nicht autorisiert. Bitte melden Sie sich erneut an.",
     "notFound": "Nicht gefunden.",
     "limit": "Limit erreicht. Upgraden Sie Ihren Plan, um fortzufahren.",
-    "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe."
+    "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe.",
+    "SUBJECT_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Ordnern im {{planName}}-Plan erreicht. Upgraden Sie, um mehr Ordner zu erstellen!",
+    "TOPIC_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Unterordnern im {{planName}}-Plan erreicht. Upgraden Sie, um mehr Unterordner zu erstellen!",
+    "UPLOAD_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Uploads pro Monat im {{planName}}-Plan erreicht. Upgraden Sie, um fortzufahren!",
+    "CHAT_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Nachrichten pro Tag im {{planName}}-Plan erreicht. Upgraden Sie für unbegrenzten Chat!",
+    "CHAT_MODE_NOT_AVAILABLE": "Der {{mode}}-Modus ist im {{planName}}-Plan nicht verfügbar. Upgraden Sie, um ihn freizuschalten!",
+    "LEARNING_STYLE_NOT_AVAILABLE": "Der Stil \"{{learningStyle}}\" ist im {{planName}}-Plan nicht verfügbar. Upgraden Sie, um auf alle Stile zuzugreifen!",
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "Die Zusammenfassung hat {{wordCount}} Wörter, aber der {{planName}}-Plan erlaubt bis zu {{limit}} Wörter. Upgraden Sie für größere Zusammenfassungen!"
   },
   "app": {
     "tagline": "Organisiere. Balanciere."
