@@ -23,10 +23,13 @@ export function XPProgressBar({
       <Progress value={progress} className="h-2" />
       {showLabel && (
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span data-testid="text-current-xp">{currentXp} XP</span>
+          <span data-testid="text-min-xp">{currentLevelXp} XP</span>
+          <span data-testid="text-current-xp" className="font-semibold text-foreground">
+            {currentXp} XP
+          </span>
           {nextLevelXp !== Infinity && (
             <span data-testid="text-next-level-xp">
-              {xpInCurrentLevel} / {xpNeededForNextLevel}
+              {nextLevelXp} XP
             </span>
           )}
         </div>
