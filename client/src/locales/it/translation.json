@@ -500,8 +500,15 @@
       "paymentCanceledMessage": "Puoi riprovare quando vuoi.",
       "checkoutError": "Errore",
       "checkoutErrorMessage": "Impossibile avviare il processo di pagamento",
-      "noUrl": "URL di pagamento non ricevuto"
+      "noUrl": "URL di pagamento non ricevuto",
+      "cancelSuccess": "Abbonamento Annullato",
+      "cancelSuccessMessage": "Il tuo abbonamento è stato annullato e sei tornato al piano Gratuito.",
+      "cancelError": "Errore di Annullamento",
+      "cancelErrorMessage": "Impossibile annullare l'abbonamento. Riprova."
     },
+    "cancelButton": "Annulla Abbonamento",
+    "canceling": "Annullamento in corso...",
+    "cancelConfirmation": "Sei sicuro di voler annullare il tuo abbonamento? Tornerai al piano Gratuito.",
     "plans": {
       "free": {
         "name": "Inizia a Studiare",

@@ -120,6 +120,27 @@ export default function SubscriptionPage() {
     },
   });
 
+  const cancelSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/subscription/cancel", {});
+    },
+    onSuccess: () => {
+      toast({
+        title: t("subscription.toasts.cancelSuccess"),
+        description: t("subscription.toasts.cancelSuccessMessage"),
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+    },
+    onError: (error: any) => {
+      console.error("Cancel subscription error:", error);
+      toast({
+        title: t("subscription.toasts.cancelError"),
+        description: error.message || t("subscription.toasts.cancelErrorMessage"),
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="container max-w-6xl mx-auto p-6 space-y-6">
@@ -386,6 +407,21 @@ export default function SubscriptionPage() {
                 </span>
               </div>
             )}
+            <div className="pt-4 border-t">
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (confirm(t("subscription.cancelConfirmation"))) {
+                    cancelSubscriptionMutation.mutate();
+                  }
+                }}
+                disabled={cancelSubscriptionMutation.isPending}
+                data-testid="button-cancel-subscription"
+                className="w-full"
+              >
+                {cancelSubscriptionMutation.isPending ? t("subscription.canceling") : t("subscription.cancelButton")}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

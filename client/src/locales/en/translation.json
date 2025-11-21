@@ -583,8 +583,15 @@
       "paymentCanceledMessage": "You can try again whenever you want.",
       "checkoutError": "Error",
       "checkoutErrorMessage": "Could not start payment process",
-      "noUrl": "Payment URL not received"
+      "noUrl": "Payment URL not received",
+      "cancelSuccess": "Subscription Canceled",
+      "cancelSuccessMessage": "Your subscription has been canceled and you're back on the Free plan.",
+      "cancelError": "Error Canceling",
+      "cancelErrorMessage": "Could not cancel subscription. Please try again."
     },
+    "cancelButton": "Cancel Subscription",
+    "canceling": "Canceling...",
+    "cancelConfirmation": "Are you sure you want to cancel your subscription? You will return to the Free plan.",
     "plans": {
       "free": {
         "name": "Start Studying",

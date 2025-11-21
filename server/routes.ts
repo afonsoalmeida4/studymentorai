@@ -1013,6 +1013,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cancel subscription and revert to free plan
+  app.post("/api/subscription/cancel", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const subscription = await subscriptionService.cancelSubscription(userId);
+      
+      return res.json({
+        success: true,
+        subscription,
+      });
+    } catch (error: any) {
+      console.error("Error canceling subscription:", error);
+      return res.status(400).json({
+        error: error.message || "Erro ao cancelar subscrição",
+      });
+    }
+  });
+
   // Create Stripe checkout session for subscription upgrade
   app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
     try {

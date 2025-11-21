@@ -574,8 +574,15 @@
       "paymentCanceledMessage": "Podes tentar novamente quando quiseres.",
       "checkoutError": "Erro",
       "checkoutErrorMessage": "Não foi possível iniciar o processo de pagamento",
-      "noUrl": "URL de pagamento não recebido"
+      "noUrl": "URL de pagamento não recebido",
+      "cancelSuccess": "Subscrição Cancelada",
+      "cancelSuccessMessage": "A tua subscrição foi cancelada e voltaste para o plano Free.",
+      "cancelError": "Erro ao Cancelar",
+      "cancelErrorMessage": "Não foi possível cancelar a subscrição. Por favor, tenta novamente."
     },
+    "cancelButton": "Cancelar Subscrição",
+    "canceling": "A cancelar...",
+    "cancelConfirmation": "Tens a certeza que queres cancelar a tua subscrição? Voltarás para o plano Free.",
     "plans": {
       "free": {
         "name": "Começa a Estudar",

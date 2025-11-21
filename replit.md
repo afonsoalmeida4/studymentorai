@@ -9,6 +9,24 @@ AI Study Mentor is a Notion-style knowledge organization platform designed to he
 
 ## Recent Changes
 
+### November 21, 2025 - Subscription Cancellation Feature
+- **Backend Implementation**:
+  - Modified `cancelSubscription()` method in `server/subscriptionService.ts` to immediately downgrade to free plan
+  - Clears all Stripe metadata (customerId, subscriptionId, priceId, period dates)
+  - Added POST `/api/subscription/cancel` endpoint in `server/routes.ts`
+  - Error handling for edge cases (no subscription, already on free plan)
+- **Frontend Implementation** (`client/src/pages/subscription.tsx`):
+  - Added `cancelSubscriptionMutation` with query invalidation
+  - Cancel button only visible when `currentPlan !== "free"`
+  - Native browser confirmation dialog before cancellation
+  - Success/error toast notifications with proper i18n
+  - Button test-id: `button-cancel-subscription`
+- **Full i18n Support**: Added 7 new translation keys across all 6 languages:
+  - `cancelButton`, `canceling`, `cancelConfirmation`
+  - `toasts.cancelSuccess`, `toasts.cancelSuccessMessage`
+  - `toasts.cancelError`, `toasts.cancelErrorMessage`
+- **User Experience**: Immediate cancellation with instant return to free plan (no end-of-period grace)
+
 ### November 21, 2025 - Dashboard Visual/UX Enhancements
 - **8 Visual Improvements Implemented**:
   1. **Contextual Colors**: Green/yellow/red system based on performance deltas and progress percentages

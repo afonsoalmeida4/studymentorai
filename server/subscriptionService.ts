@@ -344,21 +344,34 @@ export class SubscriptionService {
   }
 
   /**
-   * Cancel subscription
+   * Cancel subscription and immediately revert to free plan
    */
   async cancelSubscription(userId: string): Promise<Subscription> {
+    const subscription = await this.getUserSubscription(userId);
+    
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    if (subscription.plan === "free") {
+      throw new Error("Already on free plan");
+    }
+
     const [updated] = await db
       .update(subscriptions)
       .set({
-        cancelAtPeriodEnd: true,
+        plan: "free",
+        status: "canceled",
+        cancelAtPeriodEnd: undefined,
+        stripeCustomerId: undefined,
+        stripeSubscriptionId: undefined,
+        stripePriceId: undefined,
+        currentPeriodStart: undefined,
+        currentPeriodEnd: undefined,
         updatedAt: new Date(),
       })
       .where(eq(subscriptions.userId, userId))
       .returning();
-
-    if (!updated) {
-      throw new Error("Subscription not found");
-    }
 
     return updated;
   }

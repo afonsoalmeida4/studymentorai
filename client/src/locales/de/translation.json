@@ -500,8 +500,15 @@
       "paymentCanceledMessage": "Sie können es jederzeit erneut versuchen.",
       "checkoutError": "Fehler",
       "checkoutErrorMessage": "Zahlungsvorgang konnte nicht gestartet werden",
-      "noUrl": "Zahlungs-URL nicht erhalten"
+      "noUrl": "Zahlungs-URL nicht erhalten",
+      "cancelSuccess": "Abonnement Gekündigt",
+      "cancelSuccessMessage": "Ihr Abonnement wurde gekündigt und Sie sind zurück im kostenlosen Plan.",
+      "cancelError": "Kündigungsfehler",
+      "cancelErrorMessage": "Abonnement konnte nicht gekündigt werden. Bitte versuchen Sie es erneut."
     },
+    "cancelButton": "Abonnement Kündigen",
+    "canceling": "Wird gekündigt...",
+    "cancelConfirmation": "Sind Sie sicher, dass Sie Ihr Abonnement kündigen möchten? Sie kehren zum kostenlosen Plan zurück.",
     "plans": {
       "free": {
         "name": "Beginnen Sie zu Lernen",

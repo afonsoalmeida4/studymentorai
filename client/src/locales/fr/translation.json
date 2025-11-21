@@ -500,8 +500,15 @@
       "paymentCanceledMessage": "Vous pouvez réessayer quand vous voulez.",
       "checkoutError": "Erreur",
       "checkoutErrorMessage": "Impossible de démarrer le processus de paiement",
-      "noUrl": "URL de paiement non reçue"
+      "noUrl": "URL de paiement non reçue",
+      "cancelSuccess": "Abonnement Annulé",
+      "cancelSuccessMessage": "Votre abonnement a été annulé et vous êtes de retour au plan Gratuit.",
+      "cancelError": "Erreur d'Annulation",
+      "cancelErrorMessage": "Impossible d'annuler l'abonnement. Veuillez réessayer."
     },
+    "cancelButton": "Annuler l'Abonnement",
+    "canceling": "Annulation en cours...",
+    "cancelConfirmation": "Êtes-vous sûr de vouloir annuler votre abonnement ? Vous reviendrez au plan Gratuit.",
     "plans": {
       "free": {
         "name": "Commencer à Étudier",

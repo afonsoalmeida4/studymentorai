@@ -503,8 +503,15 @@
       "paymentCanceledMessage": "Puedes intentarlo de nuevo cuando quieras.",
       "checkoutError": "Error",
       "checkoutErrorMessage": "No se pudo iniciar el proceso de pago",
-      "noUrl": "URL de pago no recibida"
+      "noUrl": "URL de pago no recibida",
+      "cancelSuccess": "Suscripción Cancelada",
+      "cancelSuccessMessage": "Tu suscripción ha sido cancelada y has vuelto al plan Gratuito.",
+      "cancelError": "Error al Cancelar",
+      "cancelErrorMessage": "No se pudo cancelar la suscripción. Por favor, inténtalo de nuevo."
     },
+    "cancelButton": "Cancelar Suscripción",
+    "canceling": "Cancelando...",
+    "cancelConfirmation": "¿Estás seguro de que quieres cancelar tu suscripción? Volverás al plan Gratuito.",
     "plans": {
       "free": {
         "name": "Empieza a Estudiar",
