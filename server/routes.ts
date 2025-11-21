@@ -34,7 +34,7 @@ import { registerChatRoutes } from "./chatRoutes";
 import { registerStatsRoutes } from "./statsRoutes";
 import { calculateNextReview } from "./flashcardScheduler";
 import { db } from "./db";
-import { and, eq, sql, gt, asc } from "drizzle-orm";
+import { and, eq, sql, gt, asc, or, inArray } from "drizzle-orm";
 import { subscriptionService } from "./subscriptionService";
 
 if (!process.env.STRIPE_SECRET_KEY) {
