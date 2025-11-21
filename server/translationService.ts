@@ -316,13 +316,21 @@ export async function translateFlashcardsText(
     .map((fc, i) => `Flashcard ${i + 1}:\nQuestion: ${fc.question}\nAnswer: ${fc.answer}`)
     .join("\n\n");
 
-  const prompt = `You are a professional translator. Translate the following flashcards from ${fromLangName} to ${toLangName}.
+  const prompt = `You are a professional translator specializing in educational and academic content. Translate the following flashcards from ${fromLangName} to ${toLangName}.
 
-IMPORTANT:
-- Preserve the educational content and accuracy
-- Keep technical terms correct in the target language
-- Make questions and answers natural in the target language
-- Maintain the same level of difficulty
+EDUCATIONAL TRANSLATION GUIDELINES:
+- Preserve pedagogical intent: maintain the learning objectives and difficulty level
+- Technical terminology: use standard academic/professional terms in the target language
+- Contextual accuracy: ensure answers remain factually correct and complete
+- Natural phrasing: questions should sound natural to native speakers while maintaining educational rigor
+- Conceptual fidelity: preserve examples, metaphors, and explanatory structures
+- Formatting: maintain any special formatting, symbols (→, •, etc.), or structure
+
+QUALITY REQUIREMENTS:
+- Questions must remain clear, specific, and testable
+- Answers must be comprehensive and educationally sound
+- Maintain consistency in terminology across all flashcards
+- Preserve the relationship between questions and their answers
 
 FLASHCARDS TO TRANSLATE:
 ${flashcardsText}
@@ -334,7 +342,9 @@ Respond ONLY with a JSON object in this exact format:
     {"question": "translated question 2", "answer": "translated answer 2"},
     ...
   ]
-}`;
+}
+
+CRITICAL: You must return exactly ${flashcards.length} flashcards.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -355,21 +365,41 @@ Respond ONLY with a JSON object in this exact format:
       throw new Error("No translation response from OpenAI");
     }
 
-    const translated = JSON.parse(content);
+    let translated;
+    try {
+      translated = JSON.parse(content);
+    } catch (parseError) {
+      console.error("[translateFlashcardsText] JSON parse error:", parseError);
+      console.error("[translateFlashcardsText] Raw response:", content);
+      throw new Error("OpenAI returned invalid JSON format");
+    }
     
-    if (!Array.isArray(translated.flashcards)) {
-      throw new Error("Invalid flashcards translation response format");
+    if (!translated.flashcards || !Array.isArray(translated.flashcards)) {
+      console.error("[translateFlashcardsText] Invalid response structure:", translated);
+      throw new Error("Invalid flashcards translation response format: missing or invalid 'flashcards' array");
     }
 
     // Validate we got the same number of flashcards back
     if (translated.flashcards.length !== flashcards.length) {
-      console.warn(`Translation returned ${translated.flashcards.length} flashcards but expected ${flashcards.length}`);
+      console.error(`[translateFlashcardsText] Translation count mismatch: received ${translated.flashcards.length}, expected ${flashcards.length}`);
+      throw new Error(`Translation count mismatch: received ${translated.flashcards.length} flashcards but expected ${flashcards.length}`);
+    }
+
+    // Validate each flashcard has required fields
+    for (let i = 0; i < translated.flashcards.length; i++) {
+      const fc = translated.flashcards[i];
+      if (!fc.question || typeof fc.question !== 'string') {
+        throw new Error(`Flashcard ${i + 1} missing or invalid 'question' field`);
+      }
+      if (!fc.answer || typeof fc.answer !== 'string') {
+        throw new Error(`Flashcard ${i + 1} missing or invalid 'answer' field`);
+      }
     }
 
     return translated.flashcards;
   } catch (error) {
-    console.error("Flashcard translation error:", error);
-    throw new Error(`Failed to translate flashcards: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error("[translateFlashcardsText] Translation error:", error);
+    throw new Error(`Failed to translate flashcards from ${fromLangName} to ${toLangName}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

@@ -23,6 +23,8 @@ Authentication uses Replit OIDC with session-based authentication via `express-s
 
 ### Key Features
 - **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering.
+- **Automatic Flashcard Translation**: All flashcards (manual and auto-generated) are automatically translated to all 6 supported languages using GPT-4 with educational-focused prompts. Translations are created at flashcard creation time and stored in the `flashcard_translations` table, enabling seamless language switching while preserving SM-2 progress across all languages.
+- **Flashcard Migration Tool**: Admin endpoint `/api/admin/migrate-flashcards` for one-time migration of legacy flashcards without translations. Uses robust JSON validation and detailed error reporting. Note: Current implementation is functional for small batches but lacks retry/backoff, idempotency guards, and concurrency locks for production-scale migrations.
 - **PDF Export**: Premium-only feature allowing export of AI-generated summaries to professionally formatted PDFs, including app branding and metadata.
 - **Internationalized Error Messages**: Backend returns structured error codes and parameters for client-side translation, providing dynamic and language-sensitive error messages.
 - **Subscription Management**: Users can cancel subscriptions, immediately reverting to the free plan.

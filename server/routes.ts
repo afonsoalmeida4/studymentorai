@@ -1853,10 +1853,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Generate detailed summary
+      const successCount = results.filter(r => r.status === "success").length;
+      const failedCount = results.filter(r => r.status === "failed").length;
+      const totalTranslationsCreated = results
+        .filter(r => r.status === "success")
+        .reduce((sum, r) => sum + (r.translationsCreated || 0), 0);
+
+      console.log(`[MIGRATE] Migration complete - Success: ${successCount}, Failed: ${failedCount}, Translations created: ${totalTranslationsCreated}`);
+
       return res.json({
         success: true,
-        message: `Migration completed`,
-        totalProcessed: flashcardsWithoutTranslations.length,
+        message: `Migration completed: ${successCount} flashcards migrated, ${failedCount} failed`,
+        summary: {
+          totalProcessed: flashcardsWithoutTranslations.length,
+          successCount,
+          failedCount,
+          totalTranslationsCreated,
+        },
         results,
       });
     } catch (error) {
