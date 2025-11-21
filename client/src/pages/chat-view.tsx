@@ -136,7 +136,7 @@ export default function ChatView() {
     mutationFn: async (content: string) => {
       return apiRequest("POST", "/api/chat/messages", {
         threadId: selectedThreadId,
-        content,
+        message: content,
       });
     },
     onSuccess: () => {
