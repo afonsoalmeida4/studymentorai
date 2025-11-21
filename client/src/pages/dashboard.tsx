@@ -454,7 +454,7 @@ export default function Dashboard() {
                         <span>{t("dashboard.review.lastSession", { date: new Date(item.lastStudied).toLocaleDateString(i18n.language === 'pt' ? 'pt-PT' : i18n.language === 'en' ? 'en-US' : i18n.language) })}</span>
                       </div>
                     </div>
-                    <Link href="/home">
+                    <Link href="/">
                       <Button size="sm" variant="outline" data-testid={`button-review-${index}`}>
                         {t("dashboard.review.reviewButton")}
                       </Button>
@@ -473,7 +473,7 @@ export default function Dashboard() {
               <p className="text-muted-foreground">
                 {t("dashboard.review.emptyMessage")}
               </p>
-              <Link href="/home">
+              <Link href="/">
                 <Button className="mt-4" data-testid="button-start-studying">
                   {t("dashboard.review.startButton")}
                 </Button>
