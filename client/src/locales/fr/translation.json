@@ -483,8 +483,7 @@
           "topics": "Jusqu'à 10 sujets",
           "summaries": "Résumés jusqu'à 1 000 mots",
           "learningStyles": "2 styles d'apprentissage",
-          "flashcards": "Flashcards",
-    "calendar": "Calendrier",
+          "flashcards": "Flashcards de base",
           "fileSize": "Fichiers jusqu'à 10Mo"
         }
       },
@@ -498,9 +497,8 @@
           "topics": "Sous-dossiers illimités",
           "summaries": "Résumés avancés illimités",
           "learningStyles": "Style d'apprentissage personnalisé",
-          "flashcards": "Flashcards",
-    "calendar": "Calendrier",
-          "dashboard": "Tableau de bord simple de progrès",
+          "flashcards": "Flashcards avec traduction automatique en 6 langues",
+          "dashboard": "Tableau de bord avec KPIs de progrès",
           "ranking": "Classement XP",
           "sync": "Synchronisation entre appareils"
         }
@@ -514,7 +512,8 @@
           "aiAssistant": "Assistant IA illimité en modes Étude et Existentiel",
           "aiSupport": "Soutien émotionnel : motivation, concentration et gestion de l'anxiété",
           "pdfExport": "Exporter les résumés en PDF",
-          "deepStats": "Statistiques approfondies : temps par matière, mémorisation et évolution hebdomadaire"
+          "deepStats": "Tableau de bord avancé : heures d'étude, séquences et progrès détaillé",
+          "calendar": "Calendrier académique pour examens et devoirs"
         }
       }
     }

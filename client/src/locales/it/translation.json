@@ -483,8 +483,7 @@
           "topics": "Fino a 10 argomenti",
           "summaries": "Riassunti fino a 1.000 parole",
           "learningStyles": "2 stili di apprendimento",
-          "flashcards": "Flashcards",
-    "calendar": "Calendario",
+          "flashcards": "Flashcards di base",
           "fileSize": "File fino a 10MB"
         }
       },
@@ -498,9 +497,8 @@
           "topics": "Sottocartelle illimitate",
           "summaries": "Riassunti avanzati illimitati",
           "learningStyles": "Stile di apprendimento personalizzato",
-          "flashcards": "Flashcards",
-    "calendar": "Calendario",
-          "dashboard": "Pannello semplice dei progressi",
+          "flashcards": "Flashcards con traduzione automatica in 6 lingue",
+          "dashboard": "Pannello con KPI dei progressi",
           "ranking": "Classifica XP",
           "sync": "Sincronizzazione tra dispositivi"
         }
@@ -514,7 +512,8 @@
           "aiAssistant": "Assistente IA illimitato in modalità Studio ed Esistenziale",
           "aiSupport": "Supporto emotivo: motivazione, concentrazione e gestione dell'ansia",
           "pdfExport": "Esportare riassunti in PDF",
-          "deepStats": "Statistiche approfondite: tempo per materia, memorizzazione ed evoluzione settimanale"
+          "deepStats": "Pannello avanzato: ore di studio, serie e progressi dettagliati",
+          "calendar": "Calendario accademico per esami e compiti"
         }
       }
     }

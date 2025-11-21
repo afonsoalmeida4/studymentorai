@@ -567,8 +567,7 @@
           "topics": "Up to 10 topics",
           "summaries": "Summaries up to 1,000 words",
           "learningStyles": "2 learning styles",
-          "flashcards": "Flashcards",
-    "calendar": "Calendar",
+          "flashcards": "Basic flashcards",
           "fileSize": "Files up to 10MB"
         }
       },
@@ -582,9 +581,8 @@
           "topics": "Unlimited subfolders",
           "summaries": "Unlimited advanced summaries",
           "learningStyles": "Personalized learning style",
-          "flashcards": "Flashcards",
-    "calendar": "Calendar",
-          "dashboard": "Simple progress dashboard",
+          "flashcards": "Flashcards with auto-translation to 6 languages",
+          "dashboard": "Dashboard with progress KPIs",
           "ranking": "XP ranking",
           "sync": "Cross-device synchronization"
         }
@@ -598,7 +596,8 @@
           "aiAssistant": "Unlimited AI assistant in Study and Existential modes",
           "aiSupport": "Emotional support: motivation, focus and anxiety management",
           "pdfExport": "Export summaries to PDF",
-          "deepStats": "Deep statistics: time per subject, memorization and weekly evolution"
+          "deepStats": "Advanced dashboard: study hours, streaks and detailed progress",
+          "calendar": "Academic calendar for exams and assignments"
         }
       }
     }

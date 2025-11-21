@@ -572,8 +572,8 @@
           "topics": "Subpastas ilimitadas",
           "summaries": "Resumos avançados ilimitados",
           "learningStyles": "Estilo personalizado de aprendizagem",
-          "flashcards": "Flashcards inteligentes com repetição espaçada",
-          "dashboard": "Dashboard simples de progresso",
+          "flashcards": "Flashcards com traduções automáticas em 6 idiomas",
+          "dashboard": "Dashboard com KPIs de progresso",
           "ranking": "Ranking de XP",
           "sync": "Sincronização entre dispositivos"
         }
@@ -587,7 +587,8 @@
           "aiAssistant": "Assistente IA ilimitado nos modos Estudo e Existencial",
           "aiSupport": "Apoio emocional: motivação, foco e gestão de ansiedade",
           "pdfExport": "Exportar resumos em PDF",
-          "deepStats": "Estatísticas profundas: tempo por disciplina, memorização e evolução semanal"
+          "deepStats": "Dashboard avançado: horas de estudo, sequências e progresso detalhado",
+          "calendar": "Calendário académico para exames e trabalhos"
         }
       }
     }

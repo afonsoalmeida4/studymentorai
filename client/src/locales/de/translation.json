@@ -483,8 +483,7 @@
           "topics": "Bis zu 10 Themen",
           "summaries": "Zusammenfassungen bis zu 1.000 Wörter",
           "learningStyles": "2 Lernstile",
-          "flashcards": "Flashcards",
-    "calendar": "Kalender",
+          "flashcards": "Basis-Flashcards",
           "fileSize": "Dateien bis zu 10MB"
         }
       },
@@ -498,9 +497,8 @@
           "topics": "Unbegrenzte Unterordner",
           "summaries": "Unbegrenzte erweiterte Zusammenfassungen",
           "learningStyles": "Personalisierter Lernstil",
-          "flashcards": "Flashcards",
-    "calendar": "Kalender",
-          "dashboard": "Einfaches Fortschritts-Dashboard",
+          "flashcards": "Flashcards mit automatischer Übersetzung in 6 Sprachen",
+          "dashboard": "Dashboard mit Fortschritts-KPIs",
           "ranking": "XP-Rangliste",
           "sync": "Geräteübergreifende Synchronisation"
         }
@@ -514,7 +512,8 @@
           "aiAssistant": "Unbegrenzter KI-Assistent in Lern- und Existenzmodi",
           "aiSupport": "Emotionale Unterstützung: Motivation, Fokus und Angstbewältigung",
           "pdfExport": "Zusammenfassungen als PDF exportieren",
-          "deepStats": "Tiefgehende Statistiken: Zeit pro Fach, Auswendiglernen und wöchentliche Entwicklung"
+          "deepStats": "Erweitertes Dashboard: Lernstunden, Serien und detaillierter Fortschritt",
+          "calendar": "Akademischer Kalender für Prüfungen und Aufgaben"
         }
       }
     }
