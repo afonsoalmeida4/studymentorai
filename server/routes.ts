@@ -1748,6 +1748,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // TEMPORARY: Migrate old flashcards to have translations
+  app.post("/api/admin/migrate-flashcards", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      console.log(`[MIGRATE] Starting flashcard migration for user ${userId}`);
+
+      // Get all flashcards without translations
+      const flashcardsWithoutTranslations = await db
+        .select()
+        .from(flashcards)
+        .leftJoin(flashcardTranslations, eq(flashcards.id, flashcardTranslations.baseFlashcardId))
+        .where(and(
+          eq(flashcards.userId, userId),
+          sql`${flashcardTranslations.id} IS NULL`
+        ));
+
+      console.log(`[MIGRATE] Found ${flashcardsWithoutTranslations.length} flashcards without translations`);
+
+      const results = [];
+      for (const row of flashcardsWithoutTranslations) {
+        const baseFlashcard = row.flashcards;
+        const baseLanguage = baseFlashcard.language as SupportedLanguage;
+        
+        console.log(`[MIGRATE] Processing flashcard ${baseFlashcard.id} (${baseLanguage})`);
+
+        // Skip if already has translations (shouldn't happen but safety check)
+        const existingTranslations = await db
+          .select()
+          .from(flashcardTranslations)
+          .where(eq(flashcardTranslations.baseFlashcardId, baseFlashcard.id));
+        
+        if (existingTranslations.length > 0) {
+          console.log(`[MIGRATE] Skipping ${baseFlashcard.id} - already has translations`);
+          continue;
+        }
+
+        try {
+          // Translate to all other languages
+          const allLanguages: SupportedLanguage[] = ["pt", "en", "es", "fr", "de", "it"];
+          const targetLanguages = allLanguages.filter(lang => lang !== baseLanguage);
+
+          const translationsData = [];
+          for (const targetLang of targetLanguages) {
+            const translationService = await import("./translationService");
+            const translatedData = await translationService.translateFlashcardsText(
+              [{ question: baseFlashcard.question, answer: baseFlashcard.answer }],
+              baseLanguage,
+              targetLang
+            );
+            translationsData.push({
+              language: targetLang,
+              question: translatedData[0].question,
+              answer: translatedData[0].answer,
+            });
+          }
+
+          // Create translated flashcards and mappings in transaction
+          await db.transaction(async (tx) => {
+            const translationMappings = [];
+            
+            for (const translation of translationsData) {
+              const [translatedFlashcard] = await tx
+                .insert(flashcards)
+                .values({
+                  userId: baseFlashcard.userId,
+                  question: translation.question,
+                  answer: translation.answer,
+                  language: translation.language,
+                  isManual: baseFlashcard.isManual,
+                  subjectId: baseFlashcard.subjectId,
+                  topicId: baseFlashcard.topicId,
+                  summaryId: baseFlashcard.summaryId,
+                  topicSummaryId: baseFlashcard.topicSummaryId,
+                })
+                .returning();
+
+              translationMappings.push({
+                baseFlashcardId: baseFlashcard.id,
+                translatedFlashcardId: translatedFlashcard.id,
+                targetLanguage: translation.language,
+              });
+            }
+
+            // Create translation mappings
+            if (translationMappings.length > 0) {
+              await tx.insert(flashcardTranslations).values(translationMappings);
+            }
+          });
+
+          results.push({
+            flashcardId: baseFlashcard.id,
+            status: "success",
+            translationsCreated: translationsData.length,
+          });
+          console.log(`[MIGRATE] Successfully migrated ${baseFlashcard.id}`);
+        } catch (error) {
+          console.error(`[MIGRATE] Failed to migrate ${baseFlashcard.id}:`, error);
+          results.push({
+            flashcardId: baseFlashcard.id,
+            status: "failed",
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
+        }
+      }
+
+      return res.json({
+        success: true,
+        message: `Migration completed`,
+        totalProcessed: flashcardsWithoutTranslations.length,
+        results,
+      });
+    } catch (error) {
+      console.error("[MIGRATE] Migration error:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Migration failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
   registerOrganizationRoutes(app);
   registerChatRoutes(app);
   registerStatsRoutes(app);

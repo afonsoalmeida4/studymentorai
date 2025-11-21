@@ -294,9 +294,9 @@ Respond ONLY with a JSON object in this exact format:
 }
 
 /**
- * Internal: Translate flashcards text using GPT-4 (no DB interaction)
+ * Translate flashcards text using GPT-4 (no DB interaction)
  */
-async function translateFlashcardsText(
+export async function translateFlashcardsText(
   flashcards: Array<{ question: string; answer: string }>,
   fromLanguage: SupportedLanguage,
   toLanguage: SupportedLanguage
