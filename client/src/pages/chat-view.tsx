@@ -187,6 +187,12 @@ export default function ChatView() {
     }
   }, [subscriptionResolved, currentPlan, setLocation]);
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [currentThread?.messages]);
+
   if (!subscriptionResolved || currentPlan === "free") {
     return null;
   }
@@ -243,12 +249,6 @@ export default function ChatView() {
     }
     deleteThreadMutation.mutate(threadId);
   };
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [currentThread?.messages]);
 
   const currentThreads = activeMode === "study" ? studyThreads : existentialThreads;
 
