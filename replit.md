@@ -29,7 +29,7 @@ Authentication uses Replit OIDC with session-based authentication via `express-s
 - **Internationalized Error Messages**: Backend returns structured error codes and parameters for client-side translation, providing dynamic and language-sensitive error messages.
 - **Subscription Management**: Users can cancel subscriptions, immediately reverting to the free plan.
 - **Dashboard KPIs**: Enhanced dashboard with 4 new key performance indicators (Study Time, Subject Progress, Tasks Completed, Study Streak) with visual enhancements including contextual colors, larger icons, gradient progress bars, animations, tooltips, and improved empty states.
-- **Academic Calendar**: Premium-only feature for organizing exams and assignments. Supports monthly and list views, event filtering (upcoming/past/completed/by-type), optional association with subjects/topics, completion tracking, and full internationalization. All calendar data automatically displays in the user's current language.
+- **Academic Calendar**: Premium-only feature for organizing exams and assignments. Supports monthly and list views, event filtering (upcoming/past/completed/by-type), mandatory subject association (enforced at database level with NOT NULL constraint), optional topic association, completion tracking, responsive UI with overflow handling for calendar dialogs, and full internationalization. All calendar data automatically displays in the user's current language. Frontend includes defensive logic to handle edge cases with legacy events.
 
 ## External Dependencies
 - **AI Services:** OpenAI API (GPT-4) for summarization, flashcard generation, and dual-mode chat.
