@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import Stripe from "stripe";
+import PDFDocument from "pdfkit";
 import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
 import { getUserLanguage } from "./languageHelper";
 import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards } from "./translationService";
@@ -19,6 +20,8 @@ import {
   flashcards,
   flashcardAttempts,
   flashcardTranslations,
+  topics,
+  subjects,
 } from "@shared/schema";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -322,6 +325,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting summary:", error);
       res.status(500).json({ error: "Failed to delete summary" });
+    }
+  });
+
+  // Export topic summary as PDF (Premium only)
+  app.get("/api/topic-summaries/:id/export-pdf", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const summaryId = req.params.id;
+      
+      // Check if user has Premium plan
+      const subscription = await subscriptionService.getUserSubscription(userId);
+      if (!subscription || subscription.plan !== 'premium') {
+        return res.status(403).json({ 
+          error: "Esta funcionalidade está disponível apenas no plano Premium",
+          errorCode: "PREMIUM_REQUIRED"
+        });
+      }
+      
+      // Get topic summary
+      const summary = await storage.getTopicSummary(summaryId, userId);
+      if (!summary) {
+        return res.status(404).json({ error: "Resumo não encontrado" });
+      }
+      
+      // Get topic and subject for context
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, summary.topicId), eq(topics.userId, userId)),
+      });
+      if (!topic) {
+        return res.status(404).json({ error: "Tópico não encontrado" });
+      }
+      
+      const subject = await db.query.subjects.findFirst({
+        where: and(eq(subjects.id, topic.subjectId), eq(subjects.userId, userId)),
+      });
+      if (!subject) {
+        return res.status(404).json({ error: "Disciplina não encontrada" });
+      }
+      
+      // Create PDF
+      const doc = new PDFDocument({
+        size: 'A4',
+        margins: {
+          top: 50,
+          bottom: 50,
+          left: 50,
+          right: 50
+        }
+      });
+      
+      // Set response headers
+      const fileName = `${subject.name}-${topic.name}-${summary.learningStyle}.pdf`;
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      
+      // Pipe PDF to response
+      doc.pipe(res);
+      
+      // Add content to PDF
+      doc.fontSize(20).font('Helvetica-Bold').text('AI Study Mentor', { align: 'center' });
+      doc.moveDown(0.5);
+      
+      doc.fontSize(16).font('Helvetica-Bold').text(subject.name, { align: 'center' });
+      doc.fontSize(14).font('Helvetica').text(topic.name, { align: 'center' });
+      doc.moveDown(0.5);
+      
+      doc.fontSize(10).font('Helvetica-Oblique')
+        .text(`Estilo de Aprendizagem: ${summary.learningStyle}`, { align: 'center' });
+      doc.moveDown(1);
+      
+      // Add summary content
+      doc.fontSize(12).font('Helvetica');
+      const summaryText = summary.summary;
+      doc.text(summaryText, {
+        align: 'justify',
+        lineGap: 5
+      });
+      
+      // Add motivational message if exists
+      if (summary.motivationalMessage) {
+        doc.moveDown(2);
+        doc.fontSize(11).font('Helvetica-BoldOblique')
+          .text('💡 Mensagem Motivacional', { align: 'left' });
+        doc.moveDown(0.5);
+        doc.fontSize(10).font('Helvetica-Oblique')
+          .text(summary.motivationalMessage, {
+            align: 'justify',
+            lineGap: 3
+          });
+      }
+      
+      // Add footer
+      doc.moveDown(2);
+      doc.fontSize(8).font('Helvetica')
+        .text(`Gerado em ${new Date().toLocaleDateString('pt-PT')} via AI Study Mentor`, 
+          { align: 'center' });
+      
+      // Finalize PDF
+      doc.end();
+      
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: "Erro ao exportar PDF" });
+      }
     }
   });
 

@@ -176,6 +176,12 @@
       "delete": "Eliminar",
       "success": "¡Contenido eliminado!",
       "successDescription": "El contenido ha sido eliminado del tema."
+    },
+    "pdfExport": {
+      "button": "Exportar PDF",
+      "success": "¡PDF exportado!",
+      "successMessage": "El resumen ha sido exportado correctamente.",
+      "error": "No se pudo exportar el PDF."
     }
   },
   "content": {

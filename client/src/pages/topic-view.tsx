@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "wouter";
-import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw } from "lucide-react";
+import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw, Download } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -74,6 +74,7 @@ export default function TopicView() {
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("uploads");
   const [styleToRegenerate, setStyleToRegenerate] = useState<LearningStyle | null>(null);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const {
     subscription,
@@ -311,6 +312,61 @@ export default function TopicView() {
   const confirmRegenerate = () => {
     if (styleToRegenerate) {
       generateSummariesMutation.mutate([styleToRegenerate]);
+    }
+  };
+
+  // Export summary as PDF (Premium only)
+  const handleExportPdf = async (summaryId: string) => {
+    // Check if user has Premium plan
+    if (currentPlan !== 'premium') {
+      setUpgradeReason('features');
+      setShowUpgradeDialog(true);
+      return;
+    }
+
+    setIsExportingPdf(true);
+    try {
+      const response = await fetch(`/api/topic-summaries/${summaryId}/export-pdf`);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        if (error.errorCode === 'PREMIUM_REQUIRED') {
+          setUpgradeReason('features');
+          setShowUpgradeDialog(true);
+          return;
+        }
+        throw new Error(error.error || 'Erro ao exportar PDF');
+      }
+
+      // Get filename from response headers or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filenameMatch = contentDisposition?.match(/filename="?(.+?)"?$/);
+      const filename = filenameMatch?.[1] ? decodeURIComponent(filenameMatch[1]) : 'resumo.pdf';
+
+      // Download PDF
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: t('topicView.pdfExport.success'),
+        description: t('topicView.pdfExport.successMessage'),
+      });
+    } catch (error: any) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        variant: 'destructive',
+        title: t('common.error'),
+        description: error.message || t('topicView.pdfExport.error'),
+      });
+    } finally {
+      setIsExportingPdf(false);
     }
   };
 
@@ -637,17 +693,30 @@ export default function TopicView() {
                           <CardHeader>
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setStyleToRegenerate("visual")}
-                                disabled={generateSummariesMutation.isPending}
-                                data-testid="button-regenerate-visual"
-                                className="gap-2"
-                              >
-                                <RefreshCw className="w-4 h-4" />
-                                {t('topicView.summarySection.regenerate')}
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleExportPdf(visual.id)}
+                                  disabled={isExportingPdf || currentPlan !== 'premium'}
+                                  data-testid="button-export-pdf-visual"
+                                  className="gap-2"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  {t('topicView.pdfExport.button')}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setStyleToRegenerate("visual")}
+                                  disabled={generateSummariesMutation.isPending}
+                                  data-testid="button-regenerate-visual"
+                                  className="gap-2"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                  {t('topicView.summarySection.regenerate')}
+                                </Button>
+                              </div>
                             </div>
                           </CardHeader>
                           <CardContent>
@@ -675,17 +744,30 @@ export default function TopicView() {
                           <CardHeader>
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setStyleToRegenerate("auditivo")}
-                                disabled={generateSummariesMutation.isPending}
-                                data-testid="button-regenerate-auditivo"
-                                className="gap-2"
-                              >
-                                <RefreshCw className="w-4 h-4" />
-                                {t('topicView.summarySection.regenerate')}
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleExportPdf(auditivo.id)}
+                                  disabled={isExportingPdf || currentPlan !== 'premium'}
+                                  data-testid="button-export-pdf-auditivo"
+                                  className="gap-2"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  {t('topicView.pdfExport.button')}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setStyleToRegenerate("auditivo")}
+                                  disabled={generateSummariesMutation.isPending}
+                                  data-testid="button-regenerate-auditivo"
+                                  className="gap-2"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                  {t('topicView.summarySection.regenerate')}
+                                </Button>
+                              </div>
                             </div>
                           </CardHeader>
                           <CardContent>
@@ -713,17 +795,30 @@ export default function TopicView() {
                           <CardHeader>
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setStyleToRegenerate("logico")}
-                                disabled={generateSummariesMutation.isPending}
-                                data-testid="button-regenerate-logico"
-                                className="gap-2"
-                              >
-                                <RefreshCw className="w-4 h-4" />
-                                {t('topicView.summarySection.regenerate')}
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleExportPdf(logico.id)}
+                                  disabled={isExportingPdf || currentPlan !== 'premium'}
+                                  data-testid="button-export-pdf-logico"
+                                  className="gap-2"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  {t('topicView.pdfExport.button')}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setStyleToRegenerate("logico")}
+                                  disabled={generateSummariesMutation.isPending}
+                                  data-testid="button-regenerate-logico"
+                                  className="gap-2"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                  {t('topicView.summarySection.regenerate')}
+                                </Button>
+                              </div>
                             </div>
                           </CardHeader>
                           <CardContent>
@@ -751,17 +846,30 @@ export default function TopicView() {
                           <CardHeader>
                             <div className="flex items-center justify-between gap-4">
                               <CardTitle className="text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setStyleToRegenerate("conciso")}
-                                disabled={generateSummariesMutation.isPending}
-                                data-testid="button-regenerate-conciso"
-                                className="gap-2"
-                              >
-                                <RefreshCw className="w-4 h-4" />
-                                {t('topicView.summarySection.regenerate')}
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleExportPdf(conciso.id)}
+                                  disabled={isExportingPdf || currentPlan !== 'premium'}
+                                  data-testid="button-export-pdf-conciso"
+                                  className="gap-2"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  {t('topicView.pdfExport.button')}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setStyleToRegenerate("conciso")}
+                                  disabled={generateSummariesMutation.isPending}
+                                  data-testid="button-regenerate-conciso"
+                                  className="gap-2"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                  {t('topicView.summarySection.regenerate')}
+                                </Button>
+                              </div>
                             </div>
                           </CardHeader>
                           <CardContent>
