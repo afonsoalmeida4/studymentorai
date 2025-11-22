@@ -21,29 +21,43 @@ PostgreSQL (Neon) is the primary database, managed with Drizzle ORM. The schema 
 ### Authentication & Authorization
 Authentication uses Replit OIDC with session-based authentication via `express-session`. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
 
-**OAuth Loop Fix** (RESOLVED): Fixed infinite redirect loops on production/published app.
+**OAuth Loop Fix** (RESOLVED): Fixed infinite OAuth login loop on production/published app (Safari iOS).
 
-**Root Cause**: Landing page had automatic redirect logic (useEffect) that conflicted with App.tsx routing, creating an infinite loop:
-1. Landing page rendered for unauthenticated users
-2. useEffect in Landing detected authenticated user → redirected to `/`
-3. App.tsx saw authenticated user → switched to AuthenticatedRouter
-4. But Landing's redirect was still executing → **LOOP!**
-5. Additional issue: CTA button always forced `/api/login` without checking authentication
+**Root Cause**: Session cookies with `sameSite: "strict"` were being blocked by Safari on OAuth callback redirects:
+1. User clicks login → redirects to `https://replit.com/oidc` (Replit OAuth)
+2. User clicks "Allow" → OAuth redirects back to `https://your-app.replit.app/api/callback`
+3. This is a **cross-site redirect** (replit.com → your-app.replit.app)
+4. Safari iOS **blocks** cookies with `sameSite: "strict"` on cross-site redirects
+5. `/api/callback` receives no session cookie → `req.login()` fails silently
+6. User redirected back to `/api/login` → **INFINITE LOOP**
 
-**Solution Implemented**:
-1. **Removed useEffect auto-redirect** from Landing page - no more automatic redirects
-2. **App.tsx is sole routing controller** - decides Landing vs AuthenticatedRouter based on `isAuthenticated`
-3. **Fixed both login buttons** to use `handleLogin()` which checks authentication before OAuth redirect
-4. **Disabled state during loading** prevents race conditions
+**Technical Analysis** (via architect tool):
+- `sameSite: "strict"` prevents CSRF but also blocks legitimate OAuth callbacks
+- Safari is more aggressive than Chrome in enforcing SameSite policies
+- Session cookie must survive the round-trip: login → OAuth provider → callback
 
-**How It Works Now**:
-- App.tsx: `isLoading` → shows Landing temporarily
-- App.tsx: `!isAuthenticated` → shows Landing for unauthenticated users
-- App.tsx: `isAuthenticated` → shows AuthenticatedRouter (no Landing)
-- Landing: No automatic redirects, only manual button clicks trigger `handleLogin()`
-- handleLogin(): Checks if user authenticated → redirects to `/` if yes, initiates OAuth if no
+**Solution Implemented** (server/replitAuth.ts lines 39-56):
+```typescript
+cookie: {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax", // CRITICAL: Must be "lax" for OAuth callbacks
+  maxAge: sessionTtl,
+}
+```
 
-**Testing**: Logs confirm single page load (no loops), application stable
+**Why "lax" is Safe**:
+- Still protects against CSRF on state-changing requests (POST, PUT, DELETE)
+- Allows cookies on "safe" cross-site navigations (GET redirects from OAuth)
+- Industry standard for OAuth flows
+- Maintains security while enabling authentication
+
+**Frontend Fix** (client/src/pages/landing.tsx):
+- Removed conflicting useEffect that caused frontend redirect loops
+- App.tsx is sole routing controller based on authentication state
+- Login buttons check authentication before forcing OAuth redirect
+
+**Testing**: Session cookies now persist through OAuth callback, authentication works on Safari iOS
 
 ### Key Features
 - **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering. SM-2 scheduler includes guards against negative intervals (minimum 1 day).

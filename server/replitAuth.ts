@@ -34,9 +34,10 @@ export function getSession() {
   });
   
   // Replit always uses HTTPS, so secure should be true even in development
-  const isProduction = process.env.NODE_ENV === "production";
+  // Use sameSite: "lax" to allow OAuth callbacks (cross-site redirects from replit.com)
+  // Safari iOS blocks "strict" cookies on OAuth callback, causing infinite login loops
   
-  console.log("[AUTH] Session config - secure: true, sameSite:", isProduction ? "strict" : "lax");
+  console.log("[AUTH] Session config - secure: true, sameSite: lax (OAuth-compatible)");
   
   return session({
     secret: process.env.SESSION_SECRET!,
@@ -46,7 +47,7 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: true, // Always true on Replit (HTTPS)
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: "lax", // CRITICAL: Must be "lax" for OAuth callbacks to work
       maxAge: sessionTtl,
     },
   });
