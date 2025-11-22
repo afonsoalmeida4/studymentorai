@@ -21,13 +21,16 @@ PostgreSQL (Neon) is the primary database, managed with Drizzle ORM. The schema 
 ### Authentication & Authorization
 Authentication uses Replit OIDC with session-based authentication via `express-session`. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
 
-**OAuth Loop Fix**: Prevents authentication loops when FREE users have existential chat threads in browser history (Safari iOS cookie blocking issue). Solution implements localStorage-based thread persistence with plan-specific hydration:
-1. Landing page auth check before forcing OAuth redirect
-2. Post-OAuth `?auth=success` callback param with automatic cleanup
-3. **localStorage metadata map**: Stores threadId → mode mapping for PRO/PREMIUM users
-4. **Plan-specific hydration**: FREE users NEVER hydrate from localStorage (always start with selectedThreadId=null), preventing existential thread restoration
-5. **PRO/PREMIUM preservation**: Paid users restore last selected thread (study or existential) on page reload
-6. In-memory selection: FREE users can select study threads within session but never persist to localStorage, eliminating OAuth loop vector
+**OAuth Loop Fix** (RESOLVED): Prevents authentication loops when FREE users have existential chat threads in browser history (Safari iOS cookie blocking issue). Solution implements localStorage-based thread persistence with plan-specific hydration:
+1. **Landing page auth check**: Verifies authentication before forcing OAuth redirect (landing.tsx)
+2. **Post-OAuth callback param**: Adds `?auth=success` query param after OAuth callback, with automatic cleanup (replitAuth.ts, App.tsx)
+3. **localStorage metadata map**: Stores threadId → mode mapping for PRO/PREMIUM users only (chat-view.tsx)
+4. **Plan-specific hydration** (CORE FIX): 
+   - FREE users: NEVER hydrate from localStorage (always start selectedThreadId=null), preventing existential thread restoration
+   - PRO/PREMIUM users: Restore last selected thread (study or existential) on page reload with mode metadata
+5. **In-memory selection**: FREE users can select study threads within session but NEVER persist to localStorage, eliminating OAuth loop vector
+6. **Protection layers**: `safeActiveMode` hard-wired to "study" for FREE users, existentialThreads query disabled for FREE, currentThread query gated by subscriptionResolved
+7. **Guaranteed behavior**: FREE users always start fresh (no thread restoration), Study mode immediately accessible without blocking
 
 ### Key Features
 - **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering. SM-2 scheduler includes guards against negative intervals (minimum 1 day).
