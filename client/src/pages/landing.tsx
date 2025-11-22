@@ -355,8 +355,9 @@ export default function Landing() {
           <Button
             size="lg"
             className="px-12 py-6 text-lg font-semibold"
-            onClick={() => window.location.href = "/api/login"}
+            onClick={handleLogin}
             data-testid="button-cta-login"
+            disabled={isLoading}
           >
             <Sparkles className="w-5 h-5 mr-2" />
             {t('landing.cta.button')}
