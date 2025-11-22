@@ -21,25 +21,29 @@ PostgreSQL (Neon) is the primary database, managed with Drizzle ORM. The schema 
 ### Authentication & Authorization
 Authentication uses Replit OIDC with session-based authentication via `express-session`. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
 
-**OAuth Loop Fix** (RESOLVED): Fixed infinite authentication loops on production/published app. Root cause: Landing page CTA button was forcing OAuth redirect even for authenticated users.
+**OAuth Loop Fix** (RESOLVED): Fixed infinite redirect loops on production/published app.
 
-**Root Cause**: Landing page had TWO login buttons with different behavior:
-- Main login button (line 80): Correctly checked authentication before redirecting ✅
-- CTA button (line 358): **Always** redirected to `/api/login` without checking ❌
+**Root Cause**: Landing page had automatic redirect logic (useEffect) that conflicted with App.tsx routing, creating an infinite loop:
+1. Landing page rendered for unauthenticated users
+2. useEffect in Landing detected authenticated user → redirected to `/`
+3. App.tsx saw authenticated user → switched to AuthenticatedRouter
+4. But Landing's redirect was still executing → **LOOP!**
+5. Additional issue: CTA button always forced `/api/login` without checking authentication
 
 **Solution Implemented**:
-1. **Fixed CTA button** (landing.tsx line 361): Changed `onClick={() => window.location.href = "/api/login"}` to `onClick={handleLogin}` to reuse authentication check
-2. **handleLogin function** (lines 34-41): Verifies `user` state before forcing OAuth, redirects to `/` if already authenticated
-3. **Auto-redirect for authenticated users** (lines 28-32): `useEffect` redirects logged-in users from landing to home immediately
-4. **Disabled state**: Both login buttons now disable during loading to prevent race conditions
+1. **Removed useEffect auto-redirect** from Landing page - no more automatic redirects
+2. **App.tsx is sole routing controller** - decides Landing vs AuthenticatedRouter based on `isAuthenticated`
+3. **Fixed both login buttons** to use `handleLogin()` which checks authentication before OAuth redirect
+4. **Disabled state during loading** prevents race conditions
 
-**Additional Protection Layers** (localStorage plan-specific hydration for chat threads):
-- FREE users: NEVER hydrate from localStorage (always start selectedThreadId=null)
-- PRO/PREMIUM users: Restore last selected thread with mode metadata
-- `safeActiveMode` hard-wired to "study" for FREE users
-- Existential threads query disabled for FREE tier
+**How It Works Now**:
+- App.tsx: `isLoading` → shows Landing temporarily
+- App.tsx: `!isAuthenticated` → shows Landing for unauthenticated users
+- App.tsx: `isAuthenticated` → shows AuthenticatedRouter (no Landing)
+- Landing: No automatic redirects, only manual button clicks trigger `handleLogin()`
+- handleLogin(): Checks if user authenticated → redirects to `/` if yes, initiates OAuth if no
 
-**Testing**: Verified fix eliminates OAuth loops on published app (Safari iOS 18.6.2)
+**Testing**: Logs confirm single page load (no loops), application stable
 
 ### Key Features
 - **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering. SM-2 scheduler includes guards against negative intervals (minimum 1 day).

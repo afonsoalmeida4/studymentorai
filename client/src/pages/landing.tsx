@@ -17,22 +17,15 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
 
 export default function Landing() {
   const { t } = useTranslation();
   const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
-  // Redirect authenticated users to home instead of showing landing
-  useEffect(() => {
-    if (!isLoading && user) {
-      setLocation("/");
-    }
-  }, [user, isLoading, setLocation]);
-
   const handleLogin = () => {
     // If already authenticated, go to home instead of forcing OAuth again
+    // Note: App.tsx handles automatic routing, this is only for manual button clicks
     if (user) {
       setLocation("/");
     } else {
