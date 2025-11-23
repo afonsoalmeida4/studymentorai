@@ -358,7 +358,7 @@ export async function generateFlashcards(summaryText: string, language: string =
           content: `${userPrompt}\n\n${summaryText}`,
         },
       ],
-      max_completion_tokens: 2048,
+      max_completion_tokens: 4096,
     });
     
     console.log("[generateFlashcards] GPT response status:", response.choices[0].finish_reason);
