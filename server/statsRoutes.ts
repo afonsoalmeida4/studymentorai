@@ -189,6 +189,9 @@ export function registerStatsRoutes(app: Express) {
           : 0,
       }));
 
+      console.log('[STATS DEBUG] Raw result:', JSON.stringify(result, null, 2));
+      console.log('[STATS DEBUG] Processed subjects:', JSON.stringify(subjectsWithProgress, null, 2));
+
       res.json({ subjects: subjectsWithProgress });
     } catch (error) {
       console.error("Error fetching subject progress:", error);
