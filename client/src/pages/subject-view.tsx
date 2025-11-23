@@ -99,6 +99,7 @@ export default function SubjectView() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/topics", subjectId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/subject-progress"] });
       setIsTopicDialogOpen(false);
       setNewTopicName("");
       setNewTopicDescription("");
