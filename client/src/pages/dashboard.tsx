@@ -294,8 +294,8 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Tasks Completed KPI - Premium only */}
-          {currentPlan === "premium" && (
+          {/* Tasks Completed KPI - Premium only, and only if there are tasks */}
+          {currentPlan === "premium" && !tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 && (
             <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-purple-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
@@ -304,47 +304,30 @@ export default function Dashboard() {
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-6 w-6 text-purple-500" />
-                      {!tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 && (
-                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                      )}
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                     </div>
                   </TooltipTrigger>
-                  {tasksData && tasksData.totalTasks > 0 && (
-                    <TooltipContent>
-                      <p className="text-sm">{t("dashboard.kpi.tooltipTotalTasks")}: {tasksData.totalTasks}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t("dashboard.kpi.tooltipPendingTasks")}: {tasksData.pendingTasks || 0}
-                      </p>
-                    </TooltipContent>
-                  )}
+                  <TooltipContent>
+                    <p className="text-sm">{t("dashboard.kpi.tooltipTotalTasks")}: {tasksData.totalTasks}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dashboard.kpi.tooltipPendingTasks")}: {tasksData.pendingTasks || 0}
+                    </p>
+                  </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </CardHeader>
             <CardContent>
-              {tasksLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : tasksError ? (
-                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-              ) : (tasksData?.totalTasks || 0) === 0 ? (
-                <>
-                  <div className="text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-tasks-completed">0</div>
-                  <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptyTasks")}</p>
-                </>
-              ) : (
-                <>
-                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400" data-testid="kpi-tasks-completed">
-                    {tasksData?.completedToday || 0}
-                  </div>
-                  <p className="text-xs font-medium text-muted-foreground mt-2">
-                    {t("dashboard.kpi.tasksToday")}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="text-xs">
-                      {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
-                    </Badge>
-                  </div>
-                </>
-              )}
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400" data-testid="kpi-tasks-completed">
+                {tasksData.completedToday || 0}
+              </div>
+              <p className="text-xs font-medium text-muted-foreground mt-2">
+                {t("dashboard.kpi.tasksToday")}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="secondary" className="text-xs">
+                  {tasksData.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
+                </Badge>
+              </div>
             </CardContent>
             </Card>
           )}

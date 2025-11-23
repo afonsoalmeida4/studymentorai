@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "wouter";
-import { Plus, Pencil, Trash2, BookOpen } from "lucide-react";
+import { Plus, Pencil, Trash2, BookOpen, CheckCircle2, Circle } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -49,7 +49,44 @@ export default function SubjectView() {
     enabled: !!subjectId,
   });
 
+  const { data: topicProgressData = [] } = useQuery<Array<{ topicId: string; completed: boolean }>>({
+    queryKey: ["/api/topic-progress"],
+    queryFn: async () => {
+      const res = await fetch("/api/topic-progress");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.progress || [];
+    },
+    enabled: !!subjectId,
+  });
+
   const currentSubject = subjects.find((s) => s.id === subjectId);
+
+  const toggleTopicCompletionMutation = useMutation({
+    mutationFn: async (topicId: string) => {
+      return apiRequest("POST", `/api/topic-progress/${topicId}/toggle`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/topic-progress"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/subject-progress"] });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: t('subjectView.errorTogglingProgress'),
+      });
+    },
+  });
+
+  const handleToggleComplete = (e: React.MouseEvent, topicId: string) => {
+    e.stopPropagation();
+    toggleTopicCompletionMutation.mutate(topicId);
+  };
+
+  const isTopicCompleted = (topicId: string) => {
+    return topicProgressData.some(p => p.topicId === topicId && p.completed);
+  };
 
   const createTopicMutation = useMutation({
     mutationFn: async () => {
@@ -198,21 +235,40 @@ export default function SubjectView() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {topics.map((topic) => (
-              <Card
-                key={topic.id}
-                className="hover-elevate active-elevate-2 cursor-pointer"
-                onClick={() => setLocation(`/topic/${topic.id}`)}
-                data-testid={`card-topic-${topic.id}`}
-              >
-                <CardHeader>
-                  <CardTitle className="text-lg">{topic.name}</CardTitle>
-                  {topic.description && (
-                    <CardDescription>{topic.description}</CardDescription>
-                  )}
-                </CardHeader>
-              </Card>
-            ))}
+            {topics.map((topic) => {
+              const completed = isTopicCompleted(topic.id);
+              return (
+                <Card
+                  key={topic.id}
+                  className="hover-elevate active-elevate-2 cursor-pointer relative"
+                  onClick={() => setLocation(`/topic/${topic.id}`)}
+                  data-testid={`card-topic-${topic.id}`}
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{topic.name}</CardTitle>
+                        {topic.description && (
+                          <CardDescription>{topic.description}</CardDescription>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => handleToggleComplete(e, topic.id)}
+                        className="flex-shrink-0 p-1 rounded-full hover-elevate active-elevate-2 transition-colors"
+                        data-testid={`checkbox-topic-${topic.id}`}
+                        aria-label={completed ? t('subjectView.markIncomplete') : t('subjectView.markComplete')}
+                      >
+                        {completed ? (
+                          <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+                        ) : (
+                          <Circle className="w-6 h-6 text-muted-foreground" />
+                        )}
+                      </button>
+                    </div>
+                  </CardHeader>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
