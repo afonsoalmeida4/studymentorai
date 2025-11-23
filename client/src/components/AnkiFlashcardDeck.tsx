@@ -79,7 +79,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const flashcards = dueFlashcardsData?.flashcards || [];
   const currentFlashcard = flashcards[currentIndex];
   const completed = currentIndex >= flashcards.length;
-  const progress = flashcards.length > 0 ? ((currentIndex / flashcards.length) * 100) : 0;
+  const progress = flashcards.length > 0 ? (((currentIndex + 1) / flashcards.length) * 100) : 0;
   const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
 
   // Formatar tempo de sessão (MM:SS)
@@ -201,7 +201,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
             </Badge>
           </div>
           <span className="font-medium">
-            {currentIndex} / {flashcards.length}
+            {currentIndex + 1} / {flashcards.length}
           </span>
         </div>
         <Progress value={progress} className="h-2" />
