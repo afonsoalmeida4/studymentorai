@@ -178,6 +178,8 @@ export function registerStatsRoutes(app: Express) {
         .orderBy(desc(sql`COUNT(DISTINCT ${topics.id})`))
         .limit(3);
 
+      console.log("[SUBJECT PROGRESS DEBUG] Raw SQL result:", JSON.stringify(result, null, 2));
+
       const subjectsWithProgress = result.map(row => ({
         subjectId: row.subjectId,
         subjectName: row.subjectName,
@@ -188,6 +190,8 @@ export function registerStatsRoutes(app: Express) {
           ? Math.round((Number(row.completedTopics) / Number(row.totalTopics)) * 100)
           : 0,
       }));
+
+      console.log("[SUBJECT PROGRESS DEBUG] Processed result:", JSON.stringify(subjectsWithProgress, null, 2));
 
       res.json({ subjects: subjectsWithProgress });
     } catch (error) {
