@@ -342,6 +342,10 @@ export async function generateFlashcards(summaryText: string, language: string =
     const userPrompt = flashcardUserPrompts[lang] || flashcardUserPrompts["pt"];
     const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
 
+    console.log("[generateFlashcards] System prompt length:", systemPrompt.length);
+    console.log("[generateFlashcards] User prompt:", userPrompt);
+    console.log("[generateFlashcards] Summary text first 200 chars:", summaryText.substring(0, 200));
+
     const response = await openai.chat.completions.create({
       model: "gpt-5",
       messages: [
@@ -356,6 +360,9 @@ export async function generateFlashcards(summaryText: string, language: string =
       ],
       max_completion_tokens: 2048,
     });
+    
+    console.log("[generateFlashcards] GPT response status:", response.choices[0].finish_reason);
+    console.log("[generateFlashcards] GPT response model:", response.model);
 
     const content = response.choices[0].message.content || "[]";
     
