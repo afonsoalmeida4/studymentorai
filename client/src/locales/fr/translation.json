@@ -792,6 +792,8 @@
       "createFirst": "Créer première matière",
       "tooltipWeeklyGoal": "Objectif hebdomadaire",
       "tooltipRemaining": "Restant",
+      "tooltipTotalProgress": "Progrès Total",
+      "topicsProgress": "{{completed}} sur {{total}} sujets",
       "tooltipSubjectDetails": "sujets",
       "tooltipTotalTasks": "Total des tâches",
       "tooltipPendingTasks": "En attente",

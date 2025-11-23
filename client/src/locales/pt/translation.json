@@ -776,6 +776,8 @@
       "createFirst": "Criar primeira matéria",
       "tooltipWeeklyGoal": "Meta semanal",
       "tooltipRemaining": "Faltam",
+      "tooltipTotalProgress": "Progresso Total",
+      "topicsProgress": "{{completed}} de {{total}} tópicos",
       "tooltipSubjectDetails": "tópicos",
       "tooltipTotalTasks": "Total de tarefas",
       "tooltipPendingTasks": "Pendentes",

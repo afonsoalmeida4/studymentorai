@@ -785,6 +785,8 @@
       "createFirst": "Create first subject",
       "tooltipWeeklyGoal": "Weekly goal",
       "tooltipRemaining": "Remaining",
+      "tooltipTotalProgress": "Total Progress",
+      "topicsProgress": "{{completed}} of {{total}} topics",
       "tooltipSubjectDetails": "topics",
       "tooltipTotalTasks": "Total tasks",
       "tooltipPendingTasks": "Pending",

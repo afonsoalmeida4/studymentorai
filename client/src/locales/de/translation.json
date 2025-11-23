@@ -792,6 +792,8 @@
       "createFirst": "Erstes Fach erstellen",
       "tooltipWeeklyGoal": "Wochenziel",
       "tooltipRemaining": "Verbleibend",
+      "tooltipTotalProgress": "Gesamtfortschritt",
+      "topicsProgress": "{{completed}} von {{total}} Themen",
       "tooltipSubjectDetails": "Themen",
       "tooltipTotalTasks": "Gesamt Aufgaben",
       "tooltipPendingTasks": "Ausstehend",

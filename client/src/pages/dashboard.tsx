@@ -231,68 +231,72 @@ export default function Dashboard() {
           </Card>
 
           {/* Subject Progress KPI - Premium only */}
-          {currentPlan === "premium" && (
-            <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-green-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2">
-                      <Target className="h-6 w-6 text-green-500" />
-                      {!subjectProgressLoading && !subjectProgressError && subjectProgressData?.subjects && subjectProgressData.subjects.length > 0 && (
-                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                      )}
+          {currentPlan === "premium" && (() => {
+            // Calculate total progress across ALL subjects
+            const totalTopics = subjectProgressData?.subjects?.reduce((sum, s) => sum + s.totalTopics, 0) || 0;
+            const completedTopics = subjectProgressData?.subjects?.reduce((sum, s) => sum + s.completedTopics, 0) || 0;
+            const overallPercentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+            
+            return (
+              <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-green-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-2">
+                        <Target className="h-6 w-6 text-green-500" />
+                        {!subjectProgressLoading && !subjectProgressError && totalTopics > 0 && (
+                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        )}
+                      </div>
+                    </TooltipTrigger>
+                    {totalTopics > 0 && (
+                      <TooltipContent>
+                        <p className="text-sm font-semibold">{t("dashboard.kpi.tooltipTotalProgress")}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
+                        </p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+              </CardHeader>
+              <CardContent>
+                {subjectProgressLoading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : subjectProgressError ? (
+                  <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+                ) : totalTopics === 0 ? (
+                  <>
+                    <div className="text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-subject-progress">0%</div>
+                    <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptySubjects")}</p>
+                    <Link href="/">
+                      <Button variant="ghost" size="sm" className="mt-3 h-8 text-xs hover-elevate" data-testid="button-create-subject">
+                        {t("dashboard.kpi.createFirst")}
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <div className={`text-3xl font-bold ${getProgressColor(overallPercentage)}`} data-testid="kpi-subject-progress">
+                      {overallPercentage}%
                     </div>
-                  </TooltipTrigger>
-                  {subjectProgressData?.subjects && subjectProgressData.subjects.length > 0 && (
-                    <TooltipContent>
-                      <p className="text-sm font-semibold">{subjectProgressData.subjects[0].subjectName}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {subjectProgressData.subjects[0].completedTopics} de {subjectProgressData.subjects[0].totalTopics} {t("dashboard.kpi.tooltipSubjectDetails")}
-                      </p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
-            </CardHeader>
-            <CardContent>
-              {subjectProgressLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : subjectProgressError ? (
-                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-              ) : !subjectProgressData?.subjects || subjectProgressData.subjects.length === 0 ? (
-                <>
-                  <div className="text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-subject-progress">0%</div>
-                  <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptySubjects")}</p>
-                  <Link href="/">
-                    <Button variant="ghost" size="sm" className="mt-3 h-8 text-xs hover-elevate" data-testid="button-create-subject">
-                      {t("dashboard.kpi.createFirst")}
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <div className={`text-3xl font-bold ${getProgressColor(subjectProgressData.subjects[0].completionPercentage)}`} data-testid="kpi-subject-progress">
-                    {subjectProgressData.subjects[0].completionPercentage}%
-                  </div>
-                  <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-500" 
-                      style={{ width: `${subjectProgressData.subjects[0].completionPercentage}%` }}
-                    />
-                  </div>
-                  <p className="text-xs font-medium mt-2 truncate">
-                    {subjectProgressData.subjects[0].subjectName}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {subjectProgressData.subjects[0].completedTopics}/{subjectProgressData.subjects[0].totalTopics} {t("dashboard.kpi.topicsCompleted")}
-                  </p>
-                </>
-              )}
-            </CardContent>
-            </Card>
-          )}
+                    <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-500" 
+                        style={{ width: `${overallPercentage}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
+                    </p>
+                  </>
+                )}
+              </CardContent>
+              </Card>
+            );
+          })()}
 
           {/* Tasks Completed KPI - Premium only */}
           {currentPlan === "premium" && (tasksLoading || tasksError || (tasksData && tasksData.totalTasks > 0)) && (
