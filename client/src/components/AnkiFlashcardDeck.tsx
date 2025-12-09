@@ -19,6 +19,8 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
+  const [sessionTotal, setSessionTotal] = useState<number | null>(null);
+  const [completedCount, setCompletedCount] = useState(0);
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
 
@@ -27,6 +29,8 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     setCurrentIndex(0);
     setSessionTime(0);
     setIsFlipped(false);
+    setSessionTotal(null);
+    setCompletedCount(0);
   }, [mode]);
 
   // Timer de sessão
@@ -51,12 +55,24 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     },
   });
 
+  const flashcards = dueFlashcardsData?.flashcards || [];
+
+  // Capturar o total inicial quando os flashcards são carregados
+  useEffect(() => {
+    if (flashcards.length > 0 && sessionTotal === null) {
+      setSessionTotal(flashcards.length);
+    }
+  }, [flashcards.length, sessionTotal]);
+
   const recordAttemptMutation = useMutation({
     mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
     onSuccess: async () => {
       setIsFlipped(false);
+      
+      // Incrementar contador de cartões completados
+      setCompletedCount(prev => prev + 1);
       
       if (mode === "spaced") {
         // Modo Anki: invalidar query porque a lista "due" mudou
@@ -76,10 +92,12 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     },
   });
 
-  const flashcards = dueFlashcardsData?.flashcards || [];
   const currentFlashcard = flashcards[currentIndex];
-  const completed = currentIndex >= flashcards.length;
-  const progress = flashcards.length > 0 ? (((currentIndex + 1) / flashcards.length) * 100) : 0;
+  const totalForSession = sessionTotal ?? flashcards.length;
+  const completed = mode === "spaced" 
+    ? flashcards.length === 0 && completedCount > 0
+    : currentIndex >= flashcards.length;
+  const progress = totalForSession > 0 ? ((completedCount / totalForSession) * 100) : 0;
   const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
 
   // Formatar tempo de sessão (MM:SS)
@@ -169,7 +187,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
         <div>
           <h3 className="text-xl font-semibold mb-2">{t('flashcards.anki.sessionComplete')}</h3>
           <p className="text-muted-foreground">
-            {mode === "spaced" ? t('flashcards.anki.reviewed') : t('flashcards.anki.practiced')} {flashcards.length} flashcard{flashcards.length !== 1 ? 's' : ''}.
+            {mode === "spaced" ? t('flashcards.anki.reviewed') : t('flashcards.anki.practiced')} {completedCount} flashcard{completedCount !== 1 ? 's' : ''}.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             {t('flashcards.anki.time')}: {formatTime(sessionTime)}
@@ -179,6 +197,8 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
           onClick={() => {
             setCurrentIndex(0);
             setSessionTime(0);
+            setSessionTotal(null);
+            setCompletedCount(0);
             queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, endpoint] });
           }}
           data-testid="button-restart-study"
@@ -201,7 +221,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
             </Badge>
           </div>
           <span className="font-medium">
-            {currentIndex + 1} / {flashcards.length}
+            {completedCount} / {totalForSession}
           </span>
         </div>
         <Progress value={progress} className="h-2" />
