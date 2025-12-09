@@ -1,0 +1,138 @@
+You are a senior backend engineer working on an existing AI SaaS called “Study Mentor AI”.
+
+IMPORTANT CONTEXT:
+- The app is already built and working.
+- UI, pricing, and plans MUST NOT change.
+- Users must NEVER see tokens, credits, quotas, or AI usage limits.
+- The goal is to control AI costs silently using backend-only logic.
+- The experience must feel “unlimited”, similar to CalAI or Notion AI.
+
+Your task is ONLY to implement INVISIBLE LIMITS at the backend level.
+
+---------------------------------------
+CORE PRINCIPLE
+---------------------------------------
+Users should never “hit a limit”.
+They should only receive DIFFERENT OUTPUT DEPTH based on their plan.
+
+---------------------------------------
+PLANS (already exist)
+---------------------------------------
+
+Do NOT rename plans.
+Do NOT expose limits in the UI.
+
+---------------------------------------
+IMPLEMENT THESE INVISIBLE CONTROLS
+---------------------------------------
+
+1) INPUT SIZE CONTROL (silent)
+- Always extract text from uploaded documents
+- Apply an internal max character/token cap per plan
+- If document exceeds the cap, process only the most relevant sections
+- NEVER notify the user that content was trimmed
+
+Example logic:
+FREE → process partial content
+PRO → process full content
+HIGH → process full content + examples
+
+---------------------------------------
+
+2) SUMMARY DEPTH CONTROL (most important)
+Do NOT limit by “number of summaries”.
+Limit by PROMPT DEPTH.
+
+Use different internal instructions per plan:
+
+FREE:
+- concise
+- key ideas only
+- minimal explanations
+
+PRO:
+- structured summary
+- bullet points
+- definitions
+- light examples
+
+HIGH PERFORMANCE:
+- deep, exam-ready explanations
+- relationships between concepts
+- applied examples
+
+Same input → different cost → same UX.
+
+
+---------------------------------------
+
+4) AI ASSISTANT CONTEXT WINDOW
+The chat UI stays the same.
+
+Never show messages like “context limit reached”.
+
+---------------------------------------
+
+5) FREQUENCY / ABUSE PROTECTION (soft)
+Implement daily processing thresholds internally.
+
+If a user exceeds a normal daily usage pattern:
+- do NOT block
+- do NOT show errors
+- silently queue or slightly delay processing
+
+User-facing message (generic):
+“Preparing your content…”
+
+Never mention limits.
+
+---------------------------------------
+
+6) FILE SIZE CONTROL
+Enforce silently:
+FREE → up to 10MB
+PRO → up to ~25MB
+HIGH → up to ~50MB
+
+If exceeded:
+- downscale
+- chunk
+- or partially process
+without exposing the restriction.
+
+---------------------------------------
+
+7) COST OPTIMIZATION (mandatory)
+- Cache processed documents (same file = reuse output)
+- Avoid reprocessing unchanged documents
+- Chunk large documents intelligently
+- Stop generation when quality threshold is met
+
+---------------------------------------
+
+8) COMPLIANCE SAFETY
+- Process documents temporarily
+- Delete original files after processing
+- Do not log document content
+- Store only derived summaries/flashcards
+- Require user confirmation that uploaded files are study materials
+
+---------------------------------------
+STRICT RULES
+---------------------------------------
+❌ Do NOT mention tokens
+❌ Do NOT mention quotas
+❌ Do NOT mention limits
+❌ Do NOT change UI or pricing
+
+✅ All control is backend-only
+✅ UX must feel unlimited
+✅ Upgrade prompts remain benefit-based
+
+---------------------------------------
+GOAL
+---------------------------------------
+Invisible limits.
+Predictable costs.
+Zero user friction.
+CalAI-style experience.

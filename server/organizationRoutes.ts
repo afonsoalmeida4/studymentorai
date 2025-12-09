@@ -9,6 +9,7 @@ import { extractTextFromFile, validateFileType, isValidFileSize } from "./textEx
 import { generateSummary } from "./openai";
 import { awardXP } from "./gamificationService";
 import { subscriptionService } from "./subscriptionService";
+import { costControlService } from "./costControlService";
 import { getUserLanguage } from "./languageHelper";
 import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards } from "./translationService";
 import { storage } from "./storage";
@@ -94,7 +95,7 @@ async function generateTopicSummaries(
   specificStyle?: "visual" | "auditivo" | "logico" | "conciso"
 ): Promise<SummaryGenerationResult> {
   try {
-    const aggregatedContent = await aggregateTopicContent(topicId);
+    let aggregatedContent = await aggregateTopicContent(topicId);
 
     if (aggregatedContent === "Este tópico ainda não tem conteúdo.") {
       console.log(`[TopicSummary] Topic ${topicId} has no content to summarize`);
@@ -106,7 +107,9 @@ async function generateTopicSummaries(
       };
     }
 
-    console.log(`[TopicSummary] Generating summary for topic ${topicId}, content length: ${aggregatedContent.length}`);
+    // INVISIBLE COST CONTROL: Get plan tier and apply limits silently
+    const planTier = await costControlService.getUserPlanTier(userId);
+    aggregatedContent = costControlService.trimInputText(aggregatedContent, planTier);
 
     const userLanguage = await getUserLanguage(userId);
     console.log(`[TopicSummary] Using language: ${userLanguage}`);
@@ -126,13 +129,28 @@ async function generateTopicSummaries(
     const failedStyles: Array<{ style: string; reason: string }> = [];
     let wordLimitReached = false;
 
+    // INVISIBLE COST CONTROL: Get plan-based depth modifier and token limits
+    const depthModifier = costControlService.getSummaryDepthModifier(planTier, userLanguage);
+    const maxTokens = costControlService.getMaxCompletionTokens(planTier, "summary");
+
     for (const style of stylesToGenerate) {
       try {
+        // Check and apply soft daily limits (delays, never blocks)
+        const usageCheck = await costControlService.checkDailyUsage(userId, "summary", planTier);
+        if (usageCheck.shouldDelay) {
+          await costControlService.applyDelayIfNeeded(usageCheck.delayMs);
+        }
+        
         const result = await generateSummary({
           text: aggregatedContent,
           learningStyle: style,
           language: userLanguage,
+          depthModifier,
+          maxCompletionTokens: maxTokens,
         });
+        
+        // Increment daily usage counter
+        costControlService.incrementDailyUsage(userId, "summary");
 
         // Check word count limit before saving
         const wordCount = result.summary.split(/\s+/).length;

@@ -72,6 +72,14 @@ cookie: {
 - **Academic Calendar**: Premium-only feature for organizing exams and assignments. Supports monthly and list views, event filtering (upcoming/past/completed/by-type), mandatory subject association (enforced at database level with NOT NULL constraint), optional topic association, completion tracking, responsive UI with overflow handling for calendar dialogs, and full internationalization. All calendar data automatically displays in the user's current language. Frontend includes defensive logic to handle edge cases with legacy events. Protected by `requirePremium` middleware.
 - **Dual-Mode Chat**: Study mode available to all users (FREE, Pro, Premium). Existential mode requires Pro+ subscription. Frontend uses `safeActiveMode` derived from user plan to ensure FREE users always use study mode, with automatic cleanup of existential thread selection. Chat threads support editable titles via PATCH endpoint with frontend UI.
 - **Security & Robustness**: OpenAI clients configured with 60-second timeout and 2 retries for resilience. Premium endpoints (`/api/calendar/*`, `/api/export/*`) protected by middleware. Export endpoints rate-limited to prevent abuse.
+- **Invisible Cost Controls** (`server/costControlService.ts`): Backend-only AI cost management that never exposes limits to users. Experience feels "unlimited" - only output depth varies by plan. Controls include:
+  - **Input Size Control**: Silent text trimming (FREE: 15k chars, PRO: 50k chars, PREMIUM: 100k chars)
+  - **Summary Depth Control**: Plan-based prompt depth modifiers (concise → structured → exam-ready)
+  - **Chat Context Limiting**: Message history limits (FREE: 10 msgs, PRO: 30 msgs, PREMIUM: 50 msgs) and topic context limits
+  - **File Size Control**: Silent file size limits (FREE: 10MB, PRO: 25MB, PREMIUM: 50MB) - never blocks, processes partially
+  - **Frequency Protection**: Soft daily limits with silent delays (never blocks, adds 1-3s delays for abuse)
+  - **Token Optimization**: Plan-based max completion tokens for all AI operations
+  - All controls are invisible - no error messages about limits, tokens, or quotas are ever shown to users
 
 ## External Dependencies
 - **AI Services:** OpenAI API (GPT-4) for summarization, flashcard generation, and dual-mode chat.

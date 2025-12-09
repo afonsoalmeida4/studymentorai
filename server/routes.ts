@@ -41,6 +41,7 @@ import { calculateNextReview } from "./flashcardScheduler";
 import { db } from "./db";
 import { and, eq, sql, gt, asc, or, inArray } from "drizzle-orm";
 import { subscriptionService } from "./subscriptionService";
+import { costControlService } from "./costControlService";
 
 async function requirePremium(req: any, res: any, next: any) {
   try {
@@ -196,6 +197,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } as GenerateSummaryResponse);
       }
 
+      // INVISIBLE COST CONTROL: Silently check file size based on plan
+      const planTier = await costControlService.getUserPlanTier(userId);
+      const fileSizeCheck = costControlService.validateFileSize(req.file.size, planTier);
+      // Note: We never block - just process what we can
+
       // Validate learning style
       const parseResult = generateSummaryRequestSchema.safeParse({
         learningStyle: req.body.learningStyle,
@@ -236,15 +242,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } as GenerateSummaryResponse);
         }
 
-        // Limit text length to avoid token limits
-        // Reduce to 1500 words (~2000 tokens) to leave room for system prompt + response
-        const words = pdfText.split(/\s+/);
-        console.log(`[PDF Processing] Original word count: ${words.length}`);
-        if (words.length > 1500) {
-          pdfText = words.slice(0, 1500).join(" ");
-          console.log(`[PDF Processing] Truncated to 1500 words`);
-        }
-        console.log(`[PDF Processing] Final text length: ${pdfText.length} characters, ~${Math.ceil(pdfText.length / 4)} estimated tokens`);
+        // INVISIBLE COST CONTROL: Silently trim input based on plan (planTier already fetched above)
+        pdfText = costControlService.trimInputText(pdfText, planTier);
       } catch (error) {
         console.error("Error extracting PDF text:", error);
         return res.status(400).json({
@@ -253,13 +252,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } as GenerateSummaryResponse);
       }
 
-      // Generate summary using GPT-5
+      // Generate summary using GPT-5 with plan-based depth
       try {
+        // INVISIBLE COST CONTROL: Apply plan-based depth and token limits (planTier already fetched above)
+        const depthModifier = costControlService.getSummaryDepthModifier(planTier, userLanguage);
+        const maxTokens = costControlService.getMaxCompletionTokens(planTier, "summary");
+        
+        // Check and apply soft daily limits (delays, never blocks)
+        const usageCheck = await costControlService.checkDailyUsage(userId, "summary", planTier);
+        if (usageCheck.shouldDelay) {
+          await costControlService.applyDelayIfNeeded(usageCheck.delayMs);
+        }
+        
         const { summary, motivationalMessage } = await generateSummary({
           text: pdfText,
           learningStyle,
           language: userLanguage,
+          depthModifier,
+          maxCompletionTokens: maxTokens,
         });
+        
+        // Increment daily usage counter
+        costControlService.incrementDailyUsage(userId, "summary");
 
         // Check summary word count against plan limits
         const summaryWordCount = summary.split(/\s+/).length;
@@ -609,11 +623,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       const userLanguage = getUserLanguage(user?.language);
       
-      // Check subscription plan to determine flashcard limit
-      // FREE: max 10 flashcards, PRO/PREMIUM: unlimited (null)
-      const { subscription } = await subscriptionService.getSubscriptionDetails(userId);
-      const maxFlashcards = subscription.plan === 'free' ? 10 : null;
-      console.log(`[Flashcards] User plan: ${subscription.plan}, maxFlashcards: ${maxFlashcards === null ? 'unlimited' : maxFlashcards}`);
+      // INVISIBLE COST CONTROL: Use plan-based flashcard limits
+      const planTier = await costControlService.getUserPlanTier(userId);
+      const maxFlashcards = costControlService.getMaxFlashcardsPerBatch(planTier);
+      const flashcardMaxTokens = costControlService.getMaxCompletionTokens(planTier, "flashcard");
+      
+      // Check and apply soft daily limits (delays, never blocks)
+      const usageCheck = await costControlService.checkDailyUsage(userId, "flashcard", planTier);
+      if (usageCheck.shouldDelay) {
+        await costControlService.applyDelayIfNeeded(usageCheck.delayMs);
+      }
       
       if (!summaryId && !topicSummaryId) {
         return res.status(400).json({
@@ -703,8 +722,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }));
       }
 
-      const flashcardsData = await generateFlashcards(summaryText, userLanguage, maxFlashcards);
+      // INVISIBLE COST CONTROL: Trim summary text based on plan
+      const trimmedSummaryText = costControlService.trimInputText(summaryText, planTier);
+      
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, maxFlashcards, flashcardMaxTokens);
       const savedFlashcards = await storage.createFlashcards(flashcardsQuery(flashcardsData));
+      
+      // Increment daily usage counter
+      costControlService.incrementDailyUsage(userId, "flashcard");
 
       await awardXP(userId, "create_flashcards", { 
         summaryId: summaryId || topicSummaryId,

@@ -4,6 +4,7 @@ import { eq, and, desc } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 import { normalizeLanguage } from "./languageHelper";
+import { costControlService } from "./costControlService";
 
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY,
@@ -329,6 +330,15 @@ export async function sendMessage(options: SendMessageOptions): Promise<ChatResp
     throw new Error("Thread não encontrado");
   }
 
+  // INVISIBLE COST CONTROL: Get plan tier for controlling chat costs
+  const planTier = await costControlService.getUserPlanTier(userId);
+  
+  // Check and apply soft daily limits (delays, never blocks)
+  const usageCheck = await costControlService.checkDailyUsage(userId, "chat", planTier);
+  if (usageCheck.shouldDelay) {
+    await costControlService.applyDelayIfNeeded(usageCheck.delayMs);
+  }
+
   const userMsg = await db
     .insert(chatMessages)
     .values({
@@ -340,26 +350,32 @@ export async function sendMessage(options: SendMessageOptions): Promise<ChatResp
     .returning();
 
   const lang = normalizeLanguage(language, "pt");
-  console.log(`[sendMessage] Using language: ${lang} for mode: ${thread.mode}`);
   const studyPrompt = STUDY_MODE_PROMPTS[lang] || STUDY_MODE_PROMPTS["pt"];
   const existentialPrompt = EXISTENTIAL_MODE_PROMPTS[lang] || EXISTENTIAL_MODE_PROMPTS["pt"];
   
+  // INVISIBLE COST CONTROL: Append plan-based depth modifier to system prompt
+  const depthModifier = costControlService.getChatDepthModifier(planTier, lang);
   let systemPrompt =
-    thread.mode === "study" ? studyPrompt : existentialPrompt;
+    (thread.mode === "study" ? studyPrompt : existentialPrompt) + depthModifier;
 
   let contextAddition = "";
   if (thread.mode === "study" && thread.topicId) {
-    const topicContext = await getTopicContext(thread.topicId, userId);
+    let topicContext = await getTopicContext(thread.topicId, userId);
+    // INVISIBLE COST CONTROL: Limit topic context based on plan
     if (topicContext) {
+      topicContext = costControlService.limitTopicContext(topicContext, planTier);
       contextAddition = `\n\nCONTEXTO DO TÓPICO:\n${topicContext}`;
     }
   }
 
+  // INVISIBLE COST CONTROL: Limit conversation history based on plan
+  const limitedMessages = costControlService.limitChatContext(messages, planTier);
+  
   const conversationHistory: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: "system", content: systemPrompt + contextAddition },
   ];
 
-  for (const msg of messages) {
+  for (const msg of limitedMessages) {
     conversationHistory.push({
       role: msg.role as "user" | "assistant",
       content: msg.content,
@@ -371,12 +387,18 @@ export async function sendMessage(options: SendMessageOptions): Promise<ChatResp
     content: userMessage,
   });
 
+  // INVISIBLE COST CONTROL: Use plan-based max tokens
+  const maxTokens = costControlService.getMaxCompletionTokens(planTier, "chat");
+  
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: conversationHistory,
     temperature: 0.7,
-    max_tokens: 1000,
+    max_tokens: maxTokens,
   });
+  
+  // Increment daily usage counter
+  costControlService.incrementDailyUsage(userId, "chat");
 
   const assistantResponse = completion.choices[0].message.content || "Desculpa, não consegui gerar uma resposta.";
 

@@ -13,6 +13,8 @@ export interface GenerateSummaryParams {
   text: string;
   learningStyle: "visual" | "auditivo" | "logico" | "conciso";
   language?: string;
+  depthModifier?: string;  // Plan-based depth modifier (appended to system prompt)
+  maxCompletionTokens?: number;  // Plan-based token limit
 }
 
 export interface SummaryResult {
@@ -273,11 +275,13 @@ export async function generateSummary({
   text,
   learningStyle,
   language = "pt",
+  depthModifier = "",
+  maxCompletionTokens = 8192,
 }: GenerateSummaryParams): Promise<SummaryResult> {
   try {
     const lang = normalizeLanguage(language, "pt");
-    console.log(`[generateSummary] Using language: ${lang}`);
-    const systemPrompt = learningStylePrompts[lang]?.[learningStyle] || learningStylePrompts["pt"][learningStyle];
+    const baseSystemPrompt = learningStylePrompts[lang]?.[learningStyle] || learningStylePrompts["pt"][learningStyle];
+    const systemPrompt = baseSystemPrompt + depthModifier; // Append plan-based depth modifier
     const motivationalPrompt = motivationalPrompts[lang]?.[learningStyle] || motivationalPrompts["pt"][learningStyle];
 
     const userPrompts: Record<string, string> = {
@@ -289,7 +293,7 @@ export async function generateSummary({
       it: `Per favore, crea un riassunto del seguente testo adattato allo stile di apprendimento specificato:\n\n${text}`,
     };
 
-    // Generate the summary
+    // Generate the summary with plan-based token limit
     const summaryResponse = await openai.chat.completions.create({
       model: "gpt-5", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
       messages: [
@@ -302,7 +306,7 @@ export async function generateSummary({
           content: userPrompts[lang] || userPrompts["pt"],
         },
       ],
-      max_completion_tokens: 8192, // Increased to allow for reasoning tokens + actual response
+      max_completion_tokens: maxCompletionTokens,
     });
 
     console.log(`[OpenAI] Summary generation for ${learningStyle} style:`, {
@@ -371,17 +375,17 @@ export async function generateSummary({
   }
 }
 
-export async function generateFlashcards(summaryText: string, language: string = "pt", maxCards: number | null = 10): Promise<FlashcardItem[]> {
+export async function generateFlashcards(
+  summaryText: string, 
+  language: string = "pt", 
+  maxCards: number | null = 10,
+  maxCompletionTokens: number = 4096
+): Promise<FlashcardItem[]> {
   try {
     const lang = normalizeLanguage(language, "pt");
-    console.log(`[generateFlashcards] Using language: ${lang}, maxCards: ${maxCards === null ? 'unlimited' : maxCards}`);
     const systemPrompt = getFlashcardSystemPrompt(lang, maxCards);
     const userPrompt = flashcardUserPrompts[lang] || flashcardUserPrompts["pt"];
     const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
-
-    console.log("[generateFlashcards] System prompt length:", systemPrompt.length);
-    console.log("[generateFlashcards] User prompt:", userPrompt);
-    console.log("[generateFlashcards] Summary text first 200 chars:", summaryText.substring(0, 200));
 
     const response = await openai.chat.completions.create({
       model: "gpt-5",
@@ -395,7 +399,7 @@ export async function generateFlashcards(summaryText: string, language: string =
           content: `${userPrompt}\n\n${summaryText}`,
         },
       ],
-      max_completion_tokens: maxCards === null ? 16384 : 4096,
+      max_completion_tokens: maxCompletionTokens,
     });
     
     console.log("[generateFlashcards] GPT response status:", response.choices[0].finish_reason);
