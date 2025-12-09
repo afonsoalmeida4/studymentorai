@@ -609,6 +609,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       const userLanguage = getUserLanguage(user?.language);
       
+      // Check subscription plan to determine flashcard limit
+      // FREE: max 10 flashcards, PRO/PREMIUM: unlimited (null)
+      const { subscription } = await subscriptionService.getSubscriptionDetails(userId);
+      const maxFlashcards = subscription.plan === 'free' ? 10 : null;
+      console.log(`[Flashcards] User plan: ${subscription.plan}, maxFlashcards: ${maxFlashcards === null ? 'unlimited' : maxFlashcards}`);
+      
       if (!summaryId && !topicSummaryId) {
         return res.status(400).json({
           success: false,
@@ -697,7 +703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }));
       }
 
-      const flashcardsData = await generateFlashcards(summaryText, userLanguage);
+      const flashcardsData = await generateFlashcards(summaryText, userLanguage, maxFlashcards);
       const savedFlashcards = await storage.createFlashcards(flashcardsQuery(flashcardsData));
 
       await awardXP(userId, "create_flashcards", { 

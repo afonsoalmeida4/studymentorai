@@ -103,11 +103,45 @@ const motivationalPrompts: Record<string, Record<string, string>> = {
   },
 };
 
-const flashcardSystemPrompts: Record<string, string> = {
-  pt: `Você é um especialista em educação que cria flashcards eficazes para estudo.
+// Function to generate flashcard system prompts based on limit
+function getFlashcardSystemPrompt(lang: string, maxCards: number | null): string {
+  const isUnlimited = maxCards === null;
+  
+  const limitInstructions: Record<string, { limited: string; unlimited: string }> = {
+    pt: {
+      limited: `Gere no máximo ${maxCards} flashcards.`,
+      unlimited: `Gere flashcards para TODOS os conceitos, definições, fatos e informações importantes do texto. Cubra toda a matéria de forma abrangente. Não há limite - crie quantos flashcards forem necessários para cobrir todo o conteúdo.`,
+    },
+    en: {
+      limited: `Generate at most ${maxCards} flashcards.`,
+      unlimited: `Generate flashcards for ALL concepts, definitions, facts and important information in the text. Cover all the material comprehensively. There is no limit - create as many flashcards as needed to cover all the content.`,
+    },
+    es: {
+      limited: `Genera como máximo ${maxCards} flashcards.`,
+      unlimited: `Genera flashcards para TODOS los conceptos, definiciones, hechos e información importante del texto. Cubre toda la materia de forma integral. No hay límite - crea tantas flashcards como sean necesarias para cubrir todo el contenido.`,
+    },
+    fr: {
+      limited: `Générez au maximum ${maxCards} flashcards.`,
+      unlimited: `Générez des flashcards pour TOUS les concepts, définitions, faits et informations importantes du texte. Couvrez toute la matière de manière exhaustive. Il n'y a pas de limite - créez autant de flashcards que nécessaire pour couvrir tout le contenu.`,
+    },
+    de: {
+      limited: `Generieren Sie maximal ${maxCards} Lernkarten.`,
+      unlimited: `Generieren Sie Lernkarten für ALLE Konzepte, Definitionen, Fakten und wichtige Informationen im Text. Decken Sie den gesamten Stoff umfassend ab. Es gibt kein Limit - erstellen Sie so viele Lernkarten wie nötig, um den gesamten Inhalt abzudecken.`,
+    },
+    it: {
+      limited: `Genera al massimo ${maxCards} flashcard.`,
+      unlimited: `Genera flashcard per TUTTI i concetti, definizioni, fatti e informazioni importanti del testo. Copri tutta la materia in modo completo. Non c'è limite - crea quante flashcard siano necessarie per coprire tutto il contenuto.`,
+    },
+  };
+
+  const instructions = limitInstructions[lang] || limitInstructions["pt"];
+  const limitText = isUnlimited ? instructions.unlimited : instructions.limited;
+
+  const basePrompts: Record<string, string> = {
+    pt: `Você é um especialista em educação que cria flashcards eficazes para estudo.
 Crie flashcards com perguntas claras e respostas concisas baseadas no texto fornecido.
 Cada flashcard deve testar um conceito-chave ou fato importante.
-Gere entre 5 e 10 flashcards.
+${limitText}
 
 Retorne a resposta APENAS como um array JSON válido no seguinte formato:
 [
@@ -117,10 +151,10 @@ Retorne a resposta APENAS como um array JSON válido no seguinte formato:
 
 NÃO inclua nenhum texto adicional, markdown, ou explicações. APENAS o array JSON.
 RESPONDA EM PORTUGUÊS.`,
-  en: `You are an education expert who creates effective flashcards for studying.
+    en: `You are an education expert who creates effective flashcards for studying.
 Create flashcards with clear questions and concise answers based on the provided text.
 Each flashcard should test a key concept or important fact.
-Generate between 5 and 10 flashcards.
+${limitText}
 
 Return the response ONLY as a valid JSON array in the following format:
 [
@@ -130,10 +164,10 @@ Return the response ONLY as a valid JSON array in the following format:
 
 DO NOT include any additional text, markdown, or explanations. ONLY the JSON array.
 RESPOND IN ENGLISH.`,
-  es: `Eres un experto en educación que crea flashcards efectivas para estudiar.
+    es: `Eres un experto en educación que crea flashcards efectivas para estudiar.
 Crea flashcards con preguntas claras y respuestas concisas basadas en el texto proporcionado.
 Cada flashcard debe probar un concepto clave o hecho importante.
-Genera entre 5 y 10 flashcards.
+${limitText}
 
 Devuelve la respuesta SOLO como un array JSON válido en el siguiente formato:
 [
@@ -143,10 +177,10 @@ Devuelve la respuesta SOLO como un array JSON válido en el siguiente formato:
 
 NO incluyas ningún texto adicional, markdown o explicaciones. SOLO el array JSON.
 RESPONDE EN ESPAÑOL.`,
-  fr: `Vous êtes un expert en éducation qui crée des flashcards efficaces pour étudier.
+    fr: `Vous êtes un expert en éducation qui crée des flashcards efficaces pour étudier.
 Créez des flashcards avec des questions claires et des réponses concises basées sur le texte fourni.
 Chaque flashcard doit tester un concept clé ou un fait important.
-Générez entre 5 et 10 flashcards.
+${limitText}
 
 Retournez la réponse UNIQUEMENT sous forme de tableau JSON valide dans le format suivant :
 [
@@ -156,10 +190,10 @@ Retournez la réponse UNIQUEMENT sous forme de tableau JSON valide dans le forma
 
 N'incluez AUCUN texte supplémentaire, markdown ou explications. UNIQUEMENT le tableau JSON.
 RÉPONDEZ EN FRANÇAIS.`,
-  de: `Sie sind ein Bildungsexperte, der effektive Lernkarten zum Lernen erstellt.
+    de: `Sie sind ein Bildungsexperte, der effektive Lernkarten zum Lernen erstellt.
 Erstellen Sie Lernkarten mit klaren Fragen und prägnanten Antworten basierend auf dem bereitgestellten Text.
 Jede Lernkarte sollte ein Schlüsselkonzept oder eine wichtige Tatsache testen.
-Generieren Sie zwischen 5 und 10 Lernkarten.
+${limitText}
 
 Geben Sie die Antwort NUR als gültiges JSON-Array im folgenden Format zurück:
 [
@@ -169,10 +203,10 @@ Geben Sie die Antwort NUR als gültiges JSON-Array im folgenden Format zurück:
 
 Fügen Sie KEINEN zusätzlichen Text, Markdown oder Erklärungen hinzu. NUR das JSON-Array.
 ANTWORTEN SIE AUF DEUTSCH.`,
-  it: `Sei un esperto di educazione che crea flashcard efficaci per studiare.
+    it: `Sei un esperto di educazione che crea flashcard efficaci per studiare.
 Crea flashcard con domande chiare e risposte concise basate sul testo fornito.
 Ogni flashcard dovrebbe testare un concetto chiave o un fatto importante.
-Genera tra 5 e 10 flashcard.
+${limitText}
 
 Restituisci la risposta SOLO come un array JSON valido nel seguente formato:
 [
@@ -182,7 +216,10 @@ Restituisci la risposta SOLO come un array JSON valido nel seguente formato:
 
 NON includere alcun testo aggiuntivo, markdown o spiegazioni. SOLO l'array JSON.
 RISPONDI IN ITALIANO.`,
-};
+  };
+
+  return basePrompts[lang] || basePrompts["pt"];
+}
 
 const flashcardUserPrompts: Record<string, string> = {
   pt: "Crie flashcards baseados neste resumo:",
@@ -334,11 +371,11 @@ export async function generateSummary({
   }
 }
 
-export async function generateFlashcards(summaryText: string, language: string = "pt"): Promise<FlashcardItem[]> {
+export async function generateFlashcards(summaryText: string, language: string = "pt", maxCards: number | null = 10): Promise<FlashcardItem[]> {
   try {
     const lang = normalizeLanguage(language, "pt");
-    console.log(`[generateFlashcards] Using language: ${lang}`);
-    const systemPrompt = flashcardSystemPrompts[lang] || flashcardSystemPrompts["pt"];
+    console.log(`[generateFlashcards] Using language: ${lang}, maxCards: ${maxCards === null ? 'unlimited' : maxCards}`);
+    const systemPrompt = getFlashcardSystemPrompt(lang, maxCards);
     const userPrompt = flashcardUserPrompts[lang] || flashcardUserPrompts["pt"];
     const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
 
@@ -358,7 +395,7 @@ export async function generateFlashcards(summaryText: string, language: string =
           content: `${userPrompt}\n\n${summaryText}`,
         },
       ],
-      max_completion_tokens: 4096,
+      max_completion_tokens: maxCards === null ? 16384 : 4096,
     });
     
     console.log("[generateFlashcards] GPT response status:", response.choices[0].finish_reason);
