@@ -1107,5 +1107,20 @@
       "title": "Contatto",
       "content": "Per esercitare i tuoi diritti o per qualsiasi domanda relativa alla privacy, contattaci tramite il supporto dell'applicazione."
     }
+  },
+  "flashcardStats": {
+    "title": "Statistiche Flashcard",
+    "subtitle": "Segui i tuoi progressi di studio nel tempo",
+    "dailyAverage": "Media Giornaliera",
+    "daysLearned": "Giorni Studiati",
+    "longestStreak": "Serie Più Lunga",
+    "currentStreak": "Serie Attuale",
+    "totalCards": "Totale schede revisionate",
+    "cards": "schede",
+    "days": "giorni",
+    "less": "Meno",
+    "more": "Di più",
+    "empty": "Ancora nessun dato di studio. Inizia a studiare le flashcard per vedere le tue statistiche!",
+    "error": "Errore nel caricamento delle statistiche"
   }
 }

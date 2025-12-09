@@ -1345,6 +1345,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         repetitions: scheduling.repetitions,
       });
 
+      // Update daily metrics for Anki-style statistics
+      const todayDate = new Date().toISOString().split('T')[0];
+      const isCorrect = rating >= 3; // Rating 3-4 = correct, 1-2 = incorrect
+      await storage.upsertFlashcardDailyMetrics(userId, todayDate, 1, isCorrect);
+
       return res.json({
         success: true,
         nextReviewDate: scheduling.nextReviewDate.toISOString(),
@@ -1355,6 +1360,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({
         success: false,
         error: "Erro ao registar tentativa",
+      });
+    }
+  });
+
+  // Get flashcard statistics (Anki-style KPIs)
+  app.get("/api/flashcard-stats", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const daysBack = parseInt(req.query.days as string) || 365;
+      
+      const stats = await storage.getFlashcardStats(userId, daysBack);
+      
+      return res.json({
+        success: true,
+        stats,
+      });
+    } catch (error) {
+      console.error("Error fetching flashcard stats:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar estatísticas de flashcards",
       });
     }
   });

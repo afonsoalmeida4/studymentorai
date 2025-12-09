@@ -1107,5 +1107,20 @@
       "title": "Kontakt",
       "content": "Um Ihre Rechte auszuüben oder bei Fragen zum Datenschutz, kontaktieren Sie uns bitte über den Anwendungssupport."
     }
+  },
+  "flashcardStats": {
+    "title": "Lernkarten-Statistiken",
+    "subtitle": "Verfolgen Sie Ihren Lernfortschritt über die Zeit",
+    "dailyAverage": "Tagesdurchschnitt",
+    "daysLearned": "Lerntage",
+    "longestStreak": "Längste Serie",
+    "currentStreak": "Aktuelle Serie",
+    "totalCards": "Insgesamt überprüfte Karten",
+    "cards": "Karten",
+    "days": "Tage",
+    "less": "Weniger",
+    "more": "Mehr",
+    "empty": "Noch keine Lerndaten. Beginnen Sie mit dem Lernen von Lernkarten, um Ihre Statistiken zu sehen!",
+    "error": "Fehler beim Laden der Statistiken"
   }
 }

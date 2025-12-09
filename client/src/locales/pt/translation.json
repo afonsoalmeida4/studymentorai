@@ -1091,5 +1091,20 @@
       "title": "Contacto",
       "content": "Para exercer os seus direitos ou para quaisquer questões relacionadas com privacidade, entre em contacto connosco através do suporte da aplicação."
     }
+  },
+  "flashcardStats": {
+    "title": "Estatísticas de Flashcards",
+    "subtitle": "Acompanha o teu progresso de estudo ao longo do tempo",
+    "dailyAverage": "Média Diária",
+    "daysLearned": "Dias Estudados",
+    "longestStreak": "Maior Sequência",
+    "currentStreak": "Sequência Atual",
+    "totalCards": "Total de cartões revisados",
+    "cards": "cartões",
+    "days": "dias",
+    "less": "Menos",
+    "more": "Mais",
+    "empty": "Ainda não tens dados de estudo. Começa a estudar flashcards para ver as tuas estatísticas!",
+    "error": "Erro ao carregar estatísticas"
   }
 }

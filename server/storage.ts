@@ -6,6 +6,7 @@ import {
   flashcardAttempts,
   topicSummaries,
   topics,
+  flashcardDailyMetrics,
   type User,
   type UpsertUser,
   type Summary,
@@ -18,6 +19,9 @@ import {
   type StudySession,
   type InsertStudySession,
   type DashboardStats,
+  type FlashcardDailyMetrics,
+  type FlashcardStats,
+  type FlashcardHeatmapData,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql, count, sum, avg } from "drizzle-orm";
@@ -67,6 +71,11 @@ export interface IStorage {
   
   // Dashboard statistics
   getDashboardStats(userId: string): Promise<DashboardStats>;
+  
+  // Flashcard statistics (Anki-style)
+  getFlashcardStats(userId: string, daysBack?: number): Promise<FlashcardStats>;
+  upsertFlashcardDailyMetrics(userId: string, date: string, cardsReviewed: number, isCorrect: boolean): Promise<FlashcardDailyMetrics>;
+  getFlashcardDailyMetrics(userId: string, fromDate: string, toDate: string): Promise<FlashcardDailyMetrics[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -596,6 +605,206 @@ export class DatabaseStorage implements IStorage {
       studiedPDFs,
       recentStudySessions,
     };
+  }
+
+  // Flashcard statistics (Anki-style)
+  async upsertFlashcardDailyMetrics(
+    userId: string, 
+    date: string, 
+    cardsReviewed: number, 
+    isCorrect: boolean
+  ): Promise<FlashcardDailyMetrics> {
+    // Check if entry exists for this date
+    const existing = await db
+      .select()
+      .from(flashcardDailyMetrics)
+      .where(and(
+        eq(flashcardDailyMetrics.userId, userId),
+        eq(flashcardDailyMetrics.date, date)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing entry
+      const [updated] = await db
+        .update(flashcardDailyMetrics)
+        .set({
+          cardsReviewed: sql`${flashcardDailyMetrics.cardsReviewed} + ${cardsReviewed}`,
+          cardsCorrect: isCorrect 
+            ? sql`${flashcardDailyMetrics.cardsCorrect} + 1` 
+            : flashcardDailyMetrics.cardsCorrect,
+          updatedAt: new Date(),
+        })
+        .where(and(
+          eq(flashcardDailyMetrics.userId, userId),
+          eq(flashcardDailyMetrics.date, date)
+        ))
+        .returning();
+      return updated;
+    } else {
+      // Create new entry
+      const [created] = await db
+        .insert(flashcardDailyMetrics)
+        .values({
+          userId,
+          date,
+          cardsReviewed,
+          cardsCorrect: isCorrect ? 1 : 0,
+        })
+        .returning();
+      return created;
+    }
+  }
+
+  async getFlashcardDailyMetrics(
+    userId: string, 
+    fromDate: string, 
+    toDate: string
+  ): Promise<FlashcardDailyMetrics[]> {
+    return await db
+      .select()
+      .from(flashcardDailyMetrics)
+      .where(and(
+        eq(flashcardDailyMetrics.userId, userId),
+        gte(flashcardDailyMetrics.date, fromDate),
+        lte(flashcardDailyMetrics.date, toDate)
+      ))
+      .orderBy(flashcardDailyMetrics.date);
+  }
+
+  async getFlashcardStats(userId: string, daysBack: number = 365): Promise<FlashcardStats> {
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - daysBack);
+    
+    const fromDate = startDate.toISOString().split('T')[0];
+    const toDate = today.toISOString().split('T')[0];
+    
+    // Get all daily metrics for the period
+    const metrics = await this.getFlashcardDailyMetrics(userId, fromDate, toDate);
+    
+    // Calculate statistics
+    const totalCardsReviewed = metrics.reduce((sum, m) => sum + m.cardsReviewed, 0);
+    const daysLearned = metrics.filter(m => m.cardsReviewed > 0).length;
+    const totalDays = daysBack;
+    const dailyAverage = daysLearned > 0 ? Math.round(totalCardsReviewed / daysLearned) : 0;
+    const daysLearnedPercentage = Math.round((daysLearned / totalDays) * 100);
+    
+    // Calculate streaks
+    const { longestStreak, currentStreak } = this.calculateFlashcardStreaks(metrics, today);
+    
+    // Build heatmap data (last 365 days)
+    const heatmapData = this.buildHeatmapData(metrics, daysBack, totalCardsReviewed);
+    
+    return {
+      dailyAverage,
+      daysLearned,
+      totalDays,
+      daysLearnedPercentage,
+      longestStreak,
+      currentStreak,
+      totalCardsReviewed,
+      heatmapData,
+    };
+  }
+
+  private calculateFlashcardStreaks(
+    metrics: FlashcardDailyMetrics[], 
+    today: Date
+  ): { longestStreak: number; currentStreak: number } {
+    // Create a set of dates with activity
+    const datesWithActivity = new Set(
+      metrics.filter(m => m.cardsReviewed > 0).map(m => m.date)
+    );
+    
+    if (datesWithActivity.size === 0) {
+      return { longestStreak: 0, currentStreak: 0 };
+    }
+    
+    // Calculate current streak
+    let currentStreak = 0;
+    const todayStr = today.toISOString().split('T')[0];
+    const yesterdayDate = new Date(today);
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterdayStr = yesterdayDate.toISOString().split('T')[0];
+    
+    // Start from today or yesterday
+    let checkDate = datesWithActivity.has(todayStr) ? today : 
+                    datesWithActivity.has(yesterdayStr) ? yesterdayDate : null;
+    
+    if (checkDate) {
+      while (true) {
+        const dateStr = checkDate.toISOString().split('T')[0];
+        if (datesWithActivity.has(dateStr)) {
+          currentStreak++;
+          checkDate = new Date(checkDate);
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+    
+    // Calculate longest streak
+    const sortedDates = Array.from(datesWithActivity).sort();
+    let longestStreak = 0;
+    let currentRun = 1;
+    
+    for (let i = 1; i < sortedDates.length; i++) {
+      const prevDate = new Date(sortedDates[i - 1]);
+      const currDate = new Date(sortedDates[i]);
+      const diffDays = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 1) {
+        currentRun++;
+      } else {
+        longestStreak = Math.max(longestStreak, currentRun);
+        currentRun = 1;
+      }
+    }
+    longestStreak = Math.max(longestStreak, currentRun);
+    
+    return { longestStreak, currentStreak };
+  }
+
+  private buildHeatmapData(
+    metrics: FlashcardDailyMetrics[], 
+    daysBack: number,
+    totalCards: number
+  ): FlashcardHeatmapData[] {
+    // Create a map of date -> cardsReviewed
+    const metricsMap = new Map(metrics.map(m => [m.date, m.cardsReviewed]));
+    
+    // Calculate intensity thresholds based on max cards per day
+    const maxCards = metrics.reduce((max, m) => Math.max(max, m.cardsReviewed), 1);
+    
+    const heatmapData: FlashcardHeatmapData[] = [];
+    const today = new Date();
+    
+    for (let i = daysBack - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const cardsReviewed = metricsMap.get(dateStr) || 0;
+      
+      // Calculate intensity (0-4) based on cards reviewed
+      let intensity = 0;
+      if (cardsReviewed > 0) {
+        const ratio = cardsReviewed / maxCards;
+        if (ratio >= 0.75) intensity = 4;
+        else if (ratio >= 0.5) intensity = 3;
+        else if (ratio >= 0.25) intensity = 2;
+        else intensity = 1;
+      }
+      
+      heatmapData.push({
+        date: dateStr,
+        cardsReviewed,
+        intensity,
+      });
+    }
+    
+    return heatmapData;
   }
 
   // Helper method to calculate study streak

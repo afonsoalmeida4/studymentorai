@@ -1107,5 +1107,20 @@
       "title": "Contact",
       "content": "Pour exercer vos droits ou pour toute question relative à la confidentialité, veuillez nous contacter via le support de l'application."
     }
+  },
+  "flashcardStats": {
+    "title": "Statistiques des Flashcards",
+    "subtitle": "Suivez votre progression d'étude au fil du temps",
+    "dailyAverage": "Moyenne Quotidienne",
+    "daysLearned": "Jours Étudiés",
+    "longestStreak": "Plus Longue Série",
+    "currentStreak": "Série Actuelle",
+    "totalCards": "Total de cartes révisées",
+    "cards": "cartes",
+    "days": "jours",
+    "less": "Moins",
+    "more": "Plus",
+    "empty": "Pas encore de données d'étude. Commencez à étudier des flashcards pour voir vos statistiques !",
+    "error": "Erreur lors du chargement des statistiques"
   }
 }

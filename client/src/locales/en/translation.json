@@ -1100,5 +1100,20 @@
       "title": "Contact",
       "content": "To exercise your rights or for any privacy-related questions, please contact us through the application support."
     }
+  },
+  "flashcardStats": {
+    "title": "Flashcard Statistics",
+    "subtitle": "Track your study progress over time",
+    "dailyAverage": "Daily Average",
+    "daysLearned": "Days Learned",
+    "longestStreak": "Longest Streak",
+    "currentStreak": "Current Streak",
+    "totalCards": "Total cards reviewed",
+    "cards": "cards",
+    "days": "days",
+    "less": "Less",
+    "more": "More",
+    "empty": "No study data yet. Start studying flashcards to see your statistics!",
+    "error": "Error loading statistics"
   }
 }

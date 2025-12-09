@@ -1133,3 +1133,54 @@ export const insertCalendarEventSchema = createInsertSchema(calendarEvents, {
 
 export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
 export type CalendarEvent = typeof calendarEvents.$inferSelect;
+
+// Flashcard Daily Metrics table (aggregated daily stats for Anki-style KPIs)
+export const flashcardDailyMetrics = pgTable(
+  "flashcard_daily_metrics",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    date: varchar("date", { length: 10 }).notNull(), // YYYY-MM-DD format
+    cardsReviewed: integer("cards_reviewed").default(0).notNull(),
+    cardsNew: integer("cards_new").default(0).notNull(),
+    cardsCorrect: integer("cards_correct").default(0).notNull(),
+    timeSpentMinutes: integer("time_spent_minutes").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_flashcard_daily_metrics_user_date").on(table.userId, table.date),
+    index("idx_flashcard_daily_metrics_date").on(table.date),
+  ],
+);
+
+export const insertFlashcardDailyMetricsSchema = createInsertSchema(flashcardDailyMetrics).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFlashcardDailyMetrics = z.infer<typeof insertFlashcardDailyMetricsSchema>;
+export type FlashcardDailyMetrics = typeof flashcardDailyMetrics.$inferSelect;
+
+// Flashcard Stats API types
+export const flashcardHeatmapDataSchema = z.object({
+  date: z.string(),
+  cardsReviewed: z.number().int(),
+  intensity: z.number().int().min(0).max(4), // 0-4 like GitHub contributions
+});
+
+export type FlashcardHeatmapData = z.infer<typeof flashcardHeatmapDataSchema>;
+
+export const flashcardStatsSchema = z.object({
+  dailyAverage: z.number(),
+  daysLearned: z.number().int(),
+  totalDays: z.number().int(),
+  daysLearnedPercentage: z.number(),
+  longestStreak: z.number().int(),
+  currentStreak: z.number().int(),
+  totalCardsReviewed: z.number().int(),
+  heatmapData: z.array(flashcardHeatmapDataSchema),
+});
+
+export type FlashcardStats = z.infer<typeof flashcardStatsSchema>;
