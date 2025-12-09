@@ -73,6 +73,7 @@ export default function TopicView() {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [generateSummary, setGenerateSummary] = useState(true);
+  const [gdprConsent, setGdprConsent] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkTitle, setLinkTitle] = useState("");
   const [selectedLearningStyles, setSelectedLearningStyles] = useState<LearningStyle[]>(["conciso"]);
@@ -207,6 +208,7 @@ export default function TopicView() {
       setIsUploadDialogOpen(false);
       setSelectedFile(null);
       setGenerateSummary(true);
+      setGdprConsent(false);
       toast({
         title: t('topicView.uploadDialog.success'),
         description: t('topicView.uploadDialog.successDescription'),
@@ -1099,6 +1101,18 @@ export default function TopicView() {
                   {t('topicView.uploadDialog.generateSummary')}
                 </Label>
               </div>
+              <div className="flex items-start space-x-2 pt-2 border-t">
+                <Checkbox
+                  id="gdpr-consent"
+                  checked={gdprConsent}
+                  onCheckedChange={(checked) => setGdprConsent(checked as boolean)}
+                  data-testid="checkbox-gdpr-consent"
+                  className="mt-0.5"
+                />
+                <Label htmlFor="gdpr-consent" className="text-sm cursor-pointer text-muted-foreground leading-tight">
+                  {t('topicView.uploadDialog.gdprConsent')}
+                </Label>
+              </div>
             </div>
             <DialogFooter>
               <Button
@@ -1111,7 +1125,7 @@ export default function TopicView() {
               </Button>
               <Button
                 type="submit"
-                disabled={!selectedFile || uploadMutation.isPending}
+                disabled={!selectedFile || !gdprConsent || uploadMutation.isPending}
                 data-testid="button-submit-upload"
               >
                 {uploadMutation.isPending ? t('topicView.uploadDialog.uploading') : t('topicView.uploadDialog.upload')}

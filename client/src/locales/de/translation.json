@@ -133,6 +133,7 @@
       "selectFile": "Datei auswählen",
       "fileSelected": "Datei ausgewählt",
       "generateSummary": "Automatische KI-Zusammenfassung generieren",
+      "gdprConsent": "Ich bestätige, dass die hochgeladenen Dokumente keine sensiblen personenbezogenen Daten Dritter enthalten.",
       "selectStyles": "Lernstile auswählen",
       "uploading": "Hochladen...",
       "upload": "Hochladen",
@@ -630,7 +631,8 @@
       "button": "Kostenlos Starten"
     },
     "footer": {
-      "rights": "Alle Rechte vorbehalten."
+      "rights": "Alle Rechte vorbehalten.",
+      "privacy": "Datenschutzrichtlinie"
     }
   },
   "errors": {
@@ -1059,5 +1061,51 @@
     "creating": "Erstellen...",
     "updating": "Aktualisieren...",
     "deleting": "Löschen..."
+  },
+  "privacy": {
+    "title": "Datenschutzrichtlinie",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "introduction": {
+      "title": "Einführung",
+      "content": "Diese Datenschutzrichtlinie beschreibt, wie AI Study Mentor Ihre persönlichen Daten in Übereinstimmung mit der Datenschutz-Grundverordnung (DSGVO) der Europäischen Union erfasst, verwendet und schützt."
+    },
+    "dataCollection": {
+      "title": "Daten, die wir erheben",
+      "content": "Wir erheben folgende Arten von Daten:",
+      "items": {
+        "account": "Kontoinformationen: Name, E-Mail und Benutzereinstellungen",
+        "usage": "Nutzungsdaten: Lernfortschritt, überprüfte Lernkarten und Lernzeit",
+        "documents": "Hochgeladene Dokumente: Dateien, die Sie zur KI-Verarbeitung hochladen (PDF, DOCX, PPTX)"
+      }
+    },
+    "dataProcessing": {
+      "title": "Wie wir Ihre Daten verarbeiten",
+      "content": "Ihre Daten werden auf folgende Weise verarbeitet:",
+      "items": {
+        "ai": "KI-Verarbeitung: Hochgeladene Dokumente werden analysiert, um Zusammenfassungen und Lernkarten zu erstellen. Der Inhalt wird zur Verarbeitung an KI-Dienste (OpenAI) gesendet",
+        "storage": "Speicherung: Ihre Daten werden auf sicheren Servern mit Verschlüsselung gespeichert",
+        "security": "Sicherheit: Wir implementieren technische und organisatorische Maßnahmen zum Schutz Ihrer Daten"
+      }
+    },
+    "userRights": {
+      "title": "Ihre Rechte (DSGVO)",
+      "content": "Nach der DSGVO haben Sie folgende Rechte:",
+      "items": {
+        "access": "Recht auf Auskunft: Sie können eine Kopie Ihrer personenbezogenen Daten anfordern",
+        "rectification": "Recht auf Berichtigung: Sie können ungenaue oder unvollständige Daten korrigieren",
+        "erasure": "Recht auf Löschung: Sie können die Löschung Ihrer Daten verlangen",
+        "portability": "Recht auf Datenübertragbarkeit: Sie können Ihre Daten in einem strukturierten Format erhalten",
+        "objection": "Widerspruchsrecht: Sie können der Verarbeitung Ihrer Daten widersprechen"
+      }
+    },
+    "thirdPartyData": {
+      "title": "Daten Dritter",
+      "content": "Als Benutzer sind Sie dafür verantwortlich sicherzustellen, dass die von Ihnen hochgeladenen Dokumente keine sensiblen personenbezogenen Daten Dritter ohne deren Zustimmung enthalten. AI Study Mentor ist nicht für den Inhalt der von Benutzern hochgeladenen Dokumente verantwortlich.",
+      "warning": "WICHTIG: Durch das Hochladen von Dokumenten bestätigen Sie, dass Sie zur Verarbeitung aller darin enthaltenen personenbezogenen Daten berechtigt sind und dass diese keine sensiblen Daten Dritter enthalten (wie Gesundheitsinformationen, Finanzdaten oder andere geschützte Daten)."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "content": "Um Ihre Rechte auszuüben oder bei Fragen zum Datenschutz, kontaktieren Sie uns bitte über den Anwendungssupport."
+    }
   }
 }

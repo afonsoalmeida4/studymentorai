@@ -19,6 +19,7 @@ import Ranking from "@/pages/ranking";
 import FlashcardsPage from "@/pages/flashcards";
 import CalendarPage from "@/pages/calendar";
 import SubscriptionPage from "@/pages/subscription";
+import PrivacyPolicy from "@/pages/privacy-policy";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
 import "@/lib/i18n";
@@ -90,6 +91,7 @@ function Router() {
 
   return (
     <Switch>
+      <Route path="/privacy" component={PrivacyPolicy} />
       {!isAuthenticated ? (
         <>
           <Route path="/" component={Landing} />

@@ -360,8 +360,15 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="border-t py-8 px-6 md:px-12">
-        <div className="w-full max-w-6xl mx-auto text-center text-sm text-muted-foreground">
+        <div className="w-full max-w-6xl mx-auto text-center text-sm text-muted-foreground space-y-2">
           <p>© 2024 AI Study Mentor. {t('landing.footer.rights')}</p>
+          <a 
+            href="/privacy" 
+            className="text-primary hover:underline"
+            data-testid="link-privacy-policy"
+          >
+            {t('landing.footer.privacy')}
+          </a>
         </div>
       </footer>
     </div>

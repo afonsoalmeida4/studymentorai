@@ -136,6 +136,7 @@
       "selectFile": "Seleccionar archivo",
       "fileSelected": "archivo seleccionado",
       "generateSummary": "Generar resumen automático con IA",
+      "gdprConsent": "Confirmo que los documentos subidos no contienen datos personales sensibles de terceros.",
       "selectStyles": "Seleccionar estilos de aprendizaje",
       "uploading": "Subiendo...",
       "upload": "Subir",
@@ -629,7 +630,8 @@
       "button": "Empezar Gratis"
     },
     "footer": {
-      "rights": "Todos los derechos reservados."
+      "rights": "Todos los derechos reservados.",
+      "privacy": "Política de Privacidad"
     }
   },
   "errors": {
@@ -1058,5 +1060,51 @@
     "creating": "Creando...",
     "updating": "Actualizando...",
     "deleting": "Eliminando..."
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización",
+    "introduction": {
+      "title": "Introducción",
+      "content": "Esta Política de Privacidad describe cómo AI Study Mentor recopila, utiliza y protege su información personal de conformidad con el Reglamento General de Protección de Datos (RGPD) de la Unión Europea."
+    },
+    "dataCollection": {
+      "title": "Datos que Recopilamos",
+      "content": "Recopilamos los siguientes tipos de datos:",
+      "items": {
+        "account": "Información de cuenta: nombre, correo electrónico y preferencias de usuario",
+        "usage": "Datos de uso: progreso de estudio, flashcards revisados y tiempo de estudio",
+        "documents": "Documentos subidos: archivos que sube para procesamiento por IA (PDF, DOCX, PPTX)"
+      }
+    },
+    "dataProcessing": {
+      "title": "Cómo Procesamos Sus Datos",
+      "content": "Sus datos se procesan de las siguientes maneras:",
+      "items": {
+        "ai": "Procesamiento por IA: Los documentos subidos se analizan para generar resúmenes y flashcards. El contenido se envía a servicios de IA (OpenAI) para su procesamiento",
+        "storage": "Almacenamiento: Sus datos se almacenan en servidores seguros con encriptación",
+        "security": "Seguridad: Implementamos medidas técnicas y organizativas para proteger sus datos"
+      }
+    },
+    "userRights": {
+      "title": "Sus Derechos (RGPD)",
+      "content": "Bajo el RGPD, tiene los siguientes derechos:",
+      "items": {
+        "access": "Derecho de acceso: Puede solicitar una copia de sus datos personales",
+        "rectification": "Derecho de rectificación: Puede corregir datos inexactos o incompletos",
+        "erasure": "Derecho de supresión: Puede solicitar la eliminación de sus datos",
+        "portability": "Derecho a la portabilidad: Puede recibir sus datos en un formato estructurado",
+        "objection": "Derecho de oposición: Puede oponerse al procesamiento de sus datos"
+      }
+    },
+    "thirdPartyData": {
+      "title": "Datos de Terceros",
+      "content": "Como usuario, es responsable de garantizar que los documentos que sube no contengan datos personales sensibles de terceros sin su consentimiento. AI Study Mentor no se responsabiliza del contenido de los documentos subidos por los usuarios.",
+      "warning": "IMPORTANTE: Al subir documentos, confirma que tiene autorización para procesar cualquier dato personal contenido en ellos y que no incluyen datos sensibles de terceros (como información de salud, datos financieros u otros datos protegidos)."
+    },
+    "contact": {
+      "title": "Contacto",
+      "content": "Para ejercer sus derechos o para cualquier consulta relacionada con la privacidad, contáctenos a través del soporte de la aplicación."
+    }
   }
 }

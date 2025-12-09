@@ -138,6 +138,7 @@
       "selectFile": "Select file",
       "fileSelected": "file selected",
       "generateSummary": "Generate automatic AI summary",
+      "gdprConsent": "I confirm that the uploaded documents do not contain sensitive personal data of third parties.",
       "selectStyles": "Select learning styles",
       "uploading": "Uploading...",
       "upload": "Upload",
@@ -466,7 +467,8 @@
       "button": "Start Free"
     },
     "footer": {
-      "rights": "All rights reserved."
+      "rights": "All rights reserved.",
+      "privacy": "Privacy Policy"
     }
   },
   "chat": {
@@ -1052,5 +1054,51 @@
     "creating": "Creating...",
     "updating": "Updating...",
     "deleting": "Deleting..."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated",
+    "introduction": {
+      "title": "Introduction",
+      "content": "This Privacy Policy describes how AI Study Mentor collects, uses, and protects your personal information in compliance with the European Union's General Data Protection Regulation (GDPR)."
+    },
+    "dataCollection": {
+      "title": "Data We Collect",
+      "content": "We collect the following types of data:",
+      "items": {
+        "account": "Account information: name, email, and user preferences",
+        "usage": "Usage data: study progress, flashcards reviewed, and study time",
+        "documents": "Uploaded documents: files you upload for AI processing (PDF, DOCX, PPTX)"
+      }
+    },
+    "dataProcessing": {
+      "title": "How We Process Your Data",
+      "content": "Your data is processed in the following ways:",
+      "items": {
+        "ai": "AI Processing: Uploaded documents are analyzed to generate summaries and flashcards. Content is sent to AI services (OpenAI) for processing",
+        "storage": "Storage: Your data is stored on secure servers with encryption",
+        "security": "Security: We implement technical and organizational measures to protect your data"
+      }
+    },
+    "userRights": {
+      "title": "Your Rights (GDPR)",
+      "content": "Under GDPR, you have the following rights:",
+      "items": {
+        "access": "Right of access: You can request a copy of your personal data",
+        "rectification": "Right to rectification: You can correct inaccurate or incomplete data",
+        "erasure": "Right to erasure: You can request deletion of your data",
+        "portability": "Right to data portability: You can receive your data in a structured format",
+        "objection": "Right to object: You can object to the processing of your data"
+      }
+    },
+    "thirdPartyData": {
+      "title": "Third-Party Data",
+      "content": "As a user, you are responsible for ensuring that the documents you upload do not contain sensitive personal data of third parties without their consent. AI Study Mentor is not responsible for the content of documents uploaded by users.",
+      "warning": "IMPORTANT: By uploading documents, you confirm that you have authorization to process any personal data contained therein and that they do not include sensitive data of third parties (such as health information, financial data, or other protected data)."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "To exercise your rights or for any privacy-related questions, please contact us through the application support."
+    }
   }
 }

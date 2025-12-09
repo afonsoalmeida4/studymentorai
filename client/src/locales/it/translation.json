@@ -133,6 +133,7 @@
       "selectFile": "Seleziona file",
       "fileSelected": "file selezionato",
       "generateSummary": "Genera riassunto automatico con IA",
+      "gdprConsent": "Confermo che i documenti caricati non contengono dati personali sensibili di terzi.",
       "selectStyles": "Seleziona stili di apprendimento",
       "uploading": "Caricamento...",
       "upload": "Carica",
@@ -630,7 +631,8 @@
       "button": "Inizia Gratis"
     },
     "footer": {
-      "rights": "Tutti i diritti riservati."
+      "rights": "Tutti i diritti riservati.",
+      "privacy": "Informativa sulla Privacy"
     }
   },
   "errors": {
@@ -1059,5 +1061,51 @@
     "creating": "Creazione...",
     "updating": "Aggiornamento...",
     "deleting": "Eliminazione..."
+  },
+  "privacy": {
+    "title": "Informativa sulla Privacy",
+    "lastUpdated": "Ultimo aggiornamento",
+    "introduction": {
+      "title": "Introduzione",
+      "content": "Questa Informativa sulla Privacy descrive come AI Study Mentor raccoglie, utilizza e protegge le tue informazioni personali in conformità con il Regolamento Generale sulla Protezione dei Dati (GDPR) dell'Unione Europea."
+    },
+    "dataCollection": {
+      "title": "Dati che Raccogliamo",
+      "content": "Raccogliamo i seguenti tipi di dati:",
+      "items": {
+        "account": "Informazioni account: nome, email e preferenze utente",
+        "usage": "Dati di utilizzo: progressi di studio, flashcard revisionate e tempo di studio",
+        "documents": "Documenti caricati: file che carichi per l'elaborazione IA (PDF, DOCX, PPTX)"
+      }
+    },
+    "dataProcessing": {
+      "title": "Come Elaboriamo i Tuoi Dati",
+      "content": "I tuoi dati vengono elaborati nei seguenti modi:",
+      "items": {
+        "ai": "Elaborazione IA: I documenti caricati vengono analizzati per generare riassunti e flashcard. Il contenuto viene inviato ai servizi IA (OpenAI) per l'elaborazione",
+        "storage": "Archiviazione: I tuoi dati sono archiviati su server sicuri con crittografia",
+        "security": "Sicurezza: Implementiamo misure tecniche e organizzative per proteggere i tuoi dati"
+      }
+    },
+    "userRights": {
+      "title": "I Tuoi Diritti (GDPR)",
+      "content": "Ai sensi del GDPR, hai i seguenti diritti:",
+      "items": {
+        "access": "Diritto di accesso: Puoi richiedere una copia dei tuoi dati personali",
+        "rectification": "Diritto di rettifica: Puoi correggere dati inesatti o incompleti",
+        "erasure": "Diritto alla cancellazione: Puoi richiedere l'eliminazione dei tuoi dati",
+        "portability": "Diritto alla portabilità: Puoi ricevere i tuoi dati in un formato strutturato",
+        "objection": "Diritto di opposizione: Puoi opporti al trattamento dei tuoi dati"
+      }
+    },
+    "thirdPartyData": {
+      "title": "Dati di Terzi",
+      "content": "Come utente, sei responsabile di garantire che i documenti che carichi non contengano dati personali sensibili di terzi senza il loro consenso. AI Study Mentor non è responsabile del contenuto dei documenti caricati dagli utenti.",
+      "warning": "IMPORTANTE: Caricando documenti, confermi di avere l'autorizzazione a trattare tutti i dati personali in essi contenuti e che non includono dati sensibili di terzi (come informazioni sanitarie, dati finanziari o altri dati protetti)."
+    },
+    "contact": {
+      "title": "Contatto",
+      "content": "Per esercitare i tuoi diritti o per qualsiasi domanda relativa alla privacy, contattaci tramite il supporto dell'applicazione."
+    }
   }
 }
