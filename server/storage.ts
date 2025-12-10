@@ -52,6 +52,7 @@ export interface IStorage {
   }): Promise<Flashcard[]>;
   getFlashcardsBySummary(summaryId: string): Promise<Flashcard[]>;
   getFlashcardsByTopicSummary(topicSummaryId: string): Promise<Flashcard[]>;
+  countFlashcardsByTopicSummary(topicSummaryId: string): Promise<number>;
   getFlashcard(id: string): Promise<Flashcard | undefined>;
   updateFlashcard(id: string, userId: string, data: { question?: string; answer?: string }): Promise<Flashcard | null>;
   deleteFlashcard(id: string, userId: string): Promise<boolean>;
@@ -267,6 +268,14 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(flashcards)
       .where(eq(flashcards.topicSummaryId, topicSummaryId));
+  }
+
+  async countFlashcardsByTopicSummary(topicSummaryId: string): Promise<number> {
+    const result = await db
+      .select({ count: count() })
+      .from(flashcards)
+      .where(eq(flashcards.topicSummaryId, topicSummaryId));
+    return result[0]?.count || 0;
   }
 
   async getFlashcard(id: string): Promise<Flashcard | undefined> {
