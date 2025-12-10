@@ -146,7 +146,7 @@ export default function Dashboard() {
     stats: FlashcardStats;
   }>({
     queryKey: ["/api/flashcard-stats"],
-    enabled: currentPlan !== "free",
+    enabled: currentPlan === "premium",
   });
 
   const hasAnyKpiError = studyTimeError || subjectProgressError || tasksError || streakError;
@@ -423,101 +423,103 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Anki-style Flashcard Statistics */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              {t("flashcardStats.title")}
-            </CardTitle>
-            <CardDescription>{t("flashcardStats.subtitle")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {flashcardStatsLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-24 w-full" />
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <Skeleton key={i} className="h-20" />
-                  ))}
-                </div>
-              </div>
-            ) : flashcardStatsError ? (
-              <p className="text-sm text-muted-foreground">{t("flashcardStats.error")}</p>
-            ) : flashcardStatsData?.stats ? (
-              <div className="space-y-6">
-                <StudyHeatmap 
-                  data={flashcardStatsData.stats.heatmapData} 
-                  isLoading={flashcardStatsLoading}
-                />
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-lg bg-muted/50 border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Zap className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {t("flashcardStats.dailyAverage")}
-                      </span>
-                    </div>
-                    <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400" data-testid="stat-daily-average">
-                      {flashcardStatsData.stats.dailyAverage} {t("flashcardStats.cards")}
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 rounded-lg bg-muted/50 border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Percent className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {t("flashcardStats.daysLearned")}
-                      </span>
-                    </div>
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400" data-testid="stat-days-learned">
-                      {flashcardStatsData.stats.daysLearnedPercentage}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {flashcardStatsData.stats.daysLearned} {t("flashcardStats.days")}
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 rounded-lg bg-muted/50 border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Trophy className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {t("flashcardStats.longestStreak")}
-                      </span>
-                    </div>
-                    <div className="text-2xl font-bold text-orange-600 dark:text-orange-400" data-testid="stat-longest-streak">
-                      {flashcardStatsData.stats.longestStreak} {t("flashcardStats.days")}
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 rounded-lg bg-muted/50 border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Flame className="h-4 w-4 text-red-500" />
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {t("flashcardStats.currentStreak")}
-                      </span>
-                    </div>
-                    <div className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="stat-current-streak">
-                      {flashcardStatsData.stats.currentStreak} {t("flashcardStats.days")}
-                    </div>
+        {/* Anki-style Flashcard Statistics - Premium only */}
+        {currentPlan === "premium" && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                {t("flashcardStats.title")}
+              </CardTitle>
+              <CardDescription>{t("flashcardStats.subtitle")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {flashcardStatsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-24 w-full" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Skeleton key={i} className="h-20" />
+                    ))}
                   </div>
                 </div>
-                
-                {flashcardStatsData.stats.totalCardsReviewed > 0 && (
-                  <div className="text-center text-sm text-muted-foreground">
-                    {t("flashcardStats.totalCards")}: <span className="font-semibold">{flashcardStatsData.stats.totalCardsReviewed.toLocaleString()}</span>
+              ) : flashcardStatsError ? (
+                <p className="text-sm text-muted-foreground">{t("flashcardStats.error")}</p>
+              ) : flashcardStatsData?.stats ? (
+                <div className="space-y-6">
+                  <StudyHeatmap 
+                    data={flashcardStatsData.stats.heatmapData} 
+                    isLoading={flashcardStatsLoading}
+                  />
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 rounded-lg bg-muted/50 border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Zap className="h-4 w-4 text-yellow-500" />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {t("flashcardStats.dailyAverage")}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400" data-testid="stat-daily-average">
+                        {flashcardStatsData.stats.dailyAverage} {t("flashcardStats.cards")}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 rounded-lg bg-muted/50 border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Percent className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {t("flashcardStats.daysLearned")}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400" data-testid="stat-days-learned">
+                        {flashcardStatsData.stats.daysLearnedPercentage}%
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {flashcardStatsData.stats.daysLearned} {t("flashcardStats.days")}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 rounded-lg bg-muted/50 border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Trophy className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {t("flashcardStats.longestStreak")}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-bold text-orange-600 dark:text-orange-400" data-testid="stat-longest-streak">
+                        {flashcardStatsData.stats.longestStreak} {t("flashcardStats.days")}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 rounded-lg bg-muted/50 border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Flame className="h-4 w-4 text-red-500" />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {t("flashcardStats.currentStreak")}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="stat-current-streak">
+                        {flashcardStatsData.stats.currentStreak} {t("flashcardStats.days")}
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">{t("flashcardStats.empty")}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  
+                  {flashcardStatsData.stats.totalCardsReviewed > 0 && (
+                    <div className="text-center text-sm text-muted-foreground">
+                      {t("flashcardStats.totalCards")}: <span className="font-semibold">{flashcardStatsData.stats.totalCardsReviewed.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">{t("flashcardStats.empty")}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {reviewLoading ? (
           <Card>
