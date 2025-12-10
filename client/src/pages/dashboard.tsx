@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { BookOpen, Flame, Target, TrendingUp, TrendingDown, Minus, FileText, Clock, CheckCircle2, ArrowUp, ArrowDown, Info, Calendar, Zap, Trophy, Percent } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
-import type { GetDashboardStatsResponse, GetReviewPlanResponse, FlashcardStats } from "@shared/schema";
+import type { GetDashboardStatsResponse, FlashcardStats } from "@shared/schema";
 import { StudyHeatmap } from "@/components/StudyHeatmap";
 import { Link, useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -88,10 +88,6 @@ export default function Dashboard() {
     enabled: currentPlan !== "free",
   });
 
-  const { data: reviewData, isLoading: reviewLoading } = useQuery<GetReviewPlanResponse>({
-    queryKey: ["/api/review-plan"],
-    enabled: currentPlan !== "free",
-  });
 
   // New KPI queries
   const { data: studyTimeData, isLoading: studyTimeLoading, isError: studyTimeError } = useQuery<{
@@ -156,8 +152,6 @@ export default function Dashboard() {
   }
 
   const stats = statsData?.stats;
-  const reviewPlan = reviewData?.reviewPlan || [];
-  const aiRecommendation = reviewData?.aiRecommendation;
 
   return (
     <div className="min-h-screen bg-background">
@@ -521,76 +515,6 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {reviewLoading ? (
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-48" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-20 w-full" />
-            </CardContent>
-          </Card>
-        ) : reviewPlan.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("dashboard.review.title")}</CardTitle>
-              <CardDescription>{t("dashboard.review.subtitle")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {aiRecommendation && (
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-sm" data-testid="text-ai-recommendation">{aiRecommendation}</p>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <h3 className="font-semibold">{t("dashboard.review.priorities")}</h3>
-                {reviewPlan.map((item, index) => (
-                  <div key={item.summaryId} className="flex items-start justify-between gap-4 p-4 border rounded-lg hover-elevate" data-testid={`review-item-${index}`}>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium">{item.fileName}</h4>
-                        <Badge variant={
-                          item.priority === 'high' ? 'destructive' : 
-                          item.priority === 'medium' ? 'default' : 
-                          'secondary'
-                        }>
-                          {item.priority === 'high' ? t("dashboard.review.priorityHigh") : item.priority === 'medium' ? t("dashboard.review.priorityMedium") : t("dashboard.review.priorityLow")}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{item.recommendation}</p>
-                      <div className="flex gap-4 text-xs text-muted-foreground">
-                        <span>{t("dashboard.review.accuracy", { percent: item.accuracy.toFixed(1) })}</span>
-                        <span>{t("dashboard.review.lastSession", { date: new Date(item.lastStudied).toLocaleDateString(i18n.language === 'pt' ? 'pt-PT' : i18n.language === 'en' ? 'en-US' : i18n.language) })}</span>
-                      </div>
-                    </div>
-                    <Link href="/">
-                      <Button size="sm" variant="outline" data-testid={`button-review-${index}`}>
-                        {t("dashboard.review.reviewButton")}
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("dashboard.review.emptyTitle")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("dashboard.review.emptyMessage")}
-              </p>
-              <Link href="/">
-                <Button className="mt-4" data-testid="button-start-studying">
-                  {t("dashboard.review.startButton")}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
