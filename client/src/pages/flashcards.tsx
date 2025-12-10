@@ -146,7 +146,8 @@ export default function FlashcardsPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"], exact: false });
+      // Invalidate ALL flashcard queries to update counts everywhere
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       setShowCreateDialog(false);
       setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: (user as any)?.language || "pt" });
       toast({
@@ -174,7 +175,8 @@ export default function FlashcardsPage() {
       return await apiRequest("PATCH", `/api/flashcards/${id}`, { question, answer, subjectId, topicId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"], exact: false });
+      // Invalidate ALL flashcard queries to update counts everywhere
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       setShowEditDialog(false);
       setSelectedFlashcard(null);
       toast({
@@ -197,7 +199,8 @@ export default function FlashcardsPage() {
       return await apiRequest("DELETE", `/api/flashcards/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"], exact: false });
+      // Invalidate ALL flashcard queries to update counts everywhere
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       setShowDeleteDialog(false);
       setSelectedFlashcard(null);
       toast({
