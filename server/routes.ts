@@ -800,41 +800,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get existing flashcard count
+      // Get existing flashcards
       const existingFlashcards = await storage.getFlashcardsByTopicSummary(topicSummaryId);
       const existingCount = existingFlashcards.length;
-
-      // If already has unlimited-style flashcards (>10), no need to regenerate
-      if (existingCount > 10) {
-        return res.json({
-          success: true,
-          flashcards: existingFlashcards.map(fc => ({
-            ...fc,
-            createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
-          })),
-          message: "Flashcards já estão atualizados",
-        });
-      }
-
-      // Delete existing flashcards for this topic summary
-      for (const fc of existingFlashcards) {
-        await db.delete(flashcards).where(eq(flashcards.id, fc.id));
-      }
-
-      // Also delete any cached translations for this summary
-      const allLanguageSummaries = await db
-        .select()
-        .from(topicSummaries)
-        .where(
-          and(
-            eq(topicSummaries.topicId, topicSummary.topicId),
-            eq(topicSummaries.learningStyle, topicSummary.learningStyle)
-          )
-        );
-
-      for (const langSummary of allLanguageSummaries) {
-        await db.delete(flashcards).where(eq(flashcards.topicSummaryId, langSummary.id));
-      }
 
       // Get user language preference
       const user = await storage.getUser(userId);
@@ -846,11 +814,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Trim summary text based on plan
       const trimmedSummaryText = costControlService.trimInputText(topicSummary.summary, planTier);
 
-      // Generate new flashcards (unlimited for PRO/PREMIUM)
+      // Generate additional flashcards (adds to existing ones)
       const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, null, flashcardMaxTokens);
 
-      // Save new flashcards
-      const savedFlashcards = await storage.createFlashcards(
+      // Save new flashcards (add to existing, don't replace)
+      const newFlashcards = await storage.createFlashcards(
         flashcardsData.map((fc: any) => ({
           userId,
           topicSummaryId,
@@ -867,16 +835,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
 
-      console.log(`[Regenerate Flashcards] Generated ${savedFlashcards.length} flashcards (was ${existingCount})`);
+      // Get all flashcards (existing + new) to return the complete set
+      const allFlashcards = [...existingFlashcards, ...newFlashcards];
+
+      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards (total: ${allFlashcards.length})`);
 
       return res.json({
         success: true,
-        flashcards: savedFlashcards.map(fc => ({
+        flashcards: allFlashcards.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
         })),
         previousCount: existingCount,
-        newCount: savedFlashcards.length,
+        newCount: allFlashcards.length,
       });
     } catch (error) {
       console.error("Error regenerating flashcards:", error);
