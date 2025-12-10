@@ -172,7 +172,7 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                {hasAdvancedFlashcards && flashcardsData.flashcards && flashcardsData.flashcards.length <= 10 && (
+                {hasAdvancedFlashcards && (
                   <Button
                     variant="outline"
                     size="sm"
