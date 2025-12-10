@@ -195,9 +195,16 @@ export async function getOrCreateTranslatedFlashcards(
     targetLanguage
   );
 
+  // Get userId from source flashcards (all should have same userId)
+  const userId = sourceFlashcards[0]?.userId;
+  if (!userId) {
+    throw new Error(`Source flashcards have no userId for summary ${topicSummaryId}`);
+  }
+
   // 6. Persist translated flashcards to DB
   const newFlashcards = await db.insert(flashcards).values(
     translatedFlashcardsData.map(fc => ({
+      userId,
       topicSummaryId: translatedSummary.id,
       language: targetLanguage,
       question: fc.question,
