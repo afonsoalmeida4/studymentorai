@@ -567,14 +567,15 @@ export const insertFlashcardSchema = createInsertSchema(flashcards).omit({
 });
 
 // Schema for manual flashcard creation (PRO/PREMIUM only)
+// IMPORTANT: subjectId and topicId are REQUIRED for manual flashcards
 export const insertManualFlashcardSchema = insertFlashcardSchema.extend({
   isManual: z.literal(true),
   userId: z.string(),
   question: z.string().min(1, "Question is required").max(1000, "Question too long"),
   answer: z.string().min(1, "Answer is required").max(2000, "Answer too long"),
   language: z.enum(supportedLanguages),
-  subjectId: z.string().nullable().optional(),
-  topicId: z.string().nullable().optional(),
+  subjectId: z.string().min(1, "Subject is required"),
+  topicId: z.string().min(1, "Topic is required"),
   summaryId: z.literal(null).optional(),
   topicSummaryId: z.literal(null).optional(),
 });

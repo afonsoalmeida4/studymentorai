@@ -947,6 +947,8 @@
     "selectSubject": "Select a subject",
     "selectTopic": "Select a topic",
     "selectSubjectFirst": "Select a subject first",
+    "subjectRequired": "Subject is required",
+    "topicRequired": "Topic is required",
     "createSuccess": "Flashcard created!",
     "createSuccessMessage": "Your flashcard was successfully created.",
     "updateSuccess": "Flashcard updated!",

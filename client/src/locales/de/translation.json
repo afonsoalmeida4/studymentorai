@@ -954,6 +954,8 @@
     "selectSubject": "Wählen Sie ein Fach",
     "selectTopic": "Wählen Sie ein Thema",
     "selectSubjectFirst": "Wählen Sie zuerst ein Fach aus",
+    "subjectRequired": "Ein Fach ist erforderlich",
+    "topicRequired": "Ein Thema ist erforderlich",
     "createSuccess": "Lernkarte erstellt!",
     "createSuccessMessage": "Ihre Lernkarte wurde erfolgreich erstellt.",
     "updateSuccess": "Lernkarte aktualisiert!",

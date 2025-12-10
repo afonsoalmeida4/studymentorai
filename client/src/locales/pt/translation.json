@@ -938,6 +938,8 @@
     "selectSubject": "Seleciona uma matéria",
     "selectTopic": "Seleciona um tópico",
     "selectSubjectFirst": "Seleciona uma matéria primeiro",
+    "subjectRequired": "É necessário selecionar uma matéria",
+    "topicRequired": "É necessário selecionar um tópico",
     "createSuccess": "Flashcard criado!",
     "createSuccessMessage": "O teu flashcard foi criado com sucesso.",
     "updateSuccess": "Flashcard atualizado!",

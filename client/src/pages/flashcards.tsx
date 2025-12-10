@@ -130,12 +130,19 @@ export default function FlashcardsPage() {
   // Create flashcard mutation
   const createFlashcardMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      // subjectId and topicId are REQUIRED for manual flashcards
+      if (!data.subjectId || data.subjectId === "_none") {
+        throw new Error(t('flashcards.subjectRequired'));
+      }
+      if (!data.topicId || data.topicId === "_none") {
+        throw new Error(t('flashcards.topicRequired'));
+      }
       return await apiRequest("POST", "/api/flashcards/manual", {
         question: data.question,
         answer: data.answer,
         language: data.language,
-        subjectId: (data.subjectId && data.subjectId !== "_none") ? data.subjectId : null,
-        topicId: (data.topicId && data.topicId !== "_none") ? data.topicId : null,
+        subjectId: data.subjectId,
+        topicId: data.topicId,
       });
     },
     onSuccess: () => {

@@ -954,6 +954,8 @@
     "selectSubject": "Sélectionnez une matière",
     "selectTopic": "Sélectionnez un sujet",
     "selectSubjectFirst": "Sélectionnez une matière d'abord",
+    "subjectRequired": "Il est nécessaire de sélectionner une matière",
+    "topicRequired": "Il est nécessaire de sélectionner un sujet",
     "createSuccess": "Carte créée !",
     "createSuccessMessage": "Votre carte a été créée avec succès.",
     "updateSuccess": "Carte mise à jour !",
