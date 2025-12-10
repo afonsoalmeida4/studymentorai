@@ -399,28 +399,55 @@
       "cta": "Começar Agora",
       "learnMore": "Saber Mais"
     },
+    "mockup": {
+      "organize": "Organiza Matérias",
+      "flashcards": "Flashcards SM-2",
+      "aiMentor": "AI Mentor",
+      "gamification": "Gamificação"
+    },
     "features": {
       "title": "Como Funciona",
       "subtitle": "Ferramentas poderosas para organizar, estudar e evoluir",
+      "organization": {
+        "title": "Organização Hierárquica",
+        "description": "Estrutura estilo Notion: Disciplinas, Tópicos e Conteúdos. Organiza todo o teu conhecimento num só lugar."
+      },
       "uploadPdf": {
         "title": "Upload de Documentos",
         "description": "Carregue PDFs, Word e PowerPoint. A IA extrai e organiza o conteúdo automaticamente."
       },
-      "chooseStyle": {
-        "title": "Estilos de Aprendizagem",
-        "description": "Escolha como prefere aprender: visual, auditivo, lógico ou conciso. Resumos personalizados para ti."
-      },
       "getSummary": {
         "title": "Resumos com IA",
-        "description": "Receba resumos adaptados ao teu estilo, com mensagens motivacionais e dicas de estudo."
+        "description": "Receba resumos adaptados ao teu estilo de aprendizagem, com mensagens motivacionais e dicas de estudo."
       },
       "flashcards": {
-        "title": "Flashcards Inteligentes",
-        "description": "Sistema de repetição espaçada SM-2 (estilo Anki) para memorização eficaz e duradoura."
+        "title": "Flashcards SM-2",
+        "description": "Sistema de repetição espaçada estilo Anki para memorização eficaz. Tradução automática em 6 idiomas."
+      },
+      "dualChat": {
+        "title": "AI Mentor Dual",
+        "description": "Chat inteligente em dois modos: Estudo para ajuda académica e Existencial para motivação e equilíbrio."
       },
       "gamification": {
         "title": "Gamificação & Ranking",
         "description": "Ganhe XP, suba de nível e compita com outros estudantes no ranking global."
+      }
+    },
+    "premium": {
+      "badge": "Funcionalidades Premium",
+      "title": "Leva os Teus Estudos ao Próximo Nível",
+      "subtitle": "Ferramentas avançadas para maximizar o teu potencial de aprendizagem",
+      "dashboard": {
+        "title": "Dashboard Completo",
+        "description": "Acompanha o teu progresso com KPIs detalhados: tempo de estudo, sequências, tarefas e evolução."
+      },
+      "calendar": {
+        "title": "Calendário Académico",
+        "description": "Organiza testes e trabalhos com vista mensal e lista. Nunca mais percas uma data importante."
+      },
+      "stats": {
+        "title": "Estatísticas Avançadas",
+        "description": "Heatmap estilo GitHub, médias diárias, dias estudados e sequências de estudo detalhadas."
       }
     },
     "learningStyles": {
@@ -442,6 +469,10 @@
         "title": "Conciso",
         "description": "Pontos-chave diretos e objetivos"
       }
+    },
+    "i18n": {
+      "title": "Disponível em 6 Idiomas",
+      "description": "Estuda no teu idioma preferido. Todos os conteúdos, flashcards e resumos são automaticamente traduzidos."
     },
     "benefits": {
       "title": "Porquê AI Study Mentor?",

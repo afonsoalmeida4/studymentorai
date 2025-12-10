@@ -404,32 +404,55 @@
       "cta": "Get Started",
       "learnMore": "Learn More"
     },
+    "mockup": {
+      "organize": "Organize Subjects",
+      "flashcards": "SM-2 Flashcards",
+      "aiMentor": "AI Mentor",
+      "gamification": "Gamification"
+    },
     "features": {
       "title": "How It Works",
       "subtitle": "Powerful tools to organize, study and evolve",
+      "organization": {
+        "title": "Hierarchical Organization",
+        "description": "Notion-style structure: Subjects, Topics and Content. Organize all your knowledge in one place."
+      },
       "uploadPdf": {
         "title": "Document Upload",
         "description": "Upload PDFs, Word and PowerPoint. AI automatically extracts and organizes content."
       },
-      "chooseStyle": {
-        "title": "Learning Styles",
-        "description": "Choose how you prefer to learn: visual, auditory, logical or concise. Personalized summaries for you."
-      },
       "getSummary": {
         "title": "AI Summaries",
-        "description": "Receive summaries adapted to your style, with motivational messages and study tips."
+        "description": "Receive summaries adapted to your learning style, with motivational messages and study tips."
       },
       "flashcards": {
-        "title": "Smart Flashcards",
-        "description": "SM-2 spaced repetition system (Anki-style) for effective and lasting memorization."
+        "title": "SM-2 Flashcards",
+        "description": "Anki-style spaced repetition system for effective memorization. Automatic translation in 6 languages."
       },
-      "classes": {
-        "title": "Classes & Teachers",
-        "description": "Teachers can create classes and track student progress in real-time."
+      "dualChat": {
+        "title": "Dual AI Mentor",
+        "description": "Smart chat in two modes: Study for academic help and Existential for motivation and balance."
       },
       "gamification": {
         "title": "Gamification & Ranking",
         "description": "Earn XP, level up and compete with other students on the global leaderboard."
+      }
+    },
+    "premium": {
+      "badge": "Premium Features",
+      "title": "Take Your Studies to the Next Level",
+      "subtitle": "Advanced tools to maximize your learning potential",
+      "dashboard": {
+        "title": "Complete Dashboard",
+        "description": "Track your progress with detailed KPIs: study time, streaks, tasks and evolution."
+      },
+      "calendar": {
+        "title": "Academic Calendar",
+        "description": "Organize exams and assignments with monthly and list views. Never miss an important date."
+      },
+      "stats": {
+        "title": "Advanced Statistics",
+        "description": "GitHub-style heatmap, daily averages, study days and detailed study streaks."
       }
     },
     "learningStyles": {
@@ -451,6 +474,10 @@
         "title": "Concise",
         "description": "Direct and objective key points"
       }
+    },
+    "i18n": {
+      "title": "Available in 6 Languages",
+      "description": "Study in your preferred language. All content, flashcards and summaries are automatically translated."
     },
     "benefits": {
       "title": "Why AI Study Mentor?",

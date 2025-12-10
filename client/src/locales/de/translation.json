@@ -568,32 +568,55 @@
       "cta": "Jetzt Beginnen",
       "learnMore": "Mehr Erfahren"
     },
+    "mockup": {
+      "organize": "Fächer Organisieren",
+      "flashcards": "SM-2 Lernkarten",
+      "aiMentor": "AI Mentor",
+      "gamification": "Gamification"
+    },
     "features": {
       "title": "Wie Es Funktioniert",
       "subtitle": "Leistungsstarke Tools zum Organisieren, Lernen und Weiterentwickeln",
+      "organization": {
+        "title": "Hierarchische Organisation",
+        "description": "Notion-Stil Struktur: Fächer, Themen und Inhalte. Organisieren Sie Ihr gesamtes Wissen an einem Ort."
+      },
       "uploadPdf": {
         "title": "Dokument-Upload",
         "description": "Laden Sie PDFs, Word und PowerPoint hoch. KI extrahiert und organisiert Inhalte automatisch."
       },
-      "chooseStyle": {
-        "title": "Lernstile",
-        "description": "Wählen Sie, wie Sie am liebsten lernen: visuell, auditiv, logisch oder prägnant. Personalisierte Zusammenfassungen für Sie."
-      },
       "getSummary": {
         "title": "KI-Zusammenfassungen",
-        "description": "Erhalten Sie an Ihren Stil angepasste Zusammenfassungen mit motivierenden Nachrichten und Lerntipps."
+        "description": "Erhalten Sie an Ihren Lernstil angepasste Zusammenfassungen mit motivierenden Nachrichten und Lerntipps."
       },
       "flashcards": {
-        "title": "Intelligente Karteikarten",
-        "description": "SM-2-Wiederholungssystem (Anki-Stil) für effektives und dauerhaftes Auswendiglernen."
+        "title": "SM-2 Lernkarten",
+        "description": "Anki-Stil Wiederholungssystem für effektives Auswendiglernen. Automatische Übersetzung in 6 Sprachen."
       },
-      "classes": {
-        "title": "Klassen & Lehrer",
-        "description": "Lehrer können Klassen erstellen und den Fortschritt der Schüler in Echtzeit verfolgen."
+      "dualChat": {
+        "title": "Dualer AI Mentor",
+        "description": "Intelligenter Chat in zwei Modi: Lernen für akademische Hilfe und Existenziell für Motivation und Gleichgewicht."
       },
       "gamification": {
         "title": "Gamification & Rangliste",
         "description": "Verdienen Sie XP, steigen Sie auf und konkurrieren Sie mit anderen Studenten in der globalen Rangliste."
+      }
+    },
+    "premium": {
+      "badge": "Premium-Funktionen",
+      "title": "Bringen Sie Ihr Studium auf die Nächste Stufe",
+      "subtitle": "Erweiterte Tools zur Maximierung Ihres Lernpotenzials",
+      "dashboard": {
+        "title": "Vollständiges Dashboard",
+        "description": "Verfolgen Sie Ihren Fortschritt mit detaillierten KPIs: Lernzeit, Serien, Aufgaben und Entwicklung."
+      },
+      "calendar": {
+        "title": "Akademischer Kalender",
+        "description": "Organisieren Sie Prüfungen und Aufgaben mit Monats- und Listenansicht. Verpassen Sie nie wieder einen wichtigen Termin."
+      },
+      "stats": {
+        "title": "Erweiterte Statistiken",
+        "description": "GitHub-Stil Heatmap, Tagesdurchschnitte, Lerntage und detaillierte Lernserien."
       }
     },
     "learningStyles": {
@@ -615,6 +638,10 @@
         "title": "Prägnant",
         "description": "Direkte und objektive Schlüsselpunkte"
       }
+    },
+    "i18n": {
+      "title": "Verfügbar in 6 Sprachen",
+      "description": "Lernen Sie in Ihrer bevorzugten Sprache. Alle Inhalte, Lernkarten und Zusammenfassungen werden automatisch übersetzt."
     },
     "benefits": {
       "title": "Warum AI Study Mentor?",
