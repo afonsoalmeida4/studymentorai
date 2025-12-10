@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   GraduationCap, 
@@ -56,23 +56,23 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 md:py-10 lg:py-12">
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-10"
+          className="mb-6 sm:mb-8 md:mb-10"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 border border-primary/20">
-              <GraduationCap className="w-6 h-6 text-primary" />
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 border border-primary/20 flex-shrink-0">
+              <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground" data-testid="title-home-welcome">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate" data-testid="title-home-welcome">
                 {firstName ? t('home.welcomeBack', { name: firstName }) : t('home.title')}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                 {t('home.subtitle')}
               </p>
             </div>
@@ -84,53 +84,53 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8"
           >
             <Link href="/subjects">
-              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-blue-500" data-testid="stat-card-subjects">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <FolderOpen className="w-5 h-5 text-blue-500" />
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-blue-500 h-full" data-testid="stat-card-subjects">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
                   </div>
-                  <div className="text-3xl font-bold text-foreground">{subjects.length}</div>
-                  <p className="text-xs text-muted-foreground">{t('home.stats.subjects')}</p>
+                  <div className="text-2xl sm:text-3xl font-bold text-foreground">{subjects.length}</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{t('home.stats.subjects')}</p>
                 </CardContent>
               </Card>
             </Link>
             
-            <Card className="border-l-4 border-l-green-500" data-testid="stat-card-topics">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <Layers className="w-5 h-5 text-green-500" />
+            <Card className="border-l-4 border-l-green-500 h-full" data-testid="stat-card-topics">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between mb-1 sm:mb-2">
+                  <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                 </div>
-                <div className="text-3xl font-bold text-foreground">{allTopics.length}</div>
-                <p className="text-xs text-muted-foreground">{t('home.stats.topics')}</p>
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">{allTopics.length}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{t('home.stats.topics')}</p>
               </CardContent>
             </Card>
             
             <Link href="/chat">
-              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-purple-500" data-testid="stat-card-chat">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <MessageSquare className="w-5 h-5 text-purple-500" />
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-purple-500 h-full" data-testid="stat-card-chat">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
                   </div>
-                  <div className="text-3xl font-bold text-foreground">2</div>
-                  <p className="text-xs text-muted-foreground">{t('home.stats.aiModes')}</p>
+                  <div className="text-2xl sm:text-3xl font-bold text-foreground">2</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{t('home.stats.aiModes')}</p>
                 </CardContent>
               </Card>
             </Link>
             
             <Link href="/flashcards">
-              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-amber-500" data-testid="stat-card-flashcards">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Zap className="w-5 h-5 text-amber-500" />
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-amber-500 h-full" data-testid="stat-card-flashcards">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
                   </div>
-                  <div className="text-3xl font-bold text-foreground">SM-2</div>
-                  <p className="text-xs text-muted-foreground">{t('home.stats.flashcards')}</p>
+                  <div className="text-xl sm:text-3xl font-bold text-foreground">SM-2</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{t('home.stats.flashcards')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -141,7 +141,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8"
         >
           <Card 
             className="hover-elevate cursor-pointer group overflow-hidden" 
@@ -150,35 +150,35 @@ export default function Home() {
           >
             <CardContent className="p-0">
               <div className="flex items-stretch">
-                <div className="w-2 bg-gradient-to-b from-blue-500 to-blue-600" />
-                <div className="flex-1 p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                      <BookOpen className="w-5 h-5 text-blue-500" />
+                <div className="w-1.5 sm:w-2 bg-gradient-to-b from-blue-500 to-blue-600 flex-shrink-0" />
+                <div className="flex-1 p-3 sm:p-4 md:p-5 min-w-0">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-blue-500/10 border border-blue-500/20 flex-shrink-0">
+                      <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{t('home.cards.subjects.title')}</h3>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">{t('home.cards.subjects.title')}</h3>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         {subjects.length === 0 
                           ? t('home.cards.subjects.empty')
                           : t('home.cards.subjects.count_other', { count: subjects.length })
                         }
                       </p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
                   </div>
                   {subjects.length === 0 ? (
-                    <Button size="sm" className="w-full" data-testid="button-create-first-subject">
-                      <Plus className="w-4 h-4 mr-2" />
+                    <Button size="sm" className="w-full text-xs sm:text-sm" data-testid="button-create-first-subject">
+                      <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                       {t('home.cards.subjects.createButton')}
                     </Button>
                   ) : (
-                    <div className="flex flex-wrap gap-1.5">
-                      {subjects.slice(0, 3).map((subject) => (
+                    <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                      {subjects.slice(0, 2).map((subject) => (
                         <Badge 
                           key={subject.id} 
                           variant="secondary" 
-                          className="text-xs font-normal"
+                          className="text-[10px] sm:text-xs font-normal max-w-[120px] sm:max-w-none"
                           style={{ 
                             backgroundColor: subject.color ? `${subject.color}20` : undefined,
                             borderColor: subject.color || undefined,
@@ -186,15 +186,15 @@ export default function Home() {
                           }}
                         >
                           <span 
-                            className="w-1.5 h-1.5 rounded-full mr-1.5"
+                            className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full mr-1 sm:mr-1.5 flex-shrink-0"
                             style={{ backgroundColor: subject.color || '#6366f1' }}
                           />
-                          {subject.name}
+                          <span className="truncate">{subject.name}</span>
                         </Badge>
                       ))}
-                      {subjects.length > 3 && (
-                        <Badge variant="outline" className="text-xs font-normal">
-                          +{subjects.length - 3}
+                      {subjects.length > 2 && (
+                        <Badge variant="outline" className="text-[10px] sm:text-xs font-normal">
+                          +{subjects.length - 2}
                         </Badge>
                       )}
                     </div>
@@ -211,27 +211,27 @@ export default function Home() {
           >
             <CardContent className="p-0">
               <div className="flex items-stretch">
-                <div className="w-2 bg-gradient-to-b from-purple-500 to-purple-600" />
-                <div className="flex-1 p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                      <Brain className="w-5 h-5 text-purple-500" />
+                <div className="w-1.5 sm:w-2 bg-gradient-to-b from-purple-500 to-purple-600 flex-shrink-0" />
+                <div className="flex-1 p-3 sm:p-4 md:p-5 min-w-0">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-purple-500/10 border border-purple-500/20 flex-shrink-0">
+                      <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{t('home.cards.aiMentor.title')}</h3>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">{t('home.cards.aiMentor.title')}</h3>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         {t('home.cards.aiMentor.description')}
                       </p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
                   </div>
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="text-xs font-normal bg-blue-500/10 border border-blue-500/20">
-                      <BookOpen className="w-3 h-3 mr-1" />
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs font-normal bg-blue-500/10 border border-blue-500/20">
+                      <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                       {t('chat.studyMode')}
                     </Badge>
-                    <Badge variant="secondary" className="text-xs font-normal bg-amber-500/10 border border-amber-500/20">
-                      <Sparkles className="w-3 h-3 mr-1" />
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs font-normal bg-amber-500/10 border border-amber-500/20">
+                      <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                       {t('chat.existentialMode')}
                     </Badge>
                   </div>
@@ -248,42 +248,42 @@ export default function Home() {
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-muted-foreground" />
-                    <CardTitle className="text-base">{t('home.recentTopics.title')}</CardTitle>
+              <CardHeader className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 pb-2 sm:pb-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
+                    <CardTitle className="text-sm sm:text-base truncate">{t('home.recentTopics.title')}</CardTitle>
                   </div>
                   <Link href="/subjects">
-                    <Button variant="ghost" size="sm" className="text-xs h-7" data-testid="button-view-all-subjects">
-                      {t('home.recentTopics.viewAll')}
-                      <ArrowRight className="w-3 h-3 ml-1" />
+                    <Button variant="ghost" size="sm" className="text-[10px] sm:text-xs h-6 sm:h-7 px-2 sm:px-3 flex-shrink-0" data-testid="button-view-all-subjects">
+                      <span className="hidden xs:inline">{t('home.recentTopics.viewAll')}</span>
+                      <ArrowRight className="w-3 h-3 ml-0 xs:ml-1" />
                     </Button>
                   </Link>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <CardContent className="px-3 sm:px-4 md:px-6 pt-0 pb-3 sm:pb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                   {recentTopics.map((topic) => {
                     const subject = subjects.find(s => s.id === topic.subjectId);
                     return (
                       <div
                         key={topic.id}
-                        className="flex items-center gap-3 p-3 rounded-lg hover-elevate cursor-pointer border border-transparent hover:border-border transition-colors"
+                        className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover-elevate cursor-pointer border border-transparent hover:border-border transition-colors"
                         onClick={() => setLocation(`/topic/${topic.id}`)}
                         data-testid={`recent-topic-${topic.id}`}
                       >
                         <div
-                          className="w-2 h-8 rounded-full flex-shrink-0"
+                          className="w-1.5 sm:w-2 h-6 sm:h-8 rounded-full flex-shrink-0"
                           style={{ backgroundColor: subject?.color ?? "#6366f1" }}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate text-foreground">{topic.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <p className="font-medium text-xs sm:text-sm truncate text-foreground">{topic.name}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                             {subject?.name ?? t('home.stats.subjects')}
                           </p>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
                       </div>
                     );
                   })}
@@ -300,18 +300,18 @@ export default function Home() {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <Card className="border-dashed">
-              <CardContent className="py-12">
+              <CardContent className="py-8 sm:py-10 md:py-12 px-4 sm:px-6">
                 <div className="text-center">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
-                      <FileText className="w-8 h-8 text-primary" />
+                  <div className="flex justify-center mb-3 sm:mb-4">
+                    <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-primary/10 border border-primary/20">
+                      <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{t('home.empty.title')}</h3>
-                  <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold mb-1.5 sm:mb-2">{t('home.empty.title')}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-sm sm:max-w-md mx-auto mb-4 sm:mb-6 px-2">
                     {t('home.empty.description')}
                   </p>
-                  <Button onClick={() => setLocation("/subjects")} data-testid="button-get-started">
+                  <Button onClick={() => setLocation("/subjects")} className="text-sm" data-testid="button-get-started">
                     <Plus className="w-4 h-4 mr-2" />
                     {t('home.empty.button')}
                   </Button>
