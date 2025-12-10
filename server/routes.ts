@@ -21,6 +21,7 @@ import {
   type GetDashboardStatsResponse,
   type GetReviewPlanResponse,
   type SupportedLanguage,
+  type Flashcard,
   flashcards,
   flashcardAttempts,
   flashcardTranslations,
@@ -1360,13 +1361,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get or create translated flashcards
-      let allFlashcards;
+      let generatedFlashcards: Flashcard[] = [];
+      let manualFlashcards: Flashcard[] = [];
+      
       if (context.type === "topicSummary") {
         // Use new translation service with persistent cache
-        allFlashcards = await getOrCreateTranslatedFlashcards(summaryId, targetLanguage);
+        generatedFlashcards = await getOrCreateTranslatedFlashcards(summaryId, targetLanguage);
+        
+        // Also fetch manual flashcards for this topic
+        const topicSummary = await db.query.topicSummaries.findFirst({
+          where: eq(topicSummaries.id, summaryId),
+        });
+        
+        if (topicSummary?.topicId) {
+          // Get manual flashcards for this topic in the target language
+          manualFlashcards = await db.query.flashcards.findMany({
+            where: and(
+              eq(flashcards.topicId, topicSummary.topicId),
+              eq(flashcards.language, targetLanguage),
+              eq(flashcards.isManual, true)
+            ),
+            orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt)],
+          });
+        }
       } else {
         // Legacy summary system - use manual translation (no cache)
-        allFlashcards = await db
+        generatedFlashcards = await db
           .select()
           .from(flashcards)
           .where(
@@ -1377,7 +1397,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
       }
 
-      console.log(`[GET /api/flashcards/:summaryId/all] Returning ${allFlashcards.length} flashcards in ${targetLanguage}`);
+      // Combine generated and manual flashcards
+      const allFlashcards = [...generatedFlashcards, ...manualFlashcards];
+
+      console.log(`[GET /api/flashcards/:summaryId/all] Returning ${allFlashcards.length} flashcards (${generatedFlashcards.length} generated + ${manualFlashcards.length} manual) in ${targetLanguage}`);
 
       
       return res.json({
