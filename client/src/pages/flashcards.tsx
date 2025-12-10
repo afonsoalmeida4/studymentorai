@@ -293,21 +293,21 @@ export default function FlashcardsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-x-hidden min-w-0">
       {/* Header */}
-      <div className="border-b p-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <CreditCard className="h-6 w-6" />
-            {t('flashcards.title')}
+      <div className="border-b p-2 sm:p-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
+            <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
+            <span className="truncate">{t('flashcards.title')}</span>
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
             {t('flashcards.description')}
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} data-testid="button-create-flashcard">
-          <Plus className="h-4 w-4 mr-2" />
-          {t('flashcards.createButton')}
+        <Button onClick={() => setShowCreateDialog(true)} data-testid="button-create-flashcard" size="sm" className="flex-shrink-0">
+          <Plus className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t('flashcards.createButton')}</span>
         </Button>
       </div>
 

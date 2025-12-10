@@ -154,8 +154,8 @@ export default function Dashboard() {
   const stats = statsData?.stats;
 
   return (
-    <div className="flex-1 bg-background overflow-y-auto">
-      <div className="w-full mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6 max-w-7xl">
+    <div className="flex-1 bg-background overflow-y-auto overflow-x-hidden min-w-0">
+      <div className="w-full mx-auto py-4 sm:py-6 md:py-8 px-2 sm:px-4 md:px-6 max-w-7xl min-w-0">
         <div className="mb-4 sm:mb-6 md:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2" data-testid="title-dashboard">{t("dashboard.title")}</h1>
           <p className="text-xs sm:text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>

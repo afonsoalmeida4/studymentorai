@@ -68,14 +68,14 @@ function AuthenticatedRouter() {
     <SidebarProvider style={style as React.CSSProperties}>
       <div className="flex h-screen w-full">
         <AppSidebar />
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-w-0 overflow-x-hidden">
           <header className="flex items-center justify-between px-2 sm:px-3 py-2 border-b gap-2 min-h-[44px] sm:min-h-[48px]" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}>
-            <div className="flex items-center gap-2">
-              <SidebarTrigger data-testid="button-sidebar-toggle" className="h-8 w-8 sm:h-9 sm:w-9" />
+            <div className="flex items-center gap-2 min-w-0">
+              <SidebarTrigger data-testid="button-sidebar-toggle" className="h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0" />
             </div>
             <LanguageSelector />
           </header>
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto min-w-0">
             <Suspense fallback={<PageLoader />}>
               <Switch>
                 <Route path="/" component={Home} />

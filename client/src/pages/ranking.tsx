@@ -37,8 +37,8 @@ export default function Ranking() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto space-y-6 p-6">
+    <div className="min-h-screen bg-background overflow-x-hidden min-w-0">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 min-w-0">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold" data-testid="heading-ranking">
             {t("ranking.title")}

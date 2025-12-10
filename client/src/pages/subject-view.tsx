@@ -189,7 +189,7 @@ export default function SubjectView() {
 
   return (
     <>
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-2 sm:p-4 md:p-6 w-full max-w-7xl mx-auto overflow-x-hidden min-w-0">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div

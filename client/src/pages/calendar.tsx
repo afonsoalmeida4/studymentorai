@@ -198,11 +198,11 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-b p-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold" data-testid="title-calendar">{t("calendar.title")}</h1>
+    <div className="flex h-full flex-col overflow-x-hidden min-w-0">
+      <div className="border-b p-2 sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-2xl font-bold truncate" data-testid="title-calendar">{t("calendar.title")}</h1>
             <p className="text-sm text-muted-foreground">
               {filteredEvents.length} {t("calendar.events").toLowerCase()}
             </p>
