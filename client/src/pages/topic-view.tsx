@@ -474,13 +474,13 @@ export default function TopicView() {
               <div className="grid gap-4">
                 {contents.map((content) => (
                   <Card key={content.id} data-testid={`card-content-${content.id}`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
-                          {getContentIcon(content.contentType)}
-                          <div>
-                            <CardTitle className="text-base">{content.title}</CardTitle>
-                            <CardDescription className="mt-1">
+                    <CardHeader className="p-3 sm:p-6">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                          <div className="flex-shrink-0">{getContentIcon(content.contentType)}</div>
+                          <div className="min-w-0 flex-1">
+                            <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
+                            <CardDescription className="mt-1 text-xs">
                               {content.contentType.toUpperCase()}
                               {content.summaryId && (
                                 <span className="ml-2 text-primary">
@@ -493,10 +493,11 @@ export default function TopicView() {
                         </div>
                         {content.contentType === "link" && content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
                           <Button
-                            size="sm"
+                            size="icon"
                             variant="ghost"
                             onClick={() => window.open((content.metadata as any)?.url, "_blank")}
                             data-testid={`button-open-link-${content.id}`}
+                            className="flex-shrink-0 h-8 w-8"
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
@@ -514,12 +515,12 @@ export default function TopicView() {
                   .filter((c) => c.contentType !== "link")
                   .map((content) => (
                     <Card key={content.id} data-testid={`card-file-${content.id}`}>
-                      <CardHeader>
-                        <div className="flex items-start gap-3">
-                          {getContentIcon(content.contentType)}
-                          <div>
-                            <CardTitle className="text-base">{content.title}</CardTitle>
-                            <CardDescription className="mt-1">
+                      <CardHeader className="p-3 sm:p-6">
+                        <div className="flex items-start gap-2 sm:gap-3 min-w-0">
+                          <div className="flex-shrink-0">{getContentIcon(content.contentType)}</div>
+                          <div className="min-w-0 flex-1">
+                            <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
+                            <CardDescription className="mt-1 text-xs">
                               {content.contentType.toUpperCase()}
                             </CardDescription>
                           </div>
@@ -536,14 +537,14 @@ export default function TopicView() {
                   .filter((c) => c.contentType === "link")
                   .map((content) => (
                     <Card key={content.id} data-testid={`card-link-${content.id}`}>
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <Link2 className="w-4 h-4" />
-                            <div>
-                              <CardTitle className="text-base">{content.title}</CardTitle>
+                      <CardHeader className="p-3 sm:p-6">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                            <Link2 className="w-4 h-4 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
                               {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
-                                <CardDescription className="mt-1">
+                                <CardDescription className="mt-1 text-xs truncate">
                                   {(content.metadata as any)?.url}
                                 </CardDescription>
                               ) : null}
@@ -551,10 +552,11 @@ export default function TopicView() {
                           </div>
                           {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
                             <Button
-                              size="sm"
+                              size="icon"
                               variant="ghost"
                               onClick={() => window.open((content.metadata as any)?.url, "_blank")}
                               data-testid={`button-visit-link-${content.id}`}
+                              className="flex-shrink-0 h-8 w-8"
                             >
                               <ExternalLink className="w-4 h-4" />
                             </Button>
