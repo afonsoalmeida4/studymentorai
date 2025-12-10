@@ -256,7 +256,12 @@
     "available": "{{count}} flashcard disponível",
     "available_plural": "{{count}} flashcards disponíveis",
     "modeAnki": "Revisão Anki",
-    "modePractice": "Praticar Tudo"
+    "modePractice": "Praticar Tudo",
+    "regenerateButton": "Gerar Mais",
+    "regenerateSuccessTitle": "Flashcards atualizados!",
+    "regenerateSuccessDescription": "Expandido de {{previousCount}} para {{newCount}} flashcards.",
+    "errorRegenerate": "Não foi possível regenerar flashcards.",
+    "errorRegenerateTitle": "Erro ao regenerar flashcards"
   },
   "appHeader": {
     "home": "Início",

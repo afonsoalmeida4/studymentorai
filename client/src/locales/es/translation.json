@@ -259,7 +259,12 @@
     "available": "{{count}} tarjeta disponible",
     "available_plural": "{{count}} tarjetas disponibles",
     "modeAnki": "Revisión Anki",
-    "modePractice": "Practicar Todo"
+    "modePractice": "Practicar Todo",
+    "regenerateButton": "Generar Más",
+    "regenerateSuccessTitle": "¡Tarjetas actualizadas!",
+    "regenerateSuccessDescription": "Expandido de {{previousCount}} a {{newCount}} tarjetas.",
+    "errorRegenerate": "No se pudieron regenerar tarjetas.",
+    "errorRegenerateTitle": "Error al regenerar tarjetas"
   },
   "appHeader": {
     "home": "Inicio",

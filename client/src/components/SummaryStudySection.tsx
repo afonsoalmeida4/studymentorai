@@ -7,7 +7,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useSubscription } from "@/hooks/useSubscription";
 import type { GenerateFlashcardsResponse } from "@shared/schema";
 import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
-import { Loader2, Brain, Sparkles, Calendar, Dumbbell } from "lucide-react";
+import { Loader2, Brain, Sparkles, Calendar, Dumbbell, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SummaryStudySectionProps {
@@ -59,6 +59,42 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
       toast({
         variant: "destructive",
         title: t('summaryStudy.errorGenerateTitle'),
+        description: error.message,
+      });
+    },
+  });
+
+  // Regenerate flashcards mutation (PRO/PREMIUM only)
+  const regenerateMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/flashcards/regenerate", { topicSummaryId: summaryId }) as GenerateFlashcardsResponse & { previousCount?: number; newCount?: number };
+    },
+    onSuccess: (data) => {
+      if (data.success && data.flashcards) {
+        // Set the query data directly
+        queryClient.setQueryData<GenerateFlashcardsResponse>(["/api/flashcards", summaryId, "all", i18n.language], data);
+        // Also invalidate due flashcards to refresh review mode
+        queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due"] });
+        
+        toast({
+          title: t('summaryStudy.regenerateSuccessTitle'),
+          description: t('summaryStudy.regenerateSuccessDescription', { 
+            previousCount: data.previousCount || 0,
+            newCount: data.flashcards.length 
+          }),
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: t('common.error'),
+          description: data.error || t('summaryStudy.errorRegenerate'),
+        });
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: t('summaryStudy.errorRegenerateTitle'),
         description: error.message,
       });
     },
@@ -135,7 +171,24 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   </CardDescription>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {hasAdvancedFlashcards && flashcardsData.flashcards && flashcardsData.flashcards.length <= 10 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => regenerateMutation.mutate()}
+                    disabled={regenerateMutation.isPending}
+                    data-testid="button-regenerate-flashcards"
+                    className="gap-2"
+                  >
+                    {regenerateMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-4 h-4" />
+                    )}
+                    {t('summaryStudy.regenerateButton')}
+                  </Button>
+                )}
                 {hasAdvancedFlashcards && (
                   <Button
                     variant={studyMode === "spaced" ? "default" : "outline"}

@@ -256,7 +256,12 @@
     "available": "{{count}} Karteikarte verfügbar",
     "available_plural": "{{count}} Karteikarten verfügbar",
     "modeAnki": "Anki-Wiederholung",
-    "modePractice": "Alles Üben"
+    "modePractice": "Alles Üben",
+    "regenerateButton": "Mehr Generieren",
+    "regenerateSuccessTitle": "Karteikarten aktualisiert!",
+    "regenerateSuccessDescription": "Erweitert von {{previousCount}} auf {{newCount}} Karteikarten.",
+    "errorRegenerate": "Karteikarten konnten nicht regeneriert werden.",
+    "errorRegenerateTitle": "Fehler beim Regenerieren der Karteikarten"
   },
   "appHeader": {
     "home": "Startseite",

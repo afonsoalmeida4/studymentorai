@@ -256,7 +256,12 @@
     "available": "{{count}} scheda disponibile",
     "available_plural": "{{count}} schede disponibili",
     "modeAnki": "Revisione Anki",
-    "modePractice": "Pratica Tutto"
+    "modePractice": "Pratica Tutto",
+    "regenerateButton": "Genera Altro",
+    "regenerateSuccessTitle": "Schede aggiornate!",
+    "regenerateSuccessDescription": "Espanso da {{previousCount}} a {{newCount}} schede.",
+    "errorRegenerate": "Impossibile rigenerare le schede.",
+    "errorRegenerateTitle": "Errore nella rigenerazione delle schede"
   },
   "appHeader": {
     "home": "Home",

@@ -261,7 +261,12 @@
     "available": "{{count}} flashcard available",
     "available_plural": "{{count}} flashcards available",
     "modeAnki": "Anki Review",
-    "modePractice": "Practice All"
+    "modePractice": "Practice All",
+    "regenerateButton": "Generate More",
+    "regenerateSuccessTitle": "Flashcards updated!",
+    "regenerateSuccessDescription": "Expanded from {{previousCount}} to {{newCount}} flashcards.",
+    "errorRegenerate": "Could not regenerate flashcards.",
+    "errorRegenerateTitle": "Error regenerating flashcards"
   },
   "appHeader": {
     "home": "Home",

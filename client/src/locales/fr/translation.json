@@ -256,7 +256,12 @@
     "available": "{{count}} carte disponible",
     "available_plural": "{{count}} cartes disponibles",
     "modeAnki": "Révision Anki",
-    "modePractice": "Tout Pratiquer"
+    "modePractice": "Tout Pratiquer",
+    "regenerateButton": "Générer Plus",
+    "regenerateSuccessTitle": "Cartes mises à jour!",
+    "regenerateSuccessDescription": "Étendu de {{previousCount}} à {{newCount}} cartes.",
+    "errorRegenerate": "Impossible de régénérer les cartes.",
+    "errorRegenerateTitle": "Erreur lors de la régénération des cartes"
   },
   "appHeader": {
     "home": "Accueil",

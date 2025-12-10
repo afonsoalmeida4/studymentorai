@@ -28,6 +28,7 @@ import {
   subjects,
   users,
   calendarEvents,
+  topicSummaries,
   insertCalendarEventSchema,
   type CalendarEvent,
 } from "@shared/schema";
