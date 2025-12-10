@@ -27,16 +27,20 @@ export function LevelBadge({ level, levelName, size = "md", showName = true }: L
   const Icon = LEVEL_ICONS[level];
   const colorClass = LEVEL_COLORS[level];
   
-  const iconSize = size === "sm" ? 12 : size === "lg" ? 18 : 14;
+  const sizeClasses = {
+    sm: "h-3 w-3",
+    md: "h-3.5 w-3.5 sm:h-4 sm:w-4",
+    lg: "h-4 w-4 sm:h-5 sm:w-5",
+  };
   
   return (
     <Badge 
       variant="outline" 
-      className={`${colorClass} gap-1.5 font-medium`}
+      className={`${colorClass} gap-1 sm:gap-1.5 font-medium text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 flex-shrink-0`}
       data-testid={`badge-level-${level}`}
     >
-      <Icon className={`h-${iconSize} w-${iconSize}`} />
-      {showName && <span>{levelName}</span>}
+      <Icon className={sizeClasses[size]} />
+      {showName && <span className="truncate max-w-[60px] sm:max-w-none">{levelName}</span>}
     </Badge>
   );
 }

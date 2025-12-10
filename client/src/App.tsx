@@ -69,9 +69,9 @@ function AuthenticatedRouter() {
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex flex-col flex-1">
-          <header className="flex items-center justify-between p-2 border-b gap-2">
+          <header className="flex items-center justify-between px-2 sm:px-3 py-2 border-b gap-2 min-h-[44px] sm:min-h-[48px]" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}>
             <div className="flex items-center gap-2">
-              <SidebarTrigger data-testid="button-sidebar-toggle" />
+              <SidebarTrigger data-testid="button-sidebar-toggle" className="h-8 w-8 sm:h-9 sm:w-9" />
             </div>
             <LanguageSelector />
           </header>

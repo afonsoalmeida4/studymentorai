@@ -155,17 +155,17 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" data-testid="title-dashboard">{t("dashboard.title")}</h1>
-          <p className="text-muted-foreground">{t("dashboard.subtitle")}</p>
+      <div className="w-full mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6 max-w-7xl">
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2" data-testid="title-dashboard">{t("dashboard.title")}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <GamificationHeader />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4 sm:mb-6 md:mb-8">
           {/* Weekly Study Hours KPI - Spans 2 columns for emphasis */}
           <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-blue-500 lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
