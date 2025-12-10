@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { db } from "./db";
 import { topicSummaries, flashcards, flashcardTranslations } from "@shared/schema";
 import type { SupportedLanguage, TopicSummary, Flashcard } from "@shared/schema";
@@ -129,25 +129,39 @@ export async function getOrCreateTranslatedFlashcards(
     ),
   });
 
-  if (existingFlashcards.length > 0) {
-    // Cache hit! Return existing translated flashcards
-    console.log(`[Translation Cache HIT] ${existingFlashcards.length} flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
-    
-    /**
-     * LIMITATION: Older cached translations (created before flashcard_translations system)
-     * will NOT have shared SM-2 progress across languages.
-     * 
-     * Why no backfill?
-     * - Without stored metadata (baseFlashcardId or questionHash), there's no deterministic
-     *   way to pair translated flashcards with base Portuguese flashcards
-     * - Pairing by createdAt order is unreliable if users edited/reordered/regenerated cards
-     * - Incorrect mappings would corrupt SM-2 progress (worse than no sharing)
-     * 
-     * Solution: Users can re-generate flashcards to get shared SM-2 progress.
-     * New flashcards (cache miss below) correctly populate flashcard_translations.
-     */
-    
+  // For Portuguese (base language), just return existing flashcards
+  if (targetLanguage === "pt" && existingFlashcards.length > 0) {
+    console.log(`[Translation Cache HIT] ${existingFlashcards.length} flashcards for summary ${topicSummaryId} -> pt (base)`);
     return existingFlashcards;
+  }
+
+  // For non-Portuguese languages, verify these are REAL translations (have flashcard_translations mappings)
+  if (existingFlashcards.length > 0 && targetLanguage !== "pt") {
+    // Check if these flashcards have translation mappings
+    const existingIds = existingFlashcards.map(fc => fc.id);
+    const mappings = await db.query.flashcardTranslations.findMany({
+      where: inArray(flashcardTranslations.translatedFlashcardId, existingIds),
+    });
+
+    // If mappings exist and count matches, these are valid translations
+    if (mappings.length === existingFlashcards.length) {
+      console.log(`[Translation Cache HIT] ${existingFlashcards.length} validated flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
+      return existingFlashcards;
+    }
+
+    // Otherwise, these are legacy flashcards (generated separately, not translated)
+    // Delete them so we can create proper translations
+    console.log(`[Translation Cache STALE] Found ${existingFlashcards.length} legacy flashcards without mappings (${mappings.length} mappings) - regenerating...`);
+    
+    // Delete stale flashcards
+    await db.delete(flashcards).where(inArray(flashcards.id, existingIds));
+    
+    // Delete any orphaned mappings
+    if (mappings.length > 0) {
+      await db.delete(flashcardTranslations).where(
+        inArray(flashcardTranslations.translatedFlashcardId, existingIds)
+      );
+    }
   }
 
   // 4. Cache miss - need to translate flashcards
