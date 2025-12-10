@@ -336,12 +336,19 @@
   },
   "home": {
     "title": "Benvenuto in AI Study Mentor",
+    "welcomeBack": "Ciao, {{name}}!",
     "subtitle": "Organizza la tua conoscenza. Trova il tuo equilibrio.",
     "description": "Una piattaforma completa per organizzare materiali di studio, elaborare documenti con l'IA e trovare supporto nel tuo percorso di apprendimento.",
     "stats": {
       "subjects": "Materie",
       "topics": "Argomenti",
-      "aiModes": "Modalità IA"
+      "aiModes": "Modalità IA",
+      "flashcards": "Flashcards"
+    },
+    "empty": {
+      "title": "Inizia il tuo percorso",
+      "description": "Crea la tua prima materia per organizzare i tuoi materiali di studio e iniziare a imparare in modo intelligente.",
+      "button": "Crea Materia"
     },
     "cards": {
       "subjects": {
@@ -367,7 +374,8 @@
       "title": "Argomenti Recenti",
       "subtitle": "I tuoi argomenti creati più di recente",
       "empty": "Non hai ancora argomenti",
-      "createFirst": "Crea Primo Argomento"
+      "createFirst": "Crea Primo Argomento",
+      "viewAll": "Vedi Tutti"
     },
     "gettingStarted": {
       "title": "Inizia",

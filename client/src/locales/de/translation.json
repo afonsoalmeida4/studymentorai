@@ -336,12 +336,19 @@
   },
   "home": {
     "title": "Willkommen bei AI Study Mentor",
+    "welcomeBack": "Hallo, {{name}}!",
     "subtitle": "Organisieren Sie Ihr Wissen. Finden Sie Ihr Gleichgewicht.",
     "description": "Eine vollständige Plattform zum Organisieren von Lernmaterialien, Verarbeiten von Dokumenten mit KI und Unterstützung auf Ihrem Lernweg.",
     "stats": {
       "subjects": "Fächer",
       "topics": "Themen",
-      "aiModes": "KI-Modi"
+      "aiModes": "KI-Modi",
+      "flashcards": "Lernkarten"
+    },
+    "empty": {
+      "title": "Starten Sie Ihre Reise",
+      "description": "Erstellen Sie Ihr erstes Fach, um Ihre Lernmaterialien zu organisieren und intelligenter zu lernen.",
+      "button": "Fach Erstellen"
     },
     "cards": {
       "subjects": {
@@ -367,7 +374,8 @@
       "title": "Neueste Themen",
       "subtitle": "Ihre zuletzt erstellten Themen",
       "empty": "Sie haben noch keine Themen",
-      "createFirst": "Erstes Thema Erstellen"
+      "createFirst": "Erstes Thema Erstellen",
+      "viewAll": "Alle Ansehen"
     },
     "gettingStarted": {
       "title": "Erste Schritte",

@@ -341,12 +341,19 @@
   },
   "home": {
     "title": "Welcome to AI Study Mentor",
+    "welcomeBack": "Hello, {{name}}!",
     "subtitle": "Organize your knowledge. Find your balance.",
     "description": "A complete platform to organize study materials, process documents with AI and find support for your learning journey.",
     "stats": {
       "subjects": "Subjects",
       "topics": "Topics",
-      "aiModes": "AI Modes"
+      "aiModes": "AI Modes",
+      "flashcards": "Flashcards"
+    },
+    "empty": {
+      "title": "Start your journey",
+      "description": "Create your first subject to organize your study materials and start learning smarter.",
+      "button": "Create Subject"
     },
     "cards": {
       "subjects": {
@@ -372,7 +379,8 @@
       "title": "Recent Topics",
       "subtitle": "Your most recently created topics",
       "empty": "You don't have any topics yet",
-      "createFirst": "Create First Topic"
+      "createFirst": "Create First Topic",
+      "viewAll": "View All"
     },
     "gettingStarted": {
       "title": "Getting Started",
