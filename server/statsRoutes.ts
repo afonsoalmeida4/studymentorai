@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { db } from "./db";
 import { topicStudyTime, topicStudyEvents, tasks, topicProgress, subjects, topics,
-         insertTopicStudyEventSchema, insertTaskSchema } from "@shared/schema";
-import { eq, and, gte, sql, desc, count as countFn } from "drizzle-orm";
+         flashcardAttempts, insertTopicStudyEventSchema, insertTaskSchema } from "@shared/schema";
+import { eq, and, gte, lt, sql, desc, count as countFn } from "drizzle-orm";
 import { isAuthenticated } from "./replitAuth";
 import { z } from "zod";
 
@@ -108,6 +108,7 @@ export function registerStatsRoutes(app: Express) {
 
   // GET /api/stats/study-time
   // Weekly study hours + comparison with last week
+  // Combines topic study time + estimated flashcard review time (1 min per review)
   app.get("/api/stats/study-time", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -115,8 +116,8 @@ export function registerStatsRoutes(app: Express) {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-      // Current week
-      const currentWeekResult = await db
+      // Current week - Topic study time
+      const currentWeekTopicResult = await db
         .select({ total: sql<number>`COALESCE(SUM(${topicStudyTime.durationMinutes}), 0)` })
         .from(topicStudyTime)
         .where(and(
@@ -124,8 +125,17 @@ export function registerStatsRoutes(app: Express) {
           gte(topicStudyTime.startedAt, weekAgo)
         ));
 
-      // Previous week
-      const previousWeekResult = await db
+      // Current week - Flashcard reviews (estimate 1 min per review)
+      const currentWeekFlashcardResult = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(flashcardAttempts)
+        .where(and(
+          eq(flashcardAttempts.userId, userId),
+          gte(flashcardAttempts.attemptDate, weekAgo)
+        ));
+
+      // Previous week - Topic study time
+      const previousWeekTopicResult = await db
         .select({ total: sql<number>`COALESCE(SUM(${topicStudyTime.durationMinutes}), 0)` })
         .from(topicStudyTime)
         .where(and(
@@ -134,8 +144,25 @@ export function registerStatsRoutes(app: Express) {
           sql`${topicStudyTime.startedAt} < ${weekAgo}`
         ));
 
-      const currentMinutes = Number(currentWeekResult[0]?.total || 0);
-      const previousMinutes = Number(previousWeekResult[0]?.total || 0);
+      // Previous week - Flashcard reviews
+      const previousWeekFlashcardResult = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(flashcardAttempts)
+        .where(and(
+          eq(flashcardAttempts.userId, userId),
+          gte(flashcardAttempts.attemptDate, twoWeeksAgo),
+          lt(flashcardAttempts.attemptDate, weekAgo)
+        ));
+
+      // Combine: topic minutes + flashcard reviews (1 min each)
+      const currentTopicMinutes = Number(currentWeekTopicResult[0]?.total || 0);
+      const currentFlashcardMinutes = Number(currentWeekFlashcardResult[0]?.count || 0);
+      const currentMinutes = currentTopicMinutes + currentFlashcardMinutes;
+
+      const previousTopicMinutes = Number(previousWeekTopicResult[0]?.total || 0);
+      const previousFlashcardMinutes = Number(previousWeekFlashcardResult[0]?.count || 0);
+      const previousMinutes = previousTopicMinutes + previousFlashcardMinutes;
+
       const deltaMinutes = currentMinutes - previousMinutes;
       const weeklyGoalMinutes = 600; // 10 hours goal
 
@@ -357,11 +384,12 @@ export function registerStatsRoutes(app: Express) {
     try {
       const userId = req.user.claims.sub;
 
-      // Get last 30 days of study sessions (grouped by date)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      // Get last 365 days of activity (topic study + flashcard reviews)
+      const yearAgo = new Date();
+      yearAgo.setDate(yearAgo.getDate() - 365);
 
-      const sessionsResult = await db
+      // Topic study sessions (grouped by date)
+      const topicSessionsResult = await db
         .select({
           date: sql<string>`DATE(${topicStudyTime.startedAt})`,
           totalMinutes: sql<number>`SUM(${topicStudyTime.durationMinutes})`,
@@ -369,16 +397,33 @@ export function registerStatsRoutes(app: Express) {
         .from(topicStudyTime)
         .where(and(
           eq(topicStudyTime.userId, userId),
-          gte(topicStudyTime.startedAt, thirtyDaysAgo)
+          gte(topicStudyTime.startedAt, yearAgo)
         ))
         .groupBy(sql`DATE(${topicStudyTime.startedAt})`)
         .orderBy(sql`DATE(${topicStudyTime.startedAt}) DESC`);
 
-      const studyDays = new Set(
-        sessionsResult
-          .filter(row => Number(row.totalMinutes) >= 15)
-          .map(row => row.date)
-      );
+      // Flashcard review days (any flashcard attempt counts as study activity)
+      const flashcardDaysResult = await db
+        .select({
+          date: sql<string>`DATE(${flashcardAttempts.attemptDate})`,
+        })
+        .from(flashcardAttempts)
+        .where(and(
+          eq(flashcardAttempts.userId, userId),
+          gte(flashcardAttempts.attemptDate, yearAgo)
+        ))
+        .groupBy(sql`DATE(${flashcardAttempts.attemptDate})`);
+
+      // Combine both sources - a day counts if EITHER has activity
+      const studyDays = new Set<string>();
+      
+      // Add topic study days (with minimum 15 min threshold)
+      topicSessionsResult
+        .filter(row => Number(row.totalMinutes) >= 15)
+        .forEach(row => studyDays.add(row.date));
+      
+      // Add flashcard review days (any activity counts)
+      flashcardDaysResult.forEach(row => studyDays.add(row.date));
 
       // Calculate current streak
       let currentStreak = 0;
