@@ -101,6 +101,7 @@
       "description": "Gere resumos adaptados ao teu estilo de aprendizagem e cria flashcards para estudar",
       "generateMore": "Gerar Mais Estilos",
       "regenerate": "Regenerar",
+      "regenerateShort": "Regen.",
       "allGenerated": "Todos os estilos de aprendizagem já foram gerados!",
       "noContent": "Sem Conteúdo para Resumir",
       "noContentDescription": "Adicione ficheiros ou links ao tópico para gerar resumos.",
@@ -180,6 +181,7 @@
     },
     "pdfExport": {
       "button": "Exportar",
+      "buttonShort": "Exp.",
       "exportPdf": "Exportar PDF",
       "exportDocx": "Exportar DOCX",
       "success": "Exportado com sucesso!",

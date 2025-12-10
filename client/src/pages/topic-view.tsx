@@ -384,11 +384,11 @@ export default function TopicView() {
 
   return (
     <>
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-2">{topic?.name || t('topicView.title')}</h1>
+      <div className="p-3 sm:p-4 md:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-1 sm:mb-2 break-words">{topic?.name || t('topicView.title')}</h1>
           {topic?.description && (
-            <p className="text-muted-foreground">{topic.description}</p>
+            <p className="text-sm sm:text-base text-muted-foreground break-words">{topic.description}</p>
           )}
         </div>
 
@@ -412,8 +412,9 @@ export default function TopicView() {
           </Card>
         )}
 
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
           <Button
+            size="sm"
             onClick={() => {
               if (subscriptionError || (!subscriptionLoading && limits && usage && isUploadLimitReached())) {
                 setUpgradeReason("uploads");
@@ -424,16 +425,19 @@ export default function TopicView() {
             }}
             disabled={subscriptionLoading || !!subscriptionError || isUploadLimitReached()}
             data-testid="button-upload-file"
+            className="text-xs sm:text-sm"
           >
-            <Upload className="w-4 h-4 mr-2" />
+            <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             {subscriptionLoading ? t('common.loading') : t('topicView.uploadFile')}
           </Button>
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setIsLinkDialogOpen(true)}
             data-testid="button-add-link"
+            className="text-xs sm:text-sm"
           >
-            <Link2 className="w-4 h-4 mr-2" />
+            <Link2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             {t('topicView.addLink')}
           </Button>
         </div>
@@ -452,17 +456,19 @@ export default function TopicView() {
           </Card>
         ) : (
           <Tabs defaultValue="all" className="w-full">
-            <TabsList>
-              <TabsTrigger value="all" data-testid="tab-all-content">
-                {t('topicView.tabs.all')} ({contents.length})
-              </TabsTrigger>
-              <TabsTrigger value="files" data-testid="tab-files">
-                {t('topicView.tabs.files')} ({contents.filter((c) => c.contentType !== "link").length})
-              </TabsTrigger>
-              <TabsTrigger value="links" data-testid="tab-links">
-                {t('topicView.tabs.links')} ({contents.filter((c) => c.contentType === "link").length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex min-w-max">
+                <TabsTrigger value="all" data-testid="tab-all-content" className="text-xs sm:text-sm px-2 sm:px-3">
+                  {t('topicView.tabs.all')} ({contents.length})
+                </TabsTrigger>
+                <TabsTrigger value="files" data-testid="tab-files" className="text-xs sm:text-sm px-2 sm:px-3">
+                  {t('topicView.tabs.files')} ({contents.filter((c) => c.contentType !== "link").length})
+                </TabsTrigger>
+                <TabsTrigger value="links" data-testid="tab-links" className="text-xs sm:text-sm px-2 sm:px-3">
+                  {t('topicView.tabs.links')} ({contents.filter((c) => c.contentType === "link").length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="all" className="mt-6">
               <div className="grid gap-4">
@@ -565,9 +571,9 @@ export default function TopicView() {
         {/* Secção de Resumos e Estudo - Inline */}
         {contents.length > 0 && (
           <div className="mt-12">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-2">{t('topicView.summarySection.title')}</h2>
-              <p className="text-muted-foreground text-sm">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1 sm:mb-2">{t('topicView.summarySection.title')}</h2>
+              <p className="text-muted-foreground text-xs sm:text-sm">
                 {t('topicView.summarySection.description')}
               </p>
             </div>
@@ -676,36 +682,38 @@ export default function TopicView() {
                       </div>
                     )}
                   <Tabs defaultValue={availableStyles[0]} className="w-full">
-                    <TabsList className={`grid w-full ${gridClass}`}>
+                    <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 mb-2">
+                      <TabsList className="inline-flex min-w-max">
                       {visual ? (
-                        <TabsTrigger value="visual" data-testid="tab-summary-visual">
+                        <TabsTrigger value="visual" data-testid="tab-summary-visual" className="text-xs sm:text-sm px-2 sm:px-3">
                           {t('topicView.generateStylesDialog.visual')}
                         </TabsTrigger>
                       ) : null}
                       {auditivo ? (
-                        <TabsTrigger value="auditivo" data-testid="tab-summary-auditivo">
+                        <TabsTrigger value="auditivo" data-testid="tab-summary-auditivo" className="text-xs sm:text-sm px-2 sm:px-3">
                           {t('topicView.generateStylesDialog.auditivo')}
                         </TabsTrigger>
                       ) : null}
                       {logico ? (
-                        <TabsTrigger value="logico" data-testid="tab-summary-logico">
+                        <TabsTrigger value="logico" data-testid="tab-summary-logico" className="text-xs sm:text-sm px-2 sm:px-3">
                           {t('topicView.generateStylesDialog.logico')}
                         </TabsTrigger>
                       ) : null}
                       {conciso ? (
-                        <TabsTrigger value="conciso" data-testid="tab-summary-conciso">
+                        <TabsTrigger value="conciso" data-testid="tab-summary-conciso" className="text-xs sm:text-sm px-2 sm:px-3">
                           {t('topicView.generateStylesDialog.conciso')}
                         </TabsTrigger>
                       ) : null}
-                    </TabsList>
+                      </TabsList>
+                    </div>
 
                     {visual ? (
-                      <TabsContent value="visual" className="mt-6 space-y-6">
+                      <TabsContent value="visual" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
                         <Card>
-                          <CardHeader>
-                            <div className="flex items-center justify-between gap-4">
-                              <CardTitle className="text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
-                              <div className="flex items-center gap-2">
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+                              <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -713,10 +721,11 @@ export default function TopicView() {
                                       size="sm"
                                       disabled={isExportingPdf || currentPlan !== 'premium'}
                                       data-testid="button-export-visual"
-                                      className="gap-2"
+                                      className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                     >
-                                      <Download className="w-4 h-4" />
-                                      {t('topicView.pdfExport.button')}
+                                      <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                      <span className="hidden sm:inline">{t('topicView.pdfExport.button')}</span>
+                                      <span className="sm:hidden">{t('topicView.pdfExport.buttonShort', t('topicView.pdfExport.button'))}</span>
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
@@ -734,16 +743,17 @@ export default function TopicView() {
                                   onClick={() => setStyleToRegenerate("visual")}
                                   disabled={generateSummariesMutation.isPending}
                                   data-testid="button-regenerate-visual"
-                                  className="gap-2"
+                                  className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
-                                  <RefreshCw className="w-4 h-4" />
-                                  {t('topicView.summarySection.regenerate')}
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">{t('topicView.summarySection.regenerate')}</span>
+                                  <span className="sm:hidden">{t('topicView.summarySection.regenerateShort', t('topicView.summarySection.regenerate'))}</span>
                                 </Button>
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent>
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                          <CardContent className="px-3 sm:px-6">
+                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
                               {visual.summary}
                             </p>
                           </CardContent>
@@ -762,12 +772,12 @@ export default function TopicView() {
                     ) : null}
 
                     {auditivo ? (
-                      <TabsContent value="auditivo" className="mt-6 space-y-6">
+                      <TabsContent value="auditivo" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
                         <Card>
-                          <CardHeader>
-                            <div className="flex items-center justify-between gap-4">
-                              <CardTitle className="text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
-                              <div className="flex items-center gap-2">
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+                              <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -775,10 +785,10 @@ export default function TopicView() {
                                       size="sm"
                                       disabled={isExportingPdf || currentPlan !== 'premium'}
                                       data-testid="button-export-auditivo"
-                                      className="gap-2"
+                                      className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                     >
-                                      <Download className="w-4 h-4" />
-                                      {t('topicView.pdfExport.button')}
+                                      <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                      <span className="hidden sm:inline">{t('topicView.pdfExport.button')}</span>
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
@@ -796,16 +806,16 @@ export default function TopicView() {
                                   onClick={() => setStyleToRegenerate("auditivo")}
                                   disabled={generateSummariesMutation.isPending}
                                   data-testid="button-regenerate-auditivo"
-                                  className="gap-2"
+                                  className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
-                                  <RefreshCw className="w-4 h-4" />
-                                  {t('topicView.summarySection.regenerate')}
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">{t('topicView.summarySection.regenerate')}</span>
                                 </Button>
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent>
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                          <CardContent className="px-3 sm:px-6">
+                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
                               {auditivo.summary}
                             </p>
                           </CardContent>
@@ -824,12 +834,12 @@ export default function TopicView() {
                     ) : null}
 
                     {logico ? (
-                      <TabsContent value="logico" className="mt-6 space-y-6">
+                      <TabsContent value="logico" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
                         <Card>
-                          <CardHeader>
-                            <div className="flex items-center justify-between gap-4">
-                              <CardTitle className="text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
-                              <div className="flex items-center gap-2">
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+                              <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -837,10 +847,10 @@ export default function TopicView() {
                                       size="sm"
                                       disabled={isExportingPdf || currentPlan !== 'premium'}
                                       data-testid="button-export-logico"
-                                      className="gap-2"
+                                      className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                     >
-                                      <Download className="w-4 h-4" />
-                                      {t('topicView.pdfExport.button')}
+                                      <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                      <span className="hidden sm:inline">{t('topicView.pdfExport.button')}</span>
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
@@ -858,16 +868,16 @@ export default function TopicView() {
                                   onClick={() => setStyleToRegenerate("logico")}
                                   disabled={generateSummariesMutation.isPending}
                                   data-testid="button-regenerate-logico"
-                                  className="gap-2"
+                                  className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
-                                  <RefreshCw className="w-4 h-4" />
-                                  {t('topicView.summarySection.regenerate')}
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">{t('topicView.summarySection.regenerate')}</span>
                                 </Button>
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent>
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                          <CardContent className="px-3 sm:px-6">
+                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
                               {logico.summary}
                             </p>
                           </CardContent>
@@ -886,12 +896,12 @@ export default function TopicView() {
                     ) : null}
 
                     {conciso ? (
-                      <TabsContent value="conciso" className="mt-6 space-y-6">
+                      <TabsContent value="conciso" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
                         <Card>
-                          <CardHeader>
-                            <div className="flex items-center justify-between gap-4">
-                              <CardTitle className="text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
-                              <div className="flex items-center gap-2">
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+                              <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -899,10 +909,10 @@ export default function TopicView() {
                                       size="sm"
                                       disabled={isExportingPdf || currentPlan !== 'premium'}
                                       data-testid="button-export-conciso"
-                                      className="gap-2"
+                                      className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                     >
-                                      <Download className="w-4 h-4" />
-                                      {t('topicView.pdfExport.button')}
+                                      <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                      <span className="hidden sm:inline">{t('topicView.pdfExport.button')}</span>
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
@@ -920,16 +930,16 @@ export default function TopicView() {
                                   onClick={() => setStyleToRegenerate("conciso")}
                                   disabled={generateSummariesMutation.isPending}
                                   data-testid="button-regenerate-conciso"
-                                  className="gap-2"
+                                  className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
-                                  <RefreshCw className="w-4 h-4" />
-                                  {t('topicView.summarySection.regenerate')}
+                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="hidden sm:inline">{t('topicView.summarySection.regenerate')}</span>
                                 </Button>
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent>
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                          <CardContent className="px-3 sm:px-6">
+                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
                               {conciso.summary}
                             </p>
                           </CardContent>

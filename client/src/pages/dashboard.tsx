@@ -154,7 +154,7 @@ export default function Dashboard() {
   const stats = statsData?.stats;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex-1 bg-background overflow-y-auto">
       <div className="w-full mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6 max-w-7xl">
         <div className="mb-4 sm:mb-6 md:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2" data-testid="title-dashboard">{t("dashboard.title")}</h1>
@@ -167,34 +167,36 @@ export default function Dashboard() {
 
         <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4 sm:mb-6 md:mb-8">
           {/* Weekly Study Hours KPI - Spans 2 columns for emphasis */}
-          <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-blue-500 sm:col-span-2 lg:col-span-2">
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.weeklyHours")}</CardTitle>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />
-                      <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm">{t("dashboard.kpi.tooltipWeeklyGoal")}: {((studyTimeData?.weeklyGoalMinutes || 600) / 60).toFixed(0)}h</p>
-                    {studyTimeData && (() => {
-                      const remaining = ((studyTimeData.weeklyGoalMinutes || 600) - (studyTimeData.currentWeekMinutes || 0)) / 60;
-                      return remaining > 0 ? (
-                        <p className="text-xs text-muted-foreground">
-                          {t("dashboard.kpi.tooltipRemaining")}: {remaining.toFixed(1)}h
-                        </p>
-                      ) : (
-                        <p className="text-xs text-green-500">
-                          ✓ +{Math.abs(remaining).toFixed(1)}h {t("dashboard.kpi.tooltipBeyondGoal")}
-                        </p>
-                      );
-                    })()}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+          <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-blue-500 sm:col-span-2 lg:col-span-2">
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.weeklyHours")}</CardTitle>
+                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm">{t("dashboard.kpi.tooltipWeeklyGoal")}: {((studyTimeData?.weeklyGoalMinutes || 600) / 60).toFixed(0)}h</p>
+                      {studyTimeData && (() => {
+                        const remaining = ((studyTimeData.weeklyGoalMinutes || 600) - (studyTimeData.currentWeekMinutes || 0)) / 60;
+                        return remaining > 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            {t("dashboard.kpi.tooltipRemaining")}: {remaining.toFixed(1)}h
+                          </p>
+                        ) : (
+                          <p className="text-xs text-green-500">
+                            ✓ +{Math.abs(remaining).toFixed(1)}h {t("dashboard.kpi.tooltipBeyondGoal")}
+                          </p>
+                        );
+                      })()}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
               {studyTimeLoading ? (
@@ -241,29 +243,31 @@ export default function Dashboard() {
             const overallPercentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
             
             return (
-              <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-green-500">
-              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
-                <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 sm:gap-2">
-                        <Target className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
-                        {!subjectProgressLoading && !subjectProgressError && totalTopics > 0 && (
-                          <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
-                        )}
-                      </div>
-                    </TooltipTrigger>
-                    {totalTopics > 0 && (
-                      <TooltipContent>
-                        <p className="text-sm font-semibold">{t("dashboard.kpi.tooltipTotalProgress")}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
-                        </p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
+              <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-green-500">
+              <CardHeader className="pb-2 px-3 sm:px-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Target className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.subjectProgress")}</CardTitle>
+                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {!subjectProgressLoading && !subjectProgressError && totalTopics > 0 ? (
+                          <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
+                        ) : <span />}
+                      </TooltipTrigger>
+                      {totalTopics > 0 && (
+                        <TooltipContent>
+                          <p className="text-sm font-semibold">{t("dashboard.kpi.tooltipTotalProgress")}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
+                          </p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </CardHeader>
               <CardContent className="px-3 sm:px-6">
                 {subjectProgressLoading ? (
@@ -303,29 +307,31 @@ export default function Dashboard() {
 
           {/* Tasks Completed KPI - Premium only */}
           {currentPlan === "premium" && (tasksLoading || tasksError || (tasksData && tasksData.totalTasks > 0)) && (
-            <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-purple-500">
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />
-                      {!tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 && (
-                        <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  {tasksData && tasksData.totalTasks > 0 && (
-                    <TooltipContent>
-                      <p className="text-sm">{t("dashboard.kpi.tooltipTotalTasks")}: {tasksData.totalTasks}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t("dashboard.kpi.tooltipPendingTasks")}: {tasksData.pendingTasks || 0}
-                      </p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
+            <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-purple-500">
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 flex-shrink-0" />
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
+                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {!tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 ? (
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
+                      ) : <span />}
+                    </TooltipTrigger>
+                    {tasksData && tasksData.totalTasks > 0 && (
+                      <TooltipContent>
+                        <p className="text-sm">{t("dashboard.kpi.tooltipTotalTasks")}: {tasksData.totalTasks}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("dashboard.kpi.tooltipPendingTasks")}: {tasksData.pendingTasks || 0}
+                        </p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
               {tasksLoading ? (
@@ -352,32 +358,34 @@ export default function Dashboard() {
           )}
 
           {/* Study Streak KPI */}
-          <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-orange-500">
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.studyStreak")}</CardTitle>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      <Flame className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />
-                      {!streakLoading && !streakError && streakData && streakData.currentStreak > 0 && (
-                        <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  {streakData && streakData.currentStreak > 0 && (
-                    <TooltipContent>
-                      <p className="text-sm">{t("dashboard.kpi.tooltipCurrentStreak")}: {streakData.currentStreak} {t("dashboard.kpi.days")}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t("dashboard.kpi.tooltipRecord")}: {streakData.longestStreak} {t("dashboard.kpi.days")}
-                      </p>
-                      {streakData.hasStudiedToday && (
-                        <p className="text-xs text-green-500">✓ {t("dashboard.kpi.tooltipToday")}: {streakData.todayMinutes || 0} min</p>
-                      )}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
+          <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-orange-500">
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500 flex-shrink-0" />
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.studyStreak")}</CardTitle>
+                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {!streakLoading && !streakError && streakData && streakData.currentStreak > 0 ? (
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
+                      ) : <span />}
+                    </TooltipTrigger>
+                    {streakData && streakData.currentStreak > 0 && (
+                      <TooltipContent>
+                        <p className="text-sm">{t("dashboard.kpi.tooltipCurrentStreak")}: {streakData.currentStreak} {t("dashboard.kpi.days")}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("dashboard.kpi.tooltipRecord")}: {streakData.longestStreak} {t("dashboard.kpi.days")}
+                        </p>
+                        {streakData.hasStudiedToday && (
+                          <p className="text-xs text-green-500">✓ {t("dashboard.kpi.tooltipToday")}: {streakData.todayMinutes || 0} min</p>
+                        )}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
               {streakLoading ? (

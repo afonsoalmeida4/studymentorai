@@ -158,20 +158,20 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
         </Card>
       ) : (
         <Card className="border-2">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                  <Brain className="w-5 h-5 text-primary" />
+          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex-shrink-0">
+                  <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 </div>
-                <div>
-                  <CardTitle className="text-xl">{t('summaryStudy.title')}</CardTitle>
-                  <CardDescription>
+                <div className="min-w-0">
+                  <CardTitle className="text-base sm:text-xl">{t('summaryStudy.title')}</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
                     {t('summaryStudy.available', { count: flashcardsData.flashcards?.length || 0 })}
                   </CardDescription>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {hasAdvancedFlashcards && (
                   <Button
                     variant="outline"
@@ -179,14 +179,14 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                     onClick={() => regenerateMutation.mutate()}
                     disabled={regenerateMutation.isPending}
                     data-testid="button-regenerate-flashcards"
-                    className="gap-2"
+                    className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                   >
                     {regenerateMutation.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                     ) : (
-                      <RefreshCw className="w-4 h-4" />
+                      <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
-                    {t('summaryStudy.regenerateButton')}
+                    <span className="hidden sm:inline">{t('summaryStudy.regenerateButton')}</span>
                   </Button>
                 )}
                 {hasAdvancedFlashcards && (
@@ -195,10 +195,10 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                     size="sm"
                     onClick={() => setStudyMode("spaced")}
                     data-testid="button-mode-spaced"
-                    className="gap-2"
+                    className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                   >
-                    <Calendar className="w-4 h-4" />
-                    {t('summaryStudy.modeAnki')}
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">{t('summaryStudy.modeAnki')}</span>
                   </Button>
                 )}
                 <Button
@@ -206,15 +206,15 @@ export default function SummaryStudySection({ summaryId }: SummaryStudySectionPr
                   size="sm"
                   onClick={() => setStudyMode("practice")}
                   data-testid="button-mode-practice"
-                  className="gap-2"
+                  className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                 >
-                  <Dumbbell className="w-4 h-4" />
-                  {t('summaryStudy.modePractice')}
+                  <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{t('summaryStudy.modePractice')}</span>
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3 sm:px-6">
             <AnkiFlashcardDeck summaryId={summaryId} mode={studyMode} />
           </CardContent>
         </Card>
