@@ -129,10 +129,17 @@ export async function getOrCreateTranslatedFlashcards(
     ),
   });
 
-  // For Portuguese (base language), just return existing flashcards
+  // For Portuguese (base language), return existing flashcards ORDERED by createdAt
   if (targetLanguage === "pt" && existingFlashcards.length > 0) {
     console.log(`[Translation Cache HIT] ${existingFlashcards.length} flashcards for summary ${topicSummaryId} -> pt (base)`);
-    return existingFlashcards;
+    // Sort by createdAt, then by id for deterministic order
+    const sortedFlashcards = existingFlashcards.sort((a, b) => {
+      const dateA = a.createdAt?.getTime() || 0;
+      const dateB = b.createdAt?.getTime() || 0;
+      if (dateA !== dateB) return dateA - dateB;
+      return a.id.localeCompare(b.id);
+    });
+    return sortedFlashcards;
   }
 
   // For non-Portuguese languages, verify these are REAL translations (have flashcard_translations mappings)
@@ -146,7 +153,39 @@ export async function getOrCreateTranslatedFlashcards(
     // If mappings exist and count matches, these are valid translations
     if (mappings.length === existingFlashcards.length) {
       console.log(`[Translation Cache HIT] ${existingFlashcards.length} validated flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
-      return existingFlashcards;
+      
+      // CRITICAL: Order translations by base flashcard order (Portuguese order)
+      // 1. Get the base Portuguese flashcards in order
+      const baseFlashcardIds = mappings.map(m => m.baseFlashcardId);
+      const baseFlashcards = await db.query.flashcards.findMany({
+        where: inArray(flashcards.id, baseFlashcardIds),
+      });
+      
+      // Sort base flashcards by createdAt, id
+      const orderedBaseIds = baseFlashcards
+        .sort((a, b) => {
+          const dateA = a.createdAt?.getTime() || 0;
+          const dateB = b.createdAt?.getTime() || 0;
+          if (dateA !== dateB) return dateA - dateB;
+          return a.id.localeCompare(b.id);
+        })
+        .map(fc => fc.id);
+      
+      // Create a map of baseId -> translated flashcard
+      const baseToTranslatedMap = new Map<string, Flashcard>();
+      for (const mapping of mappings) {
+        const translatedFC = existingFlashcards.find(fc => fc.id === mapping.translatedFlashcardId);
+        if (translatedFC) {
+          baseToTranslatedMap.set(mapping.baseFlashcardId, translatedFC);
+        }
+      }
+      
+      // Return translations in the same order as base Portuguese flashcards
+      const orderedTranslations = orderedBaseIds
+        .map(baseId => baseToTranslatedMap.get(baseId))
+        .filter((fc): fc is Flashcard => fc !== undefined);
+      
+      return orderedTranslations;
     }
 
     // Otherwise, these are legacy flashcards (generated separately, not translated)
