@@ -167,15 +167,15 @@ export default function Dashboard() {
 
         <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4 sm:mb-6 md:mb-8">
           {/* Weekly Study Hours KPI - Spans 2 columns for emphasis */}
-          <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-blue-500 lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.weeklyHours")}</CardTitle>
+          <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-blue-500 sm:col-span-2 lg:col-span-2">
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.weeklyHours")}</CardTitle>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-6 w-6 text-blue-500" />
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />
+                      <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -196,20 +196,20 @@ export default function Dashboard() {
                 </Tooltip>
               </TooltipProvider>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               {studyTimeLoading ? (
-                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
               ) : studyTimeError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
               ) : (
                 <>
                   <div className="flex items-baseline gap-2">
-                    <div className={`text-3xl font-bold ${(studyTimeData?.currentWeekMinutes || 0) === 0 ? 'text-muted-foreground' : ''}`} data-testid="kpi-weekly-hours">
+                    <div className={`text-2xl sm:text-3xl font-bold ${(studyTimeData?.currentWeekMinutes || 0) === 0 ? 'text-muted-foreground' : ''}`} data-testid="kpi-weekly-hours">
                       {studyTimeData?.currentWeekHours || "0.0"}h
                     </div>
                   </div>
                   {studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes !== 0 && (
-                    <div className={`flex items-center gap-1 text-sm font-semibold ${getDeltaColor(studyTimeData.deltaMinutes)} mt-1`}>
+                    <div className={`flex items-center gap-1 text-xs sm:text-sm font-semibold ${getDeltaColor(studyTimeData.deltaMinutes)} mt-1`}>
                       {getDeltaIcon(studyTimeData.deltaMinutes) === ArrowUp ? (
                         <ArrowUp className="h-3 w-3" />
                       ) : (
@@ -221,7 +221,7 @@ export default function Dashboard() {
                   {(studyTimeData?.currentWeekMinutes || 0) === 0 ? (
                     <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptyStudyTime")}</p>
                   ) : (
-                    <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="mt-2 sm:mt-3 h-1.5 sm:h-2 bg-muted rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all duration-500" 
                         style={{ width: `${Math.min(100, studyTimeData?.progressPercentage || 0)}%` }}
@@ -242,15 +242,15 @@ export default function Dashboard() {
             
             return (
               <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-green-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.subjectProgress")}</CardTitle>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center gap-2">
-                        <Target className="h-6 w-6 text-green-500" />
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <Target className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
                         {!subjectProgressLoading && !subjectProgressError && totalTopics > 0 && (
-                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
                         )}
                       </div>
                     </TooltipTrigger>
@@ -265,33 +265,33 @@ export default function Dashboard() {
                   </Tooltip>
                 </TooltipProvider>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 {subjectProgressLoading ? (
-                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
                 ) : subjectProgressError ? (
                   <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
                 ) : totalTopics === 0 ? (
                   <>
-                    <div className="text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-subject-progress">0%</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-subject-progress">0%</div>
                     <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptySubjects")}</p>
                     <Link href="/">
-                      <Button variant="ghost" size="sm" className="mt-3 h-8 text-xs hover-elevate" data-testid="button-create-subject">
+                      <Button variant="ghost" size="sm" className="mt-2 sm:mt-3 h-7 sm:h-8 text-xs hover-elevate" data-testid="button-create-subject">
                         {t("dashboard.kpi.createFirst")}
                       </Button>
                     </Link>
                   </>
                 ) : (
                   <>
-                    <div className={`text-3xl font-bold ${getProgressColor(overallPercentage)}`} data-testid="kpi-subject-progress">
+                    <div className={`text-2xl sm:text-3xl font-bold ${getProgressColor(overallPercentage)}`} data-testid="kpi-subject-progress">
                       {overallPercentage}%
                     </div>
-                    <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="mt-2 sm:mt-3 h-1.5 sm:h-2 bg-muted rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-500" 
                         style={{ width: `${overallPercentage}%` }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
                       {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
                     </p>
                   </>
@@ -304,15 +304,15 @@ export default function Dashboard() {
           {/* Tasks Completed KPI - Premium only */}
           {currentPlan === "premium" && (tasksLoading || tasksError || (tasksData && tasksData.totalTasks > 0)) && (
             <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-purple-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-6 w-6 text-purple-500" />
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />
                       {!tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 && (
-                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
                       )}
                     </div>
                   </TooltipTrigger>
@@ -327,21 +327,21 @@ export default function Dashboard() {
                 </Tooltip>
               </TooltipProvider>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               {tasksLoading ? (
-                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
               ) : tasksError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
               ) : (
                 <>
-                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400" data-testid="kpi-tasks-completed">
+                  <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400" data-testid="kpi-tasks-completed">
                     {tasksData?.completedToday || 0}
                   </div>
-                  <p className="text-xs font-medium text-muted-foreground mt-2">
+                  <p className="text-xs font-medium text-muted-foreground mt-1 sm:mt-2">
                     {t("dashboard.kpi.tasksToday")}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs">
                       {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
                     </Badge>
                   </div>
@@ -353,15 +353,15 @@ export default function Dashboard() {
 
           {/* Study Streak KPI */}
           <Card className="hover-elevate transition-all duration-300 border-l-4 border-l-orange-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("dashboard.kpi.studyStreak")}</CardTitle>
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-1 space-y-0 pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">{t("dashboard.kpi.studyStreak")}</CardTitle>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2">
-                      <Flame className="h-6 w-6 text-orange-500" />
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <Flame className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />
                       {!streakLoading && !streakError && streakData && streakData.currentStreak > 0 && (
-                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        <Info className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help" />
                       )}
                     </div>
                   </TooltipTrigger>
@@ -379,36 +379,36 @@ export default function Dashboard() {
                 </Tooltip>
               </TooltipProvider>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               {streakLoading ? (
-                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
               ) : streakError ? (
                 <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
               ) : (streakData?.currentStreak || 0) === 0 && (streakData?.longestStreak || 0) === 0 ? (
                 <>
-                  <div className="text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-study-streak">0 {t("dashboard.kpi.days")}</div>
-                  <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptyStreak")}</p>
+                  <div className="text-2xl sm:text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-study-streak">0 {t("dashboard.kpi.days")}</div>
+                  <p className="text-xs text-muted-foreground mt-1 sm:mt-2">{t("dashboard.kpi.emptyStreak")}</p>
                 </>
               ) : (
                 <>
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="kpi-study-streak">
+                  <div className="flex items-baseline gap-1 sm:gap-2">
+                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="kpi-study-streak">
                       {streakData?.currentStreak || 0}
                     </div>
-                    <span className="text-sm font-medium text-muted-foreground">{t("dashboard.kpi.days")}</span>
+                    <span className="text-xs sm:text-sm font-medium text-muted-foreground">{t("dashboard.kpi.days")}</span>
                   </div>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 mt-1 sm:mt-2">
                     {streakData?.hasStudiedToday ? (
-                      <Badge variant="default" className="text-xs bg-green-600 dark:bg-green-500">
+                      <Badge variant="default" className="text-[10px] sm:text-xs bg-green-600 dark:bg-green-500">
                         ✓ {t("dashboard.kpi.studiedToday")}
                       </Badge>
                     ) : (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-[10px] sm:text-xs">
                         {t("dashboard.kpi.notStudiedToday")}
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
                     {t("dashboard.kpi.longestStreak")}: {streakData?.longestStreak || 0}
                   </p>
                 </>
