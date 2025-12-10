@@ -663,6 +663,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         const existingFlashcards = await storage.getFlashcardsByTopicSummary(topicSummaryId);
+        
+        // Check if FREE user has reached limit
+        if (existingFlashcards.length >= 10 && maxFlashcards !== null) {
+          // FREE user with 10+ flashcards - return existing, don't generate more
+          return res.json({
+            success: true,
+            flashcards: existingFlashcards.map(fc => ({
+              ...fc,
+              createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+            })),
+          } as GenerateFlashcardsResponse);
+        }
+        
         if (existingFlashcards.length > 0) {
           return res.json({
             success: true,
@@ -749,6 +762,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: "Erro ao gerar flashcards. Por favor, tente novamente.",
       } as GenerateFlashcardsResponse);
+    }
+  });
+
+  // Regenerate flashcards for upgraded users (PRO/PREMIUM only)
+  app.post("/api/flashcards/regenerate", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { topicSummaryId } = req.body;
+
+      if (!topicSummaryId) {
+        return res.status(400).json({
+          success: false,
+          error: "topicSummaryId é obrigatório",
+        });
+      }
+
+      // Get user plan
+      const planTier = await costControlService.getUserPlanTier(userId);
+      const maxFlashcards = costControlService.getMaxFlashcardsPerBatch(planTier);
+
+      // Only allow regeneration for PRO/PREMIUM users (unlimited flashcards)
+      if (maxFlashcards !== null) {
+        return res.status(403).json({
+          success: false,
+          error: "Regeneração de flashcards disponível apenas para utilizadores PRO ou PREMIUM",
+        });
+      }
+
+      // Verify topic summary ownership
+      const topicSummary = await storage.getTopicSummary(topicSummaryId, userId);
+      if (!topicSummary) {
+        return res.status(404).json({
+          success: false,
+          error: "Resumo do tópico não encontrado",
+        });
+      }
+
+      // Get existing flashcard count
+      const existingFlashcards = await storage.getFlashcardsByTopicSummary(topicSummaryId);
+      const existingCount = existingFlashcards.length;
+
+      // If already has unlimited-style flashcards (>10), no need to regenerate
+      if (existingCount > 10) {
+        return res.json({
+          success: true,
+          flashcards: existingFlashcards.map(fc => ({
+            ...fc,
+            createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+          })),
+          message: "Flashcards já estão atualizados",
+        });
+      }
+
+      // Delete existing flashcards for this topic summary
+      for (const fc of existingFlashcards) {
+        await db.delete(flashcards).where(eq(flashcards.id, fc.id));
+      }
+
+      // Also delete any cached translations for this summary
+      const allLanguageSummaries = await db
+        .select()
+        .from(topicSummaries)
+        .where(
+          and(
+            eq(topicSummaries.topicId, topicSummary.topicId),
+            eq(topicSummaries.learningStyle, topicSummary.learningStyle)
+          )
+        );
+
+      for (const langSummary of allLanguageSummaries) {
+        await db.delete(flashcards).where(eq(flashcards.topicSummaryId, langSummary.id));
+      }
+
+      // Get user language preference
+      const user = await storage.getUser(userId);
+      const userLanguage = getUserLanguage(user?.language);
+
+      // Get cost control settings
+      const flashcardMaxTokens = costControlService.getMaxCompletionTokens(planTier, "flashcard");
+
+      // Trim summary text based on plan
+      const trimmedSummaryText = costControlService.trimInputText(topicSummary.summary, planTier);
+
+      // Generate new flashcards (unlimited for PRO/PREMIUM)
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, null, flashcardMaxTokens);
+
+      // Save new flashcards
+      const savedFlashcards = await storage.createFlashcards(
+        flashcardsData.map((fc: any) => ({
+          userId,
+          topicSummaryId,
+          isManual: false,
+          language: userLanguage,
+          question: fc.question,
+          answer: fc.answer,
+          summaryId: null,
+          subjectId: null,
+          topicId: null,
+        }))
+      );
+
+      // Increment daily usage counter
+      costControlService.incrementDailyUsage(userId, "flashcard");
+
+      console.log(`[Regenerate Flashcards] Generated ${savedFlashcards.length} flashcards (was ${existingCount})`);
+
+      return res.json({
+        success: true,
+        flashcards: savedFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+        previousCount: existingCount,
+        newCount: savedFlashcards.length,
+      });
+    } catch (error) {
+      console.error("Error regenerating flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao regenerar flashcards. Por favor, tente novamente.",
+      });
     }
   });
 
