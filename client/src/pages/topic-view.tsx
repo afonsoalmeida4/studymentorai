@@ -471,9 +471,9 @@ export default function TopicView() {
             </div>
 
             <TabsContent value="all" className="mt-6">
-              <div className="grid gap-4">
+              <div className="grid gap-3 sm:gap-4">
                 {contents.map((content) => (
-                  <Card key={content.id} data-testid={`card-content-${content.id}`}>
+                  <Card key={content.id} data-testid={`card-content-${content.id}`} className="overflow-hidden">
                     <CardHeader className="p-3 sm:p-6">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
@@ -510,11 +510,11 @@ export default function TopicView() {
             </TabsContent>
 
             <TabsContent value="files" className="mt-6">
-              <div className="grid gap-4">
+              <div className="grid gap-3 sm:gap-4">
                 {contents
                   .filter((c) => c.contentType !== "link")
                   .map((content) => (
-                    <Card key={content.id} data-testid={`card-file-${content.id}`}>
+                    <Card key={content.id} data-testid={`card-file-${content.id}`} className="overflow-hidden">
                       <CardHeader className="p-3 sm:p-6">
                         <div className="flex items-start gap-2 sm:gap-3 min-w-0">
                           <div className="flex-shrink-0">{getContentIcon(content.contentType)}</div>
@@ -532,11 +532,11 @@ export default function TopicView() {
             </TabsContent>
 
             <TabsContent value="links" className="mt-6">
-              <div className="grid gap-4">
+              <div className="grid gap-3 sm:gap-4">
                 {contents
                   .filter((c) => c.contentType === "link")
                   .map((content) => (
-                    <Card key={content.id} data-testid={`card-link-${content.id}`}>
+                    <Card key={content.id} data-testid={`card-link-${content.id}`} className="overflow-hidden">
                       <CardHeader className="p-3 sm:p-6">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
