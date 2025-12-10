@@ -1374,15 +1374,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         if (topicSummary?.topicId) {
-          // Get manual flashcards for this topic in the target language
-          manualFlashcards = await db.query.flashcards.findMany({
-            where: and(
-              eq(flashcards.topicId, topicSummary.topicId),
-              eq(flashcards.language, targetLanguage),
-              eq(flashcards.isManual, true)
-            ),
-            orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt)],
-          });
+          // Get manual flashcards for this topic
+          // For Portuguese: get base manual flashcards directly
+          // For other languages: get translations via flashcard_translations
+          
+          if (targetLanguage === "pt") {
+            // Portuguese is base - get manual flashcards directly
+            manualFlashcards = await db.query.flashcards.findMany({
+              where: and(
+                eq(flashcards.topicId, topicSummary.topicId),
+                eq(flashcards.language, "pt"),
+                eq(flashcards.isManual, true)
+              ),
+              orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt)],
+            });
+          } else {
+            // For other languages: find base PT manual flashcards, then get translations
+            const baseManualFlashcards = await db.query.flashcards.findMany({
+              where: and(
+                eq(flashcards.topicId, topicSummary.topicId),
+                eq(flashcards.language, "pt"),
+                eq(flashcards.isManual, true)
+              ),
+              orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt)],
+            });
+            
+            if (baseManualFlashcards.length > 0) {
+              const baseIds = baseManualFlashcards.map(fc => fc.id);
+              
+              // Get translation mappings for these base flashcards
+              const mappings = await db.query.flashcardTranslations.findMany({
+                where: and(
+                  inArray(flashcardTranslations.baseFlashcardId, baseIds),
+                  eq(flashcardTranslations.targetLanguage, targetLanguage)
+                ),
+              });
+              
+              if (mappings.length > 0) {
+                const translatedIds = mappings.map(m => m.translatedFlashcardId);
+                const translatedManual = await db.query.flashcards.findMany({
+                  where: inArray(flashcards.id, translatedIds),
+                });
+                
+                // Order by base flashcard order
+                const baseIdOrder = new Map(baseIds.map((id, idx) => [id, idx]));
+                const mappingByTranslated = new Map(mappings.map(m => [m.translatedFlashcardId, m.baseFlashcardId]));
+                
+                manualFlashcards = translatedManual.sort((a, b) => {
+                  const orderA = baseIdOrder.get(mappingByTranslated.get(a.id) || "") || 0;
+                  const orderB = baseIdOrder.get(mappingByTranslated.get(b.id) || "") || 0;
+                  return orderA - orderB;
+                });
+              }
+            }
+          }
         }
       } else {
         // Legacy summary system - use manual translation (no cache)
