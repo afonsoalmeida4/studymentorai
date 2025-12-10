@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays } from "lucide-react";
 import {
@@ -61,6 +61,21 @@ export function AppSidebar() {
   const { subscription, isLoading: isLoadingSubscription } = useSubscription();
   const hasProOrPremium = subscription?.plan === "pro" || subscription?.plan === "premium";
   const isPremiumOnly = subscription?.plan === "premium";
+
+  // Prefetch data on hover for faster navigation
+  const prefetchDashboard = useCallback(() => {
+    queryClient.prefetchQuery({ queryKey: ["/api/stats/study-time"] });
+    queryClient.prefetchQuery({ queryKey: ["/api/stats/subject-progress"] });
+    queryClient.prefetchQuery({ queryKey: ["/api/stats/streak"] });
+  }, []);
+
+  const prefetchFlashcards = useCallback(() => {
+    queryClient.prefetchQuery({ queryKey: ["/api/flashcards"] });
+  }, []);
+
+  const prefetchRanking = useCallback(() => {
+    queryClient.prefetchQuery({ queryKey: ["/api/gamification/leaderboard"] });
+  }, []);
 
   const createSubjectMutation = useMutation({
     mutationFn: async () => {
@@ -148,6 +163,7 @@ export function AppSidebar() {
                         asChild
                         isActive={location === "/dashboard"}
                         data-testid="button-dashboard"
+                        onMouseEnter={prefetchDashboard}
                       >
                         <Link href="/dashboard">
                           <BarChart3 className="w-4 h-4" />
@@ -160,6 +176,7 @@ export function AppSidebar() {
                         asChild
                         isActive={location === "/ranking"}
                         data-testid="button-ranking"
+                        onMouseEnter={prefetchRanking}
                       >
                         <Link href="/ranking">
                           <Trophy className="w-4 h-4" />
@@ -172,6 +189,7 @@ export function AppSidebar() {
                         asChild
                         isActive={location === "/flashcards"}
                         data-testid="button-flashcards"
+                        onMouseEnter={prefetchFlashcards}
                       >
                         <Link href="/flashcards">
                           <CreditCard className="w-4 h-4" />

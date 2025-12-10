@@ -8,21 +8,35 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
-import SubjectView from "@/pages/subject-view";
-import TopicView from "@/pages/topic-view";
-import ChatView from "@/pages/chat-view";
-import Dashboard from "@/pages/dashboard";
-import Ranking from "@/pages/ranking";
-import FlashcardsPage from "@/pages/flashcards";
-import CalendarPage from "@/pages/calendar";
-import SubscriptionPage from "@/pages/subscription";
-import PrivacyPolicy from "@/pages/privacy-policy";
 import NotFound from "@/pages/not-found";
 import type { User } from "@shared/schema";
 import "@/lib/i18n";
+
+// Lazy load heavy pages for faster initial load
+const SubjectView = lazy(() => import("@/pages/subject-view"));
+const TopicView = lazy(() => import("@/pages/topic-view"));
+const ChatView = lazy(() => import("@/pages/chat-view"));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const Ranking = lazy(() => import("@/pages/ranking"));
+const FlashcardsPage = lazy(() => import("@/pages/flashcards"));
+const CalendarPage = lazy(() => import("@/pages/calendar"));
+const SubscriptionPage = lazy(() => import("@/pages/subscription"));
+const PrivacyPolicy = lazy(() => import("@/pages/privacy-policy"));
+
+// Fast loading fallback
+function PageLoader() {
+  return (
+    <div className="p-6 space-y-4">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-32 w-full" />
+    </div>
+  );
+}
 
 function AuthenticatedRouter() {
   const { user } = useAuth();
@@ -62,19 +76,21 @@ function AuthenticatedRouter() {
             <LanguageSelector />
           </header>
           <main className="flex-1 overflow-auto">
-            <Switch>
-              <Route path="/" component={Home} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/ranking" component={Ranking} />
-              <Route path="/flashcards" component={FlashcardsPage} />
-              <Route path="/calendar" component={CalendarPage} />
-              <Route path="/subscription" component={SubscriptionPage} />
-              <Route path="/subjects" component={SubjectView} />
-              <Route path="/subject/:id" component={SubjectView} />
-              <Route path="/topic/:id" component={TopicView} />
-              <Route path="/chat" component={ChatView} />
-              <Route component={NotFound} />
-            </Switch>
+            <Suspense fallback={<PageLoader />}>
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/ranking" component={Ranking} />
+                <Route path="/flashcards" component={FlashcardsPage} />
+                <Route path="/calendar" component={CalendarPage} />
+                <Route path="/subscription" component={SubscriptionPage} />
+                <Route path="/subjects" component={SubjectView} />
+                <Route path="/subject/:id" component={SubjectView} />
+                <Route path="/topic/:id" component={TopicView} />
+                <Route path="/chat" component={ChatView} />
+                <Route component={NotFound} />
+              </Switch>
+            </Suspense>
           </main>
         </div>
       </div>
@@ -90,22 +106,24 @@ function Router() {
   }
 
   return (
-    <Switch>
-      <Route path="/privacy" component={PrivacyPolicy} />
-      {!isAuthenticated ? (
-        <>
-          <Route path="/" component={Landing} />
-          <Route path="/subject/:id" component={Landing} />
-          <Route path="/topic/:id" component={Landing} />
-          <Route path="/chat" component={Landing} />
-        </>
-      ) : (
-        <Route>
-          <AuthenticatedRouter />
-        </Route>
-      )}
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<PageLoader />}>
+      <Switch>
+        <Route path="/privacy" component={PrivacyPolicy} />
+        {!isAuthenticated ? (
+          <>
+            <Route path="/" component={Landing} />
+            <Route path="/subject/:id" component={Landing} />
+            <Route path="/topic/:id" component={Landing} />
+            <Route path="/chat" component={Landing} />
+          </>
+        ) : (
+          <Route>
+            <AuthenticatedRouter />
+          </Route>
+        )}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
