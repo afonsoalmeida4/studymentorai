@@ -111,8 +111,10 @@ async function generateTopicSummaries(
     const planTier = await costControlService.getUserPlanTier(userId);
     aggregatedContent = costControlService.trimInputText(aggregatedContent, planTier);
 
-    const userLanguage = await getUserLanguage(userId);
-    console.log(`[TopicSummary] Using language: ${userLanguage}`);
+    // Always generate summaries in Portuguese (base language) for translation system
+    // The translation system will handle displaying in user's language
+    const baseLanguage = "pt";
+    console.log(`[TopicSummary] Generating in base language: ${baseLanguage} (user lang: ${await getUserLanguage(userId)})`);
 
     // Get allowed learning styles for user's plan
     const subscription = await subscriptionService.getUserSubscription(userId);
@@ -130,7 +132,7 @@ async function generateTopicSummaries(
     let wordLimitReached = false;
 
     // INVISIBLE COST CONTROL: Get plan-based depth modifier and token limits
-    const depthModifier = costControlService.getSummaryDepthModifier(planTier, userLanguage);
+    const depthModifier = costControlService.getSummaryDepthModifier(planTier, baseLanguage);
     const maxTokens = costControlService.getMaxCompletionTokens(planTier, "summary");
 
     for (const style of stylesToGenerate) {
@@ -144,7 +146,7 @@ async function generateTopicSummaries(
         const result = await generateSummary({
           text: aggregatedContent,
           learningStyle: style,
-          language: userLanguage,
+          language: baseLanguage,
           depthModifier,
           maxCompletionTokens: maxTokens,
         });
@@ -167,7 +169,7 @@ async function generateTopicSummaries(
           .values({
             topicId,
             learningStyle: style,
-            language: userLanguage,
+            language: baseLanguage,
             summary: result.summary,
             motivationalMessage: result.motivationalMessage,
           })
@@ -796,24 +798,47 @@ export function registerOrganizationRoutes(app: Express) {
       }
 
       // Fetch Portuguese (base) summaries for this topic
-      const portugueseSummaries = await db.query.topicSummaries.findMany({
+      let baseSummaries = await db.query.topicSummaries.findMany({
         where: and(
           eq(topicSummaries.topicId, id),
           eq(topicSummaries.language, "pt")
         ),
       });
 
-      console.log(`[GET /api/topics/:id/summaries] Found ${portugueseSummaries.length} Portuguese summaries`);
+      console.log(`[GET /api/topics/:id/summaries] Found ${baseSummaries.length} Portuguese summaries`);
+
+      // Fallback: If no Portuguese summaries exist, check for summaries in any language
+      // This handles legacy summaries generated before the PT-first approach
+      if (baseSummaries.length === 0) {
+        console.log(`[GET /api/topics/:id/summaries] No PT summaries, checking for legacy summaries in any language...`);
+        baseSummaries = await db.query.topicSummaries.findMany({
+          where: eq(topicSummaries.topicId, id),
+        });
+        console.log(`[GET /api/topics/:id/summaries] Found ${baseSummaries.length} legacy summaries`);
+      }
 
       // Get or create translations for each summary
       const summariesList = [];
-      for (const ptSummary of portugueseSummaries) {
+      for (const baseSummary of baseSummaries) {
         try {
-          const translatedSummary = await getOrCreateTranslatedSummary(ptSummary.id, targetLanguage);
-          summariesList.push(translatedSummary);
+          // If the base summary is already in target language, use it directly
+          if (baseSummary.language === targetLanguage) {
+            summariesList.push(baseSummary);
+          } else {
+            // Only translate if base is PT (standard path)
+            if (baseSummary.language === "pt") {
+              const translatedSummary = await getOrCreateTranslatedSummary(baseSummary.id, targetLanguage);
+              summariesList.push(translatedSummary);
+            } else {
+              // Legacy non-PT summary: return as-is (no translation available)
+              console.log(`[GET /api/topics/:id/summaries] Using legacy ${baseSummary.language} summary as-is for ${baseSummary.learningStyle}`);
+              summariesList.push(baseSummary);
+            }
+          }
         } catch (translationError) {
-          console.error(`[GET /api/topics/:id/summaries] Failed to get/create translation for ${ptSummary.learningStyle}:`, translationError);
-          // Continue with other summaries even if one translation fails
+          console.error(`[GET /api/topics/:id/summaries] Failed to get/create translation for ${baseSummary.learningStyle}:`, translationError);
+          // Fallback: return base summary even if translation fails
+          summariesList.push(baseSummary);
         }
       }
 
