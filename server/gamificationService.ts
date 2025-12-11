@@ -61,6 +61,12 @@ export async function awardXP(
     case "create_flashcards":
       xpToAward = XP_REWARDS.CREATE_FLASHCARDS;
       break;
+    case "answer_flashcard":
+      // Base XP + bonus for correct answers
+      const flashcardIsCorrect = metadata?.isCorrect || false;
+      xpToAward = XP_REWARDS.ANSWER_FLASHCARD + 
+                  (flashcardIsCorrect ? XP_REWARDS.ANSWER_FLASHCARD_CORRECT_BONUS : 0);
+      break;
     case "complete_study_session":
       // Base + bonus for correct cards
       const correctCards = metadata?.correctCards || 0;

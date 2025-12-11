@@ -442,6 +442,37 @@ export function registerStatsRoutes(app: Express) {
         }
       }
 
+      // Calculate longest streak
+      let longestStreak = 0;
+      let currentRun = 0;
+      const sortedDates = Array.from(studyDays).sort();
+      
+      for (let i = 0; i < sortedDates.length; i++) {
+        if (i === 0) {
+          currentRun = 1;
+        } else {
+          const prevDate = new Date(sortedDates[i - 1]);
+          const currDate = new Date(sortedDates[i]);
+          const diffDays = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            currentRun++;
+          } else {
+            longestStreak = Math.max(longestStreak, currentRun);
+            currentRun = 1;
+          }
+        }
+      }
+      longestStreak = Math.max(longestStreak, currentRun, currentStreak);
+
+      // Check if studied today
+      const todayStr = today.toISOString().split('T')[0];
+      const hasStudiedToday = studyDays.has(todayStr);
+      
+      // Get today's study minutes
+      const todaySession = topicSessionsResult.find(row => row.date === todayStr);
+      const todayMinutes = todaySession ? Number(todaySession.totalMinutes) : 0;
+
       // Last 7 days for sparkline
       const last7Days = [];
       for (let i = 6; i >= 0; i--) {
@@ -456,6 +487,9 @@ export function registerStatsRoutes(app: Express) {
 
       res.json({
         currentStreak,
+        longestStreak,
+        hasStudiedToday,
+        todayMinutes,
         last7Days,
       });
     } catch (error) {

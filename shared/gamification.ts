@@ -3,6 +3,8 @@ export const XP_REWARDS = {
   UPLOAD_PDF: 50,
   GENERATE_SUMMARY: 100,
   CREATE_FLASHCARDS: 30,
+  ANSWER_FLASHCARD: 5, // Per flashcard answered
+  ANSWER_FLASHCARD_CORRECT_BONUS: 3, // Bonus for correct answer
   COMPLETE_STUDY_SESSION_BASE: 20,
   CORRECT_FLASHCARD_BONUS: 5,
   DAILY_STREAK_BONUS: 25,  // After 3+ consecutive days

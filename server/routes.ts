@@ -2086,12 +2086,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Resolve base flashcard ID for progress sharing across languages
+      const baseFlashcardId = await resolveBaseFlashcardId(flashcardId);
+      const todayDate = new Date().toISOString().split('T')[0];
+      const isCorrect = rating >= 3; // Rating 3-4 = correct, 1-2 = incorrect
+
       // Check if user has advanced flashcards (SM-2 algorithm)
       const hasAdvancedFlashcards = await subscriptionService.hasFeatureAccess(userId, 'advancedFlashcards');
       
       if (!hasAdvancedFlashcards) {
         // FREE plan: basic flashcards only (no SM-2 tracking)
-        // Return success but don't save attempt or calculate next review
+        // Still record attempt for streak tracking, but no SM-2 scheduling
+        await storage.createFlashcardAttempt({
+          userId,
+          flashcardId: baseFlashcardId,
+          rating,
+          attemptDate: new Date(),
+          nextReviewDate: new Date(), // No scheduling
+          easeFactor: 250,
+          intervalDays: 0,
+          repetitions: 0,
+        });
+        
+        // Update daily metrics for streak tracking
+        await storage.upsertFlashcardDailyMetrics(userId, todayDate, 1, isCorrect);
+        
+        // Award small XP for answering flashcard
+        await awardXP(userId, "answer_flashcard", { rating, isCorrect });
+        
         return res.json({
           success: true,
           message: "Resposta registada (plano FREE não tem repetição espaçada)",
@@ -2100,9 +2122,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // PRO/PREMIUM: Use SM-2 algorithm for spaced repetition
-      // Resolve base flashcard ID for SM-2 progress sharing across languages
-      const baseFlashcardId = await resolveBaseFlashcardId(flashcardId);
-
       // Get latest attempt for BASE flashcard (shared across all translations)
       const latestAttempt = await storage.getLatestAttempt(userId, baseFlashcardId);
 
@@ -2122,9 +2141,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Update daily metrics for Anki-style statistics
-      const todayDate = new Date().toISOString().split('T')[0];
-      const isCorrect = rating >= 3; // Rating 3-4 = correct, 1-2 = incorrect
       await storage.upsertFlashcardDailyMetrics(userId, todayDate, 1, isCorrect);
+      
+      // Award XP for answering flashcard
+      await awardXP(userId, "answer_flashcard", { rating, isCorrect });
 
       return res.json({
         success: true,

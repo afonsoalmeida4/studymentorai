@@ -14,6 +14,7 @@ export const xpActions = [
   "upload_pdf",
   "generate_summary",
   "create_flashcards",
+  "answer_flashcard",
   "complete_study_session",
   "daily_streak_bonus",
   "daily_chat_interaction",
