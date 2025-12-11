@@ -74,6 +74,22 @@ const exportLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// In-memory cache for bundled flashcards (TTL: 60 seconds)
+const bundledFlashcardsCache = new Map<string, { data: any; timestamp: number; userId: string }>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
+// Helper to invalidate cache for a topic
+const invalidateBundledCache = (topicId: string) => {
+  const keysToDelete: string[] = [];
+  bundledFlashcardsCache.forEach((_, key) => {
+    if (key.startsWith(`${topicId}:`)) {
+      keysToDelete.push(key);
+    }
+  });
+  keysToDelete.forEach(key => bundledFlashcardsCache.delete(key));
+  console.log(`[Cache] Invalidated bundled cache for topic ${topicId}`);
+};
+
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
 }
@@ -839,6 +855,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all flashcards (existing + new) to return the complete set
       const allFlashcards = [...existingFlashcards, ...newFlashcards];
 
+      // Invalidate bundled cache for this topic so frontend gets fresh data
+      if (topicSummary.topicId) {
+        invalidateBundledCache(topicSummary.topicId);
+      }
+
       console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards (total: ${allFlashcards.length})`);
 
       return res.json({
@@ -1580,21 +1601,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
-  // In-memory cache for bundled flashcards (TTL: 60 seconds)
-  const bundledFlashcardsCache = new Map<string, { data: any; timestamp: number; userId: string }>();
-  const CACHE_TTL_MS = 60 * 1000; // 60 seconds
-
-  // Helper to invalidate cache for a topic
-  const invalidateBundledCache = (topicId: string) => {
-    const keysToDelete: string[] = [];
-    bundledFlashcardsCache.forEach((_, key) => {
-      if (key.startsWith(`${topicId}:`)) {
-        keysToDelete.push(key);
-      }
-    });
-    keysToDelete.forEach(key => bundledFlashcardsCache.delete(key));
-  };
 
   // Get ALL flashcards for a TOPIC with ALL translations bundled (for frontend language switching)
   // This endpoint returns flashcards once with all 6 language variants - frontend selects which to display
