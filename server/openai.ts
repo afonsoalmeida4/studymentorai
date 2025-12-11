@@ -388,7 +388,7 @@ export async function generateFlashcards(
     const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
 
     const response = await openai.chat.completions.create({
-      model: "gpt-5",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -400,6 +400,8 @@ export async function generateFlashcards(
         },
       ],
       max_completion_tokens: maxCompletionTokens,
+    }, {
+      timeout: 120000, // 2 minute timeout for flashcard generation
     });
     
     console.log("[generateFlashcards] GPT response status:", response.choices[0].finish_reason);
