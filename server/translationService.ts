@@ -118,10 +118,51 @@ export async function getOrCreateTranslatedFlashcards(
     throw new Error(`Topic summary ${topicSummaryId} not found`);
   }
 
-  // 2. Get or create the translated summary (needed for FK relationship)
+  // 2. CRITICAL FIX: For Portuguese (base language), short-circuit and return PT flashcards directly
+  // This avoids issues where getOrCreateTranslatedSummary could return a non-PT summary
+  if (targetLanguage === "pt") {
+    // Find the PT summary directly
+    const ptSummary = await db.query.topicSummaries.findFirst({
+      where: and(
+        eq(topicSummaries.topicId, originalSummary.topicId),
+        eq(topicSummaries.learningStyle, originalSummary.learningStyle),
+        eq(topicSummaries.language, "pt")
+      ),
+    });
+
+    if (!ptSummary) {
+      console.log(`[Translation] No Portuguese summary found for topic ${originalSummary.topicId}, style ${originalSummary.learningStyle}`);
+      return [];
+    }
+
+    // Fetch Portuguese flashcards directly
+    const ptFlashcards = await db.query.flashcards.findMany({
+      where: and(
+        eq(flashcards.topicSummaryId, ptSummary.id),
+        eq(flashcards.language, "pt")
+      ),
+    });
+
+    if (ptFlashcards.length > 0) {
+      console.log(`[Translation Cache HIT] ${ptFlashcards.length} flashcards for summary ${topicSummaryId} -> pt (base)`);
+      // Sort by createdAt, then by id for deterministic order
+      const sortedFlashcards = ptFlashcards.sort((a, b) => {
+        const dateA = a.createdAt?.getTime() || 0;
+        const dateB = b.createdAt?.getTime() || 0;
+        if (dateA !== dateB) return dateA - dateB;
+        return a.id.localeCompare(b.id);
+      });
+      return sortedFlashcards;
+    }
+    
+    console.log(`[Translation] No Portuguese flashcards found for summary ${ptSummary.id}`);
+    return [];
+  }
+
+  // 3. For non-Portuguese languages, get or create the translated summary
   const translatedSummary = await getOrCreateTranslatedSummary(topicSummaryId, targetLanguage);
 
-  // 3. Check if translated flashcards already exist in DB
+  // 4. Check if translated flashcards already exist in DB
   const existingFlashcards = await db.query.flashcards.findMany({
     where: and(
       eq(flashcards.topicSummaryId, translatedSummary.id),
@@ -129,21 +170,9 @@ export async function getOrCreateTranslatedFlashcards(
     ),
   });
 
-  // For Portuguese (base language), return existing flashcards ORDERED by createdAt
-  if (targetLanguage === "pt" && existingFlashcards.length > 0) {
-    console.log(`[Translation Cache HIT] ${existingFlashcards.length} flashcards for summary ${topicSummaryId} -> pt (base)`);
-    // Sort by createdAt, then by id for deterministic order
-    const sortedFlashcards = existingFlashcards.sort((a, b) => {
-      const dateA = a.createdAt?.getTime() || 0;
-      const dateB = b.createdAt?.getTime() || 0;
-      if (dateA !== dateB) return dateA - dateB;
-      return a.id.localeCompare(b.id);
-    });
-    return sortedFlashcards;
-  }
-
   // For non-Portuguese languages, verify these are REAL translations (have flashcard_translations mappings)
-  if (existingFlashcards.length > 0 && targetLanguage !== "pt") {
+  // Note: targetLanguage is guaranteed to be non-"pt" here due to early return above
+  if (existingFlashcards.length > 0) {
     // Check if these flashcards have translation mappings
     const existingIds = existingFlashcards.map(fc => fc.id);
     const mappings = await db.query.flashcardTranslations.findMany({
@@ -266,7 +295,8 @@ export async function getOrCreateTranslatedFlashcards(
   ).returning();
 
   // 7. Create flashcard translation mappings for SM-2 progress sharing
-  if (targetLanguage !== "pt" && newFlashcards.length === sourceFlashcards.length) {
+  // Note: targetLanguage is guaranteed to be non-"pt" here due to early return above
+  if (newFlashcards.length === sourceFlashcards.length) {
     const translationMappings = newFlashcards.map((translatedFC, index) => ({
       baseFlashcardId: sourceFlashcards[index].id, // PT flashcard (base)
       translatedFlashcardId: translatedFC.id,      // Translated flashcard
