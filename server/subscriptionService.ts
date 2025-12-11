@@ -230,21 +230,11 @@ export class SubscriptionService {
   }
 
   /**
-   * Check if user can use a learning style
+   * Check if user can create manual flashcards
+   * All plans (FREE, PRO, PREMIUM) can create manual flashcards
    */
   async canCreateManualFlashcard(userId: string): Promise<{ allowed: boolean; reason?: string; errorCode?: string; params?: any }> {
-    const subscription = await this.getOrCreateSubscription(userId);
-    const plan = subscription.plan as SubscriptionPlan;
-
-    if (plan === 'free') {
-      return {
-        allowed: false,
-        errorCode: 'MANUAL_FLASHCARD_NOT_AVAILABLE',
-        params: { planName: planLimits.free.name },
-        reason: 'Manual flashcard creation requires PRO or PREMIUM plan',
-      };
-    }
-
+    // All users can create manual flashcards
     return { allowed: true };
   }
 

@@ -274,7 +274,8 @@
     "regenerateSuccessTitle": "Cartes mises à jour!",
     "regenerateSuccessDescription": "Étendu de {{previousCount}} à {{newCount}} cartes.",
     "errorRegenerate": "Impossible de régénérer les cartes.",
-    "errorRegenerateTitle": "Erreur lors de la régénération des cartes"
+    "errorRegenerateTitle": "Erreur lors de la régénération des cartes",
+    "noFlashcards": "Aucune carte disponible pour ce sujet."
   },
   "appHeader": {
     "home": "Accueil",

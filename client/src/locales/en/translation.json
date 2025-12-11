@@ -279,7 +279,8 @@
     "regenerateSuccessTitle": "Flashcards updated!",
     "regenerateSuccessDescription": "Expanded from {{previousCount}} to {{newCount}} flashcards.",
     "errorRegenerate": "Could not regenerate flashcards.",
-    "errorRegenerateTitle": "Error regenerating flashcards"
+    "errorRegenerateTitle": "Error regenerating flashcards",
+    "noFlashcards": "No flashcards available for this topic yet."
   },
   "appHeader": {
     "home": "Home",

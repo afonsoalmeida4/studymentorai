@@ -277,7 +277,8 @@
     "regenerateSuccessTitle": "¡Tarjetas actualizadas!",
     "regenerateSuccessDescription": "Expandido de {{previousCount}} a {{newCount}} tarjetas.",
     "errorRegenerate": "No se pudieron regenerar tarjetas.",
-    "errorRegenerateTitle": "Error al regenerar tarjetas"
+    "errorRegenerateTitle": "Error al regenerar tarjetas",
+    "noFlashcards": "Aún no hay tarjetas disponibles para este tema."
   },
   "appHeader": {
     "home": "Inicio",

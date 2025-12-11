@@ -274,7 +274,8 @@
     "regenerateSuccessTitle": "Schede aggiornate!",
     "regenerateSuccessDescription": "Espanso da {{previousCount}} a {{newCount}} schede.",
     "errorRegenerate": "Impossibile rigenerare le schede.",
-    "errorRegenerateTitle": "Errore nella rigenerazione delle schede"
+    "errorRegenerateTitle": "Errore nella rigenerazione delle schede",
+    "noFlashcards": "Nessuna scheda disponibile per questo argomento."
   },
   "appHeader": {
     "home": "Home",

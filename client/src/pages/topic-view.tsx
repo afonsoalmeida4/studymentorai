@@ -49,6 +49,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Topic, ContentItem } from "@shared/schema";
 
+// Preprocess markdown to ensure proper list formatting
+function preprocessMarkdown(text: string): string {
+  if (!text) return "";
+  // Add blank line before list items that don't have one
+  return text
+    .replace(/([^\n])\n(-\s)/g, "$1\n\n$2")
+    .replace(/([^\n])\n(\d+\.\s)/g, "$1\n\n$2");
+}
+
 type LearningStyle = "visual" | "auditivo" | "logico" | "conciso";
 
 type TopicSummary = {
@@ -758,8 +767,8 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                              <ReactMarkdown>{visual.summary}</ReactMarkdown>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+                              <ReactMarkdown>{preprocessMarkdown(visual.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>
@@ -819,8 +828,8 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                              <ReactMarkdown>{auditivo.summary}</ReactMarkdown>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+                              <ReactMarkdown>{preprocessMarkdown(auditivo.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>
@@ -880,8 +889,8 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                              <ReactMarkdown>{logico.summary}</ReactMarkdown>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+                              <ReactMarkdown>{preprocessMarkdown(logico.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>
@@ -941,8 +950,8 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                              <ReactMarkdown>{conciso.summary}</ReactMarkdown>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+                              <ReactMarkdown>{preprocessMarkdown(conciso.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>

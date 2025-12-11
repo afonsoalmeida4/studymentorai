@@ -274,7 +274,8 @@
     "regenerateSuccessTitle": "Karteikarten aktualisiert!",
     "regenerateSuccessDescription": "Erweitert von {{previousCount}} auf {{newCount}} Karteikarten.",
     "errorRegenerate": "Karteikarten konnten nicht regeneriert werden.",
-    "errorRegenerateTitle": "Fehler beim Regenerieren der Karteikarten"
+    "errorRegenerateTitle": "Fehler beim Regenerieren der Karteikarten",
+    "noFlashcards": "Noch keine Karteikarten für dieses Thema verfügbar."
   },
   "appHeader": {
     "home": "Startseite",
