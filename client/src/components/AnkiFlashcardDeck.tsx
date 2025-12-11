@@ -229,7 +229,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           data-testid={`flashcard-${currentFlashcard.id}`}
         >
           <Card
-            className="absolute inset-0 backface-hidden border-2 cursor-pointer hover-elevate"
+            className={`absolute inset-0 backface-hidden border-2 cursor-pointer hover-elevate ${isFlipped ? 'pointer-events-none' : ''}`}
             onClick={() => !isFlipped && setIsFlipped(true)}
           >
             <CardContent className="flex flex-col h-full justify-between p-8">
@@ -251,7 +251,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
             </CardContent>
           </Card>
 
-          <Card className="absolute inset-0 backface-hidden rotate-y-180 border-2">
+          <Card className={`absolute inset-0 backface-hidden rotate-y-180 border-2 ${!isFlipped ? 'pointer-events-none' : ''}`}>
             <CardContent className="flex flex-col h-full justify-between p-8">
               <div className="flex-1 flex items-center justify-center">
                 <p
