@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { RotateCw, Check, Clock } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -151,8 +150,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     return () => clearInterval(interval);
   }, []);
 
-  const totalFlashcards = allDisplayFlashcards.length;
-
   const recordAttemptMutation = useMutation({
     mutationFn: async ({ flashcardId, baseId, rating }: { flashcardId: string; baseId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
@@ -189,7 +186,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const completed = mode === "spaced" 
     ? localDeck.length === 0 && completedCount > 0
     : currentIndex >= localDeck.length && localDeck.length > 0;
-  const progress = totalFlashcards > 0 ? ((completedCount / totalFlashcards) * 100) : 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -314,20 +310,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2" data-testid="flashcard-progress">
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">{t('flashcards.anki.progress')}</span>
-            <Badge variant="outline" className="gap-1.5">
-              <Clock className="w-3 h-3" />
-              {formatTime(sessionTime)}
-            </Badge>
-          </div>
-          <span className="font-medium">
-            {completedCount} / {totalFlashcards}
-          </span>
-        </div>
-        <Progress value={progress} className="h-2" />
+      <div className="flex items-center justify-end" data-testid="flashcard-progress">
+        <Badge variant="outline" className="gap-1.5">
+          <Clock className="w-3 h-3" />
+          {formatTime(sessionTime)}
+        </Badge>
       </div>
 
       <Card 
