@@ -526,7 +526,7 @@
           "topics": "Jusqu'à 10 sujets",
           "summaries": "Résumés jusqu'à 1 000 mots",
           "learningStyles": "2 styles d'apprentissage",
-          "flashcards": "Flashcards de base",
+          "flashcards": "Flashcards manuelles",
           "fileSize": "Fichiers jusqu'à 10Mo"
         }
       },
@@ -540,7 +540,7 @@
           "topics": "Sous-dossiers illimités",
           "summaries": "Résumés avancés illimités",
           "learningStyles": "Style d'apprentissage personnalisé",
-          "flashcards": "Flashcards avec traduction automatique en 6 langues",
+          "flashcards": "Flashcards générées par IA en 6 langues",
           "dashboard": "Tableau de bord avec KPIs très simples",
           "ranking": "Classement XP"
         }

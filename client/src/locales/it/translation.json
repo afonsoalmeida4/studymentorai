@@ -526,7 +526,7 @@
           "topics": "Fino a 10 argomenti",
           "summaries": "Riassunti fino a 1.000 parole",
           "learningStyles": "2 stili di apprendimento",
-          "flashcards": "Flashcards di base",
+          "flashcards": "Flashcards manuali",
           "fileSize": "File fino a 10MB"
         }
       },
@@ -540,7 +540,7 @@
           "topics": "Sottocartelle illimitate",
           "summaries": "Riassunti avanzati illimitati",
           "learningStyles": "Stile di apprendimento personalizzato",
-          "flashcards": "Flashcards con traduzione automatica in 6 lingue",
+          "flashcards": "Flashcards generate da IA in 6 lingue",
           "dashboard": "Pannello con KPI molto semplici",
           "ranking": "Classifica XP"
         }

@@ -526,7 +526,7 @@
           "topics": "Bis zu 10 Themen",
           "summaries": "Zusammenfassungen bis zu 1.000 Wörter",
           "learningStyles": "2 Lernstile",
-          "flashcards": "Basis-Flashcards",
+          "flashcards": "Manuelle Flashcards",
           "fileSize": "Dateien bis zu 10MB"
         }
       },
@@ -540,7 +540,7 @@
           "topics": "Unbegrenzte Unterordner",
           "summaries": "Unbegrenzte erweiterte Zusammenfassungen",
           "learningStyles": "Personalisierter Lernstil",
-          "flashcards": "Flashcards mit automatischer Übersetzung in 6 Sprachen",
+          "flashcards": "KI-generierte Flashcards in 6 Sprachen",
           "dashboard": "Dashboard mit sehr einfachen KPIs",
           "ranking": "XP-Rangliste"
         }

@@ -528,7 +528,7 @@
           "topics": "Hasta 10 temas",
           "summaries": "Resúmenes de hasta 1.000 palabras",
           "learningStyles": "2 estilos de aprendizaje",
-          "flashcards": "Flashcards básicas",
+          "flashcards": "Flashcards manuales",
           "fileSize": "Archivos de hasta 10MB"
         }
       },
@@ -542,7 +542,7 @@
           "topics": "Subcarpetas ilimitadas",
           "summaries": "Resúmenes avanzados ilimitados",
           "learningStyles": "Estilo de aprendizaje personalizado",
-          "flashcards": "Flashcards con traducción automática a 6 idiomas",
+          "flashcards": "Flashcards generadas por IA en 6 idiomas",
           "dashboard": "Panel con KPIs muy sencillos",
           "ranking": "Ranking de XP"
         }

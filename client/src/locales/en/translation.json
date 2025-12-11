@@ -638,7 +638,7 @@
           "topics": "Up to 10 topics",
           "summaries": "Summaries up to 1,000 words",
           "learningStyles": "2 learning styles",
-          "flashcards": "Basic flashcards",
+          "flashcards": "Manual flashcards",
           "fileSize": "Files up to 10MB"
         }
       },
@@ -652,7 +652,7 @@
           "topics": "Unlimited subfolders",
           "summaries": "Unlimited advanced summaries",
           "learningStyles": "Personalized learning style",
-          "flashcards": "Flashcards with auto-translation to 6 languages",
+          "flashcards": "AI-generated flashcards in 6 languages",
           "dashboard": "Dashboard with very simple KPIs",
           "ranking": "XP ranking"
         }
