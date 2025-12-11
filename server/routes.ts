@@ -1608,6 +1608,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cached = bundledFlashcardsCache.get(cacheKey);
       if (cached && cached.userId === userId && (Date.now() - cached.timestamp) < CACHE_TTL_MS) {
         console.log(`[GET /api/flashcards/topic/:topicId/bundled] CACHE HIT for ${topicId}`);
+        // Disable HTTP caching to prevent 304 responses breaking React Query
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         return res.json(cached.data);
       }
 
@@ -1783,6 +1787,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
       });
 
+      // Disable HTTP caching to prevent 304 responses breaking React Query
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       return res.json(response);
     } catch (error) {
       console.error("Error fetching bundled flashcards:", error);
