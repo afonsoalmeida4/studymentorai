@@ -1581,12 +1581,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // In-memory cache for bundled flashcards (TTL: 60 seconds)
+  const bundledFlashcardsCache = new Map<string, { data: any; timestamp: number; userId: string }>();
+  const CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
+  // Helper to invalidate cache for a topic
+  const invalidateBundledCache = (topicId: string) => {
+    const keysToDelete: string[] = [];
+    bundledFlashcardsCache.forEach((_, key) => {
+      if (key.startsWith(`${topicId}:`)) {
+        keysToDelete.push(key);
+      }
+    });
+    keysToDelete.forEach(key => bundledFlashcardsCache.delete(key));
+  };
+
   // Get ALL flashcards for a TOPIC with ALL translations bundled (for frontend language switching)
   // This endpoint returns flashcards once with all 6 language variants - frontend selects which to display
   app.get("/api/flashcards/topic/:topicId/bundled", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const topicId = req.params.topicId;
+      const cacheKey = `${topicId}:${userId}`;
+
+      // Check cache first
+      const cached = bundledFlashcardsCache.get(cacheKey);
+      if (cached && cached.userId === userId && (Date.now() - cached.timestamp) < CACHE_TTL_MS) {
+        console.log(`[GET /api/flashcards/topic/:topicId/bundled] CACHE HIT for ${topicId}`);
+        return res.json(cached.data);
+      }
 
       console.log(`[GET /api/flashcards/topic/:topicId/bundled] topicId: ${topicId}`);
 
@@ -1603,13 +1626,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get ALL PT summaries for this topic (base language)
-      const ptSummaries = await db.query.topicSummaries.findMany({
-        where: and(
-          eq(topicSummaries.topicId, topicId),
-          eq(topicSummaries.language, "pt")
-        ),
-      });
+      // Fetch PT summaries AND manual flashcards in parallel
+      const [ptSummaries, manualFlashcards] = await Promise.all([
+        db.query.topicSummaries.findMany({
+          where: and(
+            eq(topicSummaries.topicId, topicId),
+            eq(topicSummaries.language, "pt")
+          ),
+        }),
+        db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.topicId, topicId),
+            eq(flashcards.language, "pt"),
+            eq(flashcards.isManual, true)
+          ),
+          orderBy: (fc, { asc }) => [asc(fc.createdAt)],
+        }),
+      ]);
 
       // Fetch ALL Portuguese flashcards (base) for this topic
       const summaryIds = ptSummaries.map(s => s.id);
@@ -1624,16 +1657,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           orderBy: (fc, { asc }) => [asc(fc.createdAt)],
         });
       }
-
-      // Also fetch manual PT flashcards for this topic
-      const manualFlashcards = await db.query.flashcards.findMany({
-        where: and(
-          eq(flashcards.topicId, topicId),
-          eq(flashcards.language, "pt"),
-          eq(flashcards.isManual, true)
-        ),
-        orderBy: (fc, { asc }) => [asc(fc.createdAt)],
-      });
 
       // Combine and deduplicate
       const allBaseFlashcards = [...baseFlashcards, ...manualFlashcards];
@@ -1651,11 +1674,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Fetch ALL translations for these base flashcards
+      // Fetch translations AND attempts in parallel
       const baseIds = uniqueBaseFlashcards.map(fc => fc.id);
-      const translationMappings = await db.query.flashcardTranslations.findMany({
-        where: inArray(flashcardTranslations.baseFlashcardId, baseIds),
-      });
+      
+      const [translationMappings, attemptsResult] = await Promise.all([
+        db.query.flashcardTranslations.findMany({
+          where: inArray(flashcardTranslations.baseFlashcardId, baseIds),
+        }),
+        db.select()
+          .from(flashcardAttempts)
+          .where(
+            and(
+              inArray(flashcardAttempts.flashcardId, baseIds),
+              eq(flashcardAttempts.userId, userId)
+            )
+          )
+          .orderBy(desc(flashcardAttempts.attemptDate)),
+      ]);
 
       // Get the translated flashcard IDs
       const translatedIds = translationMappings.map(m => m.translatedFlashcardId);
@@ -1666,7 +1701,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get latest SM-2 attempts for all base flashcards (for scheduling data)
+      // Build attempts map - keep only latest attempt per flashcard
       const attemptsMap = new Map<string, { 
         nextReviewDate: Date | null; 
         easeFactor: number; 
@@ -1674,28 +1709,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         repetitions: number;
       }>();
       
-      if (baseIds.length > 0) {
-        const attemptsResult = await db
-          .select()
-          .from(flashcardAttempts)
-          .where(
-            and(
-              inArray(flashcardAttempts.flashcardId, baseIds),
-              eq(flashcardAttempts.userId, userId)
-            )
-          )
-          .orderBy(desc(flashcardAttempts.attemptDate));
-        
-        // Keep only latest attempt per flashcard
-        for (const attempt of attemptsResult) {
-          if (!attemptsMap.has(attempt.flashcardId)) {
-            attemptsMap.set(attempt.flashcardId, {
-              nextReviewDate: attempt.nextReviewDate,
-              easeFactor: attempt.easeFactor || 2.5,
-              intervalDays: attempt.intervalDays || 0,
-              repetitions: attempt.repetitions || 0,
-            });
-          }
+      for (const attempt of attemptsResult) {
+        if (!attemptsMap.has(attempt.flashcardId)) {
+          attemptsMap.set(attempt.flashcardId, {
+            nextReviewDate: attempt.nextReviewDate,
+            easeFactor: attempt.easeFactor || 2.5,
+            intervalDays: attempt.intervalDays || 0,
+            repetitions: attempt.repetitions || 0,
+          });
         }
       }
 
@@ -1745,16 +1766,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           interval: sm2Data?.intervalDays ?? 0,
           repetitions: sm2Data?.repetitions ?? 0,
           nextReviewDate: sm2Data?.nextReviewDate?.toISOString() || null,
-          lastReviewDate: baseFC.lastReviewDate,
         };
       });
 
       console.log(`[GET /api/flashcards/topic/:topicId/bundled] Returning ${bundledFlashcards.length} bundled flashcards`);
 
-      return res.json({
+      const response = {
         success: true,
         flashcards: bundledFlashcards,
+      };
+
+      // Store in cache
+      bundledFlashcardsCache.set(cacheKey, {
+        data: response,
+        timestamp: Date.now(),
+        userId,
       });
+
+      return res.json(response);
     } catch (error) {
       console.error("Error fetching bundled flashcards:", error);
       return res.status(500).json({
