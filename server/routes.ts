@@ -1465,6 +1465,287 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get ALL flashcards for a TOPIC (from all summaries) - for topic-view.tsx
+  app.get("/api/flashcards/topic/:topicId/all", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const topicId = req.params.topicId;
+      const requestedLanguage = req.query.language as string | undefined;
+
+      // Get user to access language preference
+      const user = await storage.getUser(userId);
+      const targetLanguage: SupportedLanguage = requestedLanguage 
+        ? getUserLanguage(requestedLanguage) 
+        : getUserLanguage(user?.language);
+
+      console.log(`[GET /api/flashcards/topic/:topicId/all] Requested language: ${targetLanguage}, topicId: ${topicId}`);
+
+      // Verify topic belongs to user
+      const topic = await db.query.topics.findFirst({
+        where: eq(topics.id, topicId),
+        with: { subject: true },
+      });
+      
+      if (!topic || topic.subject?.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Tópico não encontrado",
+        });
+      }
+
+      // Get ALL summaries for this topic
+      const allSummaries = await db.query.topicSummaries.findMany({
+        where: eq(topicSummaries.topicId, topicId),
+      });
+
+      // Collect flashcards from all summaries
+      let allGeneratedFlashcards: Flashcard[] = [];
+      for (const summary of allSummaries) {
+        const summaryFlashcards = await getOrCreateTranslatedFlashcards(summary.id, targetLanguage);
+        allGeneratedFlashcards = [...allGeneratedFlashcards, ...summaryFlashcards];
+      }
+
+      // Also fetch manual flashcards for this topic
+      let manualFlashcards: Flashcard[] = [];
+      if (targetLanguage === "pt") {
+        manualFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.topicId, topicId),
+            eq(flashcards.language, "pt"),
+            eq(flashcards.isManual, true)
+          ),
+          orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt)],
+        });
+      } else {
+        const baseManualFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.topicId, topicId),
+            eq(flashcards.language, "pt"),
+            eq(flashcards.isManual, true)
+          ),
+          orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt)],
+        });
+        
+        if (baseManualFlashcards.length > 0) {
+          const baseIds = baseManualFlashcards.map(fc => fc.id);
+          const mappings = await db.query.flashcardTranslations.findMany({
+            where: and(
+              inArray(flashcardTranslations.baseFlashcardId, baseIds),
+              eq(flashcardTranslations.targetLanguage, targetLanguage)
+            ),
+          });
+          
+          if (mappings.length > 0) {
+            const translatedIds = mappings.map(m => m.translatedFlashcardId);
+            const translatedManual = await db.query.flashcards.findMany({
+              where: inArray(flashcards.id, translatedIds),
+            });
+            
+            const baseIdOrder = new Map(baseIds.map((id, idx) => [id, idx]));
+            const mappingByTranslated = new Map(mappings.map(m => [m.translatedFlashcardId, m.baseFlashcardId]));
+            
+            manualFlashcards = translatedManual.sort((a, b) => {
+              const orderA = baseIdOrder.get(mappingByTranslated.get(a.id) || "") || 0;
+              const orderB = baseIdOrder.get(mappingByTranslated.get(b.id) || "") || 0;
+              return orderA - orderB;
+            });
+          }
+        }
+      }
+
+      // Combine and deduplicate
+      const allFlashcards = [...allGeneratedFlashcards, ...manualFlashcards];
+      const seenIds = new Set<string>();
+      const uniqueFlashcards = allFlashcards.filter(fc => {
+        if (seenIds.has(fc.id)) return false;
+        seenIds.add(fc.id);
+        return true;
+      });
+
+      console.log(`[GET /api/flashcards/topic/:topicId/all] Returning ${uniqueFlashcards.length} flashcards in ${targetLanguage}`);
+
+      return res.json({
+        success: true,
+        flashcards: uniqueFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+        language: targetLanguage,
+      });
+    } catch (error) {
+      console.error("Error fetching all topic flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards",
+      });
+    }
+  });
+
+  // Get DUE flashcards for a TOPIC (from all summaries) - for Anki review
+  app.get("/api/flashcards/topic/:topicId/due", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const topicId = req.params.topicId;
+      const requestedLanguage = req.query.language as string | undefined;
+
+      const user = await storage.getUser(userId);
+      const targetLanguage: SupportedLanguage = requestedLanguage 
+        ? getUserLanguage(requestedLanguage) 
+        : getUserLanguage(user?.language);
+
+      console.log(`[GET /api/flashcards/topic/:topicId/due] Requested language: ${targetLanguage}, topicId: ${topicId}`);
+
+      // Verify topic belongs to user
+      const topic = await db.query.topics.findFirst({
+        where: eq(topics.id, topicId),
+        with: { subject: true },
+      });
+      
+      if (!topic || topic.subject?.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Tópico não encontrado",
+        });
+      }
+
+      // Get ALL summaries for this topic
+      const allSummaries = await db.query.topicSummaries.findMany({
+        where: eq(topicSummaries.topicId, topicId),
+      });
+
+      // Collect flashcards from all summaries
+      let allFlashcards: Flashcard[] = [];
+      for (const summary of allSummaries) {
+        const summaryFlashcards = await getOrCreateTranslatedFlashcards(summary.id, targetLanguage);
+        allFlashcards = [...allFlashcards, ...summaryFlashcards];
+      }
+
+      // Also fetch manual flashcards
+      if (targetLanguage === "pt") {
+        const manualFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.topicId, topicId),
+            eq(flashcards.language, "pt"),
+            eq(flashcards.isManual, true)
+          ),
+        });
+        allFlashcards = [...allFlashcards, ...manualFlashcards];
+      } else {
+        const baseManualFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.topicId, topicId),
+            eq(flashcards.language, "pt"),
+            eq(flashcards.isManual, true)
+          ),
+        });
+        
+        if (baseManualFlashcards.length > 0) {
+          const baseIds = baseManualFlashcards.map(fc => fc.id);
+          const mappings = await db.query.flashcardTranslations.findMany({
+            where: and(
+              inArray(flashcardTranslations.baseFlashcardId, baseIds),
+              eq(flashcardTranslations.targetLanguage, targetLanguage)
+            ),
+          });
+          
+          if (mappings.length > 0) {
+            const translatedIds = mappings.map(m => m.translatedFlashcardId);
+            const translatedManual = await db.query.flashcards.findMany({
+              where: inArray(flashcards.id, translatedIds),
+            });
+            allFlashcards = [...allFlashcards, ...translatedManual];
+          }
+        }
+      }
+
+      // Deduplicate
+      const seenIds = new Set<string>();
+      const uniqueFlashcards = allFlashcards.filter(fc => {
+        if (seenIds.has(fc.id)) return false;
+        seenIds.add(fc.id);
+        return true;
+      });
+
+      console.log(`[GET /api/flashcards/topic/:topicId/due] Found ${uniqueFlashcards.length} flashcards in ${targetLanguage}`);
+
+      if (uniqueFlashcards.length === 0) {
+        return res.json({
+          success: true,
+          flashcards: [],
+          nextAvailableAt: null,
+          language: targetLanguage,
+        });
+      }
+
+      // Resolve base flashcard IDs for SM-2 progress lookup
+      const flashcardIdMappings = await Promise.all(
+        uniqueFlashcards.map(async (fc) => ({
+          translatedId: fc.id,
+          baseId: await resolveBaseFlashcardId(fc.id),
+          flashcard: fc,
+        }))
+      );
+
+      const now = new Date();
+      const baseFlashcardIds = flashcardIdMappings.map(m => m.baseId);
+      
+      // Query attempts using BASE flashcard IDs - handle empty array
+      const attemptsMap = new Map<string, any>();
+      if (baseFlashcardIds.length > 0) {
+        const attemptsResult = await db
+          .select()
+          .from(flashcardAttempts)
+          .where(
+            and(
+              sql`${flashcardAttempts.flashcardId} IN (${sql.join(baseFlashcardIds.map(id => sql`${id}`), sql`, `)})`,
+              eq(flashcardAttempts.userId, userId)
+            )
+          );
+        
+        for (const attempt of attemptsResult) {
+          attemptsMap.set(attempt.flashcardId, attempt);
+        }
+      }
+
+      // Filter due flashcards
+      const dueFlashcards = flashcardIdMappings
+        .filter(mapping => {
+          const attempt = attemptsMap.get(mapping.baseId);
+          if (!attempt || !attempt.id) {
+            return true; // New flashcard without attempt
+          }
+          return attempt.nextReviewDate && attempt.nextReviewDate <= now;
+        })
+        .map(mapping => mapping.flashcard);
+      
+      // Get next available review date
+      const upcomingAttempts = Array.from(attemptsMap.values()).filter(
+        attempt => attempt.nextReviewDate && attempt.nextReviewDate > now
+      );
+      const nextAvailableAt = upcomingAttempts.length > 0
+        ? upcomingAttempts.sort((a, b) => 
+            (a.nextReviewDate?.getTime() || 0) - (b.nextReviewDate?.getTime() || 0)
+          )[0].nextReviewDate
+        : null;
+      
+      return res.json({
+        success: true,
+        flashcards: dueFlashcards.map(fc => ({
+          ...fc,
+          createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+        nextAvailableAt: nextAvailableAt?.toISOString() || null,
+        language: targetLanguage,
+      });
+    } catch (error) {
+      console.error("Error fetching due topic flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards para revisão",
+      });
+    }
+  });
+
   // Record flashcard attempt (Anki-style rating)
   app.post("/api/flashcards/:flashcardId/attempt", isAuthenticated, async (req: any, res) => {
     try {
