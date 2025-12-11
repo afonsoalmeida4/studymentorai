@@ -193,7 +193,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
             setCurrentIndex(0);
             setSessionTime(0);
             setCompletedCount(0);
-            queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, endpoint] });
+            queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, endpoint, i18n.language] });
           }}
           data-testid="button-restart-study"
         >
