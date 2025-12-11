@@ -190,11 +190,13 @@ export default function SubjectView() {
 
   const handleDeleteTopic = (e: React.MouseEvent, topic: Topic) => {
     e.stopPropagation();
+    e.preventDefault();
     setTopicToDelete(topic);
   };
 
   const handleDeleteSubject = (e: React.MouseEvent, subject: Subject) => {
     e.stopPropagation();
+    e.preventDefault();
     setSubjectToDelete(subject);
   };
 
