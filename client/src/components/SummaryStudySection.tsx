@@ -125,11 +125,15 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   const { data: bundledData, isLoading } = useQuery<BundledFlashcardsResponse>({
     queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`);
+      // Add cache buster to prevent 304 issues
+      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`, {
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       if (!res.ok) throw new Error("Failed to fetch flashcards");
       return res.json();
     },
-    staleTime: 60000, // Cache for longer since translations are bundled
+    staleTime: 30000,
+    gcTime: 60000,
   });
 
   // Transform bundled flashcards to display format based on current language
