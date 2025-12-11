@@ -223,8 +223,8 @@ export default function ChatView() {
         setSelectedThreadId(data.thread.id);
       }
       toast({
-        title: "Nova conversa criada!",
-        description: "Pode começar a conversar com o AI Mentor.",
+        title: t('chat.threadCreated'),
+        description: t('chat.threadCreatedDescription'),
       });
     },
     onError: (error: any) => {
@@ -234,8 +234,8 @@ export default function ChatView() {
       } else {
         toast({
           variant: "destructive",
-          title: "Erro",
-          description: error.message || "Não foi possível criar a conversa.",
+          title: t('common.error'),
+          description: error.message || t('chat.errorCreatingThread'),
         });
       }
     },
@@ -257,10 +257,10 @@ export default function ChatView() {
         setUpgradeReason("chat");
         setShowUpgradeDialog(true);
         
-        // Show translated error message in toast
+        // Show translated error message in toast (data comes from apiRequest)
         const translatedError = translateError(t, {
-          errorCode: error.errorCode,
-          params: error.params,
+          errorCode: error?.data?.errorCode,
+          params: error?.data?.params,
           error: error.message
         });
         
@@ -287,15 +287,15 @@ export default function ChatView() {
       queryClient.invalidateQueries({ queryKey: ["/api/chat/threads"] });
       setSelectedThreadId(null);
       toast({
-        title: "Conversa eliminada",
-        description: "A conversa foi removida com sucesso.",
+        title: t('chat.threadDeleted'),
+        description: t('chat.threadDeletedDescription'),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível eliminar a conversa.",
+        title: t('common.error'),
+        description: t('chat.errorDeletingThread'),
       });
     },
   });
@@ -309,15 +309,15 @@ export default function ChatView() {
       setEditingThreadId(null);
       setEditingTitle("");
       toast({
-        title: "Nome atualizado!",
-        description: "O nome da conversa foi atualizado com sucesso.",
+        title: t('chat.titleUpdated'),
+        description: t('chat.titleUpdatedDescription'),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível atualizar o nome.",
+        title: t('common.error'),
+        description: t('chat.errorUpdatingTitle'),
       });
     },
   });
@@ -333,7 +333,7 @@ export default function ChatView() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <div className="text-muted-foreground">A carregar...</div>
+          <div className="text-muted-foreground">{t('chat.loading')}</div>
         </div>
       </div>
     );

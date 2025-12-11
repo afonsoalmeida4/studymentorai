@@ -424,7 +424,17 @@
     "selectTopic": "Sélectionner un sujet",
     "selectSubjectFirst": "Sélectionnez une matière d'abord",
     "selectTopicDescription": "Pour le Mode Étude, vous devez sélectionner un sujet.",
-    "upgrade": "Passez à Pro pour débloquer le chat existentiel"
+    "upgrade": "Passez à Pro pour débloquer le chat existentiel",
+    "threadCreated": "Nouvelle conversation créée !",
+    "threadCreatedDescription": "Vous pouvez commencer à discuter avec AI Mentor.",
+    "threadDeleted": "Conversation supprimée",
+    "threadDeletedDescription": "La conversation a été supprimée avec succès.",
+    "titleUpdated": "Titre mis à jour !",
+    "titleUpdatedDescription": "Le titre de la conversation a été mis à jour avec succès.",
+    "errorCreatingThread": "Impossible de créer la conversation.",
+    "errorDeletingThread": "Impossible de supprimer la conversation.",
+    "errorUpdatingTitle": "Impossible de mettre à jour le titre.",
+    "loading": "Chargement..."
   },
   "gamification": {
     "level": "Niveau",

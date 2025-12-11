@@ -424,7 +424,17 @@
     "selectTopic": "Wählen Sie ein Thema",
     "selectSubjectFirst": "Wählen Sie zuerst ein Fach aus",
     "selectTopicDescription": "Für den Lernmodus müssen Sie ein Thema auswählen.",
-    "upgrade": "Upgrade auf Pro für existenziellen Chat"
+    "upgrade": "Upgrade auf Pro für existenziellen Chat",
+    "threadCreated": "Neue Konversation erstellt!",
+    "threadCreatedDescription": "Sie können jetzt mit AI Mentor chatten.",
+    "threadDeleted": "Konversation gelöscht",
+    "threadDeletedDescription": "Die Konversation wurde erfolgreich entfernt.",
+    "titleUpdated": "Titel aktualisiert!",
+    "titleUpdatedDescription": "Der Titel der Konversation wurde erfolgreich aktualisiert.",
+    "errorCreatingThread": "Konversation konnte nicht erstellt werden.",
+    "errorDeletingThread": "Konversation konnte nicht gelöscht werden.",
+    "errorUpdatingTitle": "Titel konnte nicht aktualisiert werden.",
+    "loading": "Laden..."
   },
   "gamification": {
     "level": "Level",

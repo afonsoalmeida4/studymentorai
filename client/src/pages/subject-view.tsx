@@ -121,10 +121,10 @@ export default function SubjectView() {
       });
     },
     onError: (error: any) => {
-      // Translate error message using errorCode if available
+      // Translate error message using errorCode if available (data comes from apiRequest)
       const translatedError = translateError(t, {
-        errorCode: error?.errorCode,
-        params: error?.params,
+        errorCode: error?.data?.errorCode,
+        params: error?.data?.params,
         error: error?.message
       });
       

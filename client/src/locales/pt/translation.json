@@ -534,7 +534,17 @@
     "existentialMode": "Vida",
     "selectTopic": "Selecione um tópico",
     "selectTopicDescription": "Para Study Mode, precisa de selecionar um tópico.",
-    "upgrade": "Atualiza para Pro para desbloquear o chat existencial"
+    "upgrade": "Atualiza para Pro para desbloquear o chat existencial",
+    "threadCreated": "Nova conversa criada!",
+    "threadCreatedDescription": "Pode começar a conversar com o AI Mentor.",
+    "threadDeleted": "Conversa eliminada",
+    "threadDeletedDescription": "A conversa foi removida com sucesso.",
+    "titleUpdated": "Nome atualizado!",
+    "titleUpdatedDescription": "O nome da conversa foi atualizado com sucesso.",
+    "errorCreatingThread": "Não foi possível criar a conversa.",
+    "errorDeletingThread": "Não foi possível eliminar a conversa.",
+    "errorUpdatingTitle": "Não foi possível atualizar o nome.",
+    "loading": "A carregar..."
   },
   "gamification": {
     "level": "Nível",

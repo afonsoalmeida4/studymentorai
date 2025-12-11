@@ -104,10 +104,10 @@ export function AppSidebar() {
     onError: (error: any) => {
       console.error("Error creating subject:", error);
       
-      // Translate error message using errorCode if available
+      // Translate error message using errorCode if available (data comes from apiRequest)
       const translatedError = translateError(t, {
-        errorCode: error?.errorCode,
-        params: error?.params,
+        errorCode: error?.data?.errorCode,
+        params: error?.data?.params,
         error: error?.message
       });
       
