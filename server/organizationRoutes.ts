@@ -271,7 +271,8 @@ export function registerOrganizationRoutes(app: Express) {
     }
   });
 
-  app.put("/api/subjects/:id", isAuthenticated, async (req: any, res) => {
+  // Handler for updating subjects (shared by PUT and PATCH)
+  const updateSubjectHandler = async (req: any, res: any) => {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
@@ -286,7 +287,7 @@ export function registerOrganizationRoutes(app: Express) {
 
       const updateSchema = z.object({
         name: z.string().optional(),
-        description: z.string().optional(),
+        description: z.string().nullable().optional(),
         color: z.string().length(7).optional(),
         position: z.number().int().optional(),
       }).strict();
@@ -307,7 +308,10 @@ export function registerOrganizationRoutes(app: Express) {
       console.error("Error updating subject:", error);
       res.status(400).json({ success: false, error: "Erro ao atualizar disciplina" });
     }
-  });
+  };
+
+  app.put("/api/subjects/:id", isAuthenticated, updateSubjectHandler);
+  app.patch("/api/subjects/:id", isAuthenticated, updateSubjectHandler);
 
   app.delete("/api/subjects/:id", isAuthenticated, async (req: any, res) => {
     try {
@@ -398,7 +402,8 @@ export function registerOrganizationRoutes(app: Express) {
     }
   });
 
-  app.put("/api/topics/:id", isAuthenticated, async (req: any, res) => {
+  // Handler for updating topics (shared by PUT and PATCH)
+  const updateTopicHandler = async (req: any, res: any) => {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
@@ -413,7 +418,7 @@ export function registerOrganizationRoutes(app: Express) {
 
       const updateSchema = z.object({
         name: z.string().optional(),
-        description: z.string().optional(),
+        description: z.string().nullable().optional(),
         position: z.number().int().optional(),
       }).strict();
 
@@ -433,7 +438,10 @@ export function registerOrganizationRoutes(app: Express) {
       console.error("Error updating topic:", error);
       res.status(400).json({ success: false, error: "Erro ao atualizar tópico" });
     }
-  });
+  };
+
+  app.put("/api/topics/:id", isAuthenticated, updateTopicHandler);
+  app.patch("/api/topics/:id", isAuthenticated, updateTopicHandler);
 
   app.delete("/api/topics/:id", isAuthenticated, async (req: any, res) => {
     try {
