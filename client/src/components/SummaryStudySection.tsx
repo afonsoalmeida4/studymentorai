@@ -17,10 +17,10 @@ interface SummaryStudySectionProps {
 export default function SummaryStudySection({ topicId }: SummaryStudySectionProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
-  const { subscription } = useSubscription();
+  const { subscription, isLoading: subscriptionLoading } = useSubscription();
   const currentPlan = subscription?.plan || "free";
   const hasAdvancedFlashcards = currentPlan !== "free";
-  const canGenerateMore = currentPlan === "pro" || currentPlan === "premium";
+  const canGenerateMore = !subscriptionLoading && (currentPlan === "pro" || currentPlan === "premium");
   const [studyMode, setStudyMode] = useState<"spaced" | "practice">(hasAdvancedFlashcards ? "spaced" : "practice");
 
   // Fetch summaries for this topic (needed for regenerate)
@@ -59,10 +59,31 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     },
   });
 
-  const handleGenerateMore = () => {
-    const firstSummary = summariesData?.summaries?.[0];
-    if (firstSummary) {
-      regenerateMutation.mutate(firstSummary.id);
+  const handleGenerateMore = async () => {
+    // Use cached summaries if available, otherwise fetch
+    let summaryId = summariesData?.summaries?.[0]?.id;
+    
+    if (!summaryId) {
+      // Fetch summaries directly if not cached
+      try {
+        const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
+        if (res.ok) {
+          const data = await res.json();
+          summaryId = data.summaries?.[0]?.id;
+        }
+      } catch (e) {
+        console.error("Failed to fetch summaries for regeneration");
+      }
+    }
+    
+    if (summaryId) {
+      regenerateMutation.mutate(summaryId);
+    } else {
+      toast({
+        title: t('common.error'),
+        description: t('flashcards.errorRegenerate'),
+        variant: "destructive",
+      });
     }
   };
 
@@ -117,7 +138,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
             </div>
           </div>
           <div className="flex flex-wrap gap-1 sm:gap-2">
-            {canGenerateMore && (summariesData?.summaries?.length ?? 0) > 0 && (
+            {canGenerateMore && (
               <Button
                 variant="outline"
                 size="sm"
