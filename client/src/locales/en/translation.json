@@ -631,8 +631,7 @@
           "learningStyles": "Personalized learning style",
           "flashcards": "Flashcards with auto-translation to 6 languages",
           "dashboard": "Dashboard with very simple KPIs",
-          "ranking": "XP ranking",
-          "sync": "Cross-device synchronization"
+          "ranking": "XP ranking"
         }
       },
       "premium": {
