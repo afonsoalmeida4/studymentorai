@@ -21,6 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { Subject, Topic } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { motion } from "framer-motion";
 
 interface AuthUser {
@@ -34,6 +35,8 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
   const { user } = useAuth() as { user: AuthUser | null };
+  const { subscription } = useSubscription();
+  const isPremium = subscription?.plan === "premium";
 
   const { data: subjects = [] } = useQuery<Subject[]>({
     queryKey: ["/api/subjects"],
@@ -109,18 +112,20 @@ export default function Home() {
               </CardContent>
             </Card>
             
-            <Link href="/chat">
-              <Card className="hover-elevate cursor-pointer group border-l-4 border-l-purple-500 h-full" data-testid="stat-card-chat">
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center justify-between mb-1 sm:mb-2">
-                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
-                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-foreground">2</div>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{t('home.stats.aiModes')}</p>
-                </CardContent>
-              </Card>
-            </Link>
+            {isPremium && (
+              <Link href="/chat">
+                <Card className="hover-elevate cursor-pointer group border-l-4 border-l-purple-500 h-full" data-testid="stat-card-chat">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-center justify-between mb-1 sm:mb-2">
+                      <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+                      <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">2</div>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{t('home.stats.aiModes')}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            )}
             
             <Link href="/flashcards">
               <Card className="hover-elevate cursor-pointer group border-l-4 border-l-amber-500 h-full" data-testid="stat-card-flashcards">
@@ -204,41 +209,43 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card 
-            className="hover-elevate cursor-pointer group overflow-hidden" 
-            onClick={() => setLocation("/chat")} 
-            data-testid="card-chat"
-          >
-            <CardContent className="p-0">
-              <div className="flex items-stretch">
-                <div className="w-1.5 sm:w-2 bg-gradient-to-b from-purple-500 to-purple-600 flex-shrink-0" />
-                <div className="flex-1 p-3 sm:p-4 md:p-5 min-w-0">
-                  <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                    <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-purple-500/10 border border-purple-500/20 flex-shrink-0">
-                      <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+          {isPremium && (
+            <Card 
+              className="hover-elevate cursor-pointer group overflow-hidden" 
+              onClick={() => setLocation("/chat")} 
+              data-testid="card-chat"
+            >
+              <CardContent className="p-0">
+                <div className="flex items-stretch">
+                  <div className="w-1.5 sm:w-2 bg-gradient-to-b from-purple-500 to-purple-600 flex-shrink-0" />
+                  <div className="flex-1 p-3 sm:p-4 md:p-5 min-w-0">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                      <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-purple-500/10 border border-purple-500/20 flex-shrink-0">
+                        <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">{t('home.cards.aiMentor.title')}</h3>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                          {t('home.cards.aiMentor.description')}
+                        </p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">{t('home.cards.aiMentor.title')}</h3>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                        {t('home.cards.aiMentor.description')}
-                      </p>
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      <Badge variant="secondary" className="text-[10px] sm:text-xs font-normal bg-blue-500/10 border border-blue-500/20">
+                        <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                        {t('chat.studyMode')}
+                      </Badge>
+                      <Badge variant="secondary" className="text-[10px] sm:text-xs font-normal bg-amber-500/10 border border-amber-500/20">
+                        <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                        {t('chat.existentialMode')}
+                      </Badge>
                     </div>
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    <Badge variant="secondary" className="text-[10px] sm:text-xs font-normal bg-blue-500/10 border border-blue-500/20">
-                      <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
-                      {t('chat.studyMode')}
-                    </Badge>
-                    <Badge variant="secondary" className="text-[10px] sm:text-xs font-normal bg-amber-500/10 border border-amber-500/20">
-                      <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
-                      {t('chat.existentialMode')}
-                    </Badge>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </motion.div>
 
         {recentTopics.length > 0 && (

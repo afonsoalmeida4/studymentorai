@@ -13,8 +13,32 @@ import { chatModes } from "@shared/schema";
 import { subscriptionService } from "./subscriptionService";
 import { getUserLanguage } from "./languageHelper";
 
+// Middleware to require Premium subscription for AI Mentor access
+async function requirePremium(req: any, res: any, next: any) {
+  try {
+    const userId = req.user?.claims?.sub;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Não autenticado" });
+    }
+    
+    const subscription = await subscriptionService.getOrCreateSubscription(userId);
+    if (subscription.plan !== "premium") {
+      return res.status(403).json({ 
+        success: false, 
+        error: "AI Mentor está disponível apenas no plano Premium.",
+        upgradeRequired: true 
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error("Error checking premium status:", error);
+    return res.status(500).json({ success: false, error: "Erro ao verificar subscrição" });
+  }
+}
+
 export function registerChatRoutes(app: Express) {
-  app.post("/api/chat/threads", isAuthenticated, async (req: any, res) => {
+  app.post("/api/chat/threads", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { mode, topicId, title } = req.body;
@@ -49,7 +73,7 @@ export function registerChatRoutes(app: Express) {
     }
   });
 
-  app.get("/api/chat/threads", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/threads", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { mode } = req.query;
@@ -65,7 +89,7 @@ export function registerChatRoutes(app: Express) {
     }
   });
 
-  app.get("/api/chat/threads/:threadId", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/threads/:threadId", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { threadId } = req.params;
@@ -79,7 +103,7 @@ export function registerChatRoutes(app: Express) {
     }
   });
 
-  app.post("/api/chat/messages", isAuthenticated, async (req: any, res) => {
+  app.post("/api/chat/messages", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { threadId, message } = req.body;
@@ -123,7 +147,7 @@ export function registerChatRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/chat/threads/:threadId", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/chat/threads/:threadId", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { threadId } = req.params;
@@ -142,7 +166,7 @@ export function registerChatRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/chat/threads/:threadId", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/chat/threads/:threadId", isAuthenticated, requirePremium, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { threadId } = req.params;
