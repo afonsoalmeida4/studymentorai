@@ -2807,6 +2807,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete missing translations for flashcards that have partial translations
+  app.post("/api/admin/complete-translations", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const topicId = req.body.topicId;
+      console.log(`[COMPLETE-TRANS] Starting for user ${userId}, topic: ${topicId || 'all'}`);
+
+      // Find PT base flashcards that are missing some translations
+      const allLanguages: SupportedLanguage[] = ["pt", "en", "es", "fr", "de", "it"];
+      const targetLanguages = allLanguages.filter(lang => lang !== "pt");
+
+      // Get PT flashcards for this topic (including those linked via topic_summary_id)
+      let ptFlashcards: Flashcard[] = [];
+      
+      if (topicId) {
+        // Get direct topic flashcards
+        const directFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.userId, userId),
+            eq(flashcards.language, "pt"),
+            eq(flashcards.topicId, topicId)
+          ),
+        });
+        
+        // Get flashcards via topic summaries
+        const topicSummaryList = await db.query.topicSummaries.findMany({
+          where: and(
+            eq(topicSummaries.topicId, topicId),
+            eq(topicSummaries.language, "pt")
+          ),
+        });
+        
+        const summaryIds = topicSummaryList.map(s => s.id);
+        let summaryFlashcards: Flashcard[] = [];
+        if (summaryIds.length > 0) {
+          summaryFlashcards = await db.query.flashcards.findMany({
+            where: and(
+              eq(flashcards.language, "pt"),
+              inArray(flashcards.topicSummaryId, summaryIds)
+            ),
+          });
+        }
+        
+        // Combine and deduplicate
+        const seenIds = new Set<string>();
+        for (const fc of [...directFlashcards, ...summaryFlashcards]) {
+          if (!seenIds.has(fc.id)) {
+            seenIds.add(fc.id);
+            ptFlashcards.push(fc);
+          }
+        }
+      } else {
+        ptFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            eq(flashcards.userId, userId),
+            eq(flashcards.language, "pt")
+          ),
+        });
+      }
+      console.log(`[COMPLETE-TRANS] Found ${ptFlashcards.length} PT flashcards`);
+
+      const results: { flashcardId: string; created: string[]; skipped: string[] }[] = [];
+      const translationService = await import("./translationService");
+
+      for (const baseFlashcard of ptFlashcards) {
+        // Get existing translations for this flashcard
+        const existingTranslations = await db
+          .select()
+          .from(flashcardTranslations)
+          .where(eq(flashcardTranslations.baseFlashcardId, baseFlashcard.id));
+
+        const existingLangs = new Set(existingTranslations.map(t => t.targetLanguage));
+        const missingLangs = targetLanguages.filter(lang => !existingLangs.has(lang));
+
+        if (missingLangs.length === 0) {
+          continue; // All translations exist
+        }
+
+        console.log(`[COMPLETE-TRANS] Flashcard ${baseFlashcard.id} missing: ${missingLangs.join(', ')}`);
+
+        try {
+          // Translate to missing languages in parallel
+          const translationPromises = missingLangs.map(async (targetLang) => {
+            const translatedData = await translationService.translateFlashcardsText(
+              [{ question: baseFlashcard.question, answer: baseFlashcard.answer }],
+              "pt",
+              targetLang
+            );
+            return {
+              language: targetLang,
+              question: translatedData[0].question,
+              answer: translatedData[0].answer,
+            };
+          });
+          const translationsData = await Promise.all(translationPromises);
+
+          // Create translated flashcards and mappings
+          await db.transaction(async (tx) => {
+            for (const translation of translationsData) {
+              const [translatedFlashcard] = await tx
+                .insert(flashcards)
+                .values({
+                  userId: baseFlashcard.userId,
+                  question: translation.question,
+                  answer: translation.answer,
+                  language: translation.language,
+                  isManual: baseFlashcard.isManual,
+                  subjectId: baseFlashcard.subjectId,
+                  topicId: baseFlashcard.topicId,
+                  summaryId: baseFlashcard.summaryId,
+                  topicSummaryId: baseFlashcard.topicSummaryId,
+                })
+                .returning();
+
+              await tx.insert(flashcardTranslations).values({
+                baseFlashcardId: baseFlashcard.id,
+                translatedFlashcardId: translatedFlashcard.id,
+                targetLanguage: translation.language,
+              });
+            }
+          });
+
+          results.push({
+            flashcardId: baseFlashcard.id,
+            created: missingLangs,
+            skipped: Array.from(existingLangs) as string[],
+          });
+        } catch (error) {
+          console.error(`[COMPLETE-TRANS] Error for ${baseFlashcard.id}:`, error);
+        }
+      }
+
+      // Clear bundled cache for this topic
+      if (topicId) {
+        bundledFlashcardsCache.delete(`${topicId}:${userId}`);
+      }
+
+      console.log(`[COMPLETE-TRANS] Completed. Created translations for ${results.length} flashcards`);
+      return res.json({
+        success: true,
+        message: `Completed translations for ${results.length} flashcards`,
+        results,
+      });
+    } catch (error) {
+      console.error("[COMPLETE-TRANS] Error:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to complete translations",
+      });
+    }
+  });
+
   // ==================== CALENDAR EVENTS ROUTES (Premium Only) ====================
 
   // Get all calendar events for user
