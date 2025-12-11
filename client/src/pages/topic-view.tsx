@@ -6,6 +6,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/hooks/useSubscription";
+import ReactMarkdown from "react-markdown";
 import SummaryStudySection from "@/components/SummaryStudySection";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { translateError } from "@/lib/errorTranslation";
@@ -757,9 +758,9 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
-                              {visual.summary}
-                            </p>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                              <ReactMarkdown>{visual.summary}</ReactMarkdown>
+                            </div>
                           </CardContent>
                         </Card>
                         {visual.motivationalMessage ? (
@@ -818,9 +819,9 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
-                              {auditivo.summary}
-                            </p>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                              <ReactMarkdown>{auditivo.summary}</ReactMarkdown>
+                            </div>
                           </CardContent>
                         </Card>
                         {auditivo.motivationalMessage ? (
@@ -879,9 +880,9 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
-                              {logico.summary}
-                            </p>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                              <ReactMarkdown>{logico.summary}</ReactMarkdown>
+                            </div>
                           </CardContent>
                         </Card>
                         {logico.motivationalMessage ? (
@@ -940,9 +941,9 @@ export default function TopicView() {
                             </div>
                           </CardHeader>
                           <CardContent className="px-3 sm:px-6">
-                            <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
-                              {conciso.summary}
-                            </p>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                              <ReactMarkdown>{conciso.summary}</ReactMarkdown>
+                            </div>
                           </CardContent>
                         </Card>
                         {conciso.motivationalMessage ? (
