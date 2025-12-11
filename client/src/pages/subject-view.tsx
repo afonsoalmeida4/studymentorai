@@ -232,13 +232,15 @@ export default function SubjectView() {
             {subjects.map((subject) => (
               <Card
                 key={subject.id}
-                className="hover-elevate active-elevate-2 cursor-pointer"
-                onClick={() => setLocation(`/subject/${subject.id}`)}
+                className="hover-elevate active-elevate-2"
                 data-testid={`card-subject-${subject.id}`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-3 mb-2 flex-1">
+                    <div 
+                      className="flex items-center gap-3 mb-2 flex-1 cursor-pointer"
+                      onClick={() => setLocation(`/subject/${subject.id}`)}
+                    >
                       <div
                         className="w-4 h-4 rounded flex-shrink-0"
                         style={{ backgroundColor: subject.color ?? "#6366f1" }}
@@ -249,14 +251,19 @@ export default function SubjectView() {
                       variant="ghost"
                       size="icon"
                       className="flex-shrink-0 text-muted-foreground hover:text-destructive"
-                      onClick={(e) => handleDeleteSubject(e, subject)}
+                      onClick={() => setSubjectToDelete(subject)}
                       data-testid={`button-delete-subject-${subject.id}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                   {subject.description && (
-                    <CardDescription>{subject.description}</CardDescription>
+                    <CardDescription 
+                      className="cursor-pointer"
+                      onClick={() => setLocation(`/subject/${subject.id}`)}
+                    >
+                      {subject.description}
+                    </CardDescription>
                   )}
                 </CardHeader>
               </Card>
