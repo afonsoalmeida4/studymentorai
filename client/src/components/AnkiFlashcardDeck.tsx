@@ -168,8 +168,9 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           newSet.add(variables.baseId);
           return newSet;
         });
-        // Invalidate bundled cache for background sync
+        // Invalidate ALL flashcard queries to update counts everywhere
         queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       } else {
         // Practice mode: just move to next card
         setCurrentIndex(prev => prev + 1);
@@ -248,7 +249,9 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     setCompletedCount(0);
     setDeckInitialized(false);
     setLocalDeck([]);
+    // Invalidate ALL flashcard queries to update counts everywhere
     queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
   };
 
   if (isLoading) {

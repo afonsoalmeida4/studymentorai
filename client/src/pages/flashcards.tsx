@@ -148,6 +148,7 @@ export default function FlashcardsPage() {
     onSuccess: () => {
       // Invalidate ALL flashcard queries to update counts everywhere
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic"], exact: false });
       setShowCreateDialog(false);
       setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: (user as any)?.language || "pt" });
       toast({
@@ -177,6 +178,7 @@ export default function FlashcardsPage() {
     onSuccess: () => {
       // Invalidate ALL flashcard queries to update counts everywhere
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic"], exact: false });
       setShowEditDialog(false);
       setSelectedFlashcard(null);
       toast({
@@ -201,6 +203,7 @@ export default function FlashcardsPage() {
     onSuccess: () => {
       // Invalidate ALL flashcard queries to update counts everywhere
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic"], exact: false });
       setShowDeleteDialog(false);
       setSelectedFlashcard(null);
       toast({

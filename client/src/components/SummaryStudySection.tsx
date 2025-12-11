@@ -70,8 +70,9 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     },
     onSuccess: (data: any) => {
       setIsGeneratingInBackground(false);
-      // Invalidate bundled endpoint (no language in key!)
+      // Invalidate ALL flashcard queries to update counts everywhere
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       toast({
         title: t('summaryStudy.regenerateSuccessTitle'),
         description: t('summaryStudy.regenerateSuccessDescription', { 
