@@ -20,26 +20,13 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
+  const [localDeck, setLocalDeck] = useState<ApiFlashcard[]>([]);
+  const [deckInitialized, setDeckInitialized] = useState(false);
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
 
-  // Reset progress when mode changes
-  useEffect(() => {
-    setCurrentIndex(0);
-    setSessionTime(0);
-    setIsFlipped(false);
-    setCompletedCount(0);
-  }, [mode]);
-
-  // Session timer
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionTime(prev => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   const endpoint = mode === "practice" ? "all" : "due";
+  
   const { data: dueFlashcardsData, isLoading } = useQuery<{ 
     success: boolean; 
     flashcards: ApiFlashcard[];
@@ -53,7 +40,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     },
   });
 
-  // Query to get total flashcards count
   const { data: allFlashcardsData } = useQuery<{ 
     success: boolean; 
     flashcards: ApiFlashcard[];
@@ -66,21 +52,50 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     },
   });
 
-  const flashcards = dueFlashcardsData?.flashcards || [];
+  // Initialize local deck from server data
+  useEffect(() => {
+    if (dueFlashcardsData?.flashcards && !deckInitialized) {
+      setLocalDeck(dueFlashcardsData.flashcards);
+      setDeckInitialized(true);
+    }
+  }, [dueFlashcardsData, deckInitialized]);
+
+  // Reset when mode changes
+  useEffect(() => {
+    setCurrentIndex(0);
+    setSessionTime(0);
+    setIsFlipped(false);
+    setCompletedCount(0);
+    setLocalDeck([]);
+    setDeckInitialized(false);
+  }, [mode, topicId]);
+
+  // Session timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSessionTime(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const totalFlashcards = allFlashcardsData?.flashcards?.length || 0;
+  const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
 
   const recordAttemptMutation = useMutation({
     mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
-    onSuccess: async () => {
-      setIsFlipped(false);
+    onSuccess: (_, variables) => {
       setCompletedCount(prev => prev + 1);
+      setIsFlipped(false);
       
       if (mode === "spaced") {
-        await queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
-        setCurrentIndex(0);
+        // Remove the rated card from local deck immediately
+        setLocalDeck(prev => prev.filter(card => card.id !== variables.flashcardId));
+        // Invalidate cache for background sync
+        queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
       } else {
+        // Practice mode: just move to next card
         setCurrentIndex(prev => prev + 1);
       }
     },
@@ -93,12 +108,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     },
   });
 
-  const currentFlashcard = flashcards[currentIndex];
+  const currentFlashcard = localDeck[currentIndex];
   const completed = mode === "spaced" 
-    ? flashcards.length === 0 && completedCount > 0
-    : currentIndex >= flashcards.length;
+    ? localDeck.length === 0 && completedCount > 0
+    : currentIndex >= localDeck.length && localDeck.length > 0;
   const progress = totalFlashcards > 0 ? ((completedCount / totalFlashcards) * 100) : 0;
-  const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -138,11 +152,26 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   }, [mode, nextAvailableAt, t]);
 
   const handleRating = (rating: number) => {
-    if (!currentFlashcard) return;
+    if (!currentFlashcard || recordAttemptMutation.isPending) return;
     recordAttemptMutation.mutate({
       flashcardId: currentFlashcard.id,
       rating,
     });
+  };
+
+  const handleFlip = () => {
+    if (!isFlipped) {
+      setIsFlipped(true);
+    }
+  };
+
+  const handleRestart = () => {
+    setCurrentIndex(0);
+    setSessionTime(0);
+    setCompletedCount(0);
+    setDeckInitialized(false);
+    setLocalDeck([]);
+    queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, endpoint, i18n.language] });
   };
 
   if (isLoading) {
@@ -153,7 +182,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-  if (flashcards.length === 0) {
+  if (localDeck.length === 0 && deckInitialized && completedCount === 0) {
     return (
       <div className="text-center py-12 space-y-4">
         <Check className="w-16 h-16 mx-auto text-primary" />
@@ -188,17 +217,17 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
             {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setCurrentIndex(0);
-            setSessionTime(0);
-            setCompletedCount(0);
-            queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, endpoint, i18n.language] });
-          }}
-          data-testid="button-restart-study"
-        >
+        <Button onClick={handleRestart} data-testid="button-restart-study">
           {mode === "spaced" ? t('flashcards.anki.reviewAgain') : t('flashcards.anki.practiceAgain')}
         </Button>
+      </div>
+    );
+  }
+
+  if (!currentFlashcard) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">{t('flashcards.anki.loading')}</p>
       </div>
     );
   }
@@ -221,19 +250,14 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
         <Progress value={progress} className="h-2" />
       </div>
 
-      <div className="perspective-1000">
-        <div
-          className={`relative w-full min-h-96 transition-transform duration-500 transform-style-preserve-3d ${
-            isFlipped ? "rotate-y-180" : ""
-          }`}
-          data-testid={`flashcard-${currentFlashcard.id}`}
-        >
-          <Card
-            className={`absolute inset-0 backface-hidden border-2 cursor-pointer hover-elevate ${isFlipped ? 'pointer-events-none' : ''}`}
-            onClick={() => !isFlipped && setIsFlipped(true)}
-          >
-            <CardContent className="flex flex-col h-full justify-between p-8">
-              <div className="flex-1 flex items-center justify-center">
+      <Card 
+        className="min-h-96 border-2"
+        data-testid={`flashcard-${currentFlashcard.id}`}
+      >
+        <CardContent className="flex flex-col h-full min-h-96 justify-between p-8">
+          {!isFlipped ? (
+            <>
+              <div className="flex-1 flex items-center justify-center cursor-pointer" onClick={handleFlip}>
                 <p
                   className="text-2xl font-medium text-center"
                   data-testid={`question-${currentFlashcard.id}`}
@@ -243,16 +267,20 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
               </div>
               <div className="flex items-center justify-between pt-6 border-t">
                 <Badge variant="secondary">{t('flashcards.question')}</Badge>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleFlip}
+                  className="gap-2"
+                  data-testid="button-flip"
+                >
                   <RotateCw className="w-4 h-4" />
                   <span>{t('flashcards.anki.clickToSeeAnswer')}</span>
-                </div>
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className={`absolute inset-0 backface-hidden rotate-y-180 border-2 ${!isFlipped ? 'pointer-events-none' : ''}`}>
-            <CardContent className="flex flex-col h-full justify-between p-8">
+            </>
+          ) : (
+            <>
               <div className="flex-1 flex items-center justify-center">
                 <p
                   className="text-xl text-center"
@@ -262,53 +290,59 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
                 </p>
               </div>
               <div className="space-y-4 pt-6 border-t">
-                <Badge variant="default" className="mb-2">{t('flashcards.answer')}</Badge>
-                <p className="text-sm text-muted-foreground mb-4">
+                <div className="flex items-center justify-between">
+                  <Badge variant="default">{t('flashcards.answer')}</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">
                   {t('flashcards.anki.howWasYourAnswer')}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <Button
+                    type="button"
                     onClick={() => handleRating(1)}
                     disabled={recordAttemptMutation.isPending}
                     variant="outline"
-                    className="border-red-500/50 hover:bg-red-500/10"
+                    className="border-red-500/50 text-red-600 dark:text-red-400"
                     data-testid="button-again"
                   >
-                    <span className="text-red-600 dark:text-red-400">{t('flashcards.anki.again')}</span>
+                    {t('flashcards.anki.again')}
                   </Button>
                   <Button
+                    type="button"
                     onClick={() => handleRating(2)}
                     disabled={recordAttemptMutation.isPending}
                     variant="outline"
-                    className="border-orange-500/50 hover:bg-orange-500/10"
+                    className="border-orange-500/50 text-orange-600 dark:text-orange-400"
                     data-testid="button-hard"
                   >
-                    <span className="text-orange-600 dark:text-orange-400">{t('flashcards.anki.hard')}</span>
+                    {t('flashcards.anki.hard')}
                   </Button>
                   <Button
+                    type="button"
                     onClick={() => handleRating(3)}
                     disabled={recordAttemptMutation.isPending}
                     variant="outline"
-                    className="border-green-500/50 hover:bg-green-500/10"
+                    className="border-green-500/50 text-green-600 dark:text-green-400"
                     data-testid="button-good"
                   >
-                    <span className="text-green-600 dark:text-green-400">{t('flashcards.anki.good')}</span>
+                    {t('flashcards.anki.good')}
                   </Button>
                   <Button
+                    type="button"
                     onClick={() => handleRating(4)}
                     disabled={recordAttemptMutation.isPending}
                     variant="outline"
-                    className="border-blue-500/50 hover:bg-blue-500/10"
+                    className="border-blue-500/50 text-blue-600 dark:text-blue-400"
                     data-testid="button-easy"
                   >
-                    <span className="text-blue-600 dark:text-blue-400">{t('flashcards.anki.easy')}</span>
+                    {t('flashcards.anki.easy')}
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
