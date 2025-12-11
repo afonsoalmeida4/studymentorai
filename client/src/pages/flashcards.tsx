@@ -34,7 +34,6 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
-import { UpgradeDialog } from "@/components/UpgradeDialog";
 import type { Flashcard, Subject, Topic } from "@shared/schema";
 
 type FlashcardWithMetadata = Flashcard & {
@@ -51,8 +50,7 @@ export default function FlashcardsPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
-  const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null);
+    const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null);
   
   const [filterType, setFilterType] = useState<string>("all");
   const [filterSubject, setFilterSubject] = useState<string>("");
@@ -66,8 +64,7 @@ export default function FlashcardsPage() {
     language: (user as any)?.language || "pt",
   });
 
-  const hasProOrPremium = subscription?.plan === "pro" || subscription?.plan === "premium";
-
+  
   // Fetch all user flashcards (with translations)
   const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
     queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic, i18n.language],
@@ -85,7 +82,7 @@ export default function FlashcardsPage() {
       if (!response.ok) throw new Error("Failed to fetch flashcards");
       return response.json();
     },
-    enabled: hasProOrPremium,
+    enabled: true,
   });
 
   // Fetch subjects for filter
@@ -157,16 +154,11 @@ export default function FlashcardsPage() {
       });
     },
     onError: (error: any) => {
-      if (error?.errorCode === "MANUAL_FLASHCARD_NOT_AVAILABLE") {
-        setShowCreateDialog(false);
-        setShowUpgradeDialog(true);
-      } else {
-        toast({
-          variant: "destructive",
-          title: t('common.error'),
-          description: error?.message || t('flashcards.createError'),
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: error?.message || t('flashcards.createError'),
+      });
     },
   });
 
@@ -222,10 +214,6 @@ export default function FlashcardsPage() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!hasProOrPremium) {
-      setShowUpgradeDialog(true);
-      return;
-    }
     createFlashcardMutation.mutate(formData);
   };
 
@@ -262,38 +250,6 @@ export default function FlashcardsPage() {
     setSelectedFlashcard(flashcard);
     setShowDeleteDialog(true);
   };
-
-  if (!hasProOrPremium) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full p-8">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              {t('flashcards.title')}
-            </CardTitle>
-            <CardDescription>
-              {t('flashcards.upgradeRequired')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t('flashcards.upgradeMessage')}
-            </p>
-            <Button onClick={() => setShowUpgradeDialog(true)} className="w-full">
-              {t('common.upgradeToPro')}
-            </Button>
-          </CardContent>
-        </Card>
-        <UpgradeDialog
-          open={showUpgradeDialog}
-          onOpenChange={setShowUpgradeDialog}
-          limitType="features"
-          currentPlan={subscription?.plan || "free"}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="h-full flex flex-col overflow-x-hidden min-w-0">
@@ -627,12 +583,6 @@ export default function FlashcardsPage() {
         </DialogContent>
       </Dialog>
 
-      <UpgradeDialog
-        open={showUpgradeDialog}
-        onOpenChange={setShowUpgradeDialog}
-        limitType="features"
-        currentPlan={subscription?.plan || "free"}
-      />
-    </div>
+      </div>
   );
 }

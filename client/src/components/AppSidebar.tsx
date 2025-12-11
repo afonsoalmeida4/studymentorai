@@ -156,6 +156,19 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location === "/flashcards"}
+                    data-testid="button-flashcards"
+                    onMouseEnter={prefetchFlashcards}
+                  >
+                    <Link href="/flashcards">
+                      <CreditCard className="w-4 h-4" />
+                      <span>{t('nav.flashcards')}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 {hasProOrPremium && (
                   <>
                     <SidebarMenuItem>
@@ -181,19 +194,6 @@ export function AppSidebar() {
                         <Link href="/ranking">
                           <Trophy className="w-4 h-4" />
                           <span>{t('nav.ranking')}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={location === "/flashcards"}
-                        data-testid="button-flashcards"
-                        onMouseEnter={prefetchFlashcards}
-                      >
-                        <Link href="/flashcards">
-                          <CreditCard className="w-4 h-4" />
-                          <span>{t('nav.flashcards')}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
