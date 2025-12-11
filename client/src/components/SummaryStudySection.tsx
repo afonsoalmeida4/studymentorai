@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/hooks/useSubscription";
 import type { GenerateFlashcardsResponse } from "@shared/schema";
 import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
-import { Loader2, Brain, Calendar, Dumbbell, BookOpen } from "lucide-react";
+import { Loader2, Brain, Calendar, Dumbbell, BookOpen, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface SummaryStudySectionProps {
   topicId: string;
@@ -14,10 +16,55 @@ interface SummaryStudySectionProps {
 
 export default function SummaryStudySection({ topicId }: SummaryStudySectionProps) {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const { subscription } = useSubscription();
   const currentPlan = subscription?.plan || "free";
   const hasAdvancedFlashcards = currentPlan !== "free";
+  const canGenerateMore = currentPlan === "pro" || currentPlan === "premium";
   const [studyMode, setStudyMode] = useState<"spaced" | "practice">(hasAdvancedFlashcards ? "spaced" : "practice");
+
+  // Fetch summaries for this topic (needed for regenerate)
+  const { data: summariesData } = useQuery<{ success: boolean; summaries: any[] }>({
+    queryKey: ["/api/topics", topicId, "summaries", i18n.language],
+    queryFn: async () => {
+      const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
+      if (!res.ok) throw new Error("Failed to fetch summaries");
+      return res.json();
+    },
+    staleTime: 60000,
+  });
+
+  // Regenerate flashcards mutation
+  const regenerateMutation = useMutation({
+    mutationFn: async (topicSummaryId: string) => {
+      return apiRequest("POST", "/api/flashcards/regenerate", { topicSummaryId });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
+      toast({
+        title: t('flashcards.regenerateSuccessTitle'),
+        description: t('flashcards.regenerateSuccessDescription', { 
+          previousCount: data.previousCount || 0, 
+          newCount: data.newCount || 0 
+        }),
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('flashcards.errorRegenerateTitle'),
+        description: t('flashcards.errorRegenerate'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleGenerateMore = () => {
+    const firstSummary = summariesData?.summaries?.[0];
+    if (firstSummary) {
+      regenerateMutation.mutate(firstSummary.id);
+    }
+  };
 
   // Fetch ALL flashcards from ALL summaries in this topic
   const { data: flashcardsData, isLoading } = useQuery<GenerateFlashcardsResponse>({
@@ -70,6 +117,23 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
             </div>
           </div>
           <div className="flex flex-wrap gap-1 sm:gap-2">
+            {canGenerateMore && (summariesData?.summaries?.length ?? 0) > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateMore}
+                disabled={regenerateMutation.isPending}
+                data-testid="button-generate-more"
+                className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+              >
+                {regenerateMutation.isPending ? (
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                )}
+                <span className="hidden sm:inline">{t('flashcards.regenerateButton')}</span>
+              </Button>
+            )}
             {hasAdvancedFlashcards && (
               <Button
                 variant={studyMode === "spaced" ? "default" : "outline"}
