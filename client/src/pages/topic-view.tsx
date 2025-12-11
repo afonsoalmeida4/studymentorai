@@ -769,8 +769,7 @@ export default function TopicView() {
                             </CardContent>
                           </Card>
                         ) : null}
-                        <SummaryStudySection summaryId={visual.id} />
-                      </TabsContent>
+                        </TabsContent>
                     ) : null}
 
                     {auditivo ? (
@@ -831,8 +830,7 @@ export default function TopicView() {
                             </CardContent>
                           </Card>
                         ) : null}
-                        <SummaryStudySection summaryId={auditivo.id} />
-                      </TabsContent>
+                        </TabsContent>
                     ) : null}
 
                     {logico ? (
@@ -893,8 +891,7 @@ export default function TopicView() {
                             </CardContent>
                           </Card>
                         ) : null}
-                        <SummaryStudySection summaryId={logico.id} />
-                      </TabsContent>
+                        </TabsContent>
                     ) : null}
 
                     {conciso ? (
@@ -955,10 +952,15 @@ export default function TopicView() {
                             </CardContent>
                           </Card>
                         ) : null}
-                        <SummaryStudySection summaryId={conciso.id} />
-                      </TabsContent>
+                        </TabsContent>
                     ) : null}
                   </Tabs>
+                  
+                  {/* Flashcard Study Section - independent of summary style */}
+                  {(() => {
+                    const primarySummaryId = visual?.id || auditivo?.id || logico?.id || conciso?.id;
+                    return primarySummaryId ? <SummaryStudySection summaryId={primarySummaryId} /> : null;
+                  })()}
                   </div>
                 );
               })()
