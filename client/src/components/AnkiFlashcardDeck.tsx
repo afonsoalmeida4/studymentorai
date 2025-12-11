@@ -11,11 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 
 interface AnkiFlashcardDeckProps {
-  summaryId: string;
+  topicId: string;
   mode?: "spaced" | "practice";
 }
 
-export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFlashcardDeckProps) {
+export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlashcardDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
@@ -23,7 +23,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
 
-  // Resetar progresso quando mudar de modo
+  // Reset progress when mode changes
   useEffect(() => {
     setCurrentIndex(0);
     setSessionTime(0);
@@ -31,7 +31,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     setCompletedCount(0);
   }, [mode]);
 
-  // Timer de sessão
+  // Session timer
   useEffect(() => {
     const interval = setInterval(() => {
       setSessionTime(prev => prev + 1);
@@ -45,22 +45,22 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     flashcards: ApiFlashcard[];
     nextAvailableAt?: string | null;
   }>({
-    queryKey: ["/api/flashcards", summaryId, endpoint, i18n.language],
+    queryKey: ["/api/flashcards/topic", topicId, endpoint, i18n.language],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/${summaryId}/${endpoint}?language=${i18n.language}`);
+      const res = await fetch(`/api/flashcards/topic/${topicId}/${endpoint}?language=${i18n.language}`);
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },
   });
 
-  // Query para obter o total de todos os flashcards disponíveis
+  // Query to get total flashcards count
   const { data: allFlashcardsData } = useQuery<{ 
     success: boolean; 
     flashcards: ApiFlashcard[];
   }>({
-    queryKey: ["/api/flashcards", summaryId, "all", i18n.language],
+    queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/${summaryId}/all?language=${i18n.language}`);
+      const res = await fetch(`/api/flashcards/topic/${topicId}/all?language=${i18n.language}`);
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },
@@ -75,16 +75,12 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     },
     onSuccess: async () => {
       setIsFlipped(false);
-      
-      // Incrementar contador de cartões completados
       setCompletedCount(prev => prev + 1);
       
       if (mode === "spaced") {
-        // Modo Anki: invalidar query porque a lista "due" mudou
-        await queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, "due", i18n.language] });
+        await queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
         setCurrentIndex(0);
       } else {
-        // Modo prática: avançar para o próximo flashcard
         setCurrentIndex(prev => prev + 1);
       }
     },
@@ -104,14 +100,12 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
   const progress = totalFlashcards > 0 ? ((completedCount / totalFlashcards) * 100) : 0;
   const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
 
-  // Formatar tempo de sessão (MM:SS)
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Atualizar countdown a cada minuto
   const [countdown, setCountdown] = useState<string | null>(null);
   useEffect(() => {
     const getTimeUntilNext = () => {
@@ -133,10 +127,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     };
 
     if (mode === "spaced" && nextAvailableAt) {
-      // Atualizar imediatamente
       setCountdown(getTimeUntilNext());
-      
-      // Atualizar a cada minuto
       const interval = setInterval(() => {
         setCountdown(getTimeUntilNext());
       }, 60000);
@@ -144,7 +135,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
     } else {
       setCountdown(null);
     }
-  }, [mode, nextAvailableAt]);
+  }, [mode, nextAvailableAt, t]);
 
   const handleRating = (rating: number) => {
     if (!currentFlashcard) return;
@@ -202,7 +193,7 @@ export default function AnkiFlashcardDeck({ summaryId, mode = "spaced" }: AnkiFl
             setCurrentIndex(0);
             setSessionTime(0);
             setCompletedCount(0);
-            queryClient.invalidateQueries({ queryKey: ["/api/flashcards", summaryId, endpoint] });
+            queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, endpoint] });
           }}
           data-testid="button-restart-study"
         >
