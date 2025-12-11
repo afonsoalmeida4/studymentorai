@@ -1,14 +1,33 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/hooks/useSubscription";
-import type { GenerateFlashcardsResponse } from "@shared/schema";
 import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
 import { Loader2, Brain, Calendar, Dumbbell, BookOpen, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
+// Bundled flashcard type - contains all translations
+interface BundledFlashcard {
+  id: string;
+  topicId: string | null;
+  subjectId: string | null;
+  isManual: boolean;
+  createdAt: string;
+  translations: Record<string, { question: string; answer: string; flashcardId: string }>;
+  easeFactor?: number;
+  interval?: number;
+  repetitions?: number;
+  nextReviewDate?: string | null;
+  lastReviewDate?: string | null;
+}
+
+interface BundledFlashcardsResponse {
+  success: boolean;
+  flashcards: BundledFlashcard[];
+}
 
 interface SummaryStudySectionProps {
   topicId: string;
@@ -23,7 +42,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   const canGenerateMore = !subscriptionLoading && (currentPlan === "pro" || currentPlan === "premium");
   const [studyMode, setStudyMode] = useState<"spaced" | "practice">(hasAdvancedFlashcards ? "spaced" : "practice");
 
-  // Fetch summaries for this topic (needed for regenerate)
+  // Fetch summaries for this topic (needed for regenerate) - still needs language for summary content
   const { data: summariesData } = useQuery<{ success: boolean; summaries: any[] }>({
     queryKey: ["/api/topics", topicId, "summaries", i18n.language],
     queryFn: async () => {
@@ -43,7 +62,6 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
       return apiRequest("POST", "/api/flashcards/regenerate", { topicSummaryId });
     },
     onMutate: () => {
-      // Show immediate feedback - don't wait for response
       setIsGeneratingInBackground(true);
       toast({
         title: t('summaryStudy.generatingTitle'),
@@ -52,8 +70,8 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     },
     onSuccess: (data: any) => {
       setIsGeneratingInBackground(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language] });
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
+      // Invalidate bundled endpoint (no language in key!)
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       toast({
         title: t('summaryStudy.regenerateSuccessTitle'),
         description: t('summaryStudy.regenerateSuccessDescription', { 
@@ -73,18 +91,14 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   });
 
   const handleGenerateMore = async () => {
-    // Use cached summaries if available, otherwise fetch
-    // Note: summaries is an object keyed by learning style, not an array
     const cachedSummaries = summariesData?.summaries;
     let summaryId = cachedSummaries ? Object.values(cachedSummaries)?.[0]?.id : undefined;
     
     if (!summaryId) {
-      // Fetch summaries directly if not cached
       try {
         const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
         if (res.ok) {
           const data = await res.json();
-          // summaries is an object keyed by learning style
           const summariesObj = data.summaries;
           if (summariesObj && typeof summariesObj === 'object') {
             const firstSummary = Object.values(summariesObj)?.[0] as any;
@@ -107,18 +121,47 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     }
   };
 
-  // Fetch ALL flashcards from ALL summaries in this topic
-  const { data: flashcardsData, isLoading } = useQuery<GenerateFlashcardsResponse>({
-    queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language],
+  // Fetch ALL flashcards with ALL translations bundled - NO language in query key!
+  const { data: bundledData, isLoading } = useQuery<BundledFlashcardsResponse>({
+    queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/topic/${topicId}/all?language=${i18n.language}`);
+      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`);
       if (!res.ok) throw new Error("Failed to fetch flashcards");
       return res.json();
     },
-    staleTime: 30000,
+    staleTime: 60000, // Cache for longer since translations are bundled
   });
 
-  const hasFlashcards = flashcardsData?.flashcards && flashcardsData.flashcards.length > 0;
+  // Transform bundled flashcards to display format based on current language
+  const displayFlashcards = useMemo(() => {
+    if (!bundledData?.flashcards) return [];
+    
+    const lang = i18n.language as string;
+    
+    return bundledData.flashcards.map(fc => {
+      // Get translation for current language, fallback to PT
+      const translation = fc.translations[lang] || fc.translations['pt'];
+      
+      return {
+        id: translation?.flashcardId || fc.id,
+        baseId: fc.id,
+        question: translation?.question || '',
+        answer: translation?.answer || '',
+        topicId: fc.topicId,
+        subjectId: fc.subjectId,
+        isManual: fc.isManual,
+        createdAt: fc.createdAt,
+        language: lang,
+        easeFactor: fc.easeFactor,
+        interval: fc.interval,
+        repetitions: fc.repetitions,
+        nextReviewDate: fc.nextReviewDate,
+        lastReviewDate: fc.lastReviewDate,
+      };
+    });
+  }, [bundledData, i18n.language]);
+
+  const hasFlashcards = displayFlashcards.length > 0;
 
   if (isLoading) {
     return (
@@ -153,7 +196,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
             <div className="min-w-0">
               <CardTitle className="text-base sm:text-xl">{t('summaryStudy.title')}</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                {t('summaryStudy.available', { count: flashcardsData.flashcards?.length || 0 })}
+                {t('summaryStudy.available', { count: displayFlashcards.length })}
               </CardDescription>
             </div>
           </div>
@@ -200,7 +243,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-3 sm:px-6">
+      <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
         <AnkiFlashcardDeck topicId={topicId} mode={studyMode} />
       </CardContent>
     </Card>

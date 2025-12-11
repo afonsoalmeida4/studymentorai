@@ -1,14 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import type { ApiFlashcard } from "@shared/schema";
 import { RotateCw, Check, Clock } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+
+// Bundled flashcard type - contains all translations
+interface BundledFlashcard {
+  id: string;
+  topicId: string | null;
+  subjectId: string | null;
+  isManual: boolean;
+  createdAt: string;
+  translations: Record<string, { question: string; answer: string; flashcardId: string }>;
+  easeFactor?: number;
+  interval?: number;
+  repetitions?: number;
+  nextReviewDate?: string | null;
+  lastReviewDate?: string | null;
+}
+
+// Display flashcard - transformed from bundled based on current language
+interface DisplayFlashcard {
+  id: string;
+  baseId: string;
+  question: string;
+  answer: string;
+  nextReviewDate?: string | null;
+  lastReviewDate?: string | null;
+}
+
+interface BundledFlashcardsResponse {
+  success: boolean;
+  flashcards: BundledFlashcard[];
+}
 
 interface AnkiFlashcardDeckProps {
   topicId: string;
@@ -20,45 +49,78 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
-  const [localDeck, setLocalDeck] = useState<ApiFlashcard[]>([]);
+  const [localDeck, setLocalDeck] = useState<DisplayFlashcard[]>([]);
   const [deckInitialized, setDeckInitialized] = useState(false);
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
 
-  const endpoint = mode === "practice" ? "all" : "due";
-  
-  const { data: dueFlashcardsData, isLoading } = useQuery<{ 
-    success: boolean; 
-    flashcards: ApiFlashcard[];
-    nextAvailableAt?: string | null;
-  }>({
-    queryKey: ["/api/flashcards/topic", topicId, endpoint, i18n.language],
+  // Fetch ALL flashcards with ALL translations bundled - NO language in query key!
+  const { data: bundledData, isLoading } = useQuery<BundledFlashcardsResponse>({
+    queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/topic/${topicId}/${endpoint}?language=${i18n.language}`);
+      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`);
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },
+    staleTime: 60000,
   });
 
-  const { data: allFlashcardsData } = useQuery<{ 
-    success: boolean; 
-    flashcards: ApiFlashcard[];
-  }>({
-    queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language],
-    queryFn: async () => {
-      const res = await fetch(`/api/flashcards/topic/${topicId}/all?language=${i18n.language}`);
-      if (!res.ok) throw new Error("Erro ao carregar flashcards");
-      return res.json();
-    },
-  });
+  // Transform bundled flashcards to display format based on current language
+  const allDisplayFlashcards = useMemo((): DisplayFlashcard[] => {
+    if (!bundledData?.flashcards) return [];
+    
+    const lang = i18n.language as string;
+    
+    return bundledData.flashcards.map(fc => {
+      const translation = fc.translations[lang] || fc.translations['pt'];
+      
+      return {
+        id: translation?.flashcardId || fc.id,
+        baseId: fc.id,
+        question: translation?.question || '',
+        answer: translation?.answer || '',
+        nextReviewDate: fc.nextReviewDate,
+        lastReviewDate: fc.lastReviewDate,
+      };
+    });
+  }, [bundledData, i18n.language]);
 
-  // Initialize local deck from server data
+  // Filter for due flashcards (spaced mode) or all (practice mode)
+  const filteredFlashcards = useMemo((): DisplayFlashcard[] => {
+    if (mode === "practice") {
+      return allDisplayFlashcards;
+    }
+    
+    // Spaced mode: filter for due flashcards
+    const now = new Date();
+    return allDisplayFlashcards.filter(fc => {
+      if (!fc.nextReviewDate) return true; // Never reviewed = due now
+      return new Date(fc.nextReviewDate) <= now;
+    });
+  }, [allDisplayFlashcards, mode]);
+
+  // Calculate next available time for spaced mode
+  const nextAvailableAt = useMemo((): string | null => {
+    if (mode !== "spaced" || !bundledData?.flashcards) return null;
+    
+    const now = new Date();
+    const futureCards = bundledData.flashcards
+      .filter(fc => fc.nextReviewDate && new Date(fc.nextReviewDate) > now)
+      .map(fc => new Date(fc.nextReviewDate!));
+    
+    if (futureCards.length === 0) return null;
+    
+    const earliest = new Date(Math.min(...futureCards.map(d => d.getTime())));
+    return earliest.toISOString();
+  }, [bundledData, mode]);
+
+  // Initialize local deck from filtered data
   useEffect(() => {
-    if (dueFlashcardsData?.flashcards && !deckInitialized) {
-      setLocalDeck(dueFlashcardsData.flashcards);
+    if (filteredFlashcards.length > 0 && !deckInitialized) {
+      setLocalDeck(filteredFlashcards);
       setDeckInitialized(true);
     }
-  }, [dueFlashcardsData, deckInitialized]);
+  }, [filteredFlashcards, deckInitialized]);
 
   // Reset when mode changes
   useEffect(() => {
@@ -78,8 +140,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     return () => clearInterval(interval);
   }, []);
 
-  const totalFlashcards = allFlashcardsData?.flashcards?.length || 0;
-  const nextAvailableAt = dueFlashcardsData?.nextAvailableAt;
+  const totalFlashcards = allDisplayFlashcards.length;
 
   const recordAttemptMutation = useMutation({
     mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
@@ -92,8 +153,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       if (mode === "spaced") {
         // Remove the rated card from local deck immediately
         setLocalDeck(prev => prev.filter(card => card.id !== variables.flashcardId));
-        // Invalidate cache for background sync
-        queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
+        // Invalidate bundled cache for background sync (no language in key!)
+        queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       } else {
         // Practice mode: just move to next card
         setCurrentIndex(prev => prev + 1);
@@ -171,7 +232,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     setCompletedCount(0);
     setDeckInitialized(false);
     setLocalDeck([]);
-    queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, endpoint, i18n.language] });
+    queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
   };
 
   if (isLoading) {

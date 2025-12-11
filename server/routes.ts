@@ -41,7 +41,7 @@ import { registerChatRoutes } from "./chatRoutes";
 import { registerStatsRoutes } from "./statsRoutes";
 import { calculateNextReview } from "./flashcardScheduler";
 import { db } from "./db";
-import { and, eq, sql, gt, asc, or, inArray } from "drizzle-orm";
+import { and, eq, sql, gt, asc, desc, or, inArray } from "drizzle-orm";
 import { subscriptionService } from "./subscriptionService";
 import { costControlService } from "./costControlService";
 
@@ -1574,6 +1574,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error fetching all topic flashcards:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar flashcards",
+      });
+    }
+  });
+
+  // Get ALL flashcards for a TOPIC with ALL translations bundled (for frontend language switching)
+  // This endpoint returns flashcards once with all 6 language variants - frontend selects which to display
+  app.get("/api/flashcards/topic/:topicId/bundled", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const topicId = req.params.topicId;
+
+      console.log(`[GET /api/flashcards/topic/:topicId/bundled] topicId: ${topicId}`);
+
+      // Verify topic belongs to user
+      const topic = await db.query.topics.findFirst({
+        where: eq(topics.id, topicId),
+        with: { subject: true },
+      });
+      
+      if (!topic || topic.subject?.userId !== userId) {
+        return res.status(404).json({
+          success: false,
+          error: "Tópico não encontrado",
+        });
+      }
+
+      // Get ALL PT summaries for this topic (base language)
+      const ptSummaries = await db.query.topicSummaries.findMany({
+        where: and(
+          eq(topicSummaries.topicId, topicId),
+          eq(topicSummaries.language, "pt")
+        ),
+      });
+
+      // Fetch ALL Portuguese flashcards (base) for this topic
+      const summaryIds = ptSummaries.map(s => s.id);
+      let baseFlashcards: Flashcard[] = [];
+      
+      if (summaryIds.length > 0) {
+        baseFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            inArray(flashcards.topicSummaryId, summaryIds),
+            eq(flashcards.language, "pt")
+          ),
+          orderBy: (fc, { asc }) => [asc(fc.createdAt)],
+        });
+      }
+
+      // Also fetch manual PT flashcards for this topic
+      const manualFlashcards = await db.query.flashcards.findMany({
+        where: and(
+          eq(flashcards.topicId, topicId),
+          eq(flashcards.language, "pt"),
+          eq(flashcards.isManual, true)
+        ),
+        orderBy: (fc, { asc }) => [asc(fc.createdAt)],
+      });
+
+      // Combine and deduplicate
+      const allBaseFlashcards = [...baseFlashcards, ...manualFlashcards];
+      const seenIds = new Set<string>();
+      const uniqueBaseFlashcards = allBaseFlashcards.filter(fc => {
+        if (seenIds.has(fc.id)) return false;
+        seenIds.add(fc.id);
+        return true;
+      });
+
+      if (uniqueBaseFlashcards.length === 0) {
+        return res.json({
+          success: true,
+          flashcards: [],
+        });
+      }
+
+      // Fetch ALL translations for these base flashcards
+      const baseIds = uniqueBaseFlashcards.map(fc => fc.id);
+      const translationMappings = await db.query.flashcardTranslations.findMany({
+        where: inArray(flashcardTranslations.baseFlashcardId, baseIds),
+      });
+
+      // Get the translated flashcard IDs
+      const translatedIds = translationMappings.map(m => m.translatedFlashcardId);
+      let translatedFlashcards: Flashcard[] = [];
+      if (translatedIds.length > 0) {
+        translatedFlashcards = await db.query.flashcards.findMany({
+          where: inArray(flashcards.id, translatedIds),
+        });
+      }
+
+      // Get latest SM-2 attempts for all base flashcards (for scheduling data)
+      const attemptsMap = new Map<string, { 
+        nextReviewDate: Date | null; 
+        easeFactor: number; 
+        intervalDays: number;
+        repetitions: number;
+      }>();
+      
+      if (baseIds.length > 0) {
+        const attemptsResult = await db
+          .select()
+          .from(flashcardAttempts)
+          .where(
+            and(
+              inArray(flashcardAttempts.flashcardId, baseIds),
+              eq(flashcardAttempts.userId, userId)
+            )
+          )
+          .orderBy(desc(flashcardAttempts.attemptDate));
+        
+        // Keep only latest attempt per flashcard
+        for (const attempt of attemptsResult) {
+          if (!attemptsMap.has(attempt.flashcardId)) {
+            attemptsMap.set(attempt.flashcardId, {
+              nextReviewDate: attempt.nextReviewDate,
+              easeFactor: attempt.easeFactor || 2.5,
+              intervalDays: attempt.intervalDays || 0,
+              repetitions: attempt.repetitions || 0,
+            });
+          }
+        }
+      }
+
+      // Build a map: baseId -> { lang: flashcard }
+      const translationsMap = new Map<string, Record<string, Flashcard>>();
+      
+      // Initialize with PT base flashcards
+      for (const fc of uniqueBaseFlashcards) {
+        translationsMap.set(fc.id, { pt: fc });
+      }
+
+      // Add translations
+      for (const mapping of translationMappings) {
+        const translatedFC = translatedFlashcards.find(fc => fc.id === mapping.translatedFlashcardId);
+        if (translatedFC) {
+          const existing = translationsMap.get(mapping.baseFlashcardId) || {};
+          existing[mapping.targetLanguage] = translatedFC;
+          translationsMap.set(mapping.baseFlashcardId, existing);
+        }
+      }
+
+      // Build bundled response
+      const bundledFlashcards = uniqueBaseFlashcards.map(baseFC => {
+        const translations = translationsMap.get(baseFC.id) || { pt: baseFC };
+        const sm2Data = attemptsMap.get(baseFC.id);
+        
+        // Build translations object with question/answer for each language
+        const translationsBundle: Record<string, { question: string; answer: string; flashcardId: string }> = {};
+        
+        for (const [lang, fc] of Object.entries(translations)) {
+          translationsBundle[lang] = {
+            question: fc.question,
+            answer: fc.answer,
+            flashcardId: fc.id,
+          };
+        }
+
+        return {
+          id: baseFC.id, // Base PT flashcard ID (used for SM-2 progress)
+          topicId: baseFC.topicId,
+          subjectId: baseFC.subjectId,
+          isManual: baseFC.isManual,
+          createdAt: baseFC.createdAt?.toISOString() || new Date().toISOString(),
+          translations: translationsBundle,
+          // SM-2 fields from attempts (real scheduling data)
+          easeFactor: sm2Data?.easeFactor ?? 2.5,
+          interval: sm2Data?.intervalDays ?? 0,
+          repetitions: sm2Data?.repetitions ?? 0,
+          nextReviewDate: sm2Data?.nextReviewDate?.toISOString() || null,
+          lastReviewDate: baseFC.lastReviewDate,
+        };
+      });
+
+      console.log(`[GET /api/flashcards/topic/:topicId/bundled] Returning ${bundledFlashcards.length} bundled flashcards`);
+
+      return res.json({
+        success: true,
+        flashcards: bundledFlashcards,
+      });
+    } catch (error) {
+      console.error("Error fetching bundled flashcards:", error);
       return res.status(500).json({
         success: false,
         error: "Erro ao buscar flashcards",
