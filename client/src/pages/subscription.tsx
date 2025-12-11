@@ -212,7 +212,7 @@ export default function SubscriptionPage() {
       icon: Crown,
       color: "text-blue-600 dark:text-blue-400",
       popular: true,
-      featureKeys: ["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "dashboard", "ranking", "sync"],
+      featureKeys: ["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "dashboard", "ranking"],
     },
     {
       id: "premium",
