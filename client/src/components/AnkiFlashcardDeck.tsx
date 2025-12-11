@@ -126,7 +126,20 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     }
   }, [filteredFlashcards, deckInitialized]);
 
-  // Reset when mode changes
+  // Update translations when language changes (without resetting progress)
+  useEffect(() => {
+    if (deckInitialized && localDeck.length > 0 && filteredFlashcards.length > 0) {
+      // Update localDeck with new translations while preserving order
+      setLocalDeck(prevDeck => {
+        return prevDeck.map(card => {
+          const updated = filteredFlashcards.find(fc => fc.baseId === card.baseId);
+          return updated || card;
+        });
+      });
+    }
+  }, [i18n.language, filteredFlashcards]);
+
+  // Reset when mode or topic changes (NOT language)
   useEffect(() => {
     setCurrentIndex(0);
     setSessionTime(0);
