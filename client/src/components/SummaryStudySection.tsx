@@ -122,19 +122,24 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   };
 
   // Fetch ALL flashcards with ALL translations bundled - NO language in query key!
-  const { data: bundledData, isLoading } = useQuery<BundledFlashcardsResponse>({
+  const { data: bundledData, isLoading, error } = useQuery<BundledFlashcardsResponse>({
     queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
-      // Add cache buster to prevent 304 issues
       const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`, {
-        headers: { 'Cache-Control': 'no-cache' }
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch flashcards");
       return res.json();
     },
     staleTime: 30000,
     gcTime: 60000,
+    retry: 1,
   });
+  
+  // Debug: log any errors
+  if (error) {
+    console.error("[SummaryStudySection] Error fetching flashcards:", error);
+  }
 
   // Transform bundled flashcards to display format based on current language
   const displayFlashcards = useMemo(() => {

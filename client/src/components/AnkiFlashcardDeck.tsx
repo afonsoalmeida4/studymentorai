@@ -59,13 +59,14 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
       const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`, {
-        headers: { 'Cache-Control': 'no-cache' }
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },
     staleTime: 30000,
     gcTime: 60000,
+    retry: 1,
   });
 
   // Transform bundled flashcards to display format based on current language
