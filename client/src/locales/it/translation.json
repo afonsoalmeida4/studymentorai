@@ -578,6 +578,9 @@
     "notFound": "Non trovato.",
     "limit": "Limite raggiunto. Aggiorna il tuo piano per continuare.",
     "upload": "Errore nel caricamento del file. Controlla formato e dimensione.",
+    "generateSummaries": "Errore durante la generazione dei riassunti",
+    "tryAgain": "Impossibile completare l'operazione. Per favore riprova.",
+    "loadSubscription": "Impossibile caricare le informazioni sull'abbonamento",
     "SUBJECT_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} cartelle del piano {{planName}}. Aggiorna per creare più cartelle!",
     "TOPIC_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} sottocartelle del piano {{planName}}. Aggiorna per creare più sottocartelle!",
     "UPLOAD_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} caricamenti al mese del piano {{planName}}. Aggiorna per continuare!",
@@ -696,17 +699,6 @@
       "rights": "Tutti i diritti riservati.",
       "privacy": "Informativa sulla Privacy"
     }
-  },
-  "errors": {
-    "generic": "Si è verificato un errore. Per favore riprova.",
-    "network": "Errore di rete. Controlla la tua connessione internet.",
-    "unauthorized": "Non autorizzato. Per favore accedi nuovamente.",
-    "notFound": "Non trovato.",
-    "limit": "Limite raggiunto. Aggiorna il tuo piano per continuare.",
-    "upload": "Errore durante il caricamento del file. Controlla formato e dimensioni.",
-    "generateSummaries": "Errore durante la generazione dei riassunti",
-    "tryAgain": "Impossibile completare l'operazione. Per favore riprova.",
-    "loadSubscription": "Impossibile caricare le informazioni sull'abbonamento"
   },
   "myClasses": {
     "title": "Le Mie Classi",

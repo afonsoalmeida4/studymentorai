@@ -578,6 +578,9 @@
     "notFound": "Nicht gefunden.",
     "limit": "Limit erreicht. Upgraden Sie Ihren Plan, um fortzufahren.",
     "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe.",
+    "generateSummaries": "Fehler beim Generieren der Zusammenfassungen",
+    "tryAgain": "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+    "loadSubscription": "Abonnementinformationen konnten nicht geladen werden",
     "SUBJECT_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Ordnern im {{planName}}-Plan erreicht. Upgraden Sie, um mehr Ordner zu erstellen!",
     "TOPIC_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Unterordnern im {{planName}}-Plan erreicht. Upgraden Sie, um mehr Unterordner zu erstellen!",
     "UPLOAD_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Uploads pro Monat im {{planName}}-Plan erreicht. Upgraden Sie, um fortzufahren!",
@@ -696,17 +699,6 @@
       "rights": "Alle Rechte vorbehalten.",
       "privacy": "Datenschutzrichtlinie"
     }
-  },
-  "errors": {
-    "generic": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-    "network": "Netzwerkfehler. Überprüfen Sie Ihre Internetverbindung.",
-    "unauthorized": "Nicht autorisiert. Bitte melden Sie sich erneut an.",
-    "notFound": "Nicht gefunden.",
-    "limit": "Limit erreicht. Aktualisieren Sie Ihren Plan, um fortzufahren.",
-    "upload": "Fehler beim Hochladen der Datei. Überprüfen Sie Format und Größe.",
-    "generateSummaries": "Fehler beim Generieren der Zusammenfassungen",
-    "tryAgain": "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
-    "loadSubscription": "Abonnementinformationen konnten nicht geladen werden"
   },
   "myClasses": {
     "title": "Meine Klassen",

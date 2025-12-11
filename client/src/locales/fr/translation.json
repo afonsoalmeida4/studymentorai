@@ -578,6 +578,9 @@
     "notFound": "Non trouvé.",
     "limit": "Limite atteinte. Mettez à niveau votre plan pour continuer.",
     "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille.",
+    "generateSummaries": "Erreur lors de la génération des résumés",
+    "tryAgain": "Impossible de terminer l'opération. Veuillez réessayer.",
+    "loadSubscription": "Impossible de charger les informations d'abonnement",
     "SUBJECT_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} dossiers du plan {{planName}}. Mettez à niveau pour créer plus de dossiers !",
     "TOPIC_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} sous-dossiers du plan {{planName}}. Mettez à niveau pour créer plus de sous-dossiers !",
     "UPLOAD_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} téléchargements par mois du plan {{planName}}. Mettez à niveau pour continuer !",
@@ -696,17 +699,6 @@
       "rights": "Tous droits réservés.",
       "privacy": "Politique de Confidentialité"
     }
-  },
-  "errors": {
-    "generic": "Une erreur s'est produite. Veuillez réessayer.",
-    "network": "Erreur réseau. Vérifiez votre connexion internet.",
-    "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
-    "notFound": "Non trouvé.",
-    "limit": "Limite atteinte. Mettez à niveau votre plan pour continuer.",
-    "upload": "Erreur lors du téléchargement du fichier. Vérifiez le format et la taille.",
-    "generateSummaries": "Erreur lors de la génération des résumés",
-    "tryAgain": "Impossible de terminer l'opération. Veuillez réessayer.",
-    "loadSubscription": "Impossible de charger les informations d'abonnement"
   },
   "myClasses": {
     "title": "Mes Classes",
