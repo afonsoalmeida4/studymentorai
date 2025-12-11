@@ -43,8 +43,8 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language] });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
       toast({
-        title: t('flashcards.regenerateSuccessTitle'),
-        description: t('flashcards.regenerateSuccessDescription', { 
+        title: t('summaryStudy.regenerateSuccessTitle'),
+        description: t('summaryStudy.regenerateSuccessDescription', { 
           previousCount: data.previousCount || 0, 
           newCount: data.newCount || 0 
         }),
@@ -52,8 +52,8 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     },
     onError: () => {
       toast({
-        title: t('flashcards.errorRegenerateTitle'),
-        description: t('flashcards.errorRegenerate'),
+        title: t('summaryStudy.errorRegenerateTitle'),
+        description: t('summaryStudy.errorRegenerate'),
         variant: "destructive",
       });
     },
@@ -61,7 +61,9 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
 
   const handleGenerateMore = async () => {
     // Use cached summaries if available, otherwise fetch
-    let summaryId = summariesData?.summaries?.[0]?.id;
+    // Note: summaries is an object keyed by learning style, not an array
+    const cachedSummaries = summariesData?.summaries;
+    let summaryId = cachedSummaries ? Object.values(cachedSummaries)?.[0]?.id : undefined;
     
     if (!summaryId) {
       // Fetch summaries directly if not cached
@@ -69,7 +71,12 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
         const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
         if (res.ok) {
           const data = await res.json();
-          summaryId = data.summaries?.[0]?.id;
+          // summaries is an object keyed by learning style
+          const summariesObj = data.summaries;
+          if (summariesObj && typeof summariesObj === 'object') {
+            const firstSummary = Object.values(summariesObj)?.[0] as any;
+            summaryId = firstSummary?.id;
+          }
         }
       } catch (e) {
         console.error("Failed to fetch summaries for regeneration");
@@ -80,8 +87,8 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
       regenerateMutation.mutate(summaryId);
     } else {
       toast({
-        title: t('common.error'),
-        description: t('flashcards.errorRegenerate'),
+        title: t('summaryStudy.errorRegenerateTitle'),
+        description: t('summaryStudy.errorRegenerate'),
         variant: "destructive",
       });
     }
@@ -152,7 +159,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
                 ) : (
                   <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                 )}
-                <span className="hidden sm:inline">{t('flashcards.regenerateButton')}</span>
+                <span className="hidden sm:inline">{t('summaryStudy.regenerateButton')}</span>
               </Button>
             )}
             {hasAdvancedFlashcards && (
