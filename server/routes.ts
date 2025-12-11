@@ -819,6 +819,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get ALL existing flashcards for the TOPIC (not just this summary) to show accurate count
       const topicId = topicSummary.topicId;
+      
+      // CRITICAL: Find the PT base summary for this topic + learning style
+      // This ensures flashcards are always associated with PT summaries (which bundled endpoint filters by)
+      let ptBaseSummaryId = topicSummaryId;
+      if (topicSummary.language !== "pt") {
+        // Find corresponding PT summary with same learning style
+        const ptBaseSummary = await db.query.topicSummaries.findFirst({
+          where: and(
+            eq(topicSummaries.topicId, topicId),
+            eq(topicSummaries.language, "pt"),
+            eq(topicSummaries.learningStyle, topicSummary.learningStyle)
+          ),
+        });
+        if (ptBaseSummary) {
+          ptBaseSummaryId = ptBaseSummary.id;
+          console.log(`[Regenerate Flashcards] Mapped ${topicSummary.language} summary ${topicSummaryId} → PT base ${ptBaseSummaryId}`);
+        } else {
+          console.warn(`[Regenerate Flashcards] No PT base summary found for ${topicSummary.learningStyle}, using original`);
+        }
+      }
       const allTopicSummaries = await db.query.topicSummaries.findMany({
         where: and(
           eq(topicSummaries.topicId, topicId),
@@ -865,11 +885,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ALWAYS generate flashcards in PT (base language) for consistency with bundled endpoint
       const flashcardsData = await generateFlashcards(trimmedSummaryText, "pt", null, flashcardMaxTokens);
 
-      // Save new flashcards in PT (base language)
+      // Save new flashcards in PT (base language), linked to PT base summary
       const newFlashcards = await storage.createFlashcards(
         flashcardsData.map((fc: any) => ({
           userId,
-          topicSummaryId,
+          topicSummaryId: ptBaseSummaryId, // ALWAYS use PT base summary ID
           isManual: false,
           language: "pt", // ALWAYS PT as base
           question: fc.question,
