@@ -270,6 +270,30 @@ export default function SubjectView() {
             ))}
           </div>
         )}
+
+        {/* Delete subject confirmation dialog */}
+        <AlertDialog open={!!subjectToDelete} onOpenChange={(open) => !open && setSubjectToDelete(null)}>
+          <AlertDialogContent data-testid="dialog-delete-subject-list">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('subjectView.deleteSubjectTitle')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t('subjectView.deleteSubjectDescription', { name: subjectToDelete?.name })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel data-testid="button-cancel-delete-subject-list">
+                {t('common.cancel')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => subjectToDelete && deleteSubjectMutation.mutate(subjectToDelete.id)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                data-testid="button-confirm-delete-subject-list"
+              >
+                {deleteSubjectMutation.isPending ? t('common.deleting') : t('common.delete')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }
