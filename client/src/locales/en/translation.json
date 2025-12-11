@@ -247,7 +247,17 @@
     "namePlaceholder": "E.g., Linear Algebra",
     "descriptionOptional": "Description (optional)",
     "descriptionPlaceholder": "Brief description...",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "topicDeleted": "Topic deleted!",
+    "topicDeletedDescription": "The topic was successfully removed.",
+    "errorDeletingTopic": "Could not delete the topic.",
+    "deleteTopicTitle": "Delete topic",
+    "deleteTopicDescription": "Are you sure you want to delete \"{{name}}\"? This will remove all associated content, summaries, and flashcards.",
+    "subjectDeleted": "Subject deleted!",
+    "subjectDeletedDescription": "The subject was successfully removed.",
+    "errorDeletingSubject": "Could not delete the subject.",
+    "deleteSubjectTitle": "Delete subject",
+    "deleteSubjectDescription": "Are you sure you want to delete \"{{name}}\"? This will remove all topics, content, summaries, and flashcards."
   },
   "summaryStudy": {
     "title": "Study Flashcards",

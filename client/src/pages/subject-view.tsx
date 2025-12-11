@@ -16,6 +16,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +41,8 @@ export default function SubjectView() {
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
   const [newTopicName, setNewTopicName] = useState("");
   const [newTopicDescription, setNewTopicDescription] = useState("");
+  const [topicToDelete, setTopicToDelete] = useState<Topic | null>(null);
+  const [subjectToDelete, setSubjectToDelete] = useState<Subject | null>(null);
 
   const { data: subjects = [] } = useQuery<Subject[]>({
     queryKey: ["/api/subjects"],
@@ -131,6 +143,61 @@ export default function SubjectView() {
     }
   };
 
+  const deleteTopicMutation = useMutation({
+    mutationFn: async (topicId: string) => {
+      return apiRequest("DELETE", `/api/topics/${topicId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/topics", subjectId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/subject-progress"] });
+      setTopicToDelete(null);
+      toast({
+        title: t('subjectView.topicDeleted'),
+        description: t('subjectView.topicDeletedDescription'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: t('subjectView.errorDeletingTopic'),
+      });
+    },
+  });
+
+  const deleteSubjectMutation = useMutation({
+    mutationFn: async (subjectId: string) => {
+      return apiRequest("DELETE", `/api/subjects/${subjectId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats/subject-progress"] });
+      setSubjectToDelete(null);
+      setLocation("/subjects");
+      toast({
+        title: t('subjectView.subjectDeleted'),
+        description: t('subjectView.subjectDeletedDescription'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: t('subjectView.errorDeletingSubject'),
+      });
+    },
+  });
+
+  const handleDeleteTopic = (e: React.MouseEvent, topic: Topic) => {
+    e.stopPropagation();
+    setTopicToDelete(topic);
+  };
+
+  const handleDeleteSubject = (e: React.MouseEvent, subject: Subject) => {
+    e.stopPropagation();
+    setSubjectToDelete(subject);
+  };
+
   if (!subjectId) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
@@ -168,12 +235,23 @@ export default function SubjectView() {
                 data-testid={`card-subject-${subject.id}`}
               >
                 <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div
-                      className="w-4 h-4 rounded"
-                      style={{ backgroundColor: subject.color ?? "#6366f1" }}
-                    />
-                    <CardTitle className="text-lg">{subject.name}</CardTitle>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3 mb-2 flex-1">
+                      <div
+                        className="w-4 h-4 rounded flex-shrink-0"
+                        style={{ backgroundColor: subject.color ?? "#6366f1" }}
+                      />
+                      <CardTitle className="text-lg">{subject.name}</CardTitle>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="flex-shrink-0 text-muted-foreground hover:text-destructive"
+                      onClick={(e) => handleDeleteSubject(e, subject)}
+                      data-testid={`button-delete-subject-${subject.id}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                   {subject.description && (
                     <CardDescription>{subject.description}</CardDescription>
@@ -253,18 +331,29 @@ export default function SubjectView() {
                           <CardDescription>{topic.description}</CardDescription>
                         )}
                       </div>
-                      <button
-                        onClick={(e) => handleToggleComplete(e, topic.id)}
-                        className="flex-shrink-0 p-1 rounded-full hover-elevate active-elevate-2 transition-colors"
-                        data-testid={`checkbox-topic-${topic.id}`}
-                        aria-label={completed ? t('subjectView.markIncomplete') : t('subjectView.markComplete')}
-                      >
-                        {completed ? (
-                          <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
-                        ) : (
-                          <Circle className="w-6 h-6 text-muted-foreground" />
-                        )}
-                      </button>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          onClick={(e) => handleToggleComplete(e, topic.id)}
+                          className="p-1 rounded-full hover-elevate active-elevate-2 transition-colors"
+                          data-testid={`checkbox-topic-${topic.id}`}
+                          aria-label={completed ? t('subjectView.markIncomplete') : t('subjectView.markComplete')}
+                        >
+                          {completed ? (
+                            <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                          ) : (
+                            <Circle className="w-5 h-5 text-muted-foreground" />
+                          )}
+                        </button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={(e) => handleDeleteTopic(e, topic)}
+                          data-testid={`button-delete-topic-${topic.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                 </Card>
@@ -326,6 +415,52 @@ export default function SubjectView() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!topicToDelete} onOpenChange={(open) => !open && setTopicToDelete(null)}>
+        <AlertDialogContent data-testid="dialog-delete-topic">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('subjectView.deleteTopicTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('subjectView.deleteTopicDescription', { name: topicToDelete?.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-topic">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => topicToDelete && deleteTopicMutation.mutate(topicToDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-topic"
+            >
+              {deleteTopicMutation.isPending ? t('common.deleting') : t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!subjectToDelete} onOpenChange={(open) => !open && setSubjectToDelete(null)}>
+        <AlertDialogContent data-testid="dialog-delete-subject">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('subjectView.deleteSubjectTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('subjectView.deleteSubjectDescription', { name: subjectToDelete?.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-subject">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => subjectToDelete && deleteSubjectMutation.mutate(subjectToDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-subject"
+            >
+              {deleteSubjectMutation.isPending ? t('common.deleting') : t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

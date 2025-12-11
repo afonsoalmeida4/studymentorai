@@ -430,16 +430,18 @@ export default function TopicView() {
             <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             {subscriptionLoading ? t('common.loading') : t('topicView.uploadFile')}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsLinkDialogOpen(true)}
-            data-testid="button-add-link"
-            className="text-xs sm:text-sm"
-          >
-            <Link2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            {t('topicView.addLink')}
-          </Button>
+          {currentPlan !== "free" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsLinkDialogOpen(true)}
+              data-testid="button-add-link"
+              className="text-xs sm:text-sm"
+            >
+              <Link2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              {t('topicView.addLink')}
+            </Button>
+          )}
         </div>
 
         {contents.length === 0 ? (

@@ -22,7 +22,8 @@
     "upload": "Carregar ficheiro",
     "download": "Descarregar",
     "language": "Idioma",
-    "xp": "XP"
+    "xp": "XP",
+    "deleting": "A eliminar..."
   },
   "app": {
     "tagline": "Organiza. Equilibra."
@@ -244,7 +245,17 @@
     "namePlaceholder": "Ex: Álgebra Linear",
     "descriptionOptional": "Descrição (opcional)",
     "descriptionPlaceholder": "Breve descrição...",
-    "creating": "A criar..."
+    "creating": "A criar...",
+    "topicDeleted": "Tópico eliminado!",
+    "topicDeletedDescription": "O tópico foi removido com sucesso.",
+    "errorDeletingTopic": "Não foi possível eliminar o tópico.",
+    "deleteTopicTitle": "Eliminar tópico",
+    "deleteTopicDescription": "Tens a certeza que queres eliminar \"{{name}}\"? Esta ação irá remover todo o conteúdo, resumos e flashcards associados.",
+    "subjectDeleted": "Disciplina eliminada!",
+    "subjectDeletedDescription": "A disciplina foi removida com sucesso.",
+    "errorDeletingSubject": "Não foi possível eliminar a disciplina.",
+    "deleteSubjectTitle": "Eliminar disciplina",
+    "deleteSubjectDescription": "Tens a certeza que queres eliminar \"{{name}}\"? Esta ação irá remover todos os tópicos, conteúdo, resumos e flashcards associados."
   },
   "summaryStudy": {
     "title": "Flashcards de Estudo",

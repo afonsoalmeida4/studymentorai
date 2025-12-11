@@ -242,7 +242,17 @@
     "namePlaceholder": "z.B. Lineare Algebra",
     "descriptionOptional": "Beschreibung (optional)",
     "descriptionPlaceholder": "Kurze Beschreibung...",
-    "creating": "Erstellen..."
+    "creating": "Erstellen...",
+    "topicDeleted": "Thema gelöscht!",
+    "topicDeletedDescription": "Das Thema wurde erfolgreich entfernt.",
+    "errorDeletingTopic": "Das Thema konnte nicht gelöscht werden.",
+    "deleteTopicTitle": "Thema löschen",
+    "deleteTopicDescription": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Dies entfernt alle zugehörigen Inhalte, Zusammenfassungen und Karteikarten.",
+    "subjectDeleted": "Fach gelöscht!",
+    "subjectDeletedDescription": "Das Fach wurde erfolgreich entfernt.",
+    "errorDeletingSubject": "Das Fach konnte nicht gelöscht werden.",
+    "deleteSubjectTitle": "Fach löschen",
+    "deleteSubjectDescription": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Dies entfernt alle Themen, Inhalte, Zusammenfassungen und Karteikarten."
   },
   "summaryStudy": {
     "title": "Lernkarteikarten",

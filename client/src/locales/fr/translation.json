@@ -242,7 +242,17 @@
     "namePlaceholder": "Ex: Algèbre Linéaire",
     "descriptionOptional": "Description (facultative)",
     "descriptionPlaceholder": "Brève description...",
-    "creating": "Création..."
+    "creating": "Création...",
+    "topicDeleted": "Sujet supprimé!",
+    "topicDeletedDescription": "Le sujet a été supprimé avec succès.",
+    "errorDeletingTopic": "Impossible de supprimer le sujet.",
+    "deleteTopicTitle": "Supprimer le sujet",
+    "deleteTopicDescription": "Êtes-vous sûr de vouloir supprimer \"{{name}}\"? Cela supprimera tout le contenu, les résumés et les cartes associés.",
+    "subjectDeleted": "Matière supprimée!",
+    "subjectDeletedDescription": "La matière a été supprimée avec succès.",
+    "errorDeletingSubject": "Impossible de supprimer la matière.",
+    "deleteSubjectTitle": "Supprimer la matière",
+    "deleteSubjectDescription": "Êtes-vous sûr de vouloir supprimer \"{{name}}\"? Cela supprimera tous les sujets, le contenu, les résumés et les cartes."
   },
   "summaryStudy": {
     "title": "Cartes d'Étude",

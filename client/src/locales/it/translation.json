@@ -242,7 +242,17 @@
     "namePlaceholder": "Es: Algebra Lineare",
     "descriptionOptional": "Descrizione (opzionale)",
     "descriptionPlaceholder": "Breve descrizione...",
-    "creating": "Creazione..."
+    "creating": "Creazione...",
+    "topicDeleted": "Argomento eliminato!",
+    "topicDeletedDescription": "L'argomento è stato rimosso con successo.",
+    "errorDeletingTopic": "Impossibile eliminare l'argomento.",
+    "deleteTopicTitle": "Elimina argomento",
+    "deleteTopicDescription": "Sei sicuro di voler eliminare \"{{name}}\"? Questo rimuoverà tutti i contenuti, riassunti e schede associati.",
+    "subjectDeleted": "Materia eliminata!",
+    "subjectDeletedDescription": "La materia è stata rimossa con successo.",
+    "errorDeletingSubject": "Impossibile eliminare la materia.",
+    "deleteSubjectTitle": "Elimina materia",
+    "deleteSubjectDescription": "Sei sicuro di voler eliminare \"{{name}}\"? Questo rimuoverà tutti gli argomenti, contenuti, riassunti e schede."
   },
   "summaryStudy": {
     "title": "Schede di Studio",

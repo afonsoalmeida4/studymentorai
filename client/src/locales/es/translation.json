@@ -245,7 +245,17 @@
     "namePlaceholder": "Ej: Álgebra Lineal",
     "descriptionOptional": "Descripción (opcional)",
     "descriptionPlaceholder": "Breve descripción...",
-    "creating": "Creando..."
+    "creating": "Creando...",
+    "topicDeleted": "¡Tema eliminado!",
+    "topicDeletedDescription": "El tema se eliminó correctamente.",
+    "errorDeletingTopic": "No se pudo eliminar el tema.",
+    "deleteTopicTitle": "Eliminar tema",
+    "deleteTopicDescription": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto eliminará todo el contenido, resúmenes y tarjetas asociados.",
+    "subjectDeleted": "¡Materia eliminada!",
+    "subjectDeletedDescription": "La materia se eliminó correctamente.",
+    "errorDeletingSubject": "No se pudo eliminar la materia.",
+    "deleteSubjectTitle": "Eliminar materia",
+    "deleteSubjectDescription": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto eliminará todos los temas, contenido, resúmenes y tarjetas."
   },
   "summaryStudy": {
     "title": "Tarjetas de Estudio",
