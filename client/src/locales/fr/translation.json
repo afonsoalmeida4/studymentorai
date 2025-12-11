@@ -22,7 +22,9 @@
     "upload": "Télécharger fichier",
     "download": "Télécharger",
     "language": "Langue",
-    "xp": "XP"
+    "xp": "XP",
+    "deleting": "Suppression...",
+    "saving": "Enregistrement..."
   },
   "nav": {
     "subjects": "Matières",
@@ -252,7 +254,17 @@
     "subjectDeletedDescription": "La matière a été supprimée avec succès.",
     "errorDeletingSubject": "Impossible de supprimer la matière.",
     "deleteSubjectTitle": "Supprimer la matière",
-    "deleteSubjectDescription": "Êtes-vous sûr de vouloir supprimer \"{{name}}\"? Cela supprimera tous les sujets, le contenu, les résumés et les cartes."
+    "deleteSubjectDescription": "Êtes-vous sûr de vouloir supprimer \"{{name}}\"? Cela supprimera tous les sujets, le contenu, les résumés et les cartes.",
+    "editSubject": "Modifier la matière",
+    "editSubjectDescription": "Modifiez le nom et la description de la matière.",
+    "subjectUpdated": "Matière mise à jour!",
+    "subjectUpdatedDescription": "Les modifications ont été enregistrées avec succès.",
+    "errorUpdatingSubject": "Impossible de mettre à jour la matière.",
+    "editTopic": "Modifier le sujet",
+    "editTopicDescription": "Modifiez le nom et la description du sujet.",
+    "topicUpdated": "Sujet mis à jour!",
+    "topicUpdatedDescription": "Les modifications ont été enregistrées avec succès.",
+    "errorUpdatingTopic": "Impossible de mettre à jour le sujet."
   },
   "summaryStudy": {
     "title": "Cartes d'Étude",

@@ -23,7 +23,8 @@
     "download": "Descarregar",
     "language": "Idioma",
     "xp": "XP",
-    "deleting": "A eliminar..."
+    "deleting": "A eliminar...",
+    "saving": "A guardar..."
   },
   "app": {
     "tagline": "Organiza. Equilibra."
@@ -255,7 +256,19 @@
     "subjectDeletedDescription": "A disciplina foi removida com sucesso.",
     "errorDeletingSubject": "Não foi possível eliminar a disciplina.",
     "deleteSubjectTitle": "Eliminar disciplina",
-    "deleteSubjectDescription": "Tens a certeza que queres eliminar \"{{name}}\"? Esta ação irá remover todos os tópicos, conteúdo, resumos e flashcards associados."
+    "deleteSubjectDescription": "Tens a certeza que queres eliminar \"{{name}}\"? Esta ação irá remover todos os tópicos, conteúdo, resumos e flashcards associados.",
+    "editSubject": "Editar disciplina",
+    "editSubjectDescription": "Altera o nome e descrição da disciplina.",
+    "subjectUpdated": "Disciplina atualizada!",
+    "subjectUpdatedDescription": "As alterações foram guardadas com sucesso.",
+    "errorUpdatingSubject": "Não foi possível atualizar a disciplina.",
+    "editTopic": "Editar tópico",
+    "editTopicDescription": "Altera o nome e descrição do tópico.",
+    "topicUpdated": "Tópico atualizado!",
+    "topicUpdatedDescription": "As alterações foram guardadas com sucesso.",
+    "errorUpdatingTopic": "Não foi possível atualizar o tópico.",
+    "topicCreated": "Tópico criado!",
+    "topicCreatedDescription": "O tópico foi criado com sucesso."
   },
   "summaryStudy": {
     "title": "Flashcards de Estudo",

@@ -22,7 +22,9 @@
     "upload": "Upload file",
     "download": "Download",
     "language": "Language",
-    "xp": "XP"
+    "xp": "XP",
+    "deleting": "Deleting...",
+    "saving": "Saving..."
   },
   "app": {
     "tagline": "Organize. Balance."
@@ -257,7 +259,17 @@
     "subjectDeletedDescription": "The subject was successfully removed.",
     "errorDeletingSubject": "Could not delete the subject.",
     "deleteSubjectTitle": "Delete subject",
-    "deleteSubjectDescription": "Are you sure you want to delete \"{{name}}\"? This will remove all topics, content, summaries, and flashcards."
+    "deleteSubjectDescription": "Are you sure you want to delete \"{{name}}\"? This will remove all topics, content, summaries, and flashcards.",
+    "editSubject": "Edit subject",
+    "editSubjectDescription": "Change the name and description of the subject.",
+    "subjectUpdated": "Subject updated!",
+    "subjectUpdatedDescription": "Changes have been saved successfully.",
+    "errorUpdatingSubject": "Could not update the subject.",
+    "editTopic": "Edit topic",
+    "editTopicDescription": "Change the name and description of the topic.",
+    "topicUpdated": "Topic updated!",
+    "topicUpdatedDescription": "Changes have been saved successfully.",
+    "errorUpdatingTopic": "Could not update the topic."
   },
   "summaryStudy": {
     "title": "Study Flashcards",

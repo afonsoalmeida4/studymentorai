@@ -22,7 +22,9 @@
     "upload": "Subir archivo",
     "download": "Descargar",
     "language": "Idioma",
-    "xp": "XP"
+    "xp": "XP",
+    "deleting": "Eliminando...",
+    "saving": "Guardando..."
   },
   "app": {
     "tagline": "Organiza. Equilibra."
@@ -255,7 +257,17 @@
     "subjectDeletedDescription": "La materia se eliminó correctamente.",
     "errorDeletingSubject": "No se pudo eliminar la materia.",
     "deleteSubjectTitle": "Eliminar materia",
-    "deleteSubjectDescription": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto eliminará todos los temas, contenido, resúmenes y tarjetas."
+    "deleteSubjectDescription": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto eliminará todos los temas, contenido, resúmenes y tarjetas.",
+    "editSubject": "Editar materia",
+    "editSubjectDescription": "Cambia el nombre y descripción de la materia.",
+    "subjectUpdated": "¡Materia actualizada!",
+    "subjectUpdatedDescription": "Los cambios se han guardado con éxito.",
+    "errorUpdatingSubject": "No se pudo actualizar la materia.",
+    "editTopic": "Editar tema",
+    "editTopicDescription": "Cambia el nombre y descripción del tema.",
+    "topicUpdated": "¡Tema actualizado!",
+    "topicUpdatedDescription": "Los cambios se han guardado con éxito.",
+    "errorUpdatingTopic": "No se pudo actualizar el tema."
   },
   "summaryStudy": {
     "title": "Tarjetas de Estudio",

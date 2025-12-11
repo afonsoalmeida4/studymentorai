@@ -22,7 +22,9 @@
     "upload": "Carica file",
     "download": "Scarica",
     "language": "Lingua",
-    "xp": "XP"
+    "xp": "XP",
+    "deleting": "Eliminazione...",
+    "saving": "Salvataggio..."
   },
   "nav": {
     "subjects": "Materie",
@@ -252,7 +254,17 @@
     "subjectDeletedDescription": "La materia è stata rimossa con successo.",
     "errorDeletingSubject": "Impossibile eliminare la materia.",
     "deleteSubjectTitle": "Elimina materia",
-    "deleteSubjectDescription": "Sei sicuro di voler eliminare \"{{name}}\"? Questo rimuoverà tutti gli argomenti, contenuti, riassunti e schede."
+    "deleteSubjectDescription": "Sei sicuro di voler eliminare \"{{name}}\"? Questo rimuoverà tutti gli argomenti, contenuti, riassunti e schede.",
+    "editSubject": "Modifica materia",
+    "editSubjectDescription": "Modifica il nome e la descrizione della materia.",
+    "subjectUpdated": "Materia aggiornata!",
+    "subjectUpdatedDescription": "Le modifiche sono state salvate con successo.",
+    "errorUpdatingSubject": "Impossibile aggiornare la materia.",
+    "editTopic": "Modifica argomento",
+    "editTopicDescription": "Modifica il nome e la descrizione dell'argomento.",
+    "topicUpdated": "Argomento aggiornato!",
+    "topicUpdatedDescription": "Le modifiche sono state salvate con successo.",
+    "errorUpdatingTopic": "Impossibile aggiornare l'argomento."
   },
   "summaryStudy": {
     "title": "Schede di Studio",

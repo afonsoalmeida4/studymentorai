@@ -22,7 +22,9 @@
     "upload": "Datei hochladen",
     "download": "Herunterladen",
     "language": "Sprache",
-    "xp": "XP"
+    "xp": "XP",
+    "deleting": "Löschen...",
+    "saving": "Speichern..."
   },
   "nav": {
     "subjects": "Fächer",
@@ -252,7 +254,17 @@
     "subjectDeletedDescription": "Das Fach wurde erfolgreich entfernt.",
     "errorDeletingSubject": "Das Fach konnte nicht gelöscht werden.",
     "deleteSubjectTitle": "Fach löschen",
-    "deleteSubjectDescription": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Dies entfernt alle Themen, Inhalte, Zusammenfassungen und Karteikarten."
+    "deleteSubjectDescription": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Dies entfernt alle Themen, Inhalte, Zusammenfassungen und Karteikarten.",
+    "editSubject": "Fach bearbeiten",
+    "editSubjectDescription": "Ändern Sie den Namen und die Beschreibung des Fachs.",
+    "subjectUpdated": "Fach aktualisiert!",
+    "subjectUpdatedDescription": "Änderungen wurden erfolgreich gespeichert.",
+    "errorUpdatingSubject": "Das Fach konnte nicht aktualisiert werden.",
+    "editTopic": "Thema bearbeiten",
+    "editTopicDescription": "Ändern Sie den Namen und die Beschreibung des Themas.",
+    "topicUpdated": "Thema aktualisiert!",
+    "topicUpdatedDescription": "Änderungen wurden erfolgreich gespeichert.",
+    "errorUpdatingTopic": "Das Thema konnte nicht aktualisiert werden."
   },
   "summaryStudy": {
     "title": "Lernkarteikarten",

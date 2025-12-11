@@ -43,6 +43,14 @@ export default function SubjectView() {
   const [newTopicDescription, setNewTopicDescription] = useState("");
   const [topicToDelete, setTopicToDelete] = useState<Topic | null>(null);
   const [subjectToDelete, setSubjectToDelete] = useState<Subject | null>(null);
+  
+  // Edit states
+  const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
+  const [editSubjectName, setEditSubjectName] = useState("");
+  const [editSubjectDescription, setEditSubjectDescription] = useState("");
+  const [topicToEdit, setTopicToEdit] = useState<Topic | null>(null);
+  const [editTopicName, setEditTopicName] = useState("");
+  const [editTopicDescription, setEditTopicDescription] = useState("");
 
   const { data: subjects = [] } = useQuery<Subject[]>({
     queryKey: ["/api/subjects"],
@@ -200,6 +208,87 @@ export default function SubjectView() {
     setSubjectToDelete(subject);
   };
 
+  // Edit mutations
+  const editSubjectMutation = useMutation({
+    mutationFn: async () => {
+      if (!subjectToEdit) return;
+      return apiRequest("PATCH", `/api/subjects/${subjectToEdit.id}`, {
+        name: editSubjectName,
+        description: editSubjectDescription || null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
+      setSubjectToEdit(null);
+      toast({
+        title: t('subjectView.subjectUpdated'),
+        description: t('subjectView.subjectUpdatedDescription'),
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: t('subjectView.errorUpdatingSubject'),
+      });
+    },
+  });
+
+  const editTopicMutation = useMutation({
+    mutationFn: async () => {
+      if (!topicToEdit) return;
+      return apiRequest("PATCH", `/api/topics/${topicToEdit.id}`, {
+        name: editTopicName,
+        description: editTopicDescription || null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/topics", subjectId] });
+      setTopicToEdit(null);
+      toast({
+        title: t('subjectView.topicUpdated'),
+        description: t('subjectView.topicUpdatedDescription'),
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: t('subjectView.errorUpdatingTopic'),
+      });
+    },
+  });
+
+  const handleEditSubject = (e: React.MouseEvent, subject: Subject) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSubjectToEdit(subject);
+    setEditSubjectName(subject.name);
+    setEditSubjectDescription(subject.description || "");
+  };
+
+  const handleEditTopic = (e: React.MouseEvent, topic: Topic) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setTopicToEdit(topic);
+    setEditTopicName(topic.name);
+    setEditTopicDescription(topic.description || "");
+  };
+
+  const handleSaveSubject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editSubjectName.trim()) {
+      editSubjectMutation.mutate();
+    }
+  };
+
+  const handleSaveTopic = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editTopicName.trim()) {
+      editTopicMutation.mutate();
+    }
+  };
+
   if (!subjectId) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
@@ -247,15 +336,26 @@ export default function SubjectView() {
                       />
                       <CardTitle className="text-lg">{subject.name}</CardTitle>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="flex-shrink-0 text-muted-foreground hover:text-destructive"
-                      onClick={() => setSubjectToDelete(subject)}
-                      data-testid={`button-delete-subject-${subject.id}`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="flex-shrink-0 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => handleEditSubject(e, subject)}
+                        data-testid={`button-edit-subject-${subject.id}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="flex-shrink-0 text-muted-foreground hover:text-destructive"
+                        onClick={() => setSubjectToDelete(subject)}
+                        data-testid={`button-delete-subject-${subject.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                   {subject.description && (
                     <CardDescription 
@@ -294,6 +394,60 @@ export default function SubjectView() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Edit subject dialog */}
+        <Dialog open={!!subjectToEdit} onOpenChange={(open) => !open && setSubjectToEdit(null)}>
+          <DialogContent data-testid="dialog-edit-subject-list">
+            <form onSubmit={handleSaveSubject}>
+              <DialogHeader>
+                <DialogTitle>{t('subjectView.editSubject')}</DialogTitle>
+                <DialogDescription>
+                  {t('subjectView.editSubjectDescription')}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-subject-name-list">{t('subjectView.name')}</Label>
+                  <Input
+                    id="edit-subject-name-list"
+                    value={editSubjectName}
+                    onChange={(e) => setEditSubjectName(e.target.value)}
+                    placeholder={t('subjectView.namePlaceholder')}
+                    data-testid="input-edit-subject-name-list"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-subject-description-list">{t('subjectView.descriptionOptional')}</Label>
+                  <Textarea
+                    id="edit-subject-description-list"
+                    value={editSubjectDescription}
+                    onChange={(e) => setEditSubjectDescription(e.target.value)}
+                    placeholder={t('subjectView.descriptionPlaceholder')}
+                    data-testid="input-edit-subject-description-list"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSubjectToEdit(null)}
+                  data-testid="button-cancel-edit-subject-list"
+                >
+                  {t('common.cancel')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!editSubjectName.trim() || editSubjectMutation.isPending}
+                  data-testid="button-save-subject-list"
+                >
+                  {editSubjectMutation.isPending ? t('common.saving') : t('common.save')}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -377,6 +531,15 @@ export default function SubjectView() {
                             <Circle className="w-5 h-5 text-muted-foreground" />
                           )}
                         </button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={(e) => handleEditTopic(e, topic)}
+                          data-testid={`button-edit-topic-${topic.id}`}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -494,6 +657,114 @@ export default function SubjectView() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit subject dialog */}
+      <Dialog open={!!subjectToEdit} onOpenChange={(open) => !open && setSubjectToEdit(null)}>
+        <DialogContent data-testid="dialog-edit-subject">
+          <form onSubmit={handleSaveSubject}>
+            <DialogHeader>
+              <DialogTitle>{t('subjectView.editSubject')}</DialogTitle>
+              <DialogDescription>
+                {t('subjectView.editSubjectDescription')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject-name">{t('subjectView.name')}</Label>
+                <Input
+                  id="edit-subject-name"
+                  value={editSubjectName}
+                  onChange={(e) => setEditSubjectName(e.target.value)}
+                  placeholder={t('subjectView.namePlaceholder')}
+                  data-testid="input-edit-subject-name"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject-description">{t('subjectView.descriptionOptional')}</Label>
+                <Textarea
+                  id="edit-subject-description"
+                  value={editSubjectDescription}
+                  onChange={(e) => setEditSubjectDescription(e.target.value)}
+                  placeholder={t('subjectView.descriptionPlaceholder')}
+                  data-testid="input-edit-subject-description"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setSubjectToEdit(null)}
+                data-testid="button-cancel-edit-subject"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!editSubjectName.trim() || editSubjectMutation.isPending}
+                data-testid="button-save-subject"
+              >
+                {editSubjectMutation.isPending ? t('common.saving') : t('common.save')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit topic dialog */}
+      <Dialog open={!!topicToEdit} onOpenChange={(open) => !open && setTopicToEdit(null)}>
+        <DialogContent data-testid="dialog-edit-topic">
+          <form onSubmit={handleSaveTopic}>
+            <DialogHeader>
+              <DialogTitle>{t('subjectView.editTopic')}</DialogTitle>
+              <DialogDescription>
+                {t('subjectView.editTopicDescription')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-topic-name">{t('subjectView.name')}</Label>
+                <Input
+                  id="edit-topic-name"
+                  value={editTopicName}
+                  onChange={(e) => setEditTopicName(e.target.value)}
+                  placeholder={t('subjectView.namePlaceholder')}
+                  data-testid="input-edit-topic-name"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-topic-description">{t('subjectView.descriptionOptional')}</Label>
+                <Textarea
+                  id="edit-topic-description"
+                  value={editTopicDescription}
+                  onChange={(e) => setEditTopicDescription(e.target.value)}
+                  placeholder={t('subjectView.descriptionPlaceholder')}
+                  data-testid="input-edit-topic-description"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setTopicToEdit(null)}
+                data-testid="button-cancel-edit-topic"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!editTopicName.trim() || editTopicMutation.isPending}
+                data-testid="button-save-topic"
+              >
+                {editTopicMutation.isPending ? t('common.saving') : t('common.save')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
