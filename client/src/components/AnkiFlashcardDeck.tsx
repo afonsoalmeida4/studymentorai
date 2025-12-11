@@ -8,6 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
 
 // Bundled flashcard type - contains all translations
 interface BundledFlashcard {
@@ -51,8 +52,12 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const [completedCount, setCompletedCount] = useState(0);
   const [localDeck, setLocalDeck] = useState<DisplayFlashcard[]>([]);
   const [deckInitialized, setDeckInitialized] = useState(false);
+  const [progressRestored, setProgressRestored] = useState(false);
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
+  
+  // Persistent progress storage
+  const { progress: savedProgress, saveProgress, resetProgress, isLoaded: progressLoaded } = useFlashcardProgress(topicId, mode);
 
   // Fetch ALL flashcards with ALL translations bundled - NO language in query key!
   const { data: bundledData, isLoading } = useQuery<BundledFlashcardsResponse>({
@@ -121,57 +126,80 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   // Track which cards have been completed in this session (by baseId)
   const [completedCardIds, setCompletedCardIds] = useState<Set<string>>(new Set());
 
+  // Restore progress from localStorage when loaded
+  useEffect(() => {
+    if (progressLoaded && !progressRestored) {
+      setCurrentIndex(savedProgress.currentIndex);
+      setCompletedCount(savedProgress.completedCount);
+      setSessionTime(savedProgress.sessionTime);
+      setCompletedCardIds(new Set(savedProgress.completedCardIds));
+      setProgressRestored(true);
+    }
+  }, [progressLoaded, progressRestored, savedProgress]);
+
+  // Reset progressRestored flag when mode/topic changes
+  useEffect(() => {
+    setProgressRestored(false);
+    setDeckInitialized(false);
+    setIsFlipped(false);
+  }, [mode, topicId]);
+
   // Initialize local deck from filtered data, excluding completed cards
   // Re-sync translations when language changes
   useEffect(() => {
-    if (filteredFlashcards.length > 0) {
+    if (filteredFlashcards.length > 0 && progressRestored) {
       // Filter out already completed cards and update translations
       const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.baseId));
       setLocalDeck(remainingCards);
       setDeckInitialized(true);
     }
-  }, [filteredFlashcards, completedCardIds]);
+  }, [filteredFlashcards, completedCardIds, progressRestored]);
 
-  // Reset when mode or topic changes
-  useEffect(() => {
-    setCurrentIndex(0);
-    setSessionTime(0);
-    setIsFlipped(false);
-    setCompletedCount(0);
-    setLocalDeck([]);
-    setDeckInitialized(false);
-    setCompletedCardIds(new Set());
-  }, [mode, topicId]);
-
-  // Session timer
+  // Session timer with persistence
   useEffect(() => {
     const interval = setInterval(() => {
-      setSessionTime(prev => prev + 1);
+      setSessionTime(prev => {
+        const newTime = prev + 1;
+        // Save time every 5 seconds to avoid too many writes
+        if (newTime % 5 === 0) {
+          saveProgress({ sessionTime: newTime });
+        }
+        return newTime;
+      });
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [saveProgress]);
 
   const recordAttemptMutation = useMutation({
     mutationFn: async ({ flashcardId, baseId, rating }: { flashcardId: string; baseId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
     onSuccess: (_, variables) => {
-      setCompletedCount(prev => prev + 1);
+      const newCompletedCount = completedCount + 1;
+      setCompletedCount(newCompletedCount);
       setIsFlipped(false);
       
       if (mode === "spaced") {
         // Track completed card by baseId (persists across language changes)
-        setCompletedCardIds(prev => {
-          const newSet = new Set(Array.from(prev));
-          newSet.add(variables.baseId);
-          return newSet;
+        const newCompletedIds = [...Array.from(completedCardIds), variables.baseId];
+        setCompletedCardIds(new Set(newCompletedIds));
+        // Persist progress
+        saveProgress({
+          completedCount: newCompletedCount,
+          completedCardIds: newCompletedIds,
         });
         // Invalidate ALL flashcard queries to update counts everywhere
         queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
         queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       } else {
         // Practice mode: just move to next card
-        setCurrentIndex(prev => prev + 1);
+        const newIndex = currentIndex + 1;
+        setCurrentIndex(newIndex);
+        // Persist progress
+        saveProgress({
+          currentIndex: newIndex,
+          completedCount: newCompletedCount,
+        });
       }
     },
     onError: () => {
@@ -248,6 +276,9 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     setCompletedCount(0);
     setDeckInitialized(false);
     setLocalDeck([]);
+    setCompletedCardIds(new Set());
+    // Reset persisted progress
+    resetProgress();
     // Invalidate ALL flashcard queries to update counts everywhere
     queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
     queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
