@@ -817,9 +817,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get existing flashcards
-      const existingFlashcards = await storage.getFlashcardsByTopicSummary(topicSummaryId);
-      const existingCount = existingFlashcards.length;
+      // Get ALL existing flashcards for the TOPIC (not just this summary) to show accurate count
+      const topicId = topicSummary.topicId;
+      const allTopicSummaries = await db.query.topicSummaries.findMany({
+        where: and(
+          eq(topicSummaries.topicId, topicId),
+          eq(topicSummaries.language, "pt")
+        ),
+      });
+      const allSummaryIds = allTopicSummaries.map(s => s.id);
+      
+      let existingTopicFlashcards: Flashcard[] = [];
+      if (allSummaryIds.length > 0) {
+        existingTopicFlashcards = await db.query.flashcards.findMany({
+          where: and(
+            inArray(flashcards.topicSummaryId, allSummaryIds),
+            eq(flashcards.language, "pt")
+          ),
+        });
+      }
+      
+      // Also get manual flashcards for this topic
+      const manualFlashcards = await db.query.flashcards.findMany({
+        where: and(
+          eq(flashcards.topicId, topicId),
+          eq(flashcards.language, "pt"),
+          eq(flashcards.isManual, true)
+        ),
+      });
+      
+      // Combine and deduplicate for accurate count
+      const allExisting = [...existingTopicFlashcards, ...manualFlashcards];
+      const seenIds = new Set<string>();
+      const uniqueExisting = allExisting.filter(fc => {
+        if (seenIds.has(fc.id)) return false;
+        seenIds.add(fc.id);
+        return true;
+      });
+      const existingCount = uniqueExisting.length;
 
       // Get user language preference
       const user = await storage.getUser(userId);
@@ -852,24 +887,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
 
-      // Get all flashcards (existing + new) to return the complete set
-      const allFlashcards = [...existingFlashcards, ...newFlashcards];
+      // Calculate new total count for the entire topic
+      const newTotalCount = existingCount + newFlashcards.length;
 
       // Invalidate bundled cache for this topic so frontend gets fresh data
-      if (topicSummary.topicId) {
-        invalidateBundledCache(topicSummary.topicId);
+      if (topicId) {
+        invalidateBundledCache(topicId);
       }
 
-      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards (total: ${allFlashcards.length})`);
+      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards to topic (${existingCount} → ${newTotalCount})`);
 
       return res.json({
         success: true,
-        flashcards: allFlashcards.map(fc => ({
+        flashcards: newFlashcards.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
         })),
         previousCount: existingCount,
-        newCount: allFlashcards.length,
+        newCount: newTotalCount,
+        addedCount: newFlashcards.length,
       });
     } catch (error) {
       console.error("Error regenerating flashcards:", error);
