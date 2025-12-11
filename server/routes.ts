@@ -2046,8 +2046,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Verify user owns the summary containing this flashcard
-      if (flashcard.summaryId) {
+      // Verify user owns this flashcard
+      // Manual flashcards have userId directly, AI-generated ones have summaryId/topicSummaryId
+      if (flashcard.userId === userId) {
+        // User owns this flashcard directly (manual flashcard)
+        // Permission granted
+      } else if (flashcard.summaryId) {
         const summary = await storage.getSummary(flashcard.summaryId);
         if (!summary || summary.userId !== userId) {
           return res.status(403).json({
@@ -2064,9 +2068,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       } else {
-        return res.status(404).json({
+        return res.status(403).json({
           success: false,
-          error: "Flashcard sem referência de resumo",
+          error: "Sem permissão para este flashcard",
         });
       }
 
