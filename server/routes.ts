@@ -856,26 +856,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       const existingCount = uniqueExisting.length;
 
-      // Get user language preference
-      const user = await storage.getUser(userId);
-      const userLanguage = getUserLanguage(user?.language);
-
       // Get cost control settings
       const flashcardMaxTokens = costControlService.getMaxCompletionTokens(planTier, "flashcard");
 
       // Trim summary text based on plan
       const trimmedSummaryText = costControlService.trimInputText(topicSummary.summary, planTier);
 
-      // Generate additional flashcards (adds to existing ones)
-      const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, null, flashcardMaxTokens);
+      // ALWAYS generate flashcards in PT (base language) for consistency with bundled endpoint
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, "pt", null, flashcardMaxTokens);
 
-      // Save new flashcards (add to existing, don't replace)
+      // Save new flashcards in PT (base language)
       const newFlashcards = await storage.createFlashcards(
         flashcardsData.map((fc: any) => ({
           userId,
           topicSummaryId,
           isManual: false,
-          language: userLanguage,
+          language: "pt", // ALWAYS PT as base
           question: fc.question,
           answer: fc.answer,
           summaryId: null,
@@ -883,6 +879,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           topicId: null,
         }))
       );
+      
+      // Create translations for all new flashcards (in parallel for all 5 target languages)
+      const targetLanguages = ["en", "es", "fr", "de", "it"] as const;
+      console.log(`[Regenerate Flashcards] Creating translations for ${newFlashcards.length} new flashcards...`);
+      
+      await Promise.all(newFlashcards.map(async (baseFlashcard) => {
+        try {
+          await getOrCreateTranslatedFlashcards(baseFlashcard, targetLanguages as unknown as string[]);
+        } catch (err) {
+          console.error(`[Regenerate Flashcards] Translation error for ${baseFlashcard.id}:`, err);
+        }
+      }));
 
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
