@@ -118,28 +118,21 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     return earliest.toISOString();
   }, [bundledData, mode]);
 
-  // Initialize local deck from filtered data
+  // Track which cards have been completed in this session (by baseId)
+  const [completedCardIds, setCompletedCardIds] = useState<Set<string>>(new Set());
+
+  // Initialize local deck from filtered data, excluding completed cards
+  // Re-sync translations when language changes
   useEffect(() => {
-    if (filteredFlashcards.length > 0 && !deckInitialized) {
-      setLocalDeck(filteredFlashcards);
+    if (filteredFlashcards.length > 0) {
+      // Filter out already completed cards and update translations
+      const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.baseId));
+      setLocalDeck(remainingCards);
       setDeckInitialized(true);
     }
-  }, [filteredFlashcards, deckInitialized]);
+  }, [filteredFlashcards, completedCardIds]);
 
-  // Update translations when language changes (without resetting progress)
-  useEffect(() => {
-    if (deckInitialized && localDeck.length > 0 && filteredFlashcards.length > 0) {
-      // Update localDeck with new translations while preserving order
-      setLocalDeck(prevDeck => {
-        return prevDeck.map(card => {
-          const updated = filteredFlashcards.find(fc => fc.baseId === card.baseId);
-          return updated || card;
-        });
-      });
-    }
-  }, [i18n.language, filteredFlashcards]);
-
-  // Reset when mode or topic changes (NOT language)
+  // Reset when mode or topic changes
   useEffect(() => {
     setCurrentIndex(0);
     setSessionTime(0);
@@ -147,6 +140,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     setCompletedCount(0);
     setLocalDeck([]);
     setDeckInitialized(false);
+    setCompletedCardIds(new Set());
   }, [mode, topicId]);
 
   // Session timer
@@ -160,7 +154,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const totalFlashcards = allDisplayFlashcards.length;
 
   const recordAttemptMutation = useMutation({
-    mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
+    mutationFn: async ({ flashcardId, baseId, rating }: { flashcardId: string; baseId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
     onSuccess: (_, variables) => {
@@ -168,9 +162,13 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       setIsFlipped(false);
       
       if (mode === "spaced") {
-        // Remove the rated card from local deck immediately
-        setLocalDeck(prev => prev.filter(card => card.id !== variables.flashcardId));
-        // Invalidate bundled cache for background sync (no language in key!)
+        // Track completed card by baseId (persists across language changes)
+        setCompletedCardIds(prev => {
+          const newSet = new Set(Array.from(prev));
+          newSet.add(variables.baseId);
+          return newSet;
+        });
+        // Invalidate bundled cache for background sync
         queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       } else {
         // Practice mode: just move to next card
@@ -233,6 +231,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     if (!currentFlashcard || recordAttemptMutation.isPending) return;
     recordAttemptMutation.mutate({
       flashcardId: currentFlashcard.id,
+      baseId: currentFlashcard.baseId,
       rating,
     });
   };
