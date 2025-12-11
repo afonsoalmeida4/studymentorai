@@ -34,12 +34,24 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     staleTime: 60000,
   });
 
-  // Regenerate flashcards mutation
+  // Track background generation state
+  const [isGeneratingInBackground, setIsGeneratingInBackground] = useState(false);
+
+  // Regenerate flashcards mutation with immediate feedback
   const regenerateMutation = useMutation({
     mutationFn: async (topicSummaryId: string) => {
       return apiRequest("POST", "/api/flashcards/regenerate", { topicSummaryId });
     },
+    onMutate: () => {
+      // Show immediate feedback - don't wait for response
+      setIsGeneratingInBackground(true);
+      toast({
+        title: t('summaryStudy.generatingTitle'),
+        description: t('summaryStudy.generatingDescription'),
+      });
+    },
     onSuccess: (data: any) => {
+      setIsGeneratingInBackground(false);
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "all", i18n.language] });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "due", i18n.language] });
       toast({
@@ -51,6 +63,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
       });
     },
     onError: () => {
+      setIsGeneratingInBackground(false);
       toast({
         title: t('summaryStudy.errorRegenerateTitle'),
         description: t('summaryStudy.errorRegenerate'),

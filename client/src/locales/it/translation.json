@@ -259,6 +259,8 @@
     "modeAnki": "Revisione Anki",
     "modePractice": "Pratica Tutto",
     "regenerateButton": "Genera Altro",
+    "generatingTitle": "Generazione schede in corso...",
+    "generatingDescription": "Potrebbe richiedere qualche secondo. Puoi continuare a usare l'app.",
     "regenerateSuccessTitle": "Schede aggiornate!",
     "regenerateSuccessDescription": "Espanso da {{previousCount}} a {{newCount}} schede.",
     "errorRegenerate": "Impossibile rigenerare le schede.",

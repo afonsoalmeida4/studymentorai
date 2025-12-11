@@ -264,6 +264,8 @@
     "modeAnki": "Anki Review",
     "modePractice": "Practice All",
     "regenerateButton": "Generate More",
+    "generatingTitle": "Generating flashcards...",
+    "generatingDescription": "This may take a few seconds. You can keep using the app.",
     "regenerateSuccessTitle": "Flashcards updated!",
     "regenerateSuccessDescription": "Expanded from {{previousCount}} to {{newCount}} flashcards.",
     "errorRegenerate": "Could not regenerate flashcards.",

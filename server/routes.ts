@@ -1498,12 +1498,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         where: eq(topicSummaries.topicId, topicId),
       });
 
-      // Collect flashcards from all summaries
-      let allGeneratedFlashcards: Flashcard[] = [];
-      for (const summary of allSummaries) {
-        const summaryFlashcards = await getOrCreateTranslatedFlashcards(summary.id, targetLanguage);
-        allGeneratedFlashcards = [...allGeneratedFlashcards, ...summaryFlashcards];
-      }
+      // Collect flashcards from all summaries - PARALLELIZED for speed
+      const flashcardPromises = allSummaries.map(summary => 
+        getOrCreateTranslatedFlashcards(summary.id, targetLanguage)
+      );
+      const flashcardArrays = await Promise.all(flashcardPromises);
+      const allGeneratedFlashcards: Flashcard[] = flashcardArrays.flat();
 
       // Also fetch manual flashcards for this topic
       let manualFlashcards: Flashcard[] = [];
@@ -1613,12 +1613,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         where: eq(topicSummaries.topicId, topicId),
       });
 
-      // Collect flashcards from all summaries
-      let allFlashcards: Flashcard[] = [];
-      for (const summary of allSummaries) {
-        const summaryFlashcards = await getOrCreateTranslatedFlashcards(summary.id, targetLanguage);
-        allFlashcards = [...allFlashcards, ...summaryFlashcards];
-      }
+      // Collect flashcards from all summaries - PARALLELIZED for speed
+      const flashcardPromises = allSummaries.map(summary => 
+        getOrCreateTranslatedFlashcards(summary.id, targetLanguage)
+      );
+      const flashcardArrays = await Promise.all(flashcardPromises);
+      let allFlashcards: Flashcard[] = flashcardArrays.flat();
 
       // Also fetch manual flashcards
       if (targetLanguage === "pt") {
@@ -2489,24 +2489,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         try {
-          // Translate to all other languages
+          // Translate to all other languages - PARALLELIZED for speed
           const allLanguages: SupportedLanguage[] = ["pt", "en", "es", "fr", "de", "it"];
           const targetLanguages = allLanguages.filter(lang => lang !== baseLanguage);
 
-          const translationsData = [];
-          for (const targetLang of targetLanguages) {
-            const translationService = await import("./translationService");
+          const translationService = await import("./translationService");
+          const translationPromises = targetLanguages.map(async (targetLang) => {
             const translatedData = await translationService.translateFlashcardsText(
               [{ question: baseFlashcard.question, answer: baseFlashcard.answer }],
               baseLanguage,
               targetLang
             );
-            translationsData.push({
+            return {
               language: targetLang,
               question: translatedData[0].question,
               answer: translatedData[0].answer,
-            });
-          }
+            };
+          });
+          const translationsData = await Promise.all(translationPromises);
 
           // Create translated flashcards and mappings in transaction
           await db.transaction(async (tx) => {

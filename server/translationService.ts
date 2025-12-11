@@ -474,26 +474,28 @@ export async function createManualFlashcardWithTranslations(flashcardData: {
   console.log(`[createManualFlashcardWithTranslations] Creating manual flashcard in ${flashcardData.language}`);
   
   // First, translate all flashcards BEFORE starting DB transaction (to fail fast)
+  // PARALLELIZED: Translate to all languages simultaneously for speed
   const allLanguages: SupportedLanguage[] = ["pt", "en", "es", "fr", "de", "it"];
   const targetLanguages = allLanguages.filter(lang => lang !== flashcardData.language);
   
-  const translationsData: Array<{ language: SupportedLanguage; question: string; answer: string }> = [];
+  console.log(`[createManualFlashcardWithTranslations] Translating to ${targetLanguages.length} languages in parallel...`);
   
-  for (const targetLang of targetLanguages) {
-    console.log(`[createManualFlashcardWithTranslations] Translating to ${targetLang}...`);
+  const translationPromises = targetLanguages.map(async (targetLang) => {
     const translatedData = await translateFlashcardsText(
       [{ question: flashcardData.question, answer: flashcardData.answer }],
       flashcardData.language,
       targetLang
     );
-    translationsData.push({
+    return {
       language: targetLang,
       question: translatedData[0].question,
       answer: translatedData[0].answer,
-    });
-  }
+    };
+  });
   
-  console.log(`[createManualFlashcardWithTranslations] All translations completed successfully`);
+  const translationsData = await Promise.all(translationPromises);
+  
+  console.log(`[createManualFlashcardWithTranslations] All ${translationsData.length} translations completed in parallel`);
 
   // Now wrap DB operations in a transaction for atomicity
   return await db.transaction(async (tx) => {

@@ -262,6 +262,8 @@
     "modeAnki": "Revisión Anki",
     "modePractice": "Practicar Todo",
     "regenerateButton": "Generar Más",
+    "generatingTitle": "Generando tarjetas...",
+    "generatingDescription": "Esto puede tardar unos segundos. Puedes seguir usando la app.",
     "regenerateSuccessTitle": "¡Tarjetas actualizadas!",
     "regenerateSuccessDescription": "Expandido de {{previousCount}} a {{newCount}} tarjetas.",
     "errorRegenerate": "No se pudieron regenerar tarjetas.",

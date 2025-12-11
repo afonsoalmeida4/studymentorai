@@ -259,6 +259,8 @@
     "modeAnki": "Révision Anki",
     "modePractice": "Tout Pratiquer",
     "regenerateButton": "Générer Plus",
+    "generatingTitle": "Génération des cartes...",
+    "generatingDescription": "Cela peut prendre quelques secondes. Vous pouvez continuer à utiliser l'application.",
     "regenerateSuccessTitle": "Cartes mises à jour!",
     "regenerateSuccessDescription": "Étendu de {{previousCount}} à {{newCount}} cartes.",
     "errorRegenerate": "Impossible de régénérer les cartes.",
