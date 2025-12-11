@@ -956,11 +956,8 @@ export default function TopicView() {
                     ) : null}
                   </Tabs>
                   
-                  {/* Flashcard Study Section - independent of summary style */}
-                  {(() => {
-                    const primarySummaryId = visual?.id || auditivo?.id || logico?.id || conciso?.id;
-                    return primarySummaryId ? <SummaryStudySection summaryId={primarySummaryId} /> : null;
-                  })()}
+                  {/* Flashcard Study Section - fetches ALL flashcards from ALL summaries in this topic */}
+                  <SummaryStudySection topicId={topicId} />
                   </div>
                 );
               })()
