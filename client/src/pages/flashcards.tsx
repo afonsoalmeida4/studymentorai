@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Edit, Trash2, CreditCard, Sparkles, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,10 @@ export default function FlashcardsPage() {
     language: i18n.language || "pt",
   });
 
+  // Sync formData.language when app language changes
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, language: i18n.language || "pt" }));
+  }, [i18n.language]);
   
   // Fetch all user flashcards (no language filter - flashcards stay in creation language)
   const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
