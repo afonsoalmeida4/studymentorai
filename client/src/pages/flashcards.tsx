@@ -381,7 +381,7 @@ export default function FlashcardsPage() {
                       </Button>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      {flashcard.language.toUpperCase()}
+                      {i18n.language.toUpperCase()}
                     </Badge>
                   </div>
                 </CardContent>

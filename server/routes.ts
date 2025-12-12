@@ -1037,52 +1037,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Create a map of all flashcards for O(1) lookup
+      // SIMPLIFIED APPROACH: Get base flashcards (PT) only, then find translations
+      // Step 1: Filter to only BASE flashcards (language = 'pt' and not in reverseMap as a translation)
+      const baseFlashcards = flashcards.filter(fc => {
+        // A base flashcard is one where:
+        // - It's in Portuguese (the base language), OR
+        // - It's not a translation of another flashcard (not in reverseMap)
+        const isTranslation = reverseMap.has(fc.id);
+        if (isTranslation) return false;
+        
+        // If it's a base flashcard, include it
+        return true;
+      });
+
+      // Deduplicate base flashcards by ID
+      const seenBaseIds = new Set<string>();
+      const uniqueBaseFlashcards = baseFlashcards.filter(fc => {
+        if (seenBaseIds.has(fc.id)) return false;
+        seenBaseIds.add(fc.id);
+        return true;
+      });
+
+      console.log(`[GET /api/flashcards/user] Found ${uniqueBaseFlashcards.length} unique base flashcards`);
+
+      // Create a map of all flashcards for O(1) lookup  
       const allFlashcardsMap = new Map(flashcards.map(f => [f.id, f]));
 
-      // Track which base flashcards we've already processed to avoid duplicates
-      const processedBaseIds = new Set<string>();
+      // Step 2: For each base flashcard, find the version in user's language
       const uniqueFlashcards: typeof flashcards = [];
-
-      // Translate flashcards to user's language and deduplicate
-      for (const fc of flashcards) {
-        // Determine the base flashcard ID (the "canonical" flashcard)
-        const baseFlashcardId = reverseMap.get(fc.id) || fc.id;
+      
+      for (const baseFC of uniqueBaseFlashcards) {
+        // If base is already in user's language, use it directly
+        if (baseFC.language === userLanguage) {
+          uniqueFlashcards.push(baseFC);
+          continue;
+        }
         
-        // Skip if we already processed this base flashcard
-        if (processedBaseIds.has(baseFlashcardId)) {
-          continue;
-        }
-        processedBaseIds.add(baseFlashcardId);
-
-        // If flashcard is already in user's language, use it
-        if (fc.language === userLanguage) {
-          uniqueFlashcards.push(fc);
-          continue;
-        }
-
-        // Get the base flashcard (might be different from current flashcard)
-        const baseFlashcard = allFlashcardsMap.get(baseFlashcardId);
-        
-        // If base flashcard is in user's language, use it
-        if (baseFlashcard && baseFlashcard.language === userLanguage) {
-          uniqueFlashcards.push(baseFlashcard);
-          continue;
-        }
-
         // Look for translation in user's language
-        const languageMap = translationMap.get(baseFlashcardId);
+        const languageMap = translationMap.get(baseFC.id);
         if (languageMap) {
           const translatedId = languageMap.get(userLanguage);
           if (translatedId) {
-            // First check if already in result set
+            // Check if translation is in our loaded flashcards
             const translated = allFlashcardsMap.get(translatedId);
             if (translated) {
               uniqueFlashcards.push(translated);
               continue;
             }
             
-            // If not, fetch from DB with userId filter for security
+            // If not loaded, fetch from DB
             const [fetchedTranslation] = await db
               .select()
               .from(flashcards)
@@ -1094,9 +1097,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
         }
-
-        // No translation found, use original flashcard (fallback)
-        uniqueFlashcards.push(fc);
+        
+        // No translation found - use base flashcard as fallback
+        uniqueFlashcards.push(baseFC);
       }
 
       console.log(`[GET /api/flashcards/user] Returning ${uniqueFlashcards.length} unique flashcards in ${userLanguage}`);
