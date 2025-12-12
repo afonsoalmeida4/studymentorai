@@ -61,7 +61,7 @@ export default function FlashcardsPage() {
     answer: "",
     subjectId: "",
     topicId: "",
-    language: (user as any)?.language || "pt",
+    language: i18n.language || "pt",
   });
 
   
@@ -147,7 +147,7 @@ export default function FlashcardsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
       setShowCreateDialog(false);
-      setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: (user as any)?.language || "pt" });
+      setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: i18n.language || "pt" });
       toast({
         title: t('flashcards.createSuccess'),
         description: t('flashcards.createSuccessMessage'),
