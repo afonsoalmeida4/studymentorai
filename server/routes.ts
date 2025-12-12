@@ -976,122 +976,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[GET /api/flashcards/user] Filters:`, filters);
 
-      // Remove language filter to get ALL flashcards (we'll translate them)
-      delete filters.language;
+      // SIMPLIFIED: Get all flashcards directly - no translation mapping needed
+      // Each flashcard has its own language field and is treated independently
       const userFlashcardsList = await storage.getUserFlashcards(userId, filters);
-      console.log(`[GET /api/flashcards/user] Found ${userFlashcardsList.length} flashcards (before translation)`);
-
-      // Get requested language (from query param) or fallback to user's saved preference
-      let userLanguage: string;
-      if (language) {
-        userLanguage = getUserLanguage(language as string);
-        console.log(`[GET /api/flashcards/user] Using requested language: ${userLanguage}`);
-      } else {
-        const user = await storage.getUser(userId);
-        userLanguage = getUserLanguage(user?.language);
-        console.log(`[GET /api/flashcards/user] Using user's saved language: ${userLanguage}`);
-      }
-
-      // Get flashcard IDs for this user to filter translations
-      const userFlashcardIds = userFlashcardsList.map(fc => fc.id);
-
-      // Build translation maps ONLY for this user's flashcards
-      // Map 1: baseFlashcardId -> { language -> translatedFlashcardId }
-      const translationMap = new Map<string, Map<string, string>>();
-      // Map 2: translatedFlashcardId -> baseFlashcardId (reverse index for O(1) lookup)
-      const reverseMap = new Map<string, string>();
-
-      if (userFlashcardIds.length > 0) {
-        // Get translations where base OR translated flashcard belongs to this user
-        const userTranslations = await db
-          .select()
-          .from(flashcardTranslations)
-          .where(
-            or(
-              inArray(flashcardTranslations.baseFlashcardId, userFlashcardIds),
-              inArray(flashcardTranslations.translatedFlashcardId, userFlashcardIds)
-            )
-          );
-
-        for (const trans of userTranslations) {
-          if (!translationMap.has(trans.baseFlashcardId)) {
-            translationMap.set(trans.baseFlashcardId, new Map());
-          }
-          translationMap.get(trans.baseFlashcardId)!.set(trans.targetLanguage, trans.translatedFlashcardId);
-          reverseMap.set(trans.translatedFlashcardId, trans.baseFlashcardId);
-        }
-      }
-
-      // SIMPLIFIED APPROACH: Get base flashcards (PT) only, then find translations
-      // Step 1: Filter to only BASE flashcards (language = 'pt' and not in reverseMap as a translation)
-      const baseFlashcards = userFlashcardsList.filter(fc => {
-        // A base flashcard is one where:
-        // - It's in Portuguese (the base language), OR
-        // - It's not a translation of another flashcard (not in reverseMap)
-        const isTranslation = reverseMap.has(fc.id);
-        if (isTranslation) return false;
-        
-        // If it's a base flashcard, include it
-        return true;
-      });
-
-      // Deduplicate base flashcards by ID
-      const seenBaseIds = new Set<string>();
-      const uniqueBaseFlashcards = baseFlashcards.filter(fc => {
-        if (seenBaseIds.has(fc.id)) return false;
-        seenBaseIds.add(fc.id);
-        return true;
-      });
-
-      console.log(`[GET /api/flashcards/user] Found ${uniqueBaseFlashcards.length} unique base flashcards`);
-
-      // Create a map of all flashcards for O(1) lookup  
-      const allFlashcardsMap = new Map(userFlashcardsList.map(f => [f.id, f]));
-
-      // Step 2: For each base flashcard, find the version in user's language
-      const uniqueFlashcards: typeof userFlashcardsList = [];
-      
-      for (const baseFC of uniqueBaseFlashcards) {
-        // If base is already in user's language, use it directly
-        if (baseFC.language === userLanguage) {
-          uniqueFlashcards.push(baseFC);
-          continue;
-        }
-        
-        // Look for translation in user's language
-        const languageMap = translationMap.get(baseFC.id);
-        if (languageMap) {
-          const translatedId = languageMap.get(userLanguage);
-          if (translatedId) {
-            // Check if translation is in our loaded flashcards
-            const translated = allFlashcardsMap.get(translatedId);
-            if (translated) {
-              uniqueFlashcards.push(translated);
-              continue;
-            }
-            
-            // If not loaded, fetch from DB
-            const [fetchedTranslation] = await db
-              .select()
-              .from(flashcards)
-              .where(and(eq(flashcards.id, translatedId), eq(flashcards.userId, userId)))
-              .limit(1);
-            if (fetchedTranslation) {
-              uniqueFlashcards.push(fetchedTranslation);
-              continue;
-            }
-          }
-        }
-        
-        // No translation found - use base flashcard as fallback
-        uniqueFlashcards.push(baseFC);
-      }
-
-      console.log(`[GET /api/flashcards/user] Returning ${uniqueFlashcards.length} unique flashcards in ${userLanguage}`);
+      console.log(`[GET /api/flashcards/user] Found ${userFlashcardsList.length} flashcards`);
 
       return res.json({
         success: true,
-        flashcards: uniqueFlashcards.map(fc => ({
+        flashcards: userFlashcardsList.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
           updatedAt: fc.updatedAt?.toISOString() || new Date().toISOString(),
