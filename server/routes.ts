@@ -902,15 +902,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create translations for all new flashcards (in parallel for all 5 target languages)
       const targetLanguages = ["en", "es", "fr", "de", "it"] as const;
-      console.log(`[Regenerate Flashcards] Creating translations for ${newFlashcards.length} new flashcards...`);
+      console.log(`[Regenerate Flashcards] Creating translations for ${newFlashcards.length} new flashcards via summary ${ptBaseSummaryId}...`);
       
-      await Promise.all(newFlashcards.map(async (baseFlashcard) => {
-        try {
-          await getOrCreateTranslatedFlashcards(baseFlashcard, targetLanguages as unknown as string[]);
-        } catch (err) {
-          console.error(`[Regenerate Flashcards] Translation error for ${baseFlashcard.id}:`, err);
-        }
-      }));
+      // Trigger translation for the entire summary (which will translate all associated flashcards)
+      try {
+        await Promise.all(targetLanguages.map(async (lang) => {
+          try {
+            await getOrCreateTranslatedFlashcards(ptBaseSummaryId, lang);
+          } catch (err) {
+            console.error(`[Regenerate Flashcards] Translation error for language ${lang}:`, err);
+          }
+        }));
+      } catch (err) {
+        console.error(`[Regenerate Flashcards] Translation batch error:`, err);
+      }
 
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
@@ -993,8 +998,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Remove language filter to get ALL flashcards (we'll translate them)
       delete filters.language;
-      const flashcards = await storage.getUserFlashcards(userId, filters);
-      console.log(`[GET /api/flashcards/user] Found ${flashcards.length} flashcards (before translation)`);
+      const userFlashcardsList = await storage.getUserFlashcards(userId, filters);
+      console.log(`[GET /api/flashcards/user] Found ${userFlashcardsList.length} flashcards (before translation)`);
 
       // Get requested language (from query param) or fallback to user's saved preference
       let userLanguage: string;
@@ -1008,7 +1013,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get flashcard IDs for this user to filter translations
-      const userFlashcardIds = flashcards.map(fc => fc.id);
+      const userFlashcardIds = userFlashcardsList.map(fc => fc.id);
 
       // Build translation maps ONLY for this user's flashcards
       // Map 1: baseFlashcardId -> { language -> translatedFlashcardId }
@@ -1039,7 +1044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // SIMPLIFIED APPROACH: Get base flashcards (PT) only, then find translations
       // Step 1: Filter to only BASE flashcards (language = 'pt' and not in reverseMap as a translation)
-      const baseFlashcards = flashcards.filter(fc => {
+      const baseFlashcards = userFlashcardsList.filter(fc => {
         // A base flashcard is one where:
         // - It's in Portuguese (the base language), OR
         // - It's not a translation of another flashcard (not in reverseMap)
@@ -1061,10 +1066,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[GET /api/flashcards/user] Found ${uniqueBaseFlashcards.length} unique base flashcards`);
 
       // Create a map of all flashcards for O(1) lookup  
-      const allFlashcardsMap = new Map(flashcards.map(f => [f.id, f]));
+      const allFlashcardsMap = new Map(userFlashcardsList.map(f => [f.id, f]));
 
       // Step 2: For each base flashcard, find the version in user's language
-      const uniqueFlashcards: typeof flashcards = [];
+      const uniqueFlashcards: typeof userFlashcardsList = [];
       
       for (const baseFC of uniqueBaseFlashcards) {
         // If base is already in user's language, use it directly
@@ -1207,14 +1212,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create flashcard with automatic translations to all supported languages
-      const { baseFlashcard } = await createManualFlashcardWithTranslations({
-        question: flashcardData.question,
-        answer: flashcardData.answer,
-        language: flashcardData.language,
-        userId: flashcardData.userId,
-        subjectId: flashcardData.subjectId || null,
-        topicId: flashcardData.topicId || null,
-      });
+      // If translation fails (e.g., API quota), fallback to creating base flashcard only
+      let baseFlashcard;
+      let translationWarning = false;
+      
+      try {
+        const result = await createManualFlashcardWithTranslations({
+          question: flashcardData.question,
+          answer: flashcardData.answer,
+          language: flashcardData.language,
+          userId: flashcardData.userId,
+          subjectId: flashcardData.subjectId || null,
+          topicId: flashcardData.topicId || null,
+        });
+        baseFlashcard = result.baseFlashcard;
+      } catch (translationError: any) {
+        console.warn("Translation failed, creating base flashcard only:", translationError.message);
+        translationWarning = true;
+        
+        // Fallback: create flashcard without translations
+        const [created] = await db
+          .insert(flashcards)
+          .values({
+            question: flashcardData.question,
+            answer: flashcardData.answer,
+            language: flashcardData.language,
+            userId: flashcardData.userId,
+            subjectId: flashcardData.subjectId || null,
+            topicId: flashcardData.topicId || null,
+            isManual: true,
+          })
+          .returning();
+        baseFlashcard = created;
+      }
 
       return res.json({
         success: true,
@@ -1223,12 +1253,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           createdAt: baseFlashcard.createdAt?.toISOString() || new Date().toISOString(),
           updatedAt: baseFlashcard.updatedAt?.toISOString() || new Date().toISOString(),
         },
+        translationWarning, // Frontend can show a note if translations weren't created
       });
     } catch (error) {
       console.error("Error creating manual flashcard:", error);
       return res.status(500).json({
         success: false,
-        error: "Erro ao criar flashcard",
+        errorCode: "FLASHCARD_CREATE_ERROR",
+        error: "Failed to create flashcard",
       });
     }
   });
