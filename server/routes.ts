@@ -793,6 +793,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Regenerate flashcards for upgraded users (PRO/PREMIUM only)
+  // Flashcards are generated in the language of the summary (user's current app language)
+  // No automatic translation - flashcards stay in their creation language
   app.post("/api/flashcards/regenerate", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -826,43 +828,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get ALL existing flashcards for the TOPIC (not just this summary) to show accurate count
       const topicId = topicSummary.topicId;
+      // Use the language from the summary (which reflects the user's current app language)
+      const flashcardLanguage = topicSummary.language || "pt";
       
-      // CRITICAL: Find the PT base summary for this topic + learning style
-      // This ensures flashcards are always associated with PT summaries (which bundled endpoint filters by)
-      let ptBaseSummaryId = topicSummaryId;
-      if (topicSummary.language !== "pt") {
-        // Find corresponding PT summary with same learning style
-        const ptBaseSummary = await db.query.topicSummaries.findFirst({
-          where: and(
-            eq(topicSummaries.topicId, topicId),
-            eq(topicSummaries.language, "pt"),
-            eq(topicSummaries.learningStyle, topicSummary.learningStyle)
-          ),
-        });
-        if (ptBaseSummary) {
-          ptBaseSummaryId = ptBaseSummary.id;
-          console.log(`[Regenerate Flashcards] Mapped ${topicSummary.language} summary ${topicSummaryId} → PT base ${ptBaseSummaryId}`);
-        } else {
-          console.warn(`[Regenerate Flashcards] No PT base summary found for ${topicSummary.learningStyle}, using original`);
-        }
-      }
-      const allTopicSummaries = await db.query.topicSummaries.findMany({
-        where: and(
-          eq(topicSummaries.topicId, topicId),
-          eq(topicSummaries.language, "pt")
-        ),
+      // Get the topic to find subjectId
+      const topic = await db.query.topics.findFirst({
+        where: eq(topics.id, topicId),
       });
-      const allSummaryIds = allTopicSummaries.map(s => s.id);
+      const subjectId = topic?.subjectId || null;
+      
+      console.log(`[Regenerate Flashcards] Generating flashcards in language: ${flashcardLanguage} for topic ${topicId}, subject ${subjectId}`);
+
+      // Count existing flashcards for this topic (all languages, no filtering)
+      const allTopicSummariesForCount = await db.query.topicSummaries.findMany({
+        where: eq(topicSummaries.topicId, topicId),
+      });
+      const allSummaryIds = allTopicSummariesForCount.map(s => s.id);
       
       let existingTopicFlashcards: Flashcard[] = [];
       if (allSummaryIds.length > 0) {
         existingTopicFlashcards = await db.query.flashcards.findMany({
-          where: and(
-            inArray(flashcards.topicSummaryId, allSummaryIds),
-            eq(flashcards.language, "pt")
-          ),
+          where: inArray(flashcards.topicSummaryId, allSummaryIds),
         });
       }
       
@@ -870,7 +857,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const manualFlashcards = await db.query.flashcards.findMany({
         where: and(
           eq(flashcards.topicId, topicId),
-          eq(flashcards.language, "pt"),
           eq(flashcards.isManual, true)
         ),
       });
@@ -891,40 +877,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Trim summary text based on plan
       const trimmedSummaryText = costControlService.trimInputText(topicSummary.summary, planTier);
 
-      // ALWAYS generate flashcards in PT (base language) for consistency with bundled endpoint
-      const flashcardsData = await generateFlashcards(trimmedSummaryText, "pt", null, flashcardMaxTokens);
+      // Generate flashcards in the summary's language (no forced PT, no translations)
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, flashcardLanguage, null, flashcardMaxTokens);
 
-      // Save new flashcards in PT (base language), linked to PT base summary
+      // Save new flashcards with proper topicId and subjectId set
       const newFlashcards = await storage.createFlashcards(
         flashcardsData.map((fc: any) => ({
           userId,
-          topicSummaryId: ptBaseSummaryId, // ALWAYS use PT base summary ID
+          topicSummaryId: topicSummaryId,
+          topicId: topicId,
+          subjectId: subjectId,
           isManual: false,
-          language: "pt", // ALWAYS PT as base
+          language: flashcardLanguage,
           question: fc.question,
           answer: fc.answer,
           summaryId: null,
-          subjectId: null,
-          topicId: null,
         }))
       );
       
-      // Create translations for all new flashcards (in parallel for all 5 target languages)
-      const targetLanguages = ["en", "es", "fr", "de", "it"] as const;
-      console.log(`[Regenerate Flashcards] Creating translations for ${newFlashcards.length} new flashcards via summary ${ptBaseSummaryId}...`);
-      
-      // Trigger translation for the entire summary (which will translate all associated flashcards)
-      try {
-        await Promise.all(targetLanguages.map(async (lang) => {
-          try {
-            await getOrCreateTranslatedFlashcards(ptBaseSummaryId, lang);
-          } catch (err) {
-            console.error(`[Regenerate Flashcards] Translation error for language ${lang}:`, err);
-          }
-        }));
-      } catch (err) {
-        console.error(`[Regenerate Flashcards] Translation batch error:`, err);
-      }
+      // NO automatic translations - flashcards stay in their creation language
 
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
@@ -937,7 +908,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invalidateBundledCache(topicId);
       }
 
-      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards to topic (${existingCount} → ${newTotalCount})`);
+      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards in ${flashcardLanguage} to topic (${existingCount} → ${newTotalCount})`);
 
       return res.json({
         success: true,
