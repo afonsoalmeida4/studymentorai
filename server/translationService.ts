@@ -284,6 +284,10 @@ export async function getOrCreateTranslatedFlashcards(
   }
 
   // 6. Persist translated flashcards to DB
+  // Copy topicId and subjectId from source flashcards to enable proper filtering
+  const sourceTopicId = sourceFlashcards[0]?.topicId || null;
+  const sourceSubjectId = sourceFlashcards[0]?.subjectId || null;
+  
   const newFlashcards = await db.insert(flashcards).values(
     translatedFlashcardsData.map(fc => ({
       userId,
@@ -291,6 +295,8 @@ export async function getOrCreateTranslatedFlashcards(
       language: targetLanguage,
       question: fc.question,
       answer: fc.answer,
+      topicId: sourceTopicId,
+      subjectId: sourceSubjectId,
     }))
   ).returning();
 

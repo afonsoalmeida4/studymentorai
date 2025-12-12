@@ -708,6 +708,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("[Flashcards] Summary text type:", typeof summaryText);
         console.log("[Flashcards] Summary text length:", summaryText?.length || 0);
         console.log("[Flashcards] Summary text preview:", JSON.stringify(summaryText?.substring(0, 100)));
+        
+        // Get topic to populate topicId and subjectId for proper filtering
+        const [relatedTopic] = await db
+          .select()
+          .from(topics)
+          .where(eq(topics.id, topicSummary.topicId));
+        const topicIdForFlashcards = topicSummary.topicId;
+        const subjectIdForFlashcards = relatedTopic?.subjectId || null;
+        
         flashcardsQuery = (flashcardsData: any[]) => flashcardsData.map((fc: any) => ({
           userId,
           topicSummaryId,
@@ -716,8 +725,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           question: fc.question,
           answer: fc.answer,
           summaryId: null,
-          subjectId: null,
-          topicId: null,
+          subjectId: subjectIdForFlashcards,
+          topicId: topicIdForFlashcards,
         }));
       } else {
         const summary = await storage.getSummary(summaryId);
