@@ -1796,6 +1796,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // AUTO-MIGRATE: Create translations for flashcards that don't have them (background, non-blocking)
+      const allLanguages: SupportedLanguage[] = ["pt", "en", "es", "fr", "de", "it"];
+      const flashcardsNeedingTranslation = uniqueBaseFlashcards.filter(fc => {
+        const existingLangs = Object.keys(translationsMap.get(fc.id) || {});
+        return existingLangs.length < allLanguages.length;
+      });
+
+      if (flashcardsNeedingTranslation.length > 0) {
+        console.log(`[BUNDLED] Auto-migrating ${flashcardsNeedingTranslation.length} flashcards with missing translations`);
+        
+        // Do this in background to not block the response
+        (async () => {
+          try {
+            const translationService = await import("./translationService");
+            
+            for (const baseFC of flashcardsNeedingTranslation) {
+              const existingLangs = Object.keys(translationsMap.get(baseFC.id) || {});
+              const missingLangs = allLanguages.filter(lang => !existingLangs.includes(lang));
+              
+              if (missingLangs.length === 0) continue;
+              
+              console.log(`[BUNDLED-MIGRATE] Creating ${missingLangs.length} translations for flashcard ${baseFC.id}`);
+              
+              const translationPromises = missingLangs.map(async (targetLang) => {
+                try {
+                  const translatedData = await translationService.translateFlashcardsText(
+                    [{ question: baseFC.question, answer: baseFC.answer }],
+                    "pt" as SupportedLanguage,
+                    targetLang
+                  );
+                  return {
+                    language: targetLang,
+                    question: translatedData[0].question,
+                    answer: translatedData[0].answer,
+                  };
+                } catch (err) {
+                  console.error(`[BUNDLED-MIGRATE] Failed to translate to ${targetLang}:`, err);
+                  return null;
+                }
+              });
+              
+              const translations = (await Promise.all(translationPromises)).filter(t => t !== null);
+              
+              if (translations.length > 0) {
+                await db.transaction(async (tx) => {
+                  for (const translation of translations) {
+                    if (!translation) continue;
+                    
+                    const [translatedFlashcard] = await tx
+                      .insert(flashcards)
+                      .values({
+                        userId: baseFC.userId,
+                        question: translation.question,
+                        answer: translation.answer,
+                        language: translation.language,
+                        isManual: baseFC.isManual,
+                        subjectId: baseFC.subjectId,
+                        topicId: baseFC.topicId,
+                        summaryId: baseFC.summaryId,
+                        topicSummaryId: baseFC.topicSummaryId,
+                      })
+                      .returning();
+                    
+                    await tx.insert(flashcardTranslations).values({
+                      baseFlashcardId: baseFC.id,
+                      translatedFlashcardId: translatedFlashcard.id,
+                      targetLanguage: translation.language,
+                    });
+                  }
+                });
+                console.log(`[BUNDLED-MIGRATE] Created ${translations.length} translations for flashcard ${baseFC.id}`);
+              }
+            }
+            
+            // Invalidate cache after migration
+            bundledFlashcardsCache.delete(cacheKey);
+            console.log(`[BUNDLED-MIGRATE] Migration complete, cache invalidated`);
+          } catch (err) {
+            console.error("[BUNDLED-MIGRATE] Background migration failed:", err);
+          }
+        })();
+      }
+
       // Build bundled response
       const bundledFlashcards = uniqueBaseFlashcards.map(baseFC => {
         const translations = translationsMap.get(baseFC.id) || { pt: baseFC };
