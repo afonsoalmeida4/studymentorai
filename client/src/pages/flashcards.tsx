@@ -380,8 +380,8 @@ export default function FlashcardsPage() {
                         {t('common.delete')}
                       </Button>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      {i18n.language.toUpperCase()}
+                    <Badge variant="outline" className="text-xs uppercase">
+                      {flashcard.language || 'pt'}
                     </Badge>
                   </div>
                 </CardContent>

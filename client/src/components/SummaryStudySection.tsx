@@ -9,14 +9,16 @@ import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Bundled flashcard type - contains all translations
+// Flashcard type - stays in its creation language (no translations)
 interface BundledFlashcard {
   id: string;
   topicId: string | null;
   subjectId: string | null;
   isManual: boolean;
   createdAt: string;
-  translations: Record<string, { question: string; answer: string; flashcardId: string }>;
+  language: string;
+  question: string;
+  answer: string;
   easeFactor?: number;
   interval?: number;
   repetitions?: number;
@@ -164,34 +166,26 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     console.error("[SummaryStudySection] Error fetching flashcards:", error);
   }
 
-  // Transform bundled flashcards to display format based on current language
+  // Transform flashcards to display format (no translations - use creation language)
   const displayFlashcards = useMemo(() => {
     if (!bundledData?.flashcards) return [];
     
-    const lang = i18n.language as string;
-    
-    return bundledData.flashcards.map(fc => {
-      // Get translation for current language, fallback to PT
-      const translation = fc.translations[lang] || fc.translations['pt'];
-      
-      return {
-        id: translation?.flashcardId || fc.id,
-        baseId: fc.id,
-        question: translation?.question || '',
-        answer: translation?.answer || '',
-        topicId: fc.topicId,
-        subjectId: fc.subjectId,
-        isManual: fc.isManual,
-        createdAt: fc.createdAt,
-        language: lang,
-        easeFactor: fc.easeFactor,
-        interval: fc.interval,
-        repetitions: fc.repetitions,
-        nextReviewDate: fc.nextReviewDate,
-        lastReviewDate: fc.lastReviewDate,
-      };
-    });
-  }, [bundledData, i18n.language]);
+    return bundledData.flashcards.map(fc => ({
+      id: fc.id,
+      question: fc.question,
+      answer: fc.answer,
+      topicId: fc.topicId,
+      subjectId: fc.subjectId,
+      isManual: fc.isManual,
+      createdAt: fc.createdAt,
+      language: fc.language || 'pt',
+      easeFactor: fc.easeFactor,
+      interval: fc.interval,
+      repetitions: fc.repetitions,
+      nextReviewDate: fc.nextReviewDate,
+      lastReviewDate: fc.lastReviewDate,
+    }));
+  }, [bundledData]);
 
   const hasFlashcards = displayFlashcards.length > 0;
 

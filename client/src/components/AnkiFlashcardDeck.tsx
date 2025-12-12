@@ -10,14 +10,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
 
-// Bundled flashcard type - contains all translations
+// Flashcard type - stays in its creation language (no translations)
 interface BundledFlashcard {
   id: string;
   topicId: string | null;
   subjectId: string | null;
   isManual: boolean;
   createdAt: string;
-  translations: Record<string, { question: string; answer: string; flashcardId: string }>;
+  language: string; // Language in which flashcard was created
+  question: string;
+  answer: string;
   easeFactor?: number;
   interval?: number;
   repetitions?: number;
@@ -25,12 +27,12 @@ interface BundledFlashcard {
   lastReviewDate?: string | null;
 }
 
-// Display flashcard - transformed from bundled based on current language
+// Display flashcard with language badge
 interface DisplayFlashcard {
   id: string;
-  baseId: string;
   question: string;
   answer: string;
+  language: string;
   nextReviewDate?: string | null;
   lastReviewDate?: string | null;
 }
@@ -74,25 +76,19 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     retry: 1,
   });
 
-  // Transform bundled flashcards to display format based on current language
+  // Transform flashcards to display format (flashcards stay in creation language)
   const allDisplayFlashcards = useMemo((): DisplayFlashcard[] => {
     if (!bundledData?.flashcards) return [];
     
-    const lang = i18n.language as string;
-    
-    return bundledData.flashcards.map(fc => {
-      const translation = fc.translations[lang] || fc.translations['pt'];
-      
-      return {
-        id: translation?.flashcardId || fc.id,
-        baseId: fc.id,
-        question: translation?.question || '',
-        answer: translation?.answer || '',
-        nextReviewDate: fc.nextReviewDate,
-        lastReviewDate: fc.lastReviewDate,
-      };
-    });
-  }, [bundledData, i18n.language]);
+    return bundledData.flashcards.map(fc => ({
+      id: fc.id,
+      question: fc.question,
+      answer: fc.answer,
+      language: fc.language || 'pt',
+      nextReviewDate: fc.nextReviewDate,
+      lastReviewDate: fc.lastReviewDate,
+    }));
+  }, [bundledData]);
 
   // Filter for due flashcards (spaced mode) or all (practice mode)
   const filteredFlashcards = useMemo((): DisplayFlashcard[] => {
@@ -123,7 +119,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     return earliest.toISOString();
   }, [bundledData, mode]);
 
-  // Track which cards have been completed in this session (by baseId)
+  // Track which cards have been completed in this session (by id)
   const [completedCardIds, setCompletedCardIds] = useState<Set<string>>(new Set());
 
   // Restore progress from localStorage when loaded
@@ -145,24 +141,20 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   }, [mode, topicId]);
 
   // Initialize local deck from filtered data, excluding completed cards
-  // Re-sync translations when language changes (preserving current position)
   useEffect(() => {
     if (filteredFlashcards.length > 0 && progressRestored) {
-      // Filter out already completed cards and update translations
-      const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.baseId));
+      // Filter out already completed cards
+      const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.id));
       
-      // Preserve current position when only translations change
-      // Find current card's baseId and locate it in the new deck
-      const currentBaseId = localDeck[currentIndex]?.baseId;
+      // Find current card's id and locate it in the new deck
+      const currentCardId = localDeck[currentIndex]?.id;
       
       setLocalDeck(remainingCards);
       
-      // If we had a current card, try to find it in the new deck (same position by baseId)
-      if (currentBaseId && deckInitialized) {
-        const newIndex = remainingCards.findIndex(fc => fc.baseId === currentBaseId);
+      // If we had a current card, try to find it in the new deck
+      if (currentCardId && deckInitialized) {
+        const newIndex = remainingCards.findIndex(fc => fc.id === currentCardId);
         if (newIndex !== -1 && newIndex !== currentIndex) {
-          // Card still exists at different position - this shouldn't happen normally
-          // but ensures we stay on the same card after language change
           setCurrentIndex(newIndex);
         }
       }
@@ -187,7 +179,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   }, [saveProgress]);
 
   const recordAttemptMutation = useMutation({
-    mutationFn: async ({ flashcardId, baseId, rating }: { flashcardId: string; baseId: string; rating: number }) => {
+    mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
     onSuccess: (_, variables) => {
@@ -196,8 +188,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       setIsFlipped(false);
       
       if (mode === "spaced") {
-        // Track completed card by baseId (persists across language changes)
-        const newCompletedIds = [...Array.from(completedCardIds), variables.baseId];
+        // Track completed card by flashcardId
+        const newCompletedIds = [...Array.from(completedCardIds), variables.flashcardId];
         setCompletedCardIds(new Set(newCompletedIds));
         // Persist progress
         saveProgress({
@@ -275,7 +267,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     if (!currentFlashcard || recordAttemptMutation.isPending) return;
     recordAttemptMutation.mutate({
       flashcardId: currentFlashcard.id,
-      baseId: currentFlashcard.baseId,
       rating,
     });
   };
@@ -401,7 +392,12 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
                 </p>
               </div>
               <div className="flex items-center justify-between pt-6 border-t">
-                <Badge variant="secondary">{t('flashcards.question')}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{t('flashcards.question')}</Badge>
+                  <Badge variant="outline" className="text-xs uppercase">
+                    {currentFlashcard.language}
+                  </Badge>
+                </div>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -425,8 +421,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
                 </p>
               </div>
               <div className="space-y-4 pt-6 border-t">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
                   <Badge variant="default">{t('flashcards.answer')}</Badge>
+                  <Badge variant="outline" className="text-xs uppercase">
+                    {currentFlashcard.language}
+                  </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('flashcards.anki.howWasYourAnswer')}
