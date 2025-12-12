@@ -65,16 +65,15 @@ export default function FlashcardsPage() {
   });
 
   
-  // Fetch all user flashcards (with translations)
+  // Fetch all user flashcards (no language filter - flashcards stay in creation language)
   const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
-    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic, i18n.language],
+    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterType === "manual") params.set("isManual", "true");
       if (filterType === "auto") params.set("isManual", "false");
       if (filterSubject && filterSubject !== "_all") params.set("subjectId", filterSubject);
       if (filterTopic && filterTopic !== "_all") params.set("topicId", filterTopic);
-      params.set("language", i18n.language);
       
       const response = await fetch(`/api/flashcards/user?${params.toString()}`, {
         credentials: "include",
