@@ -145,12 +145,28 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   }, [mode, topicId]);
 
   // Initialize local deck from filtered data, excluding completed cards
-  // Re-sync translations when language changes
+  // Re-sync translations when language changes (preserving current position)
   useEffect(() => {
     if (filteredFlashcards.length > 0 && progressRestored) {
       // Filter out already completed cards and update translations
       const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.baseId));
+      
+      // Preserve current position when only translations change
+      // Find current card's baseId and locate it in the new deck
+      const currentBaseId = localDeck[currentIndex]?.baseId;
+      
       setLocalDeck(remainingCards);
+      
+      // If we had a current card, try to find it in the new deck (same position by baseId)
+      if (currentBaseId && deckInitialized) {
+        const newIndex = remainingCards.findIndex(fc => fc.baseId === currentBaseId);
+        if (newIndex !== -1 && newIndex !== currentIndex) {
+          // Card still exists at different position - this shouldn't happen normally
+          // but ensures we stay on the same card after language change
+          setCurrentIndex(newIndex);
+        }
+      }
+      
       setDeckInitialized(true);
     }
   }, [filteredFlashcards, completedCardIds, progressRestored]);

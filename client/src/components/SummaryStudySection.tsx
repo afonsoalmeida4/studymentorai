@@ -40,7 +40,29 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   const currentPlan = subscription?.plan || "free";
   const hasAdvancedFlashcards = currentPlan !== "free";
   const canGenerateMore = !subscriptionLoading && (currentPlan === "pro" || currentPlan === "premium");
-  const [studyMode, setStudyMode] = useState<"spaced" | "practice">(hasAdvancedFlashcards ? "spaced" : "practice");
+  
+  // Persist study mode per topic in localStorage to survive navigation
+  const getStoredStudyMode = (): "spaced" | "practice" => {
+    try {
+      const stored = localStorage.getItem(`study_mode_${topicId}`);
+      if (stored === "spaced" || stored === "practice") {
+        // Ensure FREE users can't use spaced mode
+        if (stored === "spaced" && !hasAdvancedFlashcards) return "practice";
+        return stored;
+      }
+    } catch (e) {}
+    return hasAdvancedFlashcards ? "spaced" : "practice";
+  };
+  
+  const [studyMode, setStudyModeInternal] = useState<"spaced" | "practice">(getStoredStudyMode);
+  
+  // Wrapper to persist mode changes
+  const setStudyMode = (mode: "spaced" | "practice") => {
+    setStudyModeInternal(mode);
+    try {
+      localStorage.setItem(`study_mode_${topicId}`, mode);
+    } catch (e) {}
+  };
 
   // Fetch summaries for this topic (needed for regenerate) - still needs language for summary content
   const { data: summariesData } = useQuery<{ success: boolean; summaries: any[] }>({
