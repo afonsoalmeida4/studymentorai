@@ -276,7 +276,8 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
         </div>
       </CardHeader>
       <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-        <AnkiFlashcardDeck topicId={topicId} mode={studyMode} />
+        {/* key forces remount when mode changes, ensuring separate state for each mode */}
+        <AnkiFlashcardDeck key={`${topicId}-${studyMode}`} topicId={topicId} mode={studyMode} />
       </CardContent>
     </Card>
   );
