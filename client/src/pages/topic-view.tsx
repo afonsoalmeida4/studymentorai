@@ -680,9 +680,9 @@ export default function TopicView() {
                                   />
                                   <Label
                                     htmlFor={`style-${style}`}
-                                    className="text-sm cursor-pointer capitalize"
+                                    className="text-sm cursor-pointer"
                                   >
-                                    {style}
+                                    {t(`topicView.generateStylesDialog.${style}`)}
                                   </Label>
                                 </div>
                               ))}
@@ -962,9 +962,9 @@ export default function TopicView() {
                               />
                               <Label
                                 htmlFor={`style-${style}`}
-                                className="text-sm cursor-pointer capitalize"
+                                className="text-sm cursor-pointer"
                               >
-                                {style}
+                                {t(`topicView.generateStylesDialog.${style}`)}
                               </Label>
                             </div>
                           ))}
@@ -1021,9 +1021,9 @@ export default function TopicView() {
                   />
                   <Label
                     htmlFor={`dialog-style-${style}`}
-                    className="text-sm cursor-pointer capitalize"
+                    className="text-sm cursor-pointer"
                   >
-                    {style}
+                    {t(`topicView.generateStylesDialog.${style}`)}
                   </Label>
                 </div>
               ))}
