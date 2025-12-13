@@ -359,6 +359,30 @@ export function registerOrganizationRoutes(app: Express) {
     }
   });
 
+  // Get single topic by ID
+  app.get("/api/topics/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+
+      const topic = await db.query.topics.findFirst({
+        where: and(eq(topics.id, id), eq(topics.userId, userId)),
+        with: {
+          subject: true,
+        },
+      });
+
+      if (!topic) {
+        return res.status(404).json({ success: false, error: "Tópico não encontrado" });
+      }
+
+      res.json({ success: true, topic });
+    } catch (error) {
+      console.error("Error fetching topic:", error);
+      res.status(500).json({ success: false, error: "Erro ao carregar tópico" });
+    }
+  });
+
   app.post("/api/topics", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
