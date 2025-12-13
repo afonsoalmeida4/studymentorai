@@ -287,7 +287,9 @@
     "regenerateSuccessDescription": "Espanso da {{previousCount}} a {{newCount}} schede.",
     "errorRegenerate": "Impossibile rigenerare le schede.",
     "errorRegenerateTitle": "Errore nella rigenerazione delle schede",
-    "noFlashcards": "Nessuna scheda disponibile per questo argomento."
+    "noFlashcards": "Nessuna scheda disponibile per questo argomento.",
+    "noFlashcardsYet": "Hai un riassunto pronto! Genera automaticamente schede per studiare.",
+    "generateFlashcardsButton": "Genera Schede"
   },
   "appHeader": {
     "home": "Home",

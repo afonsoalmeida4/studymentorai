@@ -291,7 +291,9 @@
     "regenerateSuccessDescription": "Expandido de {{previousCount}} para {{newCount}} flashcards.",
     "errorRegenerate": "Não foi possível regenerar flashcards.",
     "errorRegenerateTitle": "Erro ao regenerar flashcards",
-    "noFlashcards": "Ainda não existem flashcards para este tópico."
+    "noFlashcards": "Ainda não existem flashcards para este tópico.",
+    "noFlashcardsYet": "Tens um resumo pronto! Gera flashcards automaticamente para estudar.",
+    "generateFlashcardsButton": "Gerar Flashcards"
   },
   "appHeader": {
     "home": "Início",

@@ -200,7 +200,39 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     );
   }
 
+  // Check if we have summaries to generate flashcards from
+  const hasSummaries = summariesData?.summaries && 
+    (Array.isArray(summariesData.summaries) 
+      ? summariesData.summaries.length > 0 
+      : Object.keys(summariesData.summaries).length > 0);
+
   if (!hasFlashcards) {
+    // If there are summaries, show option to generate flashcards
+    if (hasSummaries) {
+      return (
+        <Card className="border-2">
+          <CardContent className="p-8 text-center">
+            <Brain className="w-8 h-8 mx-auto mb-4 text-primary" />
+            <p className="text-sm text-muted-foreground mb-4">{t('summaryStudy.noFlashcardsYet')}</p>
+            <Button
+              onClick={handleGenerateMore}
+              disabled={regenerateMutation.isPending || isGeneratingInBackground}
+              data-testid="button-generate-flashcards-initial"
+              className="gap-2"
+            >
+              {(regenerateMutation.isPending || isGeneratingInBackground) ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
+              {t('summaryStudy.generateFlashcardsButton')}
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
+    
+    // No summaries and no flashcards
     return (
       <Card className="border-2 border-muted">
         <CardContent className="p-8 text-center">

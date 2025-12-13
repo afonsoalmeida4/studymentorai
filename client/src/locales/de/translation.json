@@ -287,7 +287,9 @@
     "regenerateSuccessDescription": "Erweitert von {{previousCount}} auf {{newCount}} Karteikarten.",
     "errorRegenerate": "Karteikarten konnten nicht regeneriert werden.",
     "errorRegenerateTitle": "Fehler beim Regenerieren der Karteikarten",
-    "noFlashcards": "Noch keine Karteikarten für dieses Thema verfügbar."
+    "noFlashcards": "Noch keine Karteikarten für dieses Thema verfügbar.",
+    "noFlashcardsYet": "Sie haben eine Zusammenfassung bereit! Generieren Sie automatisch Karteikarten zum Lernen.",
+    "generateFlashcardsButton": "Karteikarten Generieren"
   },
   "appHeader": {
     "home": "Startseite",

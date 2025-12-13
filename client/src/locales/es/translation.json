@@ -290,7 +290,9 @@
     "regenerateSuccessDescription": "Expandido de {{previousCount}} a {{newCount}} tarjetas.",
     "errorRegenerate": "No se pudieron regenerar tarjetas.",
     "errorRegenerateTitle": "Error al regenerar tarjetas",
-    "noFlashcards": "Aún no hay tarjetas disponibles para este tema."
+    "noFlashcards": "Aún no hay tarjetas disponibles para este tema.",
+    "noFlashcardsYet": "¡Tienes un resumen listo! Genera tarjetas automáticamente para estudiar.",
+    "generateFlashcardsButton": "Generar Tarjetas"
   },
   "appHeader": {
     "home": "Inicio",
