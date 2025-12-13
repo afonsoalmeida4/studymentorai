@@ -72,7 +72,17 @@
     "createSuccessMessage": "Tu nueva asignatura se ha añadido con éxito.",
     "createError": "No se pudo crear la asignatura.",
     "delete": "Eliminar materia",
-    "deleteConfirm": "¿Estás seguro de que quieres eliminar esta materia? Todos los temas y contenidos serán eliminados."
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar esta materia? Todos los temas y contenidos serán eliminados.",
+    "editSubject": "Editar Materia",
+    "editDescription": "Cambia el nombre, descripción o color de la materia.",
+    "editSuccess": "¡Materia actualizada!",
+    "editSuccessMessage": "Los cambios se han guardado correctamente.",
+    "editError": "No se pudo actualizar la materia.",
+    "deleteSubject": "Eliminar Materia",
+    "deleteConfirmation": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Todos los temas y contenidos serán eliminados permanentemente.",
+    "deleteSuccess": "¡Materia eliminada!",
+    "deleteSuccessMessage": "La materia ha sido eliminada correctamente.",
+    "deleteError": "No se pudo eliminar la materia."
   },
   "topics": {
     "title": "Temas",

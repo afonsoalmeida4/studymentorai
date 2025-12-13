@@ -1,6 +1,16 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays, Pencil, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Sidebar,
   SidebarContent,
@@ -52,6 +62,13 @@ export function AppSidebar() {
   const [newSubjectName, setNewSubjectName] = useState("");
   const [newSubjectDescription, setNewSubjectDescription] = useState("");
   const [newSubjectColor, setNewSubjectColor] = useState("#6366f1");
+  
+  // Edit/delete subject state
+  const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
+  const [subjectToDelete, setSubjectToDelete] = useState<Subject | null>(null);
+  const [editSubjectName, setEditSubjectName] = useState("");
+  const [editSubjectDescription, setEditSubjectDescription] = useState("");
+  const [editSubjectColor, setEditSubjectColor] = useState("#6366f1");
 
   const { data: subjects = [] } = useQuery<Subject[]>({
     queryKey: ["/api/subjects"],
@@ -124,6 +141,88 @@ export function AppSidebar() {
     if (newSubjectName.trim()) {
       createSubjectMutation.mutate();
     }
+  };
+
+  // Edit subject mutation
+  const editSubjectMutation = useMutation({
+    mutationFn: async () => {
+      if (!subjectToEdit) return;
+      return await apiRequest("PATCH", `/api/subjects/${subjectToEdit.id}`, {
+        name: editSubjectName,
+        description: editSubjectDescription,
+        color: editSubjectColor,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
+      setSubjectToEdit(null);
+      toast({
+        title: t('subjects.editSuccess'),
+        description: t('subjects.editSuccessMessage'),
+      });
+    },
+    onError: (error: any) => {
+      const translatedError = translateError(t, {
+        errorCode: error?.data?.errorCode,
+        params: error?.data?.params,
+        error: error?.message
+      });
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: translatedError || t('subjects.editError'),
+      });
+    },
+  });
+
+  // Delete subject mutation
+  const deleteSubjectMutation = useMutation({
+    mutationFn: async () => {
+      if (!subjectToDelete) return;
+      return await apiRequest("DELETE", `/api/subjects/${subjectToDelete.id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
+      setSubjectToDelete(null);
+      toast({
+        title: t('subjects.deleteSuccess'),
+        description: t('subjects.deleteSuccessMessage'),
+      });
+    },
+    onError: (error: any) => {
+      const translatedError = translateError(t, {
+        errorCode: error?.data?.errorCode,
+        params: error?.data?.params,
+        error: error?.message
+      });
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: translatedError || t('subjects.deleteError'),
+      });
+    },
+  });
+
+  const handleEditSubject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editSubjectName.trim()) {
+      editSubjectMutation.mutate();
+    }
+  };
+
+  const openEditDialog = (subject: Subject, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSubjectToEdit(subject);
+    setEditSubjectName(subject.name);
+    setEditSubjectDescription(subject.description || "");
+    setEditSubjectColor(subject.color || "#6366f1");
+  };
+
+  const openDeleteDialog = (subject: Subject, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSubjectToDelete(subject);
   };
 
   return (
@@ -252,7 +351,7 @@ export function AppSidebar() {
                   </div>
                 ) : (
                   subjects.map((subject) => (
-                    <SidebarMenuItem key={subject.id}>
+                    <SidebarMenuItem key={subject.id} className="group">
                       <SidebarMenuButton
                         asChild
                         isActive={location === `/subject/${subject.id}`}
@@ -260,12 +359,32 @@ export function AppSidebar() {
                       >
                         <Link href={`/subject/${subject.id}`}>
                           <div
-                            className="w-3 h-3 rounded-sm"
+                            className="w-3 h-3 rounded-sm flex-shrink-0"
                             style={{ backgroundColor: subject.color ?? "#6366f1" }}
                           />
-                          <span>{subject.name}</span>
+                          <span className="flex-1 truncate">{subject.name}</span>
                         </Link>
                       </SidebarMenuButton>
+                      <div className="invisible group-hover:visible flex items-center absolute right-1 top-1/2 -translate-y-1/2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={(e) => openEditDialog(subject, e)}
+                          data-testid={`button-edit-subject-${subject.id}`}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-destructive hover:text-destructive"
+                          onClick={(e) => openDeleteDialog(subject, e)}
+                          data-testid={`button-delete-subject-${subject.id}`}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </SidebarMenuItem>
                   ))
                 )}
@@ -377,6 +496,98 @@ export function AppSidebar() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Subject Dialog */}
+      <Dialog open={!!subjectToEdit} onOpenChange={(open) => !open && setSubjectToEdit(null)}>
+        <DialogContent data-testid="dialog-edit-subject">
+          <form onSubmit={handleEditSubject}>
+            <DialogHeader>
+              <DialogTitle>{t('subjects.editSubject')}</DialogTitle>
+              <DialogDescription>
+                {t('subjects.editDescription')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject-name">{t('subjects.name')}</Label>
+                <Input
+                  id="edit-subject-name"
+                  value={editSubjectName}
+                  onChange={(e) => setEditSubjectName(e.target.value)}
+                  placeholder={t('subjects.namePlaceholder')}
+                  data-testid="input-edit-subject-name"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject-description">{t('subjects.description')}</Label>
+                <Textarea
+                  id="edit-subject-description"
+                  value={editSubjectDescription}
+                  onChange={(e) => setEditSubjectDescription(e.target.value)}
+                  placeholder={t('subjects.descriptionPlaceholder')}
+                  data-testid="input-edit-subject-description"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject-color">{t('subjects.color')}</Label>
+                <div className="flex gap-2 items-center">
+                  <Input
+                    id="edit-subject-color"
+                    type="color"
+                    value={editSubjectColor}
+                    onChange={(e) => setEditSubjectColor(e.target.value)}
+                    className="w-20 h-9"
+                    data-testid="input-edit-subject-color"
+                  />
+                  <span className="text-sm text-muted-foreground">{editSubjectColor}</span>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setSubjectToEdit(null)}
+                data-testid="button-cancel-edit-subject"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!editSubjectName.trim() || editSubjectMutation.isPending}
+                data-testid="button-submit-edit-subject"
+              >
+                {editSubjectMutation.isPending ? t('common.saving') : t('common.save')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Subject Confirmation Dialog */}
+      <AlertDialog open={!!subjectToDelete} onOpenChange={(open) => !open && setSubjectToDelete(null)}>
+        <AlertDialogContent data-testid="dialog-delete-subject">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('subjects.deleteSubject')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('subjects.deleteConfirmation', { name: subjectToDelete?.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-subject">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteSubjectMutation.mutate()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-subject"
+            >
+              {deleteSubjectMutation.isPending ? t('common.deleting') : t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

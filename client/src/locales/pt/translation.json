@@ -69,7 +69,17 @@
     "createSuccessMessage": "A sua nova disciplina foi adicionada com sucesso.",
     "createError": "Não foi possível criar a disciplina.",
     "delete": "Eliminar matéria",
-    "deleteConfirm": "Tens a certeza que queres eliminar esta matéria? Todos os tópicos e conteúdos serão eliminados."
+    "deleteConfirm": "Tens a certeza que queres eliminar esta matéria? Todos os tópicos e conteúdos serão eliminados.",
+    "editSubject": "Editar Disciplina",
+    "editDescription": "Altere o nome, descrição ou cor da disciplina.",
+    "editSuccess": "Disciplina atualizada!",
+    "editSuccessMessage": "As alterações foram guardadas com sucesso.",
+    "editError": "Não foi possível atualizar a disciplina.",
+    "deleteSubject": "Eliminar Disciplina",
+    "deleteConfirmation": "Tem a certeza que deseja eliminar \"{{name}}\"? Todos os tópicos e conteúdos serão eliminados permanentemente.",
+    "deleteSuccess": "Disciplina eliminada!",
+    "deleteSuccessMessage": "A disciplina foi removida com sucesso.",
+    "deleteError": "Não foi possível eliminar a disciplina."
   },
   "topics": {
     "title": "Tópicos",
