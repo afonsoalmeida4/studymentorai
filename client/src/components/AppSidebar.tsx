@@ -177,9 +177,8 @@ export function AppSidebar() {
 
   // Delete subject mutation
   const deleteSubjectMutation = useMutation({
-    mutationFn: async () => {
-      if (!subjectToDelete) return;
-      return await apiRequest("DELETE", `/api/subjects/${subjectToDelete.id}`);
+    mutationFn: async (subjectId: string) => {
+      return await apiRequest("DELETE", `/api/subjects/${subjectId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
@@ -579,7 +578,11 @@ export function AppSidebar() {
               {t('common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deleteSubjectMutation.mutate()}
+              onClick={() => {
+                if (subjectToDelete) {
+                  deleteSubjectMutation.mutate(subjectToDelete.id);
+                }
+              }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete-subject"
             >
