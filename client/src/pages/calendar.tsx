@@ -249,7 +249,7 @@ export default function CalendarPage() {
                   {t("calendar.createEvent")}
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
                 <EventForm
                   subjects={subjects}
                   onSubmit={(data) => createEvent.mutate(data)}
@@ -349,7 +349,7 @@ export default function CalendarPage() {
       </div>
 
       <Dialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           {editingEvent && (
             <EventForm
               event={editingEvent}
