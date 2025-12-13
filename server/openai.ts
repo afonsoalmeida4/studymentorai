@@ -5,8 +5,8 @@ import { normalizeLanguage } from "./languageHelper";
 // The newest OpenAI model is "gpt-5" which was released August 7, 2025. Do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY,
-  timeout: 60000, // 60 second timeout
-  maxRetries: 2, // Retry twice on temporary failures
+  timeout: 120000, // 120 second timeout (2 minutes) for longer content
+  maxRetries: 3, // Retry 3 times on temporary failures
 });
 
 export interface GenerateSummaryParams {
