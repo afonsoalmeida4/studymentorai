@@ -272,7 +272,10 @@ export default function FlashcardsPage() {
             {t('flashcards.description')}
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} data-testid="button-create-flashcard" size="sm" className="flex-shrink-0">
+        <Button onClick={() => {
+          setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: i18n.language || "pt" });
+          setShowCreateDialog(true);
+        }} data-testid="button-create-flashcard" size="sm" className="flex-shrink-0">
           <Plus className="h-4 w-4 sm:mr-2" />
           <span className="hidden sm:inline">{t('flashcards.createButton')}</span>
         </Button>
