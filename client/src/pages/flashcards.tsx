@@ -86,6 +86,8 @@ export default function FlashcardsPage() {
       return response.json();
     },
     enabled: true,
+    staleTime: 0, // Always fetch fresh data - no caching
+    refetchOnMount: "always", // Refetch when component mounts
   });
 
   // Fetch subjects for filter
