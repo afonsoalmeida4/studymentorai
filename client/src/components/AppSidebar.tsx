@@ -54,7 +54,7 @@ type SubscriptionDetails = {
 
 export function AppSidebar() {
   const { t } = useTranslation();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
   const typedUser = user as User | null;
@@ -180,8 +180,12 @@ export function AppSidebar() {
     mutationFn: async (subjectId: string) => {
       return await apiRequest("DELETE", `/api/subjects/${subjectId}`);
     },
-    onSuccess: () => {
+    onSuccess: (_, deletedSubjectId) => {
       queryClient.invalidateQueries({ queryKey: ["/api/subjects"] });
+      // Redirect to home if the deleted subject was currently open
+      if (location.startsWith(`/subject/${deletedSubjectId}`) || location.startsWith(`/topic/`)) {
+        setLocation("/");
+      }
       setSubjectToDelete(null);
       toast({
         title: t('subjects.deleteSuccess'),
@@ -364,7 +368,7 @@ export function AppSidebar() {
                           <span className="flex-1 truncate">{subject.name}</span>
                         </Link>
                       </SidebarMenuButton>
-                      <div className="invisible group-hover:visible flex items-center absolute right-1 top-1/2 -translate-y-1/2">
+                      <div className="flex items-center absolute right-1 top-1/2 -translate-y-1/2">
                         <Button
                           variant="ghost"
                           size="icon"
