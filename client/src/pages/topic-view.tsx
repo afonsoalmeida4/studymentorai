@@ -143,6 +143,21 @@ export default function TopicView() {
     enabled: !!topicId,
   });
 
+  // Query to check if topic has flashcards (including manual ones)
+  const { data: topicFlashcardsData } = useQuery<{ success: boolean; flashcards: any[] }>({
+    queryKey: ["/api/flashcards/topic", topicId, "bundled"],
+    queryFn: async () => {
+      if (!topicId) throw new Error("Topic ID required");
+      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`);
+      if (!res.ok) throw new Error("Failed to fetch flashcards");
+      return res.json();
+    },
+    enabled: !!topicId,
+    staleTime: 0,
+  });
+
+  const hasFlashcards = (topicFlashcardsData?.flashcards?.length ?? 0) > 0;
+
   const generateSummariesMutation = useMutation({
     mutationFn: async (learningStyles: LearningStyle[]) => {
       if (!topicId) throw new Error("Topic ID required");
@@ -455,17 +470,31 @@ export default function TopicView() {
         </div>
 
         {contents.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">{t('topicView.emptyState.title')}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t('topicView.emptyState.description')}
-                </p>
+          <>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-12">
+                  <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-medium mb-2">{t('topicView.emptyState.title')}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t('topicView.emptyState.description')}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Show flashcard section even when no content, if there are manual flashcards */}
+            {hasFlashcards && (
+              <div className="mt-12">
+                <div className="mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1 sm:mb-2">{t('topicView.flashcardSection.title', t('topicView.summarySection.title'))}</h2>
+                  <p className="text-muted-foreground text-xs sm:text-sm">
+                    {t('topicView.flashcardSection.description', t('topicView.summarySection.description'))}
+                  </p>
+                </div>
+                <SummaryStudySection topicId={topicId} />
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </>
         ) : (
           <Tabs defaultValue="all" className="w-full">
             <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
@@ -974,53 +1003,61 @@ export default function TopicView() {
                 );
               })()
             ) : (
-              <Card>
-                <CardContent className="py-12 text-center space-y-6">
-                  <Sparkles className="w-12 h-12 mx-auto text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Ainda não há resumos disponíveis para este tópico.
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Escolhe um ou mais estilos de aprendizagem para gerar resumos.
-                    </p>
-                  </div>
-                  <div className="max-w-sm mx-auto space-y-4">
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium">{t('topicView.generateStylesDialog.selectStyles')}</Label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {getMissingStyles().map(style => (
-                          <div key={style} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`style-${style}`}
-                              checked={selectedLearningStyles.includes(style)}
-                              onCheckedChange={() => toggleLearningStyle(style)}
-                              data-testid={`checkbox-style-${style}`}
-                            />
-                            <Label
-                              htmlFor={`style-${style}`}
-                              className="text-sm cursor-pointer capitalize"
-                            >
-                              {style}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
+              <>
+                <Card>
+                  <CardContent className="py-12 text-center space-y-6">
+                    <Sparkles className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Ainda não há resumos disponíveis para este tópico.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Escolhe um ou mais estilos de aprendizagem para gerar resumos.
+                      </p>
                     </div>
-                    <Button
-                      onClick={handleManualGenerate}
-                      disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
-                      data-testid="button-manual-generate"
-                      className="w-full"
-                    >
-                      {generateSummariesMutation.isPending 
-                        ? t('topicView.generateStylesDialog.generating')
-                        : t('topicView.generateStylesDialog.generate')
-                      }
-                    </Button>
+                    <div className="max-w-sm mx-auto space-y-4">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">{t('topicView.generateStylesDialog.selectStyles')}</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {getMissingStyles().map(style => (
+                            <div key={style} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`style-${style}`}
+                                checked={selectedLearningStyles.includes(style)}
+                                onCheckedChange={() => toggleLearningStyle(style)}
+                                data-testid={`checkbox-style-${style}`}
+                              />
+                              <Label
+                                htmlFor={`style-${style}`}
+                                className="text-sm cursor-pointer capitalize"
+                              >
+                                {style}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <Button
+                        onClick={handleManualGenerate}
+                        disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
+                        data-testid="button-manual-generate"
+                        className="w-full"
+                      >
+                        {generateSummariesMutation.isPending 
+                          ? t('topicView.generateStylesDialog.generating')
+                          : t('topicView.generateStylesDialog.generate')
+                        }
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                {/* Show flashcard section even when no summaries, if there are manual flashcards */}
+                {hasFlashcards && (
+                  <div className="mt-6">
+                    <SummaryStudySection topicId={topicId} />
                   </div>
-                </CardContent>
-              </Card>
+                )}
+              </>
             )}
           </div>
         )}
