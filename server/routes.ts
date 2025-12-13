@@ -1097,6 +1097,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .returning();
 
+      // Invalidate bundled flashcards cache for this topic (if topicId provided)
+      if (flashcardData.topicId) {
+        bundledFlashcardsCache.delete(`${flashcardData.topicId}:${userId}`);
+        console.log(`[POST /api/flashcards/manual] Cache invalidated for topic ${flashcardData.topicId}`);
+      }
+
       return res.json({
         success: true,
         flashcard: {
