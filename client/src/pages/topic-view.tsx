@@ -58,7 +58,7 @@ function preprocessMarkdown(text: string): string {
     .replace(/([^\n])\n(\d+\.\s)/g, "$1\n\n$2");
 }
 
-type LearningStyle = "visual" | "auditivo" | "logico" | "conciso";
+type LearningStyle = "visual" | "logico" | "conciso";
 
 type TopicSummary = {
   id: string;
@@ -337,7 +337,7 @@ export default function TopicView() {
   const getMissingStyles = (): LearningStyle[] => {
     if (!limits) return []; // Don't show any styles until limits are loaded
     const existing = new Set(Object.keys(topicSummariesData?.summaries || {}) as LearningStyle[]);
-    const allStyles: LearningStyle[] = ["visual", "auditivo", "logico", "conciso"];
+    const allStyles: LearningStyle[] = ["visual", "logico", "conciso"];
     const allowedStyles = limits.allowedLearningStyles || ["conciso"];
     return allStyles.filter(style => !existing.has(style) && allowedStyles.includes(style));
   };
@@ -641,7 +641,6 @@ export default function TopicView() {
                 const allowedStyles = limits?.allowedLearningStyles || ["conciso"];
                 
                 const visual = allowedStyles.includes("visual") ? summaries.visual : undefined;
-                const auditivo = allowedStyles.includes("auditivo") ? summaries.auditivo : undefined;
                 const logico = allowedStyles.includes("logico") ? summaries.logico : undefined;
                 const conciso = allowedStyles.includes("conciso") ? summaries.conciso : undefined;
                 
@@ -732,11 +731,6 @@ export default function TopicView() {
                           {t('topicView.generateStylesDialog.visual')}
                         </TabsTrigger>
                       ) : null}
-                      {auditivo ? (
-                        <TabsTrigger value="auditivo" data-testid="tab-summary-auditivo" className="text-xs sm:text-sm px-2 sm:px-3">
-                          {t('topicView.generateStylesDialog.auditivo')}
-                        </TabsTrigger>
-                      ) : null}
                       {logico ? (
                         <TabsTrigger value="logico" data-testid="tab-summary-logico" className="text-xs sm:text-sm px-2 sm:px-3">
                           {t('topicView.generateStylesDialog.logico')}
@@ -806,67 +800,6 @@ export default function TopicView() {
                             <CardContent className="pt-4">
                               <p className="text-sm italic text-primary">
                                 {visual.motivationalMessage}
-                              </p>
-                            </CardContent>
-                          </Card>
-                        ) : null}
-                        </TabsContent>
-                    ) : null}
-
-                    {auditivo ? (
-                      <TabsContent value="auditivo" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
-                        <Card>
-                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-                              <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.auditivo.title')}</CardTitle>
-                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      disabled={isExportingPdf || currentPlan !== 'premium'}
-                                      data-testid="button-export-auditivo"
-                                      className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
-                                    >
-                                      <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                                      <span className="hidden sm:inline">{t('topicView.pdfExport.button')}</span>
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => handleExport(auditivo.id, 'pdf')} data-testid="menu-export-pdf-auditivo">
-                                      {t('topicView.pdfExport.exportPdf')}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleExport(auditivo.id, 'docx')} data-testid="menu-export-docx-auditivo">
-                                      {t('topicView.pdfExport.exportDocx')}
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setStyleToRegenerate("auditivo")}
-                                  disabled={generateSummariesMutation.isPending}
-                                  data-testid="button-regenerate-auditivo"
-                                  className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
-                                >
-                                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
-                                  <span className="hidden sm:inline">{t('topicView.summarySection.regenerate')}</span>
-                                </Button>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="px-3 sm:px-6">
-                            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
-                              <ReactMarkdown>{preprocessMarkdown(auditivo.summary)}</ReactMarkdown>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        {auditivo.motivationalMessage ? (
-                          <Card className="bg-primary/5 border-primary/20">
-                            <CardContent className="pt-4">
-                              <p className="text-sm italic text-primary">
-                                {auditivo.motivationalMessage}
                               </p>
                             </CardContent>
                           </Card>

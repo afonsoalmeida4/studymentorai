@@ -6,7 +6,7 @@ import { z } from "zod";
 import { desc } from "drizzle-orm";
 
 // Learning style enum
-export const learningStyles = ["visual", "auditivo", "logico", "conciso"] as const;
+export const learningStyles = ["visual", "logico", "conciso"] as const;
 export type LearningStyle = typeof learningStyles[number];
 
 // XP Actions enum
@@ -95,7 +95,7 @@ export const planLimits = {
     maxSubjects: -1,
     maxTopics: -1,
     maxSummaryWords: -1,
-    allowedLearningStyles: ["visual", "auditivo", "logico", "conciso"] as LearningStyle[],
+    allowedLearningStyles: ["visual", "logico", "conciso"] as LearningStyle[],
     advancedFlashcards: true,
     chatModes: [] as ChatMode[],
     dailyChatLimit: 0,
@@ -113,7 +113,7 @@ export const planLimits = {
     maxSubjects: -1,
     maxTopics: -1,
     maxSummaryWords: -1,
-    allowedLearningStyles: ["visual", "auditivo", "logico", "conciso"] as LearningStyle[],
+    allowedLearningStyles: ["visual", "logico", "conciso"] as LearningStyle[],
     advancedFlashcards: true,
     chatModes: ["study", "existential"] as ChatMode[],
     dailyChatLimit: -1,

@@ -8,7 +8,6 @@ import {
   Brain,
   Zap,
   Eye,
-  Volume2,
   FileText,
   Heart,
   BookOpen,
@@ -304,7 +303,7 @@ export default function Landing() {
               {t('landing.learningStyles.subtitle')}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border-2 hover-elevate">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4">
@@ -317,24 +316,6 @@ export default function Landing() {
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       {t('landing.learningStyles.visual.description')}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover-elevate">
-              <CardContent className="p-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Volume2 className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">
-                      {t('landing.learningStyles.auditory.title')}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {t('landing.learningStyles.auditory.description')}
                     </p>
                   </div>
                 </div>

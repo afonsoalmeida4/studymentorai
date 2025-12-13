@@ -92,7 +92,7 @@ interface SummaryGenerationResult {
 async function generateTopicSummaries(
   topicId: string, 
   userId: string,
-  specificStyle?: "visual" | "auditivo" | "logico" | "conciso"
+  specificStyle?: "visual" | "logico" | "conciso"
 ): Promise<SummaryGenerationResult> {
   try {
     let aggregatedContent = await aggregateTopicContent(topicId);
@@ -573,7 +573,7 @@ export function registerOrganizationRoutes(app: Express) {
         console.log(`[ContentUpload] Using language: ${userLanguage} for summaries`);
         
         // Generate all 4 summaries sequentially to avoid rate limits
-        const learningStyles: Array<"visual" | "auditivo" | "logico" | "conciso"> = ["visual", "auditivo", "logico", "conciso"];
+        const learningStyles: Array<"visual" | "logico" | "conciso"> = ["visual", "logico", "conciso"];
         let successfulSummaries = 0;
         
         for (const style of learningStyles) {
