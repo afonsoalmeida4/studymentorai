@@ -456,12 +456,37 @@ export default function SubjectView() {
     <>
       <div className="p-2 sm:p-4 md:p-6 w-full max-w-7xl mx-auto overflow-x-hidden min-w-0">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className="w-5 h-5 rounded"
-              style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
-            />
-            <h1 className="text-3xl font-semibold">{currentSubject?.name || t('subjectView.subject')}</h1>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-5 h-5 rounded flex-shrink-0"
+                style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
+              />
+              <h1 className="text-2xl sm:text-3xl font-semibold">{currentSubject?.name || t('subjectView.subject')}</h1>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (currentSubject) handleEditSubject(e, currentSubject);
+                }}
+                data-testid="button-edit-current-subject"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-destructive"
+                onClick={() => currentSubject && setSubjectToDelete(currentSubject)}
+                data-testid="button-delete-current-subject"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           {currentSubject?.description && (
             <p className="text-muted-foreground">{currentSubject.description}</p>
