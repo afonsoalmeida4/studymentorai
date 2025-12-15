@@ -11,7 +11,7 @@ async function setupStripeProducts() {
     // Plano Pro - €7.99/mês
     console.log("Criando plano Pro (€7.99/mês)...");
     const proProd = await stripe.products.create({
-      name: "Study AI Mentor - Pro",
+      name: "Study Mentor AI - Pro",
       description: "Uploads ilimitados, resumos avançados, chat existencial",
     });
     const proPrice = await stripe.prices.create({
@@ -25,7 +25,7 @@ async function setupStripeProducts() {
     // Plano Premium - €18.99/mês
     console.log("Criando plano Premium (€18.99/mês)...");
     const premiumProd = await stripe.products.create({
-      name: "Study AI Mentor - Premium",
+      name: "Study Mentor AI - Premium",
       description: "Tudo do Pro + AI tutor, planos de estudo personalizados",
     });
     const premiumPrice = await stripe.prices.create({
@@ -39,7 +39,7 @@ async function setupStripeProducts() {
     // Plano Educational (Professor) - €14.99/mês
     console.log("Criando plano Educational Teacher (€14.99/mês)...");
     const eduTeacherProd = await stripe.products.create({
-      name: "Study AI Mentor - Educational (Teacher)",
+      name: "Study Mentor AI - Educational (Teacher)",
       description: "Para professores: gestão de turmas, monitorização de progresso",
     });
     const eduTeacherPrice = await stripe.prices.create({
@@ -53,7 +53,7 @@ async function setupStripeProducts() {
     // Plano Educational (Aluno) - €3/mês
     console.log("Criando plano Educational Student (€3/mês)...");
     const eduStudentProd = await stripe.products.create({
-      name: "Study AI Mentor - Educational (Student)",
+      name: "Study Mentor AI - Educational (Student)",
       description: "Para alunos: acesso a turmas, funcionalidades de estudo",
     });
     const eduStudentPrice = await stripe.prices.create({

@@ -1,4 +1,4 @@
-# Study AI Mentor — Design Guidelines
+# Study Mentor AI — Design Guidelines
 
 ## Design Approach
 

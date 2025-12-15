@@ -377,7 +377,7 @@
     }
   },
   "home": {
-    "title": "Welcome to Study AI Mentor",
+    "title": "Welcome to Study Mentor AI",
     "welcomeBack": "Hello, {{name}}!",
     "subtitle": "Organize your knowledge. Find your balance.",
     "description": "A complete platform to organize study materials, process documents with AI and find support for your learning journey.",
@@ -421,7 +421,7 @@
     },
     "gettingStarted": {
       "title": "Getting Started",
-      "subtitle": "Follow these steps to make the most of Study AI Mentor",
+      "subtitle": "Follow these steps to make the most of Study Mentor AI",
       "step1": {
         "title": "Create a Subject",
         "description": "Use the sidebar on the left and click the + button to create your first subject",
@@ -444,7 +444,7 @@
   "landing": {
     "hero": {
       "badge": "AI-Powered Study Platform",
-      "title": "Study AI Mentor",
+      "title": "Study Mentor AI",
       "description": "Transform documents into organized knowledge with AI. Study in a personalized way and find support for your learning journey.",
       "cta": "Get Started",
       "learnMore": "Learn More"
@@ -525,7 +525,7 @@
       "description": "Study in your preferred language. All content, flashcards and summaries are automatically translated."
     },
     "benefits": {
-      "title": "Why Study AI Mentor?",
+      "title": "Why Study Mentor AI?",
       "aiPowered": {
         "title": "Advanced AI",
         "description": "Cutting-edge GPT-4 technology for precise and personalized summaries"
@@ -1149,7 +1149,7 @@
     "lastUpdated": "Last updated",
     "introduction": {
       "title": "Introduction",
-      "content": "This Privacy Policy describes how Study AI Mentor collects, uses, and protects your personal information in compliance with the European Union's General Data Protection Regulation (GDPR)."
+      "content": "This Privacy Policy describes how Study Mentor AI collects, uses, and protects your personal information in compliance with the European Union's General Data Protection Regulation (GDPR)."
     },
     "dataCollection": {
       "title": "Data We Collect",
@@ -1182,7 +1182,7 @@
     },
     "thirdPartyData": {
       "title": "Third-Party Data",
-      "content": "As a user, you are responsible for ensuring that the documents you upload do not contain sensitive personal data of third parties without their consent. Study AI Mentor is not responsible for the content of documents uploaded by users.",
+      "content": "As a user, you are responsible for ensuring that the documents you upload do not contain sensitive personal data of third parties without their consent. Study Mentor AI is not responsible for the content of documents uploaded by users.",
       "warning": "IMPORTANT: By uploading documents, you confirm that you have authorization to process any personal data contained therein and that they do not include sensitive data of third parties (such as health information, financial data, or other protected data)."
     },
     "contact": {

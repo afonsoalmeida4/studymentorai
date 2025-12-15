@@ -372,7 +372,7 @@
     }
   },
   "home": {
-    "title": "Benvenuto in Study AI Mentor",
+    "title": "Benvenuto in Study Mentor AI",
     "welcomeBack": "Ciao, {{name}}!",
     "subtitle": "Organizza la tua conoscenza. Trova il tuo equilibrio.",
     "description": "Una piattaforma completa per organizzare materiali di studio, elaborare documenti con l'IA e trovare supporto nel tuo percorso di apprendimento.",
@@ -416,7 +416,7 @@
     },
     "gettingStarted": {
       "title": "Inizia",
-      "subtitle": "Segui questi passaggi per sfruttare al meglio Study AI Mentor",
+      "subtitle": "Segui questi passaggi per sfruttare al meglio Study Mentor AI",
       "step1": {
         "title": "Crea una Materia",
         "description": "Usa la barra laterale a sinistra e fai clic sul pulsante + per creare la tua prima materia",
@@ -620,7 +620,7 @@
   "landing": {
     "hero": {
       "badge": "Piattaforma di Studio con IA",
-      "title": "Study AI Mentor",
+      "title": "Study Mentor AI",
       "description": "Trasforma documenti in conoscenza organizzata con l'IA. Studia in modo personalizzato e trova supporto per il tuo percorso di apprendimento.",
       "cta": "Inizia Ora",
       "learnMore": "Scopri di Più"
@@ -701,7 +701,7 @@
       "description": "Studia nella tua lingua preferita. Tutti i contenuti, flashcard e riassunti vengono tradotti automaticamente."
     },
     "benefits": {
-      "title": "Perché Study AI Mentor?",
+      "title": "Perché Study Mentor AI?",
       "aiPowered": {
         "title": "IA Avanzata",
         "description": "Tecnologia GPT-4 all'avanguardia per riassunti precisi e personalizzati"
@@ -1148,7 +1148,7 @@
     "lastUpdated": "Ultimo aggiornamento",
     "introduction": {
       "title": "Introduzione",
-      "content": "Questa Informativa sulla Privacy descrive come Study AI Mentor raccoglie, utilizza e protegge le tue informazioni personali in conformità con il Regolamento Generale sulla Protezione dei Dati (GDPR) dell'Unione Europea."
+      "content": "Questa Informativa sulla Privacy descrive come Study Mentor AI raccoglie, utilizza e protegge le tue informazioni personali in conformità con il Regolamento Generale sulla Protezione dei Dati (GDPR) dell'Unione Europea."
     },
     "dataCollection": {
       "title": "Dati che Raccogliamo",
@@ -1181,7 +1181,7 @@
     },
     "thirdPartyData": {
       "title": "Dati di Terzi",
-      "content": "Come utente, sei responsabile di garantire che i documenti che carichi non contengano dati personali sensibili di terzi senza il loro consenso. Study AI Mentor non è responsabile del contenuto dei documenti caricati dagli utenti.",
+      "content": "Come utente, sei responsabile di garantire che i documenti che carichi non contengano dati personali sensibili di terzi senza il loro consenso. Study Mentor AI non è responsabile del contenuto dei documenti caricati dagli utenti.",
       "warning": "IMPORTANTE: Caricando documenti, confermi di avere l'autorizzazione a trattare tutti i dati personali in essi contenuti e che non includono dati sensibili di terzi (come informazioni sanitarie, dati finanziari o altri dati protetti)."
     },
     "contact": {

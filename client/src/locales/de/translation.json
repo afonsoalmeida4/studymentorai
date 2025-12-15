@@ -372,7 +372,7 @@
     }
   },
   "home": {
-    "title": "Willkommen bei Study AI Mentor",
+    "title": "Willkommen bei Study Mentor AI",
     "welcomeBack": "Hallo, {{name}}!",
     "subtitle": "Organisieren Sie Ihr Wissen. Finden Sie Ihr Gleichgewicht.",
     "description": "Eine vollständige Plattform zum Organisieren von Lernmaterialien, Verarbeiten von Dokumenten mit KI und Unterstützung auf Ihrem Lernweg.",
@@ -416,7 +416,7 @@
     },
     "gettingStarted": {
       "title": "Erste Schritte",
-      "subtitle": "Befolgen Sie diese Schritte, um das Beste aus Study AI Mentor herauszuholen",
+      "subtitle": "Befolgen Sie diese Schritte, um das Beste aus Study Mentor AI herauszuholen",
       "step1": {
         "title": "Ein Fach Erstellen",
         "description": "Verwenden Sie die Seitenleiste links und klicken Sie auf die +-Schaltfläche, um Ihr erstes Fach zu erstellen",
@@ -620,7 +620,7 @@
   "landing": {
     "hero": {
       "badge": "KI-gestützte Lernplattform",
-      "title": "Study AI Mentor",
+      "title": "Study Mentor AI",
       "description": "Verwandeln Sie Dokumente mit KI in organisiertes Wissen. Studieren Sie personalisiert und finden Sie Unterstützung für Ihre Lernreise.",
       "cta": "Jetzt Beginnen",
       "learnMore": "Mehr Erfahren"
@@ -701,7 +701,7 @@
       "description": "Lernen Sie in Ihrer bevorzugten Sprache. Alle Inhalte, Lernkarten und Zusammenfassungen werden automatisch übersetzt."
     },
     "benefits": {
-      "title": "Warum Study AI Mentor?",
+      "title": "Warum Study Mentor AI?",
       "aiPowered": {
         "title": "Fortgeschrittene KI",
         "description": "Hochmoderne GPT-4-Technologie für präzise und personalisierte Zusammenfassungen"
@@ -1148,7 +1148,7 @@
     "lastUpdated": "Zuletzt aktualisiert",
     "introduction": {
       "title": "Einführung",
-      "content": "Diese Datenschutzrichtlinie beschreibt, wie Study AI Mentor Ihre persönlichen Daten in Übereinstimmung mit der Datenschutz-Grundverordnung (DSGVO) der Europäischen Union erfasst, verwendet und schützt."
+      "content": "Diese Datenschutzrichtlinie beschreibt, wie Study Mentor AI Ihre persönlichen Daten in Übereinstimmung mit der Datenschutz-Grundverordnung (DSGVO) der Europäischen Union erfasst, verwendet und schützt."
     },
     "dataCollection": {
       "title": "Daten, die wir erheben",
@@ -1181,7 +1181,7 @@
     },
     "thirdPartyData": {
       "title": "Daten Dritter",
-      "content": "Als Benutzer sind Sie dafür verantwortlich sicherzustellen, dass die von Ihnen hochgeladenen Dokumente keine sensiblen personenbezogenen Daten Dritter ohne deren Zustimmung enthalten. Study AI Mentor ist nicht für den Inhalt der von Benutzern hochgeladenen Dokumente verantwortlich.",
+      "content": "Als Benutzer sind Sie dafür verantwortlich sicherzustellen, dass die von Ihnen hochgeladenen Dokumente keine sensiblen personenbezogenen Daten Dritter ohne deren Zustimmung enthalten. Study Mentor AI ist nicht für den Inhalt der von Benutzern hochgeladenen Dokumente verantwortlich.",
       "warning": "WICHTIG: Durch das Hochladen von Dokumenten bestätigen Sie, dass Sie zur Verarbeitung aller darin enthaltenen personenbezogenen Daten berechtigt sind und dass diese keine sensiblen Daten Dritter enthalten (wie Gesundheitsinformationen, Finanzdaten oder andere geschützte Daten)."
     },
     "contact": {

@@ -52,7 +52,7 @@ export default function Landing() {
               <GraduationCap className="w-6 h-6 text-primary" />
             </div>
             <span className="text-xl font-bold text-foreground">
-              Study AI Mentor
+              Study Mentor AI
             </span>
           </div>
           <LanguageSelector />
@@ -454,7 +454,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t py-8 px-6 md:px-12">
         <div className="w-full max-w-6xl mx-auto text-center text-sm text-muted-foreground space-y-2">
-          <p>© 2024 Study AI Mentor. {t('landing.footer.rights')}</p>
+          <p>© 2024 Study Mentor AI. {t('landing.footer.rights')}</p>
           <a 
             href="/privacy" 
             className="text-primary hover:underline"
