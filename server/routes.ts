@@ -444,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.pipe(res);
       
       // Add content to PDF
-      doc.fontSize(20).font('Helvetica-Bold').text('AI Study Mentor', { align: 'center' });
+      doc.fontSize(20).font('Helvetica-Bold').text('Study AI Mentor', { align: 'center' });
       doc.moveDown(0.5);
       
       doc.fontSize(16).font('Helvetica-Bold').text(subject.name, { align: 'center' });
@@ -479,7 +479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add footer
       doc.moveDown(2);
       doc.fontSize(8).font('Helvetica')
-        .text(`Gerado em ${new Date().toLocaleDateString('pt-PT')} via AI Study Mentor`, 
+        .text(`Gerado em ${new Date().toLocaleDateString('pt-PT')} via Study AI Mentor`, 
           { align: 'center' });
       
       // Finalize PDF
@@ -527,7 +527,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           children: [
             // Header
             new Paragraph({
-              text: "AI Study Mentor",
+              text: "Study AI Mentor",
               heading: HeadingLevel.HEADING_1,
               alignment: AlignmentType.CENTER,
             }),
@@ -598,7 +598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Gerado em ${new Date().toLocaleDateString('pt-PT')} via AI Study Mentor`,
+                  text: `Gerado em ${new Date().toLocaleDateString('pt-PT')} via Study AI Mentor`,
                   size: 16,
                 }),
               ],

@@ -235,7 +235,7 @@ export function AppSidebar() {
           <div className="flex items-center gap-2 p-2">
             <GraduationCap className="w-6 h-6 text-primary" data-testid="icon-app-logo" />
             <div className="flex flex-col">
-              <span className="font-semibold text-sm">AI Study Mentor</span>
+              <span className="font-semibold text-sm">Study AI Mentor</span>
               <span className="text-xs text-muted-foreground">{t('app.tagline')}</span>
             </div>
           </div>

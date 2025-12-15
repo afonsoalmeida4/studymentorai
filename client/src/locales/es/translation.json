@@ -375,7 +375,7 @@
     }
   },
   "home": {
-    "title": "Bienvenido a AI Study Mentor",
+    "title": "Bienvenido a Study AI Mentor",
     "welcomeBack": "¡Hola, {{name}}!",
     "subtitle": "Organiza tu conocimiento. Encuentra tu equilibrio.",
     "description": "Una plataforma completa para organizar materiales de estudio, procesar documentos con IA y encontrar apoyo en tu viaje de aprendizaje.",
@@ -419,7 +419,7 @@
     },
     "gettingStarted": {
       "title": "Comenzar",
-      "subtitle": "Sigue estos pasos para aprovechar al máximo AI Study Mentor",
+      "subtitle": "Sigue estos pasos para aprovechar al máximo Study AI Mentor",
       "step1": {
         "title": "Crea una Materia",
         "description": "Usa la barra lateral izquierda y haz clic en el botón + para crear tu primera materia",
@@ -619,7 +619,7 @@
   "landing": {
     "hero": {
       "badge": "Plataforma de Estudios con IA",
-      "title": "AI Study Mentor",
+      "title": "Study AI Mentor",
       "description": "Transforme documentos en conocimiento organizado con IA. Estudie de forma personalizada y encuentre apoyo para su viaje de aprendizaje.",
       "cta": "Empezar Ahora",
       "learnMore": "Saber Más"
@@ -700,7 +700,7 @@
       "description": "Estudia en tu idioma preferido. Todos los contenidos, flashcards y resúmenes se traducen automáticamente."
     },
     "benefits": {
-      "title": "¿Por Qué AI Study Mentor?",
+      "title": "¿Por Qué Study AI Mentor?",
       "aiPowered": {
         "title": "IA Avanzada",
         "description": "Tecnología GPT-4 de vanguardia para resúmenes precisos y personalizados"
@@ -1147,7 +1147,7 @@
     "lastUpdated": "Última actualización",
     "introduction": {
       "title": "Introducción",
-      "content": "Esta Política de Privacidad describe cómo AI Study Mentor recopila, utiliza y protege su información personal de conformidad con el Reglamento General de Protección de Datos (RGPD) de la Unión Europea."
+      "content": "Esta Política de Privacidad describe cómo Study AI Mentor recopila, utiliza y protege su información personal de conformidad con el Reglamento General de Protección de Datos (RGPD) de la Unión Europea."
     },
     "dataCollection": {
       "title": "Datos que Recopilamos",
@@ -1180,7 +1180,7 @@
     },
     "thirdPartyData": {
       "title": "Datos de Terceros",
-      "content": "Como usuario, es responsable de garantizar que los documentos que sube no contengan datos personales sensibles de terceros sin su consentimiento. AI Study Mentor no se responsabiliza del contenido de los documentos subidos por los usuarios.",
+      "content": "Como usuario, es responsable de garantizar que los documentos que sube no contengan datos personales sensibles de terceros sin su consentimiento. Study AI Mentor no se responsabiliza del contenido de los documentos subidos por los usuarios.",
       "warning": "IMPORTANTE: Al subir documentos, confirma que tiene autorización para procesar cualquier dato personal contenido en ellos y que no incluyen datos sensibles de terceros (como información de salud, datos financieros u otros datos protegidos)."
     },
     "contact": {
