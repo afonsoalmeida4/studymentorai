@@ -1205,5 +1205,70 @@
     "more": "Mehr",
     "empty": "Noch keine Lerndaten. Beginnen Sie mit dem Lernen von Lernkarten, um Ihre Statistiken zu sehen!",
     "error": "Fehler beim Laden der Statistiken"
+  },
+  "quiz": {
+    "title": "Intelligentes Quiz",
+    "subtitle": "Testen Sie Ihr Wissen mit KI-generierten Fragen",
+    "generate": "Quiz Generieren",
+    "generating": "Quiz wird generiert...",
+    "regenerate": "Quiz Regenerieren",
+    "startQuiz": "Quiz Starten",
+    "continueQuiz": "Quiz Fortsetzen",
+    "retakeQuiz": "Quiz Wiederholen",
+    "difficulty": {
+      "title": "Schwierigkeit",
+      "easy": "Einfach",
+      "medium": "Mittel",
+      "hard": "Schwer"
+    },
+    "questionCount": "Anzahl der Fragen",
+    "questions": "Fragen",
+    "question": "Frage",
+    "of": "von",
+    "selectAnswer": "Wählen Sie eine Antwort",
+    "submit": "Antworten Absenden",
+    "submitting": "Wird gesendet...",
+    "next": "Nächste",
+    "previous": "Vorherige",
+    "finish": "Quiz Beenden",
+    "results": {
+      "title": "Quiz-Ergebnisse",
+      "score": "Punktzahl",
+      "correct": "Richtig",
+      "incorrect": "Falsch",
+      "percentage": "Prozent",
+      "timeSpent": "Aufgewandte Zeit",
+      "excellent": "Ausgezeichnet!",
+      "good": "Gute Arbeit!",
+      "needsImprovement": "Weiter üben!",
+      "viewDetails": "Details Anzeigen",
+      "hideDetails": "Details Ausblenden"
+    },
+    "explanation": {
+      "title": "Erklärung",
+      "correct": "Richtige Antwort",
+      "yourAnswer": "Ihre Antwort",
+      "correctAnswer": "Richtige Antwort"
+    },
+    "history": {
+      "title": "Versuchshistorie",
+      "noAttempts": "Noch keine Versuche",
+      "attempt": "Versuch",
+      "bestScore": "Beste Punktzahl"
+    },
+    "empty": {
+      "title": "Kein Quiz Verfügbar",
+      "description": "Erstellen Sie zuerst eine Zusammenfassung, um ein Quiz zu erstellen.",
+      "noSummary": "Dieses Thema hat keine Zusammenfassungen. Fügen Sie Inhalte hinzu und erstellen Sie zuerst eine Zusammenfassung."
+    },
+    "error": {
+      "generate": "Fehler beim Generieren des Quiz",
+      "submit": "Fehler beim Absenden der Antworten",
+      "load": "Fehler beim Laden des Quiz"
+    },
+    "success": {
+      "generated": "Quiz erfolgreich generiert!",
+      "submitted": "Antworten gesendet!"
+    }
   }
 }

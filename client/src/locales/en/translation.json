@@ -1206,5 +1206,70 @@
     "more": "More",
     "empty": "No study data yet. Start studying flashcards to see your statistics!",
     "error": "Error loading statistics"
+  },
+  "quiz": {
+    "title": "Smart Quiz",
+    "subtitle": "Test your knowledge with AI-generated questions",
+    "generate": "Generate Quiz",
+    "generating": "Generating quiz...",
+    "regenerate": "Regenerate Quiz",
+    "startQuiz": "Start Quiz",
+    "continueQuiz": "Continue Quiz",
+    "retakeQuiz": "Retake Quiz",
+    "difficulty": {
+      "title": "Difficulty",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "questionCount": "Number of Questions",
+    "questions": "questions",
+    "question": "Question",
+    "of": "of",
+    "selectAnswer": "Select an answer",
+    "submit": "Submit Answers",
+    "submitting": "Submitting...",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish Quiz",
+    "results": {
+      "title": "Quiz Results",
+      "score": "Score",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "percentage": "Percentage",
+      "timeSpent": "Time Spent",
+      "excellent": "Excellent!",
+      "good": "Good job!",
+      "needsImprovement": "Keep practicing!",
+      "viewDetails": "View Details",
+      "hideDetails": "Hide Details"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "correct": "Correct Answer",
+      "yourAnswer": "Your answer",
+      "correctAnswer": "Correct answer"
+    },
+    "history": {
+      "title": "Attempt History",
+      "noAttempts": "No attempts yet",
+      "attempt": "Attempt",
+      "bestScore": "Best Score"
+    },
+    "empty": {
+      "title": "No Quiz Available",
+      "description": "Generate a summary first to create a quiz.",
+      "noSummary": "This topic has no summaries. Add content and generate a summary first."
+    },
+    "error": {
+      "generate": "Error generating quiz",
+      "submit": "Error submitting answers",
+      "load": "Error loading quiz"
+    },
+    "success": {
+      "generated": "Quiz generated successfully!",
+      "submitted": "Answers submitted!"
+    }
   }
 }

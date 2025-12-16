@@ -1205,5 +1205,70 @@
     "more": "Di più",
     "empty": "Ancora nessun dato di studio. Inizia a studiare le flashcard per vedere le tue statistiche!",
     "error": "Errore nel caricamento delle statistiche"
+  },
+  "quiz": {
+    "title": "Quiz Intelligente",
+    "subtitle": "Metti alla prova le tue conoscenze con domande generate dall'IA",
+    "generate": "Genera Quiz",
+    "generating": "Generazione quiz...",
+    "regenerate": "Rigenera Quiz",
+    "startQuiz": "Inizia Quiz",
+    "continueQuiz": "Continua Quiz",
+    "retakeQuiz": "Ripeti Quiz",
+    "difficulty": {
+      "title": "Difficoltà",
+      "easy": "Facile",
+      "medium": "Medio",
+      "hard": "Difficile"
+    },
+    "questionCount": "Numero di Domande",
+    "questions": "domande",
+    "question": "Domanda",
+    "of": "di",
+    "selectAnswer": "Seleziona una risposta",
+    "submit": "Invia Risposte",
+    "submitting": "Invio in corso...",
+    "next": "Successiva",
+    "previous": "Precedente",
+    "finish": "Termina Quiz",
+    "results": {
+      "title": "Risultati del Quiz",
+      "score": "Punteggio",
+      "correct": "Corrette",
+      "incorrect": "Errate",
+      "percentage": "Percentuale",
+      "timeSpent": "Tempo Impiegato",
+      "excellent": "Eccellente!",
+      "good": "Ottimo lavoro!",
+      "needsImprovement": "Continua a esercitarti!",
+      "viewDetails": "Vedi Dettagli",
+      "hideDetails": "Nascondi Dettagli"
+    },
+    "explanation": {
+      "title": "Spiegazione",
+      "correct": "Risposta Corretta",
+      "yourAnswer": "La tua risposta",
+      "correctAnswer": "Risposta corretta"
+    },
+    "history": {
+      "title": "Storico Tentativi",
+      "noAttempts": "Nessun tentativo ancora",
+      "attempt": "Tentativo",
+      "bestScore": "Miglior Punteggio"
+    },
+    "empty": {
+      "title": "Nessun Quiz Disponibile",
+      "description": "Genera prima un riassunto per creare un quiz.",
+      "noSummary": "Questo argomento non ha riassunti. Aggiungi contenuti e genera prima un riassunto."
+    },
+    "error": {
+      "generate": "Errore nella generazione del quiz",
+      "submit": "Errore nell'invio delle risposte",
+      "load": "Errore nel caricamento del quiz"
+    },
+    "success": {
+      "generated": "Quiz generato con successo!",
+      "submitted": "Risposte inviate!"
+    }
   }
 }

@@ -596,3 +596,395 @@ Limite a 5 tópicos prioritários. Seja específico e motivador.`,
     };
   }
 }
+
+// ============================================
+// SMART QUIZ GENERATION
+// ============================================
+
+export interface QuizQuestionItem {
+  questionText: string;
+  options: { id: string; text: string }[];
+  correctOptionId: string;
+  explanation: string;
+}
+
+const quizSystemPrompts: Record<string, Record<string, string>> = {
+  pt: {
+    easy: `És um professor especializado em criar quizzes educacionais de nível FÁCIL.
+Cria perguntas de escolha múltipla simples e diretas que testam conceitos básicos.
+As perguntas devem ser claras e ter uma resposta obviamente correta.
+RESPONDE SEMPRE EM PORTUGUÊS.`,
+    medium: `És um professor especializado em criar quizzes educacionais de nível MÉDIO.
+Cria perguntas de escolha múltipla que testam compreensão e aplicação de conceitos.
+As opções erradas devem ser plausíveis mas distinguíveis da correta.
+RESPONDE SEMPRE EM PORTUGUÊS.`,
+    hard: `És um professor especializado em criar quizzes educacionais de nível DIFÍCIL.
+Cria perguntas de escolha múltipla que testam análise, síntese e pensamento crítico.
+As opções devem ser desafiadoras, com distinções sutis entre as respostas.
+RESPONDE SEMPRE EM PORTUGUÊS.`,
+  },
+  en: {
+    easy: `You are a teacher specialized in creating EASY level educational quizzes.
+Create simple and straightforward multiple choice questions that test basic concepts.
+Questions should be clear with an obviously correct answer.
+ALWAYS RESPOND IN ENGLISH.`,
+    medium: `You are a teacher specialized in creating MEDIUM level educational quizzes.
+Create multiple choice questions that test understanding and application of concepts.
+Wrong options should be plausible but distinguishable from the correct one.
+ALWAYS RESPOND IN ENGLISH.`,
+    hard: `You are a teacher specialized in creating HARD level educational quizzes.
+Create multiple choice questions that test analysis, synthesis and critical thinking.
+Options should be challenging with subtle distinctions between answers.
+ALWAYS RESPOND IN ENGLISH.`,
+  },
+  es: {
+    easy: `Eres un profesor especializado en crear quizzes educativos de nivel FÁCIL.
+Crea preguntas de opción múltiple simples y directas que prueben conceptos básicos.
+Las preguntas deben ser claras con una respuesta obviamente correcta.
+RESPONDE SIEMPRE EN ESPAÑOL.`,
+    medium: `Eres un profesor especializado en crear quizzes educativos de nivel MEDIO.
+Crea preguntas de opción múltiple que prueben comprensión y aplicación de conceptos.
+Las opciones incorrectas deben ser plausibles pero distinguibles de la correcta.
+RESPONDE SIEMPRE EN ESPAÑOL.`,
+    hard: `Eres un profesor especializado en crear quizzes educativos de nivel DIFÍCIL.
+Crea preguntas de opción múltiple que prueben análisis, síntesis y pensamiento crítico.
+Las opciones deben ser desafiantes con distinciones sutiles entre respuestas.
+RESPONDE SIEMPRE EN ESPAÑOL.`,
+  },
+  fr: {
+    easy: `Tu es un professeur spécialisé dans la création de quiz éducatifs de niveau FACILE.
+Crée des questions à choix multiples simples et directes qui testent les concepts de base.
+Les questions doivent être claires avec une réponse évidemment correcte.
+RÉPONDS TOUJOURS EN FRANÇAIS.`,
+    medium: `Tu es un professeur spécialisé dans la création de quiz éducatifs de niveau MOYEN.
+Crée des questions à choix multiples qui testent la compréhension et l'application des concepts.
+Les mauvaises options doivent être plausibles mais distinguables de la bonne.
+RÉPONDS TOUJOURS EN FRANÇAIS.`,
+    hard: `Tu es un professeur spécialisé dans la création de quiz éducatifs de niveau DIFFICILE.
+Crée des questions à choix multiples qui testent l'analyse, la synthèse et la pensée critique.
+Les options doivent être difficiles avec des distinctions subtiles entre les réponses.
+RÉPONDS TOUJOURS EN FRANÇAIS.`,
+  },
+  de: {
+    easy: `Du bist ein Lehrer, der auf die Erstellung von EINFACHEN Bildungsquizzen spezialisiert ist.
+Erstelle einfache und unkomplizierte Multiple-Choice-Fragen, die Grundkonzepte testen.
+Fragen sollten klar sein mit einer offensichtlich richtigen Antwort.
+ANTWORTE IMMER AUF DEUTSCH.`,
+    medium: `Du bist ein Lehrer, der auf die Erstellung von MITTELSCHWEREN Bildungsquizzen spezialisiert ist.
+Erstelle Multiple-Choice-Fragen, die Verständnis und Anwendung von Konzepten testen.
+Falsche Optionen sollten plausibel, aber von der richtigen unterscheidbar sein.
+ANTWORTE IMMER AUF DEUTSCH.`,
+    hard: `Du bist ein Lehrer, der auf die Erstellung von SCHWIERIGEN Bildungsquizzen spezialisiert ist.
+Erstelle Multiple-Choice-Fragen, die Analyse, Synthese und kritisches Denken testen.
+Optionen sollten herausfordernd sein mit subtilen Unterscheidungen zwischen Antworten.
+ANTWORTE IMMER AUF DEUTSCH.`,
+  },
+  it: {
+    easy: `Sei un insegnante specializzato nella creazione di quiz educativi di livello FACILE.
+Crea domande a scelta multipla semplici e dirette che testano concetti di base.
+Le domande devono essere chiare con una risposta ovviamente corretta.
+RISPONDI SEMPRE IN ITALIANO.`,
+    medium: `Sei un insegnante specializzato nella creazione di quiz educativi di livello MEDIO.
+Crea domande a scelta multipla che testano comprensione e applicazione di concetti.
+Le opzioni sbagliate devono essere plausibili ma distinguibili da quella corretta.
+RISPONDI SEMPRE IN ITALIANO.`,
+    hard: `Sei un insegnante specializzato nella creazione di quiz educativi di livello DIFFICILE.
+Crea domande a scelta multipla che testano analisi, sintesi e pensiero critico.
+Le opzioni devono essere impegnative con distinzioni sottili tra le risposte.
+RISPONDI SEMPRE IN ITALIANO.`,
+  },
+};
+
+const quizUserPrompts: Record<string, string> = {
+  pt: `Com base no seguinte conteúdo de estudo, cria perguntas de quiz de escolha múltipla.
+
+Para cada pergunta:
+- Escreve a pergunta de forma clara
+- Fornece exatamente 4 opções (A, B, C, D)
+- Indica qual é a opção correta
+- Escreve uma explicação educativa que explique porque a resposta correta está certa e porque as outras estão erradas
+
+Retorna a resposta APENAS como um array JSON válido no seguinte formato:
+[
+  {
+    "questionText": "A pergunta aqui",
+    "options": [
+      {"id": "A", "text": "Opção A"},
+      {"id": "B", "text": "Opção B"},
+      {"id": "C", "text": "Opção C"},
+      {"id": "D", "text": "Opção D"}
+    ],
+    "correctOptionId": "A",
+    "explanation": "Explicação detalhada da resposta correta e porque as outras estão erradas"
+  }
+]
+
+Conteúdo de estudo:`,
+  en: `Based on the following study content, create multiple choice quiz questions.
+
+For each question:
+- Write the question clearly
+- Provide exactly 4 options (A, B, C, D)
+- Indicate which option is correct
+- Write an educational explanation that explains why the correct answer is right and why the others are wrong
+
+Return the response ONLY as a valid JSON array in the following format:
+[
+  {
+    "questionText": "The question here",
+    "options": [
+      {"id": "A", "text": "Option A"},
+      {"id": "B", "text": "Option B"},
+      {"id": "C", "text": "Option C"},
+      {"id": "D", "text": "Option D"}
+    ],
+    "correctOptionId": "A",
+    "explanation": "Detailed explanation of the correct answer and why others are wrong"
+  }
+]
+
+Study content:`,
+  es: `Basándote en el siguiente contenido de estudio, crea preguntas de quiz de opción múltiple.
+
+Para cada pregunta:
+- Escribe la pregunta de forma clara
+- Proporciona exactamente 4 opciones (A, B, C, D)
+- Indica cuál es la opción correcta
+- Escribe una explicación educativa que explique por qué la respuesta correcta es correcta y por qué las otras están mal
+
+Devuelve la respuesta SOLO como un array JSON válido en el siguiente formato:
+[
+  {
+    "questionText": "La pregunta aquí",
+    "options": [
+      {"id": "A", "text": "Opción A"},
+      {"id": "B", "text": "Opción B"},
+      {"id": "C", "text": "Opción C"},
+      {"id": "D", "text": "Opción D"}
+    ],
+    "correctOptionId": "A",
+    "explanation": "Explicación detallada de la respuesta correcta y por qué las otras están mal"
+  }
+]
+
+Contenido de estudio:`,
+  fr: `Sur la base du contenu d'étude suivant, crée des questions de quiz à choix multiples.
+
+Pour chaque question:
+- Écris la question clairement
+- Fournis exactement 4 options (A, B, C, D)
+- Indique quelle option est correcte
+- Écris une explication éducative qui explique pourquoi la bonne réponse est correcte et pourquoi les autres sont fausses
+
+Retourne la réponse UNIQUEMENT sous forme d'un tableau JSON valide au format suivant:
+[
+  {
+    "questionText": "La question ici",
+    "options": [
+      {"id": "A", "text": "Option A"},
+      {"id": "B", "text": "Option B"},
+      {"id": "C", "text": "Option C"},
+      {"id": "D", "text": "Option D"}
+    ],
+    "correctOptionId": "A",
+    "explanation": "Explication détaillée de la bonne réponse et pourquoi les autres sont fausses"
+  }
+]
+
+Contenu d'étude:`,
+  de: `Erstelle basierend auf dem folgenden Studieninhalt Multiple-Choice-Quiz-Fragen.
+
+Für jede Frage:
+- Schreibe die Frage klar
+- Gib genau 4 Optionen an (A, B, C, D)
+- Gib an, welche Option richtig ist
+- Schreibe eine lehrreiche Erklärung, die erklärt, warum die richtige Antwort richtig ist und warum die anderen falsch sind
+
+Gib die Antwort NUR als gültiges JSON-Array im folgenden Format zurück:
+[
+  {
+    "questionText": "Die Frage hier",
+    "options": [
+      {"id": "A", "text": "Option A"},
+      {"id": "B", "text": "Option B"},
+      {"id": "C", "text": "Option C"},
+      {"id": "D", "text": "Option D"}
+    ],
+    "correctOptionId": "A",
+    "explanation": "Detaillierte Erklärung der richtigen Antwort und warum andere falsch sind"
+  }
+]
+
+Studieninhalt:`,
+  it: `In base al seguente contenuto di studio, crea domande quiz a scelta multipla.
+
+Per ogni domanda:
+- Scrivi la domanda in modo chiaro
+- Fornisci esattamente 4 opzioni (A, B, C, D)
+- Indica quale opzione è corretta
+- Scrivi una spiegazione educativa che spiega perché la risposta corretta è giusta e perché le altre sono sbagliate
+
+Restituisci la risposta SOLO come un array JSON valido nel seguente formato:
+[
+  {
+    "questionText": "La domanda qui",
+    "options": [
+      {"id": "A", "text": "Opzione A"},
+      {"id": "B", "text": "Opzione B"},
+      {"id": "C", "text": "Opzione C"},
+      {"id": "D", "text": "Opzione D"}
+    ],
+    "correctOptionId": "A",
+    "explanation": "Spiegazione dettagliata della risposta corretta e perché le altre sono sbagliate"
+  }
+]
+
+Contenuto di studio:`,
+};
+
+const quizErrorMessages: Record<string, Record<string, string>> = {
+  pt: {
+    invalidFormat: "Formato de resposta inválido do AI",
+    invalidArray: "A resposta não é um array válido",
+    noValidQuestions: "Não foi possível gerar perguntas válidas",
+    generalError: "Erro ao gerar quiz",
+  },
+  en: {
+    invalidFormat: "Invalid AI response format",
+    invalidArray: "Response is not a valid array",
+    noValidQuestions: "Could not generate valid questions",
+    generalError: "Error generating quiz",
+  },
+  es: {
+    invalidFormat: "Formato de respuesta AI inválido",
+    invalidArray: "La respuesta no es un array válido",
+    noValidQuestions: "No se pudieron generar preguntas válidas",
+    generalError: "Error al generar quiz",
+  },
+  fr: {
+    invalidFormat: "Format de réponse AI invalide",
+    invalidArray: "La réponse n'est pas un tableau valide",
+    noValidQuestions: "Impossible de générer des questions valides",
+    generalError: "Erreur lors de la génération du quiz",
+  },
+  de: {
+    invalidFormat: "Ungültiges AI-Antwortformat",
+    invalidArray: "Antwort ist kein gültiges Array",
+    noValidQuestions: "Konnte keine gültigen Fragen generieren",
+    generalError: "Fehler beim Generieren des Quiz",
+  },
+  it: {
+    invalidFormat: "Formato risposta AI non valido",
+    invalidArray: "La risposta non è un array valido",
+    noValidQuestions: "Impossibile generare domande valide",
+    generalError: "Errore nella generazione del quiz",
+  },
+};
+
+export interface GenerateQuizParams {
+  summaryText: string;
+  language?: string;
+  difficulty?: "easy" | "medium" | "hard";
+  questionCount?: number;
+  maxCompletionTokens?: number;
+}
+
+export async function generateQuiz({
+  summaryText,
+  language = "pt",
+  difficulty = "medium",
+  questionCount = 10,
+  maxCompletionTokens = 4096,
+}: GenerateQuizParams): Promise<QuizQuestionItem[]> {
+  try {
+    const lang = normalizeLanguage(language, "pt");
+    const systemPrompt = quizSystemPrompts[lang]?.[difficulty] || quizSystemPrompts["pt"][difficulty];
+    const userPrompt = quizUserPrompts[lang] || quizUserPrompts["pt"];
+    const errors = quizErrorMessages[lang] || quizErrorMessages["pt"];
+
+    const countInstructions: Record<string, string> = {
+      pt: `\n\nCria exatamente ${questionCount} perguntas.`,
+      en: `\n\nCreate exactly ${questionCount} questions.`,
+      es: `\n\nCrea exactamente ${questionCount} preguntas.`,
+      fr: `\n\nCrée exactement ${questionCount} questions.`,
+      de: `\n\nErstelle genau ${questionCount} Fragen.`,
+      it: `\n\nCrea esattamente ${questionCount} domande.`,
+    };
+
+    const fullUserPrompt = userPrompt + "\n\n" + summaryText + (countInstructions[lang] || countInstructions["pt"]);
+
+    console.log("[generateQuiz] Starting quiz generation:", { language: lang, difficulty, questionCount });
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: fullUserPrompt },
+      ],
+      max_completion_tokens: maxCompletionTokens,
+    }, {
+      timeout: 120000,
+    });
+
+    console.log("[generateQuiz] GPT response status:", response.choices[0].finish_reason);
+
+    const content = response.choices[0].message.content || "[]";
+    
+    // Clean JSON response
+    let cleanedContent = content.trim();
+    if (cleanedContent.startsWith("```json")) {
+      cleanedContent = cleanedContent.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (cleanedContent.startsWith("```")) {
+      cleanedContent = cleanedContent.replace(/```\n?/g, "");
+    }
+
+    // Parse JSON
+    let questions;
+    try {
+      questions = JSON.parse(cleanedContent);
+    } catch (parseError) {
+      console.error("[generateQuiz] Failed to parse JSON:", parseError);
+      console.error("[generateQuiz] Content received:", content.substring(0, 500));
+      throw new Error(errors.invalidFormat);
+    }
+
+    // Validate structure
+    if (!Array.isArray(questions)) {
+      console.error("[generateQuiz] Response is not an array:", questions);
+      throw new Error(errors.invalidArray);
+    }
+
+    // Validate each question
+    const validQuestions = questions.filter((q: any) => 
+      q && 
+      q.questionText && 
+      typeof q.questionText === "string" &&
+      Array.isArray(q.options) && 
+      q.options.length === 4 &&
+      q.correctOptionId &&
+      q.explanation &&
+      q.options.every((opt: any) => opt.id && opt.text)
+    );
+
+    console.log("[generateQuiz] Valid questions:", validQuestions.length, "out of", questions.length);
+
+    if (validQuestions.length === 0) {
+      console.error("[generateQuiz] No valid questions after filtering");
+      throw new Error(errors.noValidQuestions);
+    }
+
+    return validQuestions as QuizQuestionItem[];
+  } catch (error) {
+    console.error("[generateQuiz] Error generating quiz:", error);
+    const lang = language || "pt";
+    const errors = quizErrorMessages[lang] || quizErrorMessages["pt"];
+    
+    if (error instanceof Error) {
+      const localizedErrors = Object.values(errors);
+      if (localizedErrors.some(msg => error.message.includes(msg))) {
+        throw error;
+      }
+    }
+    throw new Error(errors.generalError);
+  }
+}

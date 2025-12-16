@@ -1205,5 +1205,70 @@
     "more": "Plus",
     "empty": "Pas encore de données d'étude. Commencez à étudier des flashcards pour voir vos statistiques !",
     "error": "Erreur lors du chargement des statistiques"
+  },
+  "quiz": {
+    "title": "Quiz Intelligent",
+    "subtitle": "Testez vos connaissances avec des questions générées par l'IA",
+    "generate": "Générer Quiz",
+    "generating": "Génération du quiz...",
+    "regenerate": "Régénérer Quiz",
+    "startQuiz": "Commencer le Quiz",
+    "continueQuiz": "Continuer le Quiz",
+    "retakeQuiz": "Refaire le Quiz",
+    "difficulty": {
+      "title": "Difficulté",
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile"
+    },
+    "questionCount": "Nombre de Questions",
+    "questions": "questions",
+    "question": "Question",
+    "of": "sur",
+    "selectAnswer": "Sélectionnez une réponse",
+    "submit": "Soumettre les Réponses",
+    "submitting": "Envoi en cours...",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "finish": "Terminer le Quiz",
+    "results": {
+      "title": "Résultats du Quiz",
+      "score": "Score",
+      "correct": "Correctes",
+      "incorrect": "Incorrectes",
+      "percentage": "Pourcentage",
+      "timeSpent": "Temps Passé",
+      "excellent": "Excellent !",
+      "good": "Bon travail !",
+      "needsImprovement": "Continuez à pratiquer !",
+      "viewDetails": "Voir Détails",
+      "hideDetails": "Masquer Détails"
+    },
+    "explanation": {
+      "title": "Explication",
+      "correct": "Réponse Correcte",
+      "yourAnswer": "Votre réponse",
+      "correctAnswer": "Réponse correcte"
+    },
+    "history": {
+      "title": "Historique des Tentatives",
+      "noAttempts": "Pas encore de tentatives",
+      "attempt": "Tentative",
+      "bestScore": "Meilleur Score"
+    },
+    "empty": {
+      "title": "Pas de Quiz Disponible",
+      "description": "Générez d'abord un résumé pour créer un quiz.",
+      "noSummary": "Ce sujet n'a pas de résumés. Ajoutez du contenu et générez d'abord un résumé."
+    },
+    "error": {
+      "generate": "Erreur lors de la génération du quiz",
+      "submit": "Erreur lors de l'envoi des réponses",
+      "load": "Erreur lors du chargement du quiz"
+    },
+    "success": {
+      "generated": "Quiz généré avec succès !",
+      "submitted": "Réponses soumises !"
+    }
   }
 }

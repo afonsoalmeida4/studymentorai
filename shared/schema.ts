@@ -1186,3 +1186,216 @@ export const flashcardStatsSchema = z.object({
 });
 
 export type FlashcardStats = z.infer<typeof flashcardStatsSchema>;
+
+// ============================================
+// SMART QUIZZES TABLES
+// ============================================
+
+// Quiz difficulty levels
+export const quizDifficulties = ["easy", "medium", "hard"] as const;
+export type QuizDifficulty = typeof quizDifficulties[number];
+
+// Quizzes table - stores generated quizzes for topics
+export const quizzes = pgTable(
+  "quizzes",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").notNull().references(() => topics.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    language: varchar("language", { length: 5 }).default("pt").notNull(),
+    difficulty: varchar("difficulty", { length: 10 }).default("medium").notNull(),
+    questionCount: integer("question_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_quizzes_user_id").on(table.userId),
+    index("idx_quizzes_topic_id").on(table.topicId),
+    index("idx_quizzes_user_topic_lang").on(table.userId, table.topicId, table.language),
+  ],
+);
+
+export const insertQuizSchema = createInsertSchema(quizzes, {
+  difficulty: z.enum(quizDifficulties),
+  language: z.enum(supportedLanguages),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertQuiz = z.infer<typeof insertQuizSchema>;
+export type Quiz = typeof quizzes.$inferSelect;
+
+// Quiz Questions table - individual questions with multiple choice options
+export const quizQuestions = pgTable(
+  "quiz_questions",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    quizId: varchar("quiz_id").notNull().references(() => quizzes.id, { onDelete: "cascade" }),
+    questionText: text("question_text").notNull(),
+    options: jsonb("options").notNull(), // Array of {id: string, text: string}
+    correctOptionId: varchar("correct_option_id", { length: 10 }).notNull(),
+    explanation: text("explanation").notNull(), // Explanation for the correct answer
+    position: integer("position").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_quiz_questions_quiz_id").on(table.quizId),
+    index("idx_quiz_questions_position").on(table.quizId, table.position),
+  ],
+);
+
+export const insertQuizQuestionSchema = createInsertSchema(quizQuestions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertQuizQuestion = z.infer<typeof insertQuizQuestionSchema>;
+export type QuizQuestion = typeof quizQuestions.$inferSelect;
+
+// Quiz question option type
+export const quizOptionSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+});
+
+export type QuizOption = z.infer<typeof quizOptionSchema>;
+
+// Quiz Attempts table - tracks user attempts on quizzes
+export const quizAttempts = pgTable(
+  "quiz_attempts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    quizId: varchar("quiz_id").notNull().references(() => quizzes.id, { onDelete: "cascade" }),
+    score: integer("score").notNull(), // Number of correct answers
+    totalQuestions: integer("total_questions").notNull(),
+    percentage: integer("percentage").notNull(), // 0-100
+    timeSpentSeconds: integer("time_spent_seconds"),
+    completedAt: timestamp("completed_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_quiz_attempts_user_id").on(table.userId),
+    index("idx_quiz_attempts_quiz_id").on(table.quizId),
+    index("idx_quiz_attempts_user_quiz").on(table.userId, table.quizId),
+  ],
+);
+
+export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+
+// Quiz Question Answers table - tracks individual question answers per attempt
+export const quizQuestionAnswers = pgTable(
+  "quiz_question_answers",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    attemptId: varchar("attempt_id").notNull().references(() => quizAttempts.id, { onDelete: "cascade" }),
+    questionId: varchar("question_id").notNull().references(() => quizQuestions.id, { onDelete: "cascade" }),
+    selectedOptionId: varchar("selected_option_id", { length: 10 }).notNull(),
+    isCorrect: boolean("is_correct").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_quiz_question_answers_attempt_id").on(table.attemptId),
+    index("idx_quiz_question_answers_question_id").on(table.questionId),
+  ],
+);
+
+export const insertQuizQuestionAnswerSchema = createInsertSchema(quizQuestionAnswers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertQuizQuestionAnswer = z.infer<typeof insertQuizQuestionAnswerSchema>;
+export type QuizQuestionAnswer = typeof quizQuestionAnswers.$inferSelect;
+
+// Quiz relations
+export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
+  user: one(users, {
+    fields: [quizzes.userId],
+    references: [users.id],
+  }),
+  topic: one(topics, {
+    fields: [quizzes.topicId],
+    references: [topics.id],
+  }),
+  questions: many(quizQuestions),
+  attempts: many(quizAttempts),
+}));
+
+export const quizQuestionsRelations = relations(quizQuestions, ({ one, many }) => ({
+  quiz: one(quizzes, {
+    fields: [quizQuestions.quizId],
+    references: [quizzes.id],
+  }),
+  answers: many(quizQuestionAnswers),
+}));
+
+export const quizAttemptsRelations = relations(quizAttempts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [quizAttempts.userId],
+    references: [users.id],
+  }),
+  quiz: one(quizzes, {
+    fields: [quizAttempts.quizId],
+    references: [quizzes.id],
+  }),
+  answers: many(quizQuestionAnswers),
+}));
+
+export const quizQuestionAnswersRelations = relations(quizQuestionAnswers, ({ one }) => ({
+  attempt: one(quizAttempts, {
+    fields: [quizQuestionAnswers.attemptId],
+    references: [quizAttempts.id],
+  }),
+  question: one(quizQuestions, {
+    fields: [quizQuestionAnswers.questionId],
+    references: [quizQuestions.id],
+  }),
+}));
+
+// API types for quiz generation
+export const generateQuizRequestSchema = z.object({
+  topicId: z.string(),
+  questionCount: z.number().int().min(3).max(20).default(10),
+  difficulty: z.enum(quizDifficulties).default("medium"),
+});
+
+export type GenerateQuizRequest = z.infer<typeof generateQuizRequestSchema>;
+
+export const submitQuizAnswersSchema = z.object({
+  quizId: z.string(),
+  answers: z.array(z.object({
+    questionId: z.string(),
+    selectedOptionId: z.string(),
+  })),
+  timeSpentSeconds: z.number().int().optional(),
+});
+
+export type SubmitQuizAnswers = z.infer<typeof submitQuizAnswersSchema>;
+
+export const quizResultSchema = z.object({
+  attemptId: z.string(),
+  score: z.number().int(),
+  totalQuestions: z.number().int(),
+  percentage: z.number().int(),
+  results: z.array(z.object({
+    questionId: z.string(),
+    questionText: z.string(),
+    selectedOptionId: z.string(),
+    correctOptionId: z.string(),
+    isCorrect: z.boolean(),
+    explanation: z.string(),
+    options: z.array(quizOptionSchema),
+  })),
+});
+
+export type QuizResult = z.infer<typeof quizResultSchema>;

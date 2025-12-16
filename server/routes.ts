@@ -5,7 +5,7 @@ import Stripe from "stripe";
 import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel } from "docx";
-import { generateSummary, generateFlashcards, generateReviewPlan, type StudyHistoryItem } from "./openai";
+import { generateSummary, generateFlashcards, generateReviewPlan, generateQuiz, type StudyHistoryItem } from "./openai";
 import { getUserLanguage } from "./languageHelper";
 import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards, createManualFlashcardWithTranslations } from "./translationService";
 import { 
@@ -15,6 +15,8 @@ import {
   recordAttemptSchema,
   insertManualFlashcardSchema,
   updateFlashcardSchema,
+  generateQuizRequestSchema,
+  submitQuizAnswersSchema,
   type GenerateSummaryResponse,
   type GenerateFlashcardsResponse,
   type RecordStudySessionResponse,
@@ -22,6 +24,7 @@ import {
   type GetReviewPlanResponse,
   type SupportedLanguage,
   type Flashcard,
+  type QuizDifficulty,
   flashcards,
   flashcardAttempts,
   flashcardTranslations,
@@ -30,6 +33,10 @@ import {
   users,
   calendarEvents,
   topicSummaries,
+  quizzes,
+  quizQuestions,
+  quizAttempts,
+  quizQuestionAnswers,
   insertCalendarEventSchema,
   type CalendarEvent,
 } from "@shared/schema";
@@ -50,7 +57,7 @@ async function requirePremium(req: any, res: any, next: any) {
     const userId = req.user.claims.sub;
     const subscription = await subscriptionService.getOrCreateSubscription(userId);
     
-    if (subscription.plan === "free") {
+    if (subscription.plan !== "premium") {
       return res.status(403).json({
         success: false,
         error: "PREMIUM_REQUIRED",
@@ -2997,6 +3004,483 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting calendar event:", error);
       return res.status(500).json({ success: false, error: "Failed to delete event" });
+    }
+  });
+
+  // ============================================
+  // SMART QUIZ ROUTES
+  // ============================================
+
+  // Generate quiz for a topic
+  app.post("/api/quizzes/generate", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      const userLanguage = user?.language || "pt";
+
+      const parseResult = generateQuizRequestSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid request data",
+          details: parseResult.error.errors 
+        });
+      }
+
+      const { topicId, questionCount, difficulty } = parseResult.data;
+
+      // Verify topic ownership
+      const [topic] = await db
+        .select()
+        .from(topics)
+        .where(and(eq(topics.id, topicId), eq(topics.userId, userId)));
+
+      if (!topic) {
+        return res.status(404).json({ 
+          success: false, 
+          errorCode: "TOPIC_NOT_FOUND",
+          error: "Topic not found" 
+        });
+      }
+
+      // Get topic summaries for quiz generation
+      const summaries = await db
+        .select()
+        .from(topicSummaries)
+        .where(eq(topicSummaries.topicId, topicId));
+
+      if (summaries.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          errorCode: "NO_SUMMARY",
+          error: "This topic has no summaries. Generate a summary first." 
+        });
+      }
+
+      // Combine summaries for quiz generation
+      const combinedSummary = summaries.map(s => s.summary).join("\n\n");
+
+      // Check for existing quiz in this language and difficulty
+      const [existingQuiz] = await db
+        .select()
+        .from(quizzes)
+        .where(and(
+          eq(quizzes.topicId, topicId),
+          eq(quizzes.userId, userId),
+          eq(quizzes.language, userLanguage),
+          eq(quizzes.difficulty, difficulty)
+        ));
+
+      if (existingQuiz) {
+        // Return existing quiz with questions
+        const questions = await db
+          .select()
+          .from(quizQuestions)
+          .where(eq(quizQuestions.quizId, existingQuiz.id))
+          .orderBy(asc(quizQuestions.position));
+
+        return res.json({
+          success: true,
+          quiz: existingQuiz,
+          questions: questions,
+          isExisting: true,
+        });
+      }
+
+      // Generate new quiz
+      console.log("[Quiz] Generating quiz for topic:", topicId, { language: userLanguage, difficulty, questionCount });
+
+      const generatedQuestions = await generateQuiz({
+        summaryText: combinedSummary,
+        language: userLanguage,
+        difficulty: difficulty as "easy" | "medium" | "hard",
+        questionCount: questionCount,
+      });
+
+      // Create quiz record
+      const [newQuiz] = await db
+        .insert(quizzes)
+        .values({
+          userId,
+          topicId,
+          title: topic.name,
+          language: userLanguage,
+          difficulty,
+          questionCount: generatedQuestions.length,
+        })
+        .returning();
+
+      // Create quiz questions
+      const questionRecords = await Promise.all(
+        generatedQuestions.map((q, index) =>
+          db
+            .insert(quizQuestions)
+            .values({
+              quizId: newQuiz.id,
+              questionText: q.questionText,
+              options: q.options,
+              correctOptionId: q.correctOptionId,
+              explanation: q.explanation,
+              position: index,
+            })
+            .returning()
+        )
+      );
+
+      const questions = questionRecords.map(r => r[0]);
+
+      console.log("[Quiz] Quiz created successfully:", { quizId: newQuiz.id, questionCount: questions.length });
+
+      return res.json({
+        success: true,
+        quiz: newQuiz,
+        questions: questions,
+        isExisting: false,
+      });
+    } catch (error) {
+      console.error("Error generating quiz:", error);
+      return res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to generate quiz" 
+      });
+    }
+  });
+
+  // Get quiz by ID with questions
+  app.get("/api/quizzes/:quizId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { quizId } = req.params;
+
+      const [quiz] = await db
+        .select()
+        .from(quizzes)
+        .where(and(eq(quizzes.id, quizId), eq(quizzes.userId, userId)));
+
+      if (!quiz) {
+        return res.status(404).json({ 
+          success: false, 
+          errorCode: "QUIZ_NOT_FOUND",
+          error: "Quiz not found" 
+        });
+      }
+
+      const questions = await db
+        .select()
+        .from(quizQuestions)
+        .where(eq(quizQuestions.quizId, quizId))
+        .orderBy(asc(quizQuestions.position));
+
+      return res.json({
+        success: true,
+        quiz,
+        questions,
+      });
+    } catch (error) {
+      console.error("Error getting quiz:", error);
+      return res.status(500).json({ success: false, error: "Failed to get quiz" });
+    }
+  });
+
+  // Get quizzes for a topic
+  app.get("/api/topics/:topicId/quizzes", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { topicId } = req.params;
+
+      // Verify topic ownership
+      const [topic] = await db
+        .select()
+        .from(topics)
+        .where(and(eq(topics.id, topicId), eq(topics.userId, userId)));
+
+      if (!topic) {
+        return res.status(404).json({ 
+          success: false, 
+          errorCode: "TOPIC_NOT_FOUND",
+          error: "Topic not found" 
+        });
+      }
+
+      const topicQuizzes = await db
+        .select()
+        .from(quizzes)
+        .where(and(eq(quizzes.topicId, topicId), eq(quizzes.userId, userId)))
+        .orderBy(desc(quizzes.createdAt));
+
+      // Get latest attempt for each quiz
+      const quizzesWithAttempts = await Promise.all(
+        topicQuizzes.map(async (quiz) => {
+          const [latestAttempt] = await db
+            .select()
+            .from(quizAttempts)
+            .where(and(eq(quizAttempts.quizId, quiz.id), eq(quizAttempts.userId, userId)))
+            .orderBy(desc(quizAttempts.completedAt))
+            .limit(1);
+
+          return {
+            ...quiz,
+            lastAttempt: latestAttempt || null,
+          };
+        })
+      );
+
+      return res.json({
+        success: true,
+        quizzes: quizzesWithAttempts,
+      });
+    } catch (error) {
+      console.error("Error getting topic quizzes:", error);
+      return res.status(500).json({ success: false, error: "Failed to get quizzes" });
+    }
+  });
+
+  // Submit quiz answers
+  app.post("/api/quizzes/:quizId/submit", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { quizId } = req.params;
+
+      const parseResult = submitQuizAnswersSchema.safeParse({ ...req.body, quizId });
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid submission data",
+          details: parseResult.error.errors 
+        });
+      }
+
+      const { answers, timeSpentSeconds } = parseResult.data;
+
+      // Verify quiz ownership
+      const [quiz] = await db
+        .select()
+        .from(quizzes)
+        .where(and(eq(quizzes.id, quizId), eq(quizzes.userId, userId)));
+
+      if (!quiz) {
+        return res.status(404).json({ 
+          success: false, 
+          errorCode: "QUIZ_NOT_FOUND",
+          error: "Quiz not found" 
+        });
+      }
+
+      // Get all questions
+      const questions = await db
+        .select()
+        .from(quizQuestions)
+        .where(eq(quizQuestions.quizId, quizId));
+
+      const questionMap = new Map(questions.map(q => [q.id, q]));
+
+      // Calculate score
+      let correctCount = 0;
+      const results: any[] = [];
+
+      for (const answer of answers) {
+        const question = questionMap.get(answer.questionId);
+        if (!question) continue;
+
+        const isCorrect = answer.selectedOptionId === question.correctOptionId;
+        if (isCorrect) correctCount++;
+
+        results.push({
+          questionId: question.id,
+          questionText: question.questionText,
+          selectedOptionId: answer.selectedOptionId,
+          correctOptionId: question.correctOptionId,
+          isCorrect,
+          explanation: question.explanation,
+          options: question.options,
+        });
+      }
+
+      const totalQuestions = questions.length;
+      const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+      // Create attempt record
+      const [attempt] = await db
+        .insert(quizAttempts)
+        .values({
+          userId,
+          quizId,
+          score: correctCount,
+          totalQuestions,
+          percentage,
+          timeSpentSeconds: timeSpentSeconds || null,
+          completedAt: new Date(),
+        })
+        .returning();
+
+      // Record individual answers
+      await Promise.all(
+        results.map((r) =>
+          db.insert(quizQuestionAnswers).values({
+            attemptId: attempt.id,
+            questionId: r.questionId,
+            selectedOptionId: r.selectedOptionId,
+            isCorrect: r.isCorrect,
+          })
+        )
+      );
+
+      // Award XP for completing quiz
+      await awardXP(userId, "complete_study_session");
+
+      console.log("[Quiz] Quiz submitted:", { attemptId: attempt.id, score: correctCount, percentage });
+
+      return res.json({
+        success: true,
+        attemptId: attempt.id,
+        score: correctCount,
+        totalQuestions,
+        percentage,
+        results,
+      });
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+      return res.status(500).json({ success: false, error: "Failed to submit quiz" });
+    }
+  });
+
+  // Get quiz attempt history
+  app.get("/api/quizzes/:quizId/attempts", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { quizId } = req.params;
+
+      const attempts = await db
+        .select()
+        .from(quizAttempts)
+        .where(and(eq(quizAttempts.quizId, quizId), eq(quizAttempts.userId, userId)))
+        .orderBy(desc(quizAttempts.completedAt));
+
+      return res.json({
+        success: true,
+        attempts,
+      });
+    } catch (error) {
+      console.error("Error getting quiz attempts:", error);
+      return res.status(500).json({ success: false, error: "Failed to get attempts" });
+    }
+  });
+
+  // Delete quiz
+  app.delete("/api/quizzes/:quizId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { quizId } = req.params;
+
+      const [deletedQuiz] = await db
+        .delete(quizzes)
+        .where(and(eq(quizzes.id, quizId), eq(quizzes.userId, userId)))
+        .returning();
+
+      if (!deletedQuiz) {
+        return res.status(404).json({ 
+          success: false, 
+          errorCode: "QUIZ_NOT_FOUND",
+          error: "Quiz not found" 
+        });
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting quiz:", error);
+      return res.status(500).json({ success: false, error: "Failed to delete quiz" });
+    }
+  });
+
+  // Regenerate quiz (delete existing and create new)
+  app.post("/api/quizzes/:quizId/regenerate", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { quizId } = req.params;
+      const user = await storage.getUser(userId);
+      const userLanguage = user?.language || "pt";
+
+      // Get existing quiz
+      const [existingQuiz] = await db
+        .select()
+        .from(quizzes)
+        .where(and(eq(quizzes.id, quizId), eq(quizzes.userId, userId)));
+
+      if (!existingQuiz) {
+        return res.status(404).json({ 
+          success: false, 
+          errorCode: "QUIZ_NOT_FOUND",
+          error: "Quiz not found" 
+        });
+      }
+
+      // Get topic summaries
+      const summaries = await db
+        .select()
+        .from(topicSummaries)
+        .where(eq(topicSummaries.topicId, existingQuiz.topicId));
+
+      if (summaries.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          errorCode: "NO_SUMMARY",
+          error: "No summaries available for regeneration" 
+        });
+      }
+
+      const combinedSummary = summaries.map(s => s.summary).join("\n\n");
+
+      // Generate new questions
+      const generatedQuestions = await generateQuiz({
+        summaryText: combinedSummary,
+        language: userLanguage,
+        difficulty: existingQuiz.difficulty as "easy" | "medium" | "hard",
+        questionCount: existingQuiz.questionCount,
+      });
+
+      // Delete old questions
+      await db.delete(quizQuestions).where(eq(quizQuestions.quizId, quizId));
+
+      // Update quiz timestamp
+      const [updatedQuiz] = await db
+        .update(quizzes)
+        .set({ 
+          questionCount: generatedQuestions.length,
+          updatedAt: new Date() 
+        })
+        .where(eq(quizzes.id, quizId))
+        .returning();
+
+      // Create new questions
+      const questionRecords = await Promise.all(
+        generatedQuestions.map((q, index) =>
+          db
+            .insert(quizQuestions)
+            .values({
+              quizId: quizId,
+              questionText: q.questionText,
+              options: q.options,
+              correctOptionId: q.correctOptionId,
+              explanation: q.explanation,
+              position: index,
+            })
+            .returning()
+        )
+      );
+
+      const questions = questionRecords.map(r => r[0]);
+
+      return res.json({
+        success: true,
+        quiz: updatedQuiz,
+        questions,
+      });
+    } catch (error) {
+      console.error("Error regenerating quiz:", error);
+      return res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to regenerate quiz" 
+      });
     }
   });
 

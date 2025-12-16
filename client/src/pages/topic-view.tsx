@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/hooks/useSubscription";
 import ReactMarkdown from "react-markdown";
 import SummaryStudySection from "@/components/SummaryStudySection";
+import QuizSection from "@/components/QuizSection";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { translateError } from "@/lib/errorTranslation";
 import { Button } from "@/components/ui/button";
@@ -492,6 +493,12 @@ export default function TopicView() {
                   </p>
                 </div>
                 <SummaryStudySection topicId={topicId} />
+                {/* Quiz Section - Premium feature */}
+                {currentPlan === "premium" && (
+                  <div className="mt-6">
+                    <QuizSection topicId={topicId} hasSummaries={false} />
+                  </div>
+                )}
               </div>
             )}
           </>
@@ -932,6 +939,13 @@ export default function TopicView() {
                   
                   {/* Flashcard Study Section - fetches ALL flashcards from ALL summaries in this topic */}
                   <SummaryStudySection topicId={topicId} />
+                  
+                  {/* Quiz Section - Premium feature with AI-generated questions */}
+                  {currentPlan === "premium" && (
+                    <div className="mt-6">
+                      <QuizSection topicId={topicId} hasSummaries={true} />
+                    </div>
+                  )}
                   </div>
                 );
               })()
@@ -988,6 +1002,12 @@ export default function TopicView() {
                 {hasFlashcards && (
                   <div className="mt-6">
                     <SummaryStudySection topicId={topicId} />
+                  </div>
+                )}
+                {/* Quiz Section - Premium feature (shows empty state without summaries) */}
+                {currentPlan === "premium" && (
+                  <div className="mt-6">
+                    <QuizSection topicId={topicId} hasSummaries={false} />
                   </div>
                 )}
               </>

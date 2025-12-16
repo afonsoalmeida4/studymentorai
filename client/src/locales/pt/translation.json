@@ -1205,5 +1205,70 @@
     "more": "Mais",
     "empty": "Ainda não tens dados de estudo. Começa a estudar flashcards para ver as tuas estatísticas!",
     "error": "Erro ao carregar estatísticas"
+  },
+  "quiz": {
+    "title": "Quiz Inteligente",
+    "subtitle": "Testa os teus conhecimentos com perguntas geradas por IA",
+    "generate": "Gerar Quiz",
+    "generating": "A gerar quiz...",
+    "regenerate": "Regenerar Quiz",
+    "startQuiz": "Iniciar Quiz",
+    "continueQuiz": "Continuar Quiz",
+    "retakeQuiz": "Repetir Quiz",
+    "difficulty": {
+      "title": "Dificuldade",
+      "easy": "Fácil",
+      "medium": "Médio",
+      "hard": "Difícil"
+    },
+    "questionCount": "Número de Perguntas",
+    "questions": "perguntas",
+    "question": "Pergunta",
+    "of": "de",
+    "selectAnswer": "Seleciona uma resposta",
+    "submit": "Submeter Respostas",
+    "submitting": "A submeter...",
+    "next": "Próxima",
+    "previous": "Anterior",
+    "finish": "Terminar Quiz",
+    "results": {
+      "title": "Resultados do Quiz",
+      "score": "Pontuação",
+      "correct": "Corretas",
+      "incorrect": "Incorretas",
+      "percentage": "Percentagem",
+      "timeSpent": "Tempo Gasto",
+      "excellent": "Excelente!",
+      "good": "Bom trabalho!",
+      "needsImprovement": "Continua a praticar!",
+      "viewDetails": "Ver Detalhes",
+      "hideDetails": "Esconder Detalhes"
+    },
+    "explanation": {
+      "title": "Explicação",
+      "correct": "Resposta Correta",
+      "yourAnswer": "A tua resposta",
+      "correctAnswer": "Resposta correta"
+    },
+    "history": {
+      "title": "Histórico de Tentativas",
+      "noAttempts": "Ainda não fizeste nenhuma tentativa",
+      "attempt": "Tentativa",
+      "bestScore": "Melhor Pontuação"
+    },
+    "empty": {
+      "title": "Sem Quiz Disponível",
+      "description": "Gera um resumo primeiro para poder criar um quiz.",
+      "noSummary": "Este tópico não tem resumos. Adiciona conteúdo e gera um resumo primeiro."
+    },
+    "error": {
+      "generate": "Erro ao gerar quiz",
+      "submit": "Erro ao submeter respostas",
+      "load": "Erro ao carregar quiz"
+    },
+    "success": {
+      "generated": "Quiz gerado com sucesso!",
+      "submitted": "Respostas submetidas!"
+    }
   }
 }
