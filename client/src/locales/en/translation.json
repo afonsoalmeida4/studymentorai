@@ -1216,6 +1216,9 @@
     "startQuiz": "Start Quiz",
     "continueQuiz": "Continue Quiz",
     "retakeQuiz": "Retake Quiz",
+    "aiPowered": "AI-Powered",
+    "withExplanations": "With explanations",
+    "progress": "complete",
     "difficulty": {
       "title": "Difficulty",
       "easy": "Easy",
@@ -1232,16 +1235,23 @@
     "next": "Next",
     "previous": "Previous",
     "finish": "Finish Quiz",
+    "mastery": {
+      "mastered": "Mastered",
+      "familiar": "Familiar",
+      "learning": "Learning",
+      "unfamiliar": "Unfamiliar"
+    },
     "results": {
       "title": "Quiz Results",
       "score": "Score",
       "correct": "Correct",
       "incorrect": "Incorrect",
       "percentage": "Percentage",
+      "time": "Time",
       "timeSpent": "Time Spent",
-      "excellent": "Excellent!",
-      "good": "Good job!",
-      "needsImprovement": "Keep practicing!",
+      "excellent": "Excellent! You've mastered this!",
+      "good": "Good job! You're making progress!",
+      "needsImprovement": "Keep practicing! You've got this!",
       "viewDetails": "View Details",
       "hideDetails": "Hide Details"
     },

@@ -1215,6 +1215,9 @@
     "startQuiz": "Inizia Quiz",
     "continueQuiz": "Continua Quiz",
     "retakeQuiz": "Ripeti Quiz",
+    "aiPowered": "Generato da IA",
+    "withExplanations": "Con spiegazioni",
+    "progress": "completato",
     "difficulty": {
       "title": "Difficoltà",
       "easy": "Facile",
@@ -1231,16 +1234,23 @@
     "next": "Successiva",
     "previous": "Precedente",
     "finish": "Termina Quiz",
+    "mastery": {
+      "mastered": "Padroneggiato",
+      "familiar": "Familiare",
+      "learning": "In apprendimento",
+      "unfamiliar": "Nuovo"
+    },
     "results": {
       "title": "Risultati del Quiz",
       "score": "Punteggio",
       "correct": "Corrette",
       "incorrect": "Errate",
       "percentage": "Percentuale",
+      "time": "Tempo",
       "timeSpent": "Tempo Impiegato",
-      "excellent": "Eccellente!",
-      "good": "Ottimo lavoro!",
-      "needsImprovement": "Continua a esercitarti!",
+      "excellent": "Eccellente! Hai padroneggiato questo argomento!",
+      "good": "Ottimo lavoro! Stai progredendo!",
+      "needsImprovement": "Continua a esercitarti! Ce la farai!",
       "viewDetails": "Vedi Dettagli",
       "hideDetails": "Nascondi Dettagli"
     },
