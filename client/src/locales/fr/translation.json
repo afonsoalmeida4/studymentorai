@@ -33,6 +33,7 @@
     "settings": "Paramètres",
     "classes": "Classes",
     "subscription": "Abonnement",
+    "privacyPolicy": "Confidentialité",
     "logout": "Déconnexion",
     "navigation": "Navigation",
     "home": "Accueil",
@@ -305,6 +306,7 @@
     "home": "Accueil",
     "dashboard": "Tableau de Bord",
     "ranking": "Classement",
+    "privacyPolicy": "Confidentialité",
     "logout": "Déconnexion"
   },
   "upgradeDialog": {

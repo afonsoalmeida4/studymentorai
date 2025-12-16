@@ -42,6 +42,7 @@
     "profile": "Perfil",
     "settings": "Definições",
     "subscription": "Plano",
+    "privacyPolicy": "Privacidade",
     "logout": "Sair"
   },
   "auth": {
@@ -309,6 +310,7 @@
     "home": "Início",
     "dashboard": "Dashboard",
     "ranking": "Ranking",
+    "privacyPolicy": "Privacidade",
     "logout": "Sair"
   },
   "upgradeDialog": {

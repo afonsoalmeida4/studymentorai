@@ -41,6 +41,7 @@
     "settings": "Configuración",
     "classes": "Clases",
     "subscription": "Plan",
+    "privacyPolicy": "Privacidad",
     "logout": "Salir"
   },
   "auth": {
@@ -308,6 +309,7 @@
     "home": "Inicio",
     "dashboard": "Panel",
     "ranking": "Clasificación",
+    "privacyPolicy": "Privacidad",
     "logout": "Salir"
   },
   "upgradeDialog": {

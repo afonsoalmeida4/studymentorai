@@ -43,6 +43,7 @@
     "settings": "Settings",
     "classes": "Classes",
     "subscription": "Plan",
+    "privacyPolicy": "Privacy",
     "logout": "Logout"
   },
   "auth": {
@@ -310,6 +311,7 @@
     "home": "Home",
     "dashboard": "Dashboard",
     "ranking": "Ranking",
+    "privacyPolicy": "Privacy",
     "logout": "Logout"
   },
   "upgradeDialog": {

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays, Pencil, Trash2 } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays, Pencil, Trash2, Shield } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -420,6 +420,18 @@ export function AppSidebar() {
 
         <SidebarFooter>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={location === "/privacy"}
+                data-testid="button-privacy-policy"
+              >
+                <Link href="/privacy">
+                  <Shield className="w-4 h-4" />
+                  <span>{t('nav.privacyPolicy')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => window.location.href = "/api/logout"}
