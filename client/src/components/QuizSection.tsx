@@ -30,6 +30,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useRef } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -76,7 +77,7 @@ interface SubmitQuizResponse {
 type QuizState = "setup" | "taking" | "results";
 
 export default function QuizSection({ topicId, hasSummaries }: QuizSectionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   
   const [quizState, setQuizState] = useState<QuizState>("setup");
@@ -88,6 +89,23 @@ export default function QuizSection({ topicId, hasSummaries }: QuizSectionProps)
   const [results, setResults] = useState<SubmitQuizResponse | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [showExplanations, setShowExplanations] = useState(false);
+  
+  const previousLanguageRef = useRef(i18n.language);
+  
+  useEffect(() => {
+    if (previousLanguageRef.current !== i18n.language) {
+      if (quizState !== "setup") {
+        setQuizState("setup");
+        setQuizData(null);
+        setResults(null);
+        setAnswers({});
+        setCurrentQuestionIndex(0);
+        setStartTime(null);
+        setShowExplanations(false);
+      }
+      previousLanguageRef.current = i18n.language;
+    }
+  }, [i18n.language, quizState]);
 
   const generateQuizMutation = useMutation({
     mutationFn: async ({ topicId, difficulty, questionCount }: { topicId: string; difficulty: QuizDifficulty; questionCount: number }) => {
