@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { BookOpen, Flame, Target, TrendingUp, TrendingDown, Minus, FileText, Clock, CheckCircle2, ArrowUp, ArrowDown, Info, Calendar, Zap, Trophy, Percent } from "lucide-react";
+import { BookOpen, Flame, Target, TrendingUp, TrendingDown, Minus, FileText, Clock, CheckCircle2, ArrowUp, ArrowDown, Info, Calendar, Zap, Trophy, Percent, Sparkles } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import type { GetDashboardStatsResponse, FlashcardStats } from "@shared/schema";
 import { StudyHeatmap } from "@/components/StudyHeatmap";
@@ -17,6 +17,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { useMemo, useEffect } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
+import { motion } from "framer-motion";
 
 const dateLocaleMap: Record<string, Locale> = {
   pt: ptBR,
@@ -167,360 +168,519 @@ export default function Dashboard() {
 
         <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4 sm:mb-6 md:mb-8">
           {/* Weekly Study Hours KPI - Spans 2 columns for emphasis */}
-          <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-blue-500 sm:col-span-2 lg:col-span-2">
-            <CardHeader className="pb-2 px-3 sm:px-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
-                  <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.weeklyHours")}</CardTitle>
-                </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-sm">{t("dashboard.kpi.tooltipWeeklyGoal")}: {((studyTimeData?.weeklyGoalMinutes || 600) / 60).toFixed(0)}h</p>
-                      {studyTimeData && (() => {
-                        const remaining = ((studyTimeData.weeklyGoalMinutes || 600) - (studyTimeData.currentWeekMinutes || 0)) / 60;
-                        return remaining > 0 ? (
-                          <p className="text-xs text-muted-foreground">
-                            {t("dashboard.kpi.tooltipRemaining")}: {remaining.toFixed(1)}h
-                          </p>
-                        ) : (
-                          <p className="text-xs text-green-500">
-                            ✓ +{Math.abs(remaining).toFixed(1)}h {t("dashboard.kpi.tooltipBeyondGoal")}
-                          </p>
-                        );
-                      })()}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6">
-              {studyTimeLoading ? (
-                <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
-              ) : studyTimeError ? (
-                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-              ) : (
-                <>
-                  <div className="flex items-baseline gap-2">
-                    <div className={`text-2xl sm:text-3xl font-bold ${(studyTimeData?.currentWeekMinutes || 0) === 0 ? 'text-muted-foreground' : ''}`} data-testid="kpi-weekly-hours">
-                      {studyTimeData?.currentWeekHours || "0.0"}h
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="sm:col-span-2 lg:col-span-2"
+          >
+            <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-sky-500/5" />
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-sky-500 rounded-l-md" />
+              <CardHeader className="pb-2 px-3 sm:px-4 relative">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500/20 to-sky-500/20 shadow-sm">
+                      <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                     </div>
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.weeklyHours")}</CardTitle>
                   </div>
-                  {studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes !== 0 && (
-                    <div className={`flex items-center gap-1 text-xs sm:text-sm font-semibold ${getDeltaColor(studyTimeData.deltaMinutes)} mt-1`}>
-                      {getDeltaIcon(studyTimeData.deltaMinutes) === ArrowUp ? (
-                        <ArrowUp className="h-3 w-3" />
-                      ) : (
-                        <ArrowDown className="h-3 w-3" />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help flex-shrink-0 ml-1 hover:text-foreground transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">{t("dashboard.kpi.tooltipWeeklyGoal")}: {((studyTimeData?.weeklyGoalMinutes || 600) / 60).toFixed(0)}h</p>
+                        {studyTimeData && (() => {
+                          const remaining = ((studyTimeData.weeklyGoalMinutes || 600) - (studyTimeData.currentWeekMinutes || 0)) / 60;
+                          return remaining > 0 ? (
+                            <p className="text-xs text-muted-foreground">
+                              {t("dashboard.kpi.tooltipRemaining")}: {remaining.toFixed(1)}h
+                            </p>
+                          ) : (
+                            <p className="text-xs text-emerald-500">
+                              +{Math.abs(remaining).toFixed(1)}h {t("dashboard.kpi.tooltipBeyondGoal")}
+                            </p>
+                          );
+                        })()}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </CardHeader>
+              <CardContent className="px-3 sm:px-4 relative">
+                {studyTimeLoading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-2.5 w-full rounded-full" />
+                  </div>
+                ) : studyTimeError ? (
+                  <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <motion.div 
+                        className={`text-2xl sm:text-3xl font-bold ${(studyTimeData?.currentWeekMinutes || 0) === 0 ? 'text-muted-foreground/50' : 'text-blue-600 dark:text-blue-400'}`} 
+                        data-testid="kpi-weekly-hours"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.3, type: "spring" }}
+                      >
+                        {studyTimeData?.currentWeekHours || "0.0"}h
+                      </motion.div>
+                      {studyTimeData?.deltaMinutes !== undefined && studyTimeData.deltaMinutes !== 0 && (
+                        <motion.div
+                          initial={{ x: -10, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                          className={`flex items-center gap-1 text-xs font-semibold ${getDeltaColor(studyTimeData.deltaMinutes)}`}
+                        >
+                          {getDeltaIcon(studyTimeData.deltaMinutes) === ArrowUp ? (
+                            <TrendingUp className="h-3.5 w-3.5" />
+                          ) : (
+                            <TrendingDown className="h-3.5 w-3.5" />
+                          )}
+                          <span>{studyTimeData.deltaMinutes > 0 ? '+' : ''}{(studyTimeData.deltaMinutes / 60).toFixed(1)}h</span>
+                        </motion.div>
                       )}
-                      <span>{studyTimeData.deltaMinutes > 0 ? '+' : ''}{(studyTimeData.deltaMinutes / 60).toFixed(1)}h {t("dashboard.kpi.vsLastWeek")}</span>
                     </div>
-                  )}
-                  {(studyTimeData?.currentWeekMinutes || 0) === 0 ? (
-                    <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptyStudyTime")}</p>
-                  ) : (
-                    <div className="mt-2 sm:mt-3 h-1.5 sm:h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all duration-500" 
-                        style={{ width: `${Math.min(100, studyTimeData?.progressPercentage || 0)}%` }}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
+                    {(studyTimeData?.currentWeekMinutes || 0) === 0 ? (
+                      <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptyStudyTime")}</p>
+                    ) : (
+                      <motion.div 
+                        className="mt-3 h-2.5 bg-muted rounded-full overflow-hidden"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
+                        style={{ transformOrigin: "left" }}
+                      >
+                        <motion.div 
+                          className="h-full bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500 rounded-full" 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(100, studyTimeData?.progressPercentage || 0)}%` }}
+                          transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+                        />
+                      </motion.div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Subject Progress KPI - Premium only */}
           {currentPlan === "premium" && (() => {
-            // Calculate total progress across ALL subjects
             const totalTopics = subjectProgressData?.subjects?.reduce((sum, s) => sum + s.totalTopics, 0) || 0;
             const completedTopics = subjectProgressData?.subjects?.reduce((sum, s) => sum + s.completedTopics, 0) || 0;
             const overallPercentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
             
             return (
-              <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-green-500">
-              <CardHeader className="pb-2 px-3 sm:px-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Target className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
-                    <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.subjectProgress")}</CardTitle>
-                  </div>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        {!subjectProgressLoading && !subjectProgressError && totalTopics > 0 ? (
-                          <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
-                        ) : <span />}
-                      </TooltipTrigger>
-                      {totalTopics > 0 && (
-                        <TooltipContent>
-                          <p className="text-sm font-semibold">{t("dashboard.kpi.tooltipTotalProgress")}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
-                          </p>
-                        </TooltipContent>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              >
+                <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/5" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-green-500 rounded-l-md" />
+                  <CardHeader className="pb-2 px-3 sm:px-4 relative">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 shadow-sm">
+                          <Target className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                        </div>
+                        <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.subjectProgress")}</CardTitle>
+                      </div>
+                      {!subjectProgressLoading && !subjectProgressError && totalTopics > 0 && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help flex-shrink-0 ml-1 hover:text-foreground transition-colors" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-sm font-semibold">{t("dashboard.kpi.tooltipTotalProgress")}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </CardHeader>
-              <CardContent className="px-3 sm:px-6">
-                {subjectProgressLoading ? (
-                  <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
-                ) : subjectProgressError ? (
-                  <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-                ) : totalTopics === 0 ? (
-                  <>
-                    <div className="text-2xl sm:text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-subject-progress">0%</div>
-                    <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptySubjects")}</p>
-                    <Link href="/">
-                      <Button variant="ghost" size="sm" className="mt-2 sm:mt-3 h-7 sm:h-8 text-xs hover-elevate" data-testid="button-create-subject">
-                        {t("dashboard.kpi.createFirst")}
-                      </Button>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <div className={`text-2xl sm:text-3xl font-bold ${getProgressColor(overallPercentage)}`} data-testid="kpi-subject-progress">
-                      {overallPercentage}%
                     </div>
-                    <div className="mt-2 sm:mt-3 h-1.5 sm:h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-500" 
-                        style={{ width: `${overallPercentage}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
-                      {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
-                    </p>
-                  </>
-                )}
-              </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent className="px-3 sm:px-4 relative">
+                    {subjectProgressLoading ? (
+                      <div className="space-y-2">
+                        <Skeleton className="h-8 w-16" />
+                        <Skeleton className="h-2.5 w-full rounded-full" />
+                      </div>
+                    ) : subjectProgressError ? (
+                      <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+                    ) : totalTopics === 0 ? (
+                      <>
+                        <div className="text-2xl sm:text-3xl font-bold text-muted-foreground/50" data-testid="kpi-subject-progress">0%</div>
+                        <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptySubjects")}</p>
+                        <Link href="/">
+                          <Button variant="outline" size="sm" className="mt-3 h-8 text-xs gap-1" data-testid="button-create-subject">
+                            <Sparkles className="h-3 w-3" />
+                            {t("dashboard.kpi.createFirst")}
+                          </Button>
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <motion.div 
+                          className={`text-2xl sm:text-3xl font-bold ${getProgressColor(overallPercentage)}`} 
+                          data-testid="kpi-subject-progress"
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.3, type: "spring" }}
+                        >
+                          {overallPercentage}%
+                        </motion.div>
+                        <motion.div 
+                          className="mt-3 h-2.5 bg-muted rounded-full overflow-hidden"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          transition={{ delay: 0.4, duration: 0.5 }}
+                          style={{ transformOrigin: "left" }}
+                        >
+                          <motion.div 
+                            className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full" 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${overallPercentage}%` }}
+                            transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+                          />
+                        </motion.div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {t("dashboard.kpi.topicsProgress", { completed: completedTopics, total: totalTopics })}
+                        </p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
             );
           })()}
 
           {/* Tasks Completed KPI - Premium only */}
           {currentPlan === "premium" && (tasksLoading || tasksError || (tasksData && tasksData.totalTasks > 0)) && (
-            <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-purple-500">
-            <CardHeader className="pb-2 px-3 sm:px-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 flex-shrink-0" />
-                  <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
-                </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      {!tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 ? (
-                        <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
-                      ) : <span />}
-                    </TooltipTrigger>
-                    {tasksData && tasksData.totalTasks > 0 && (
-                      <TooltipContent>
-                        <p className="text-sm">{t("dashboard.kpi.tooltipTotalTasks")}: {tasksData.totalTasks}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {t("dashboard.kpi.tooltipPendingTasks")}: {tasksData.pendingTasks || 0}
-                        </p>
-                      </TooltipContent>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-purple-500/5" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-purple-500 rounded-l-md" />
+                <CardHeader className="pb-2 px-3 sm:px-4 relative">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 shadow-sm">
+                        <CheckCircle2 className="h-4 w-4 text-violet-600 dark:text-violet-400 flex-shrink-0" />
+                      </div>
+                      <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.tasksCompleted")}</CardTitle>
+                    </div>
+                    {!tasksLoading && !tasksError && tasksData && tasksData.totalTasks > 0 && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help flex-shrink-0 ml-1 hover:text-foreground transition-colors" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-sm">{t("dashboard.kpi.tooltipTotalTasks")}: {tasksData.totalTasks}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {t("dashboard.kpi.tooltipPendingTasks")}: {tasksData.pendingTasks || 0}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6">
-              {tasksLoading ? (
-                <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
-              ) : tasksError ? (
-                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-              ) : (
-                <>
-                  <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400" data-testid="kpi-tasks-completed">
-                    {tasksData?.completedToday || 0}
                   </div>
-                  <p className="text-xs font-medium text-muted-foreground mt-1 sm:mt-2">
-                    {t("dashboard.kpi.tasksToday")}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                      {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
-                    </Badge>
-                  </div>
-                </>
-              )}
-            </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="px-3 sm:px-4 relative">
+                  {tasksLoading ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-8 w-12" />
+                      <Skeleton className="h-5 w-24 rounded-full" />
+                    </div>
+                  ) : tasksError ? (
+                    <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+                  ) : (
+                    <>
+                      <motion.div 
+                        className="text-2xl sm:text-3xl font-bold text-violet-600 dark:text-violet-400" 
+                        data-testid="kpi-tasks-completed"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.4, type: "spring" }}
+                      >
+                        {tasksData?.completedToday || 0}
+                      </motion.div>
+                      <p className="text-xs font-medium text-muted-foreground mt-2">
+                        {t("dashboard.kpi.tasksToday")}
+                      </p>
+                      <motion.div 
+                        className="flex items-center gap-2 mt-2"
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <Badge className="text-[10px] sm:text-xs bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-700 dark:text-violet-300 border-violet-300 dark:border-violet-600">
+                          {tasksData?.completedThisWeek || 0} {t("dashboard.kpi.tasksThisWeek")}
+                        </Badge>
+                      </motion.div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
 
           {/* Study Streak KPI */}
-          <Card className="hover-elevate transition-all duration-300 border-l-2 sm:border-l-4 border-l-orange-500">
-            <CardHeader className="pb-2 px-3 sm:px-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500 flex-shrink-0" />
-                  <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.studyStreak")}</CardTitle>
-                </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      {!streakLoading && !streakError && streakData && streakData.currentStreak > 0 ? (
-                        <Info className="h-3 w-3 text-muted-foreground cursor-help flex-shrink-0 ml-1" />
-                      ) : <span />}
-                    </TooltipTrigger>
-                    {streakData && streakData.currentStreak > 0 && (
-                      <TooltipContent>
-                        <p className="text-sm">{t("dashboard.kpi.tooltipCurrentStreak")}: {streakData.currentStreak} {t("dashboard.kpi.days")}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {t("dashboard.kpi.tooltipRecord")}: {streakData.longestStreak} {t("dashboard.kpi.days")}
-                        </p>
-                        {streakData.hasStudiedToday && (
-                          <p className="text-xs text-green-500">✓ {t("dashboard.kpi.tooltipToday")}: {streakData.todayMinutes || 0} min</p>
-                        )}
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6">
-              {streakLoading ? (
-                <Skeleton className="h-7 w-14 sm:h-8 sm:w-16" />
-              ) : streakError ? (
-                <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
-              ) : (streakData?.currentStreak || 0) === 0 && (streakData?.longestStreak || 0) === 0 ? (
-                <>
-                  <div className="text-2xl sm:text-3xl font-bold text-muted-foreground animate-pulse" data-testid="kpi-study-streak">0 {t("dashboard.kpi.days")}</div>
-                  <p className="text-xs text-muted-foreground mt-1 sm:mt-2">{t("dashboard.kpi.emptyStreak")}</p>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-baseline gap-1 sm:gap-2">
-                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="kpi-study-streak">
-                      {streakData?.currentStreak || 0}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-amber-500/5" />
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-500 to-amber-500 rounded-l-md" />
+              <CardHeader className="pb-2 px-3 sm:px-4 relative">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 shadow-sm">
+                      <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0" />
                     </div>
-                    <span className="text-xs sm:text-sm font-medium text-muted-foreground">{t("dashboard.kpi.days")}</span>
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">{t("dashboard.kpi.studyStreak")}</CardTitle>
                   </div>
-                  <div className="flex items-center gap-2 mt-1 sm:mt-2">
-                    {streakData?.hasStudiedToday ? (
-                      <Badge variant="default" className="text-[10px] sm:text-xs bg-green-600 dark:bg-green-500">
-                        ✓ {t("dashboard.kpi.studiedToday")}
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                        {t("dashboard.kpi.notStudiedToday")}
-                      </Badge>
-                    )}
+                  {!streakLoading && !streakError && streakData && streakData.currentStreak > 0 && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help flex-shrink-0 ml-1 hover:text-foreground transition-colors" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm">{t("dashboard.kpi.tooltipCurrentStreak")}: {streakData.currentStreak} {t("dashboard.kpi.days")}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {t("dashboard.kpi.tooltipRecord")}: {streakData.longestStreak} {t("dashboard.kpi.days")}
+                          </p>
+                          {streakData.hasStudiedToday && (
+                            <p className="text-xs text-emerald-500">{t("dashboard.kpi.tooltipToday")}: {streakData.todayMinutes || 0} min</p>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="px-3 sm:px-4 relative">
+                {streakLoading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-5 w-24 rounded-full" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
-                    {t("dashboard.kpi.longestStreak")}: {streakData?.longestStreak || 0}
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                ) : streakError ? (
+                  <p className="text-xs text-muted-foreground">{t("dashboard.kpi.errorLoading")}</p>
+                ) : (streakData?.currentStreak || 0) === 0 && (streakData?.longestStreak || 0) === 0 ? (
+                  <>
+                    <div className="text-2xl sm:text-3xl font-bold text-muted-foreground/50" data-testid="kpi-study-streak">0 {t("dashboard.kpi.days")}</div>
+                    <p className="text-xs text-muted-foreground mt-2">{t("dashboard.kpi.emptyStreak")}</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-baseline gap-2">
+                      <motion.div 
+                        className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400" 
+                        data-testid="kpi-study-streak"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.5, type: "spring" }}
+                      >
+                        {streakData?.currentStreak || 0}
+                      </motion.div>
+                      <span className="text-xs sm:text-sm font-medium text-muted-foreground">{t("dashboard.kpi.days")}</span>
+                    </div>
+                    <motion.div 
+                      className="flex items-center gap-2 mt-2"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      {streakData?.hasStudiedToday ? (
+                        <Badge className="text-[10px] sm:text-xs bg-gradient-to-r from-emerald-500/20 to-green-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-600">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          {t("dashboard.kpi.studiedToday")}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-[10px] sm:text-xs">
+                          {t("dashboard.kpi.notStudiedToday")}
+                        </Badge>
+                      )}
+                    </motion.div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {t("dashboard.kpi.longestStreak")}: {streakData?.longestStreak || 0}
+                    </p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
         {/* Anki-style Flashcard Statistics - Premium only */}
         {currentPlan === "premium" && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                {t("flashcardStats.title")}
-              </CardTitle>
-              <CardDescription>{t("flashcardStats.subtitle")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {flashcardStatsLoading ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-24 w-full" />
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[1, 2, 3, 4].map((i) => (
-                      <Skeleton key={i} className="h-20" />
-                    ))}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            <Card className="mb-8 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-violet-500/5" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-violet-500/20 shadow-sm">
+                    <Calendar className="h-4 w-4 text-primary" />
                   </div>
-                </div>
-              ) : flashcardStatsError ? (
-                <p className="text-sm text-muted-foreground">{t("flashcardStats.error")}</p>
-              ) : flashcardStatsData?.stats ? (
-                <div className="space-y-6">
-                  <StudyHeatmap 
-                    data={flashcardStatsData.stats.heatmapData} 
-                    isLoading={flashcardStatsLoading}
-                  />
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-lg bg-muted/50 border">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Zap className="h-4 w-4 text-yellow-500" />
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {t("flashcardStats.dailyAverage")}
-                        </span>
-                      </div>
-                      <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400" data-testid="stat-daily-average">
-                        {flashcardStatsData.stats.dailyAverage} {t("flashcardStats.cards")}
-                      </div>
-                    </div>
-                    
-                    <div className="p-4 rounded-lg bg-muted/50 border">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Percent className="h-4 w-4 text-blue-500" />
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {t("flashcardStats.daysLearned")}
-                        </span>
-                      </div>
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400" data-testid="stat-days-learned">
-                        {flashcardStatsData.stats.daysLearnedPercentage}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {flashcardStatsData.stats.daysLearned} {t("flashcardStats.days")}
-                      </div>
-                    </div>
-                    
-                    <div className="p-4 rounded-lg bg-muted/50 border">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Trophy className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {t("flashcardStats.longestStreak")}
-                        </span>
-                      </div>
-                      <div className="text-2xl font-bold text-orange-600 dark:text-orange-400" data-testid="stat-longest-streak">
-                        {flashcardStatsData.stats.longestStreak} {t("flashcardStats.days")}
-                      </div>
-                    </div>
-                    
-                    <div className="p-4 rounded-lg bg-muted/50 border">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Flame className="h-4 w-4 text-red-500" />
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {t("flashcardStats.currentStreak")}
-                        </span>
-                      </div>
-                      <div className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="stat-current-streak">
-                        {flashcardStatsData.stats.currentStreak} {t("flashcardStats.days")}
-                      </div>
+                  {t("flashcardStats.title")}
+                </CardTitle>
+                <CardDescription>{t("flashcardStats.subtitle")}</CardDescription>
+              </CardHeader>
+              <CardContent className="relative">
+                {flashcardStatsLoading ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-24 w-full rounded-lg" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {[1, 2, 3, 4].map((i) => (
+                        <Skeleton key={i} className="h-24 rounded-lg" />
+                      ))}
                     </div>
                   </div>
-                  
-                  {flashcardStatsData.stats.totalCardsReviewed > 0 && (
-                    <div className="text-center text-sm text-muted-foreground">
-                      {t("flashcardStats.totalCards")}: <span className="font-semibold">{flashcardStatsData.stats.totalCardsReviewed.toLocaleString()}</span>
+                ) : flashcardStatsError ? (
+                  <p className="text-sm text-muted-foreground">{t("flashcardStats.error")}</p>
+                ) : flashcardStatsData?.stats ? (
+                  <div className="space-y-6">
+                    <StudyHeatmap 
+                      data={flashcardStatsData.stats.heatmapData} 
+                      isLoading={flashcardStatsLoading}
+                    />
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <motion.div 
+                        className="relative overflow-hidden p-4 rounded-lg border border-amber-200 dark:border-amber-800"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-yellow-500/10" />
+                        <div className="relative">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1 rounded-md bg-gradient-to-br from-amber-500/20 to-yellow-500/20">
+                              <Zap className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {t("flashcardStats.dailyAverage")}
+                            </span>
+                          </div>
+                          <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400" data-testid="stat-daily-average">
+                            {flashcardStatsData.stats.dailyAverage} {t("flashcardStats.cards")}
+                          </div>
+                        </div>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="relative overflow-hidden p-4 rounded-lg border border-blue-200 dark:border-blue-800"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-sky-500/10" />
+                        <div className="relative">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1 rounded-md bg-gradient-to-br from-blue-500/20 to-sky-500/20">
+                              <Percent className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {t("flashcardStats.daysLearned")}
+                            </span>
+                          </div>
+                          <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400" data-testid="stat-days-learned">
+                            {flashcardStatsData.stats.daysLearnedPercentage}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {flashcardStatsData.stats.daysLearned} {t("flashcardStats.days")}
+                          </div>
+                        </div>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="relative overflow-hidden p-4 rounded-lg border border-orange-200 dark:border-orange-800"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-amber-500/10" />
+                        <div className="relative">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1 rounded-md bg-gradient-to-br from-orange-500/20 to-amber-500/20">
+                              <Trophy className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {t("flashcardStats.longestStreak")}
+                            </span>
+                          </div>
+                          <div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400" data-testid="stat-longest-streak">
+                            {flashcardStatsData.stats.longestStreak} {t("flashcardStats.days")}
+                          </div>
+                        </div>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="relative overflow-hidden p-4 rounded-lg border border-rose-200 dark:border-rose-800"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.9 }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-red-500/10" />
+                        <div className="relative">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1 rounded-md bg-gradient-to-br from-rose-500/20 to-red-500/20">
+                              <Flame className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {t("flashcardStats.currentStreak")}
+                            </span>
+                          </div>
+                          <div className="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400" data-testid="stat-current-streak">
+                            {flashcardStatsData.stats.currentStreak} {t("flashcardStats.days")}
+                          </div>
+                        </div>
+                      </motion.div>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">{t("flashcardStats.empty")}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    
+                    {flashcardStatsData.stats.totalCardsReviewed > 0 && (
+                      <motion.div 
+                        className="text-center text-sm text-muted-foreground"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1 }}
+                      >
+                        {t("flashcardStats.totalCards")}: <span className="font-semibold">{flashcardStatsData.stats.totalCardsReviewed.toLocaleString()}</span>
+                      </motion.div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="p-3 rounded-full bg-muted/50 w-fit mx-auto mb-4">
+                      <Calendar className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">{t("flashcardStats.empty")}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
       </div>
