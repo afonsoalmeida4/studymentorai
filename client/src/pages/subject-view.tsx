@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "wouter";
-import { Plus, Pencil, Trash2, BookOpen, CheckCircle2, Circle } from "lucide-react";
+import { Plus, Pencil, Trash2, BookOpen, CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -455,63 +456,113 @@ export default function SubjectView() {
   return (
     <>
       <div className="p-2 sm:p-4 md:p-6 w-full max-w-7xl mx-auto overflow-x-hidden min-w-0">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className="w-5 h-5 rounded"
-              style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
-            />
-            <h1 className="text-3xl font-semibold">{currentSubject?.name || t('subjectView.subject')}</h1>
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="flex items-center gap-4 mb-3">
+            <div className="relative flex-shrink-0">
+              <div 
+                className="absolute inset-0 blur-md opacity-50 rounded-xl"
+                style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
+              />
+              <div
+                className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-lg"
+                style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
+              >
+                <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+              </div>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold truncate">{currentSubject?.name || t('subjectView.subject')}</h1>
+              {currentSubject?.description && (
+                <p className="text-sm text-muted-foreground line-clamp-1">{currentSubject.description}</p>
+              )}
+            </div>
           </div>
-          {currentSubject?.description && (
-            <p className="text-muted-foreground">{currentSubject.description}</p>
-          )}
-        </div>
+        </motion.div>
 
-        <div className="flex items-center justify-between mb-6">
+        <motion.div 
+          className="flex items-center justify-between mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
           <h2 className="text-xl font-medium">{t('subjectView.topics')}</h2>
           <Button
             onClick={() => setIsTopicDialogOpen(true)}
+            className="bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
             data-testid="button-add-topic"
           >
             <Plus className="w-4 h-4 mr-2" />
             {t('subjectView.newTopic')}
           </Button>
-        </div>
+        </motion.div>
 
         {topics.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">{t('subjectView.noTopics')}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t('subjectView.createTopicsDescription')}
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsTopicDialogOpen(true)}
-                  data-testid="button-create-first-topic"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t('subjectView.createFirstTopic')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Card className="border-dashed">
+              <CardContent className="pt-6">
+                <div className="text-center py-12">
+                  <div className="relative mx-auto w-fit mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary to-violet-600 blur-md opacity-30 rounded-2xl" />
+                    <div className="relative p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-violet-500/10 border border-primary/20">
+                      <BookOpen className="w-10 h-10 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{t('subjectView.noTopics')}</h3>
+                  <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+                    {t('subjectView.createTopicsDescription')}
+                  </p>
+                  <Button
+                    onClick={() => setIsTopicDialogOpen(true)}
+                    className="bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
+                    data-testid="button-create-first-topic"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t('subjectView.createFirstTopic')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {topics.map((topic) => {
+          <motion.div 
+            className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            {topics.map((topic, index) => {
               const completed = isTopicCompleted(topic.id);
               return (
-                <Card
+                <motion.div
                   key={topic.id}
-                  className="hover-elevate active-elevate-2 cursor-pointer relative"
-                  onClick={() => setLocation(`/topic/${topic.id}`)}
-                  data-testid={`card-topic-${topic.id}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
+                  <Card
+                    className="relative overflow-hidden hover:shadow-lg cursor-pointer transition-all duration-300 hover:-translate-y-0.5 group"
+                    onClick={() => setLocation(`/topic/${topic.id}`)}
+                    data-testid={`card-topic-${topic.id}`}
+                  >
+                    <div 
+                      className="absolute inset-0 opacity-5"
+                      style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
+                    />
+                    <div 
+                      className="absolute left-0 top-0 bottom-0 w-1 rounded-l-md"
+                      style={{ backgroundColor: currentSubject?.color ?? "#6366f1" }}
+                    />
+                    <CardHeader className="relative">
+                      <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <CardTitle className="text-lg">{topic.name}</CardTitle>
                         {topic.description && (
@@ -553,9 +604,10 @@ export default function SubjectView() {
                     </div>
                   </CardHeader>
                 </Card>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </div>
 

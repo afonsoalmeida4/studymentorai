@@ -232,11 +232,16 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2 p-2">
-            <GraduationCap className="w-6 h-6 text-primary" data-testid="icon-app-logo" />
-            <div className="flex flex-col">
-              <span className="font-semibold text-sm">Study Mentor AI</span>
-              <span className="text-xs text-muted-foreground">{t('app.tagline')}</span>
+          <div className="flex items-center gap-3 p-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-violet-600 blur-sm opacity-50 rounded-xl" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-lg shadow-primary/25">
+                <GraduationCap className="w-5 h-5 text-white" data-testid="icon-app-logo" />
+              </div>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-sm bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">Study Mentor AI</span>
+              <span className="text-xs text-muted-foreground truncate">{t('app.tagline')}</span>
             </div>
           </div>
         </SidebarHeader>

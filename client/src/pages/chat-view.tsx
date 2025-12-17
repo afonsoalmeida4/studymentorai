@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Brain, Sparkles, Trash2, Plus, Lock, Pencil } from "lucide-react";
+import { Send, Brain, Sparkles, Trash2, Plus, Lock, Pencil, MessageSquare } from "lucide-react";
+import { motion } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -406,12 +407,18 @@ export default function ChatView() {
   const currentThreads = safeActiveMode === "study" ? studyThreads : existentialThreads;
 
   return (
-    <div className="flex h-full">
-      <div className="w-64 border-r flex flex-col">
+    <div className="flex h-full bg-gradient-to-br from-background via-background to-muted/30">
+      <div className="w-64 border-r flex flex-col bg-gradient-to-b from-muted/20 to-transparent">
         <div className="p-4 border-b">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20">
+              <MessageSquare className="w-4 h-4 text-violet-500" />
+            </div>
+            <span className="font-semibold text-sm">{t('chat.title')}</span>
+          </div>
           <Tabs value={safeActiveMode} onValueChange={handleModeChange}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="study" data-testid="tab-study-mode">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+              <TabsTrigger value="study" data-testid="tab-study-mode" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/10 data-[state=active]:to-cyan-500/10">
                 <Brain className="w-4 h-4 mr-2" />
                 {t('chat.studyMode')}
               </TabsTrigger>
@@ -419,6 +426,7 @@ export default function ChatView() {
                 value="existential" 
                 data-testid="tab-existential-mode"
                 disabled={isExistentialLocked}
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500/10 data-[state=active]:to-orange-500/10"
               >
                 {isExistentialLocked && <Lock className="w-3 h-3 mr-2" />}
                 {!isExistentialLocked && <Sparkles className="w-4 h-4 mr-2" />}
@@ -448,12 +456,12 @@ export default function ChatView() {
         <div className="p-4">
           <Button
             onClick={handleStartNewThread}
-            className="w-full"
+            className="w-full bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
             disabled={createThreadMutation.isPending}
             data-testid="button-new-chat"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Nova Conversa
+            {t('chat.newConversation')}
           </Button>
         </div>
 
