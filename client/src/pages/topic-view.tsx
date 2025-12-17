@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "wouter";
-import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw, Download } from "lucide-react";
+import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw, Download, BookOpen } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
@@ -410,35 +411,70 @@ export default function TopicView() {
 
   return (
     <>
-      <div className="p-3 sm:p-4 md:p-6 w-full max-w-7xl mx-auto overflow-x-hidden">
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-1 sm:mb-2 break-words">{topic?.name || t('topicView.title')}</h1>
-          {topic?.description && (
-            <p className="text-sm sm:text-base text-muted-foreground break-words">{topic.description}</p>
-          )}
-        </div>
+      <div className="p-3 sm:p-4 md:p-6 w-full max-w-7xl mx-auto overflow-x-hidden bg-gradient-to-br from-background via-background to-muted/30 min-h-screen">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-4 sm:mb-6 md:mb-8"
+        >
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="relative flex-shrink-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 blur-md opacity-30 rounded-xl" />
+              <div className="relative p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 shadow-lg">
+                <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-1 sm:mb-2 break-words">{topic?.name || t('topicView.title')}</h1>
+              {topic?.description && (
+                <p className="text-sm sm:text-base text-muted-foreground break-words">{topic.description}</p>
+              )}
+            </div>
+          </div>
+        </motion.div>
 
         {subscriptionError && (
-          <Card className="mb-4 bg-destructive/10 border-destructive/20">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+          <Card className="mb-4 bg-destructive/10 border-destructive/20 relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-500 to-rose-500 rounded-l-md" />
             <CardContent className="p-4">
               <p className="text-sm text-destructive">
                 {t('common.error')}: {t('errors.loadSubscription')}
               </p>
             </CardContent>
           </Card>
+          </motion.div>
         )}
 
         {!subscriptionLoading && !subscriptionError && limits && usage && (
-          <Card className="mb-4 bg-muted/50">
-            <CardContent className="p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+          <Card className="mb-4 bg-muted/50 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5" />
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-l-md" />
+            <CardContent className="p-4 relative">
               <p className="text-sm text-muted-foreground">
                 {getUploadUsageText(t)}
               </p>
             </CardContent>
           </Card>
+          </motion.div>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6"
+        >
           <Button
             size="sm"
             onClick={() => {
@@ -451,7 +487,7 @@ export default function TopicView() {
             }}
             disabled={subscriptionLoading || !!subscriptionError || isUploadLimitReached()}
             data-testid="button-upload-file"
-            className="text-xs sm:text-sm"
+            className="text-xs sm:text-sm bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-500/90 hover:to-teal-500/90 text-white shadow-lg shadow-emerald-500/25"
           >
             <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             {subscriptionLoading ? t('common.loading') : t('topicView.uploadFile')}
@@ -468,7 +504,7 @@ export default function TopicView() {
               {t('topicView.addLink')}
             </Button>
           )}
-        </div>
+        </motion.div>
 
         {contents.length === 0 ? (
           <>
