@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Edit, Trash2, CreditCard, Sparkles, Filter } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -260,26 +261,38 @@ export default function FlashcardsPage() {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-x-hidden min-w-0">
+    <div className="h-full flex flex-col overflow-x-hidden min-w-0 bg-gradient-to-br from-background via-background to-muted/30">
       {/* Header */}
-      <div className="border-b p-2 sm:p-4 flex flex-wrap items-center justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-            <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
-            <span className="truncate">{t('flashcards.title')}</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
-            {t('flashcards.description')}
-          </p>
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="border-b p-2 sm:p-4 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-amber-500/5 to-orange-500/5"
+      >
+        <div className="min-w-0 flex-1 flex items-center gap-3">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-30 rounded-xl" />
+            <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 shadow-lg">
+              <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+            </div>
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-2xl font-semibold">
+              <span className="truncate">{t('flashcards.title')}</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">
+              {t('flashcards.description')}
+            </p>
+          </div>
         </div>
         <Button onClick={() => {
           setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: i18n.language || "pt" });
           setShowCreateDialog(true);
-        }} data-testid="button-create-flashcard" size="sm" className="flex-shrink-0">
+        }} data-testid="button-create-flashcard" className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-500/90 hover:to-orange-500/90 text-white shadow-lg shadow-amber-500/25">
           <Plus className="h-4 w-4 sm:mr-2" />
           <span className="hidden sm:inline">{t('flashcards.createButton')}</span>
         </Button>
-      </div>
+      </motion.div>
 
       {/* Filters */}
       <div className="border-b p-4">
@@ -349,9 +362,22 @@ export default function FlashcardsPage() {
             </CardHeader>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {flashcards.map((flashcard) => (
-              <Card key={flashcard.id} className="hover-elevate" data-testid={`card-flashcard-${flashcard.id}`}>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {flashcards.map((flashcard, index) => (
+              <motion.div
+                key={flashcard.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+              <Card className="hover-elevate relative overflow-hidden group" data-testid={`card-flashcard-${flashcard.id}`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500 rounded-l-md" />
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base line-clamp-2">
@@ -397,8 +423,9 @@ export default function FlashcardsPage() {
                   </div>
                 </CardContent>
               </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 

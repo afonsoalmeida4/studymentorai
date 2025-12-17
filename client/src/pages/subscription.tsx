@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Check, Crown, Zap, Rocket, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import type { Subscription, UsageTracking, SubscriptionPlan } from "@shared/schema";
 import { planLimits } from "@shared/schema";
@@ -223,10 +224,23 @@ export default function SubscriptionPage() {
   ];
 
   return (
-    <div className="container max-w-6xl mx-auto p-6 space-y-8">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold" data-testid="text-subscription-title">
+    <div className="container max-w-6xl mx-auto p-6 space-y-8 bg-gradient-to-br from-background via-background to-muted/30 min-h-screen">
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-4"
+      >
+        <div className="space-y-3 text-center">
+          <div className="inline-flex items-center justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-500 blur-lg opacity-40 rounded-full" />
+              <div className="relative p-4 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-500/20 shadow-xl">
+                <Crown className="h-8 w-8 text-violet-500" />
+              </div>
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-500 to-purple-500 bg-clip-text text-transparent" data-testid="text-subscription-title">
             {t("subscription.title")}
           </h1>
           <p className="text-muted-foreground" data-testid="text-subscription-subtitle">
@@ -259,15 +273,22 @@ export default function SubscriptionPage() {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {currentPlan === "free" && (
-        <Card className="border-primary/50">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+        <Card className="border-primary/50 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5" />
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-l-md" />
           <CardHeader>
             <CardTitle>{t("subscription.currentUsage")}</CardTitle>
             <CardDescription>{t("subscription.currentUsageSubtitle", { planName: t(`subscription.plans.${currentPlan}.name`) })}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 relative">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span>{t("subscription.uploads")}</span>
@@ -288,19 +309,42 @@ export default function SubscriptionPage() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {plans.map((plan) => {
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.15 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        {plans.map((plan, index) => {
           const Icon = plan.icon;
           const isCurrent = plan.id === currentPlan;
+          const gradientColors = plan.id === "free" 
+            ? "from-slate-500/10 to-gray-500/5" 
+            : plan.id === "pro" 
+            ? "from-blue-500/10 to-cyan-500/5" 
+            : "from-violet-500/10 to-purple-500/5";
+          const accentColors = plan.id === "free" 
+            ? "from-slate-500 to-gray-500" 
+            : plan.id === "pro" 
+            ? "from-blue-500 to-cyan-500" 
+            : "from-violet-500 to-purple-500";
 
           return (
+            <motion.div
+              key={plan.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
+            >
             <Card 
-              key={plan.id} 
-              className={`relative ${isCurrent ? "border-primary shadow-md" : ""}`}
+              className={`relative overflow-hidden h-full ${isCurrent ? "border-primary shadow-md" : ""}`}
               data-testid={`card-plan-${plan.id}`}
             >
+              <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors}`} />
+              <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${accentColors} rounded-l-md`} />
               {plan.popular && !isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-primary" data-testid="badge-popular">
@@ -386,9 +430,10 @@ export default function SubscriptionPage() {
                 )}
               </CardFooter>
             </Card>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {currentPlan !== "free" && (
         <Card>

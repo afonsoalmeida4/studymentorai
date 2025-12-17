@@ -2,9 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LevelBadge } from "@/components/LevelBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, Medal, Award } from "lucide-react";
+import { Trophy, Medal, Award, Crown } from "lucide-react";
 import { type UserLevel } from "@shared/schema";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 interface LeaderboardEntry {
   userId: string;
@@ -37,19 +38,39 @@ export default function Ranking() {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden min-w-0">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 overflow-x-hidden min-w-0">
       <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 min-w-0">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold" data-testid="heading-ranking">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="text-center space-y-3"
+        >
+          <div className="inline-flex items-center justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-yellow-500 blur-lg opacity-40 rounded-full" />
+              <div className="relative p-4 rounded-full bg-gradient-to-br from-amber-500/20 to-yellow-500/20 shadow-xl">
+                <Crown className="h-8 w-8 text-amber-500" />
+              </div>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent" data-testid="heading-ranking">
             {t("ranking.title")}
           </h1>
           <p className="text-muted-foreground" data-testid="text-ranking-description">
             {t("ranking.subtitle")}
           </p>
-        </div>
+        </motion.div>
 
-        <Card data-testid="card-leaderboard">
-          <CardHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+        <Card className="relative overflow-hidden" data-testid="card-leaderboard">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-yellow-500/5" />
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-yellow-500 rounded-l-md" />
+          <CardHeader className="relative">
             <CardTitle>{t("ranking.topUsers")}</CardTitle>
             <CardDescription>
               {t("ranking.rankedBy")}
@@ -113,14 +134,22 @@ export default function Ranking() {
             )}
           </CardContent>
         </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5" />
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-purple-500 rounded-l-md" />
+          <CardHeader className="relative">
             <CardTitle>{t("ranking.howToClimb")}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 relative">
             <div className="flex items-start gap-3">
-              <div className="bg-primary/10 text-primary rounded-lg p-2 mt-0.5">
+              <div className="bg-gradient-to-br from-emerald-500/20 to-green-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg p-2 mt-0.5 shadow-sm">
                 <span className="font-bold">{t("ranking.actions.generateSummary.xp")}</span>
               </div>
               <div>
@@ -132,7 +161,7 @@ export default function Ranking() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="bg-primary/10 text-primary rounded-lg p-2 mt-0.5">
+              <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-blue-600 dark:text-blue-400 rounded-lg p-2 mt-0.5 shadow-sm">
                 <span className="font-bold">{t("ranking.actions.createFlashcards.xp")}</span>
               </div>
               <div>
@@ -144,7 +173,7 @@ export default function Ranking() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="bg-primary/10 text-primary rounded-lg p-2 mt-0.5">
+              <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 rounded-lg p-2 mt-0.5 shadow-sm">
                 <span className="font-bold">{t("ranking.actions.completeSession.xp")}</span>
               </div>
               <div>
@@ -156,6 +185,7 @@ export default function Ranking() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
       </div>
     </div>
   );

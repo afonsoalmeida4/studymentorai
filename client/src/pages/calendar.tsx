@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { format, isAfter, isBefore, isToday, differenceInDays, startOfDay } from "date-fns";
 import { pt, enUS, es, fr, de, it, type Locale } from "date-fns/locale";
 import { Calendar as CalendarIcon, Plus, Trash2, Edit, Check, X, CalendarDays, ListTodo, BookOpen } from "lucide-react";
+import { motion } from "framer-motion";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -198,14 +199,27 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-x-hidden min-w-0">
-      <div className="border-b p-2 sm:p-4">
+    <div className="flex h-full flex-col overflow-x-hidden min-w-0 bg-gradient-to-br from-background via-background to-muted/30">
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="border-b p-2 sm:p-4 bg-gradient-to-r from-violet-500/5 to-purple-500/5"
+      >
         <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
-          <div className="min-w-0">
-            <h1 className="text-lg sm:text-2xl font-bold truncate" data-testid="title-calendar">{t("calendar.title")}</h1>
-            <p className="text-sm text-muted-foreground">
-              {filteredEvents.length} {t("calendar.events").toLowerCase()}
-            </p>
+          <div className="min-w-0 flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-500 blur-md opacity-30 rounded-xl" />
+              <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 shadow-lg">
+                <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 text-violet-600 dark:text-violet-400" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold truncate" data-testid="title-calendar">{t("calendar.title")}</h1>
+              <p className="text-sm text-muted-foreground">
+                {filteredEvents.length} {t("calendar.events").toLowerCase()}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -244,7 +258,7 @@ export default function CalendarPage() {
 
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-create-event">
+                <Button data-testid="button-create-event" className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-500/90 hover:to-purple-500/90 text-white shadow-lg shadow-violet-500/25">
                   <Plus className="mr-2 h-4 w-4" />
                   {t("calendar.createEvent")}
                 </Button>
@@ -260,7 +274,7 @@ export default function CalendarPage() {
             </Dialog>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="flex-1 overflow-auto p-4">
         {viewMode === "month" ? (
