@@ -79,7 +79,16 @@ export function AppSidebar() {
   const hasProOrPremium = subscription?.plan === "pro" || subscription?.plan === "premium";
   const isPremiumOnly = subscription?.plan === "premium";
 
-  // Prefetch data on hover for faster navigation
+  // Prefetch data on mouse hover only (not touch) for faster navigation
+  // Touch devices tap to navigate, so prefetch would block the interaction
+  const handlePrefetch = useCallback((prefetchFn: () => void) => {
+    return (e: React.PointerEvent | React.MouseEvent) => {
+      // Only prefetch on mouse hover, not touch
+      if ('pointerType' in e && e.pointerType === 'touch') return;
+      prefetchFn();
+    };
+  }, []);
+
   const prefetchDashboard = useCallback(() => {
     queryClient.prefetchQuery({ queryKey: ["/api/stats/study-time"] });
     queryClient.prefetchQuery({ queryKey: ["/api/stats/subject-progress"] });

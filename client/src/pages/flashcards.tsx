@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDeferredValue } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Edit, Trash2, CreditCard, Sparkles, Filter } from "lucide-react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -57,6 +56,11 @@ export default function FlashcardsPage() {
   const [filterSubject, setFilterSubject] = useState<string>("");
   const [filterTopic, setFilterTopic] = useState<string>("");
   
+  // Defer filter values to prevent blocking UI during touch interactions
+  const deferredFilterType = useDeferredValue(filterType);
+  const deferredFilterSubject = useDeferredValue(filterSubject);
+  const deferredFilterTopic = useDeferredValue(filterTopic);
+  
   const [formData, setFormData] = useState({
     question: "",
     answer: "",
@@ -71,14 +75,15 @@ export default function FlashcardsPage() {
   }, [i18n.language]);
   
   // Fetch all user flashcards (no language filter - flashcards stay in creation language)
-  const { data: flashcardsData, isLoading: isLoadingFlashcards, isFetching } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
-    queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic],
+  // Uses deferred values to prevent blocking UI during touch interactions
+  const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
+    queryKey: ["/api/flashcards/user", deferredFilterType, deferredFilterSubject, deferredFilterTopic],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (filterType === "manual") params.set("isManual", "true");
-      if (filterType === "auto") params.set("isManual", "false");
-      if (filterSubject && filterSubject !== "_all") params.set("subjectId", filterSubject);
-      if (filterTopic && filterTopic !== "_all") params.set("topicId", filterTopic);
+      if (deferredFilterType === "manual") params.set("isManual", "true");
+      if (deferredFilterType === "auto") params.set("isManual", "false");
+      if (deferredFilterSubject && deferredFilterSubject !== "_all") params.set("subjectId", deferredFilterSubject);
+      if (deferredFilterTopic && deferredFilterTopic !== "_all") params.set("topicId", deferredFilterTopic);
       
       const response = await fetch(`/api/flashcards/user?${params.toString()}`, {
         credentials: "include",
@@ -263,12 +268,7 @@ export default function FlashcardsPage() {
   return (
     <div className="h-full flex flex-col overflow-x-hidden min-w-0 bg-gradient-to-br from-background via-background to-muted/30">
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="border-b p-3 sm:p-4 bg-gradient-to-r from-amber-500/5 to-orange-500/5"
-      >
+      <div className="border-b p-3 sm:p-4 bg-gradient-to-r from-amber-500/5 to-orange-500/5">
         <div className="flex items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative flex-shrink-0">
@@ -295,7 +295,7 @@ export default function FlashcardsPage() {
             <span className="hidden sm:inline sm:ml-2">{t('flashcards.createButton')}</span>
           </Button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Filters */}
       <div className="border-b p-4">
@@ -365,20 +365,9 @@ export default function FlashcardsPage() {
             </CardHeader>
           </Card>
         ) : (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-          >
-            {flashcards.map((flashcard, index) => (
-              <motion.div
-                key={flashcard.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-              >
-              <Card className="hover-elevate relative overflow-hidden group" data-testid={`card-flashcard-${flashcard.id}`}>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {flashcards.map((flashcard) => (
+              <Card key={flashcard.id} className="hover-elevate relative overflow-hidden group" data-testid={`card-flashcard-${flashcard.id}`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500 rounded-l-md" />
                 <CardHeader className="pb-3">
@@ -426,9 +415,8 @@ export default function FlashcardsPage() {
                   </div>
                 </CardContent>
               </Card>
-              </motion.div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
 
