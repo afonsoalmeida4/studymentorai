@@ -22,7 +22,8 @@ import { useTranslation } from "react-i18next";
 import type { Subject, Topic } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
-import { motion } from "framer-motion";
+import { motion, LazyMotion, domAnimation } from "framer-motion";
+import { useMemo } from "react";
 
 interface AuthUser {
   id?: string;
@@ -58,13 +59,14 @@ export default function Home() {
   const firstName = user?.firstName || user?.email?.split('@')[0] || '';
 
   return (
+    <LazyMotion features={domAnimation}>
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 overflow-x-hidden min-w-0">
       <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 md:py-10 lg:py-12 min-w-0">
         
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.2 }}
           className="mb-6 sm:mb-8 md:mb-10"
         >
           <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
@@ -86,12 +88,7 @@ export default function Home() {
         </motion.div>
 
         {hasContent && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8"
-          >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
             <Link href="/subjects">
               <Card className="relative overflow-hidden hover:shadow-lg cursor-pointer group h-full transition-all duration-300 hover:-translate-y-0.5" data-testid="stat-card-subjects">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/5" />
@@ -158,15 +155,10 @@ export default function Home() {
                 </CardContent>
               </Card>
             </Link>
-          </motion.div>
+          </div>
         )}
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
           <Card 
             className="relative overflow-hidden hover:shadow-lg cursor-pointer group transition-all duration-300 hover:-translate-y-0.5" 
             onClick={() => setLocation("/subjects")} 
@@ -259,14 +251,10 @@ export default function Home() {
               </CardContent>
             </Card>
           )}
-        </motion.div>
+        </div>
 
         {recentTopics.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
+          <div>
             <Card>
               <CardHeader className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 pb-2 sm:pb-3">
                 <div className="flex items-center justify-between gap-2">
@@ -310,15 +298,11 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
 
         {!hasContent && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
+          <div>
             <Card className="border-dashed">
               <CardContent className="py-8 sm:py-10 md:py-12 px-4 sm:px-6">
                 <div className="text-center">
@@ -338,9 +322,10 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
+    </LazyMotion>
   );
 }
