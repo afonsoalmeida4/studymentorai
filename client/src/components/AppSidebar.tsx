@@ -380,42 +380,42 @@ export function AppSidebar() {
                   subjects.map((subject) => {
                     const isActive = location === `/subject/${subject.id}`;
                     return (
-                      <SidebarMenuItem key={subject.id} className="group relative">
-                        <SidebarMenuButton
-                          asChild
-                          isActive={isActive}
-                          className={`relative overflow-hidden transition-all duration-200 ${isActive ? 'bg-primary/10 border-l-2 border-primary' : 'hover:bg-muted/50'}`}
+                      <SidebarMenuItem key={subject.id} className="relative">
+                        <div 
+                          className={`flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 cursor-pointer ${isActive ? 'bg-gradient-to-r from-primary/15 to-primary/5 ring-1 ring-primary/20' : 'hover:bg-muted/60'}`}
+                          onClick={() => setLocation(`/subject/${subject.id}`)}
                           data-testid={`button-subject-${subject.id}`}
                         >
-                          <Link href={`/subject/${subject.id}`}>
-                            <div className="flex items-center gap-3 w-full">
-                              <div
-                                className="w-3.5 h-3.5 rounded-md flex-shrink-0 shadow-sm ring-1 ring-black/5"
-                                style={{ backgroundColor: subject.color ?? "#6366f1" }}
-                              />
-                              <span className="flex-1 truncate font-medium text-sm">{subject.name}</span>
-                            </div>
-                          </Link>
-                        </SidebarMenuButton>
-                        <div className="flex items-center absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-sidebar/80 backdrop-blur-sm rounded-md px-0.5">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                            onClick={(e) => openEditDialog(subject, e)}
-                            data-testid={`button-edit-subject-${subject.id}`}
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                            onClick={(e) => openDeleteDialog(subject, e)}
-                            data-testid={`button-delete-subject-${subject.id}`}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          <div
+                            className="w-4 h-4 rounded-md flex-shrink-0 shadow-sm ring-1 ring-white/20"
+                            style={{ 
+                              backgroundColor: subject.color ?? "#6366f1",
+                              boxShadow: `0 2px 8px ${subject.color ?? "#6366f1"}40`
+                            }}
+                          />
+                          <span className={`flex-1 truncate text-sm ${isActive ? 'font-semibold text-foreground' : 'font-medium text-foreground/80'}`}>
+                            {subject.name}
+                          </span>
+                          <div className="flex items-center gap-0.5 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted"
+                              onClick={(e) => openEditDialog(subject, e)}
+                              data-testid={`button-edit-subject-${subject.id}`}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 rounded-md text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10"
+                              onClick={(e) => openDeleteDialog(subject, e)}
+                              data-testid={`button-delete-subject-${subject.id}`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
                       </SidebarMenuItem>
                     );
