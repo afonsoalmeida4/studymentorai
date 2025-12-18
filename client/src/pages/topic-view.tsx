@@ -508,25 +508,51 @@ export default function TopicView() {
 
         {contents.length === 0 ? (
           <>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-medium mb-2">{t('topicView.emptyState.title')}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {t('topicView.emptyState.description')}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-muted/20" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-muted-foreground/20 to-muted-foreground/10 rounded-l-md" />
+                <CardContent className="pt-6 relative">
+                  <div className="text-center py-12">
+                    <div className="relative inline-flex mb-4">
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 blur-md opacity-20 rounded-xl" />
+                      <div className="relative p-3 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10">
+                        <Upload className="w-10 h-10 text-emerald-500/70" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">{t('topicView.emptyState.title')}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {t('topicView.emptyState.description')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
             {/* Show flashcard section even when no content, if there are manual flashcards */}
             {hasFlashcards && (
-              <div className="mt-12">
-                <div className="mb-4 sm:mb-6">
-                  <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1 sm:mb-2">{t('topicView.flashcardSection.title', t('topicView.summarySection.title'))}</h2>
-                  <p className="text-muted-foreground text-xs sm:text-sm">
-                    {t('topicView.flashcardSection.description', t('topicView.summarySection.description'))}
-                  </p>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="mt-12"
+              >
+                <div className="mb-4 sm:mb-6 flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
+                    <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-500 blur-md opacity-20 rounded-lg" />
+                    <div className="relative p-2 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20">
+                      <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-violet-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{t('topicView.flashcardSection.title', t('topicView.summarySection.title'))}</h2>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
+                      {t('topicView.flashcardSection.description', t('topicView.summarySection.description'))}
+                    </p>
+                  </div>
                 </div>
                 <SummaryStudySection topicId={topicId} />
                 {/* Quiz Section - Premium feature */}
@@ -535,10 +561,15 @@ export default function TopicView() {
                     <QuizSection topicId={topicId} hasSummaries={false} />
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </>
         ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
           <Tabs defaultValue="all" className="w-full">
             <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
               <TabsList className="inline-flex min-w-max">
@@ -556,90 +587,39 @@ export default function TopicView() {
 
             <TabsContent value="all" className="mt-6">
               <div className="grid gap-3 sm:gap-4">
-                {contents.map((content) => (
-                  <Card key={content.id} data-testid={`card-content-${content.id}`} className="overflow-hidden">
-                    <CardHeader className="p-3 sm:p-6">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
-                          <div className="flex-shrink-0">{getContentIcon(content.contentType)}</div>
-                          <div className="min-w-0 flex-1">
-                            <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
-                            <CardDescription className="mt-1 text-xs">
-                              {content.contentType.toUpperCase()}
-                              {content.summaryId && (
-                                <span className="ml-2 text-primary">
-                                  <Sparkles className="w-3 h-3 inline mr-1" />
-                                  {t('content.aiSummary')}
-                                </span>
-                              )}
-                            </CardDescription>
-                          </div>
-                        </div>
-                        {content.contentType === "link" && content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => window.open((content.metadata as any)?.url, "_blank")}
-                            data-testid={`button-open-link-${content.id}`}
-                            className="flex-shrink-0 h-8 w-8"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
-                        ) : null}
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="files" className="mt-6">
-              <div className="grid gap-3 sm:gap-4">
-                {contents
-                  .filter((c) => c.contentType !== "link")
-                  .map((content) => (
-                    <Card key={content.id} data-testid={`card-file-${content.id}`} className="overflow-hidden">
-                      <CardHeader className="p-3 sm:p-6">
-                        <div className="flex items-start gap-2 sm:gap-3 min-w-0">
-                          <div className="flex-shrink-0">{getContentIcon(content.contentType)}</div>
-                          <div className="min-w-0 flex-1">
-                            <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
-                            <CardDescription className="mt-1 text-xs">
-                              {content.contentType.toUpperCase()}
-                            </CardDescription>
-                          </div>
-                        </div>
-                      </CardHeader>
-                    </Card>
-                  ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="links" className="mt-6">
-              <div className="grid gap-3 sm:gap-4">
-                {contents
-                  .filter((c) => c.contentType === "link")
-                  .map((content) => (
-                    <Card key={content.id} data-testid={`card-link-${content.id}`} className="overflow-hidden">
-                      <CardHeader className="p-3 sm:p-6">
+                {contents.map((content, index) => (
+                  <motion.div
+                    key={content.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.08 }}
+                  >
+                    <Card data-testid={`card-content-${content.id}`} className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5" />
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-l-md" />
+                      <CardHeader className="p-3 sm:p-6 relative">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
-                            <Link2 className="w-4 h-4 flex-shrink-0" />
+                            <div className="flex-shrink-0 p-1.5 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20">{getContentIcon(content.contentType)}</div>
                             <div className="min-w-0 flex-1">
                               <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
-                              {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
-                                <CardDescription className="mt-1 text-xs truncate">
-                                  {(content.metadata as any)?.url}
-                                </CardDescription>
-                              ) : null}
+                              <CardDescription className="mt-1 text-xs">
+                                {content.contentType.toUpperCase()}
+                                {content.summaryId && (
+                                  <span className="ml-2 text-primary">
+                                    <Sparkles className="w-3 h-3 inline mr-1" />
+                                    {t('content.aiSummary')}
+                                  </span>
+                                )}
+                              </CardDescription>
                             </div>
                           </div>
-                          {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                          {content.contentType === "link" && content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
                             <Button
                               size="icon"
                               variant="ghost"
                               onClick={() => window.open((content.metadata as any)?.url, "_blank")}
-                              data-testid={`button-visit-link-${content.id}`}
+                              data-testid={`button-open-link-${content.id}`}
                               className="flex-shrink-0 h-8 w-8"
                             >
                               <ExternalLink className="w-4 h-4" />
@@ -648,33 +628,135 @@ export default function TopicView() {
                         </div>
                       </CardHeader>
                     </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="files" className="mt-6">
+              <div className="grid gap-3 sm:gap-4">
+                {contents
+                  .filter((c) => c.contentType !== "link")
+                  .map((content, index) => (
+                    <motion.div
+                      key={content.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.08 }}
+                    >
+                      <Card data-testid={`card-file-${content.id}`} className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5" />
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-l-md" />
+                        <CardHeader className="p-3 sm:p-6 relative">
+                          <div className="flex items-start gap-2 sm:gap-3 min-w-0">
+                            <div className="flex-shrink-0 p-1.5 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20">{getContentIcon(content.contentType)}</div>
+                            <div className="min-w-0 flex-1">
+                              <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
+                              <CardDescription className="mt-1 text-xs">
+                                {content.contentType.toUpperCase()}
+                              </CardDescription>
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </motion.div>
+                  ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="links" className="mt-6">
+              <div className="grid gap-3 sm:gap-4">
+                {contents
+                  .filter((c) => c.contentType === "link")
+                  .map((content, index) => (
+                    <motion.div
+                      key={content.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.08 }}
+                    >
+                      <Card data-testid={`card-link-${content.id}`} className="relative overflow-hidden hover:shadow-lg transition-all duration-300">
+                        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5" />
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-purple-500 rounded-l-md" />
+                        <CardHeader className="p-3 sm:p-6 relative">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                              <div className="p-1.5 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20">
+                                <Link2 className="w-4 h-4 flex-shrink-0 text-violet-500" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
+                                {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                                  <CardDescription className="mt-1 text-xs truncate">
+                                    {(content.metadata as any)?.url}
+                                  </CardDescription>
+                                ) : null}
+                              </div>
+                            </div>
+                            {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => window.open((content.metadata as any)?.url, "_blank")}
+                                data-testid={`button-visit-link-${content.id}`}
+                                className="flex-shrink-0 h-8 w-8"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                            ) : null}
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </motion.div>
                   ))}
               </div>
             </TabsContent>
           </Tabs>
+          </motion.div>
         )}
 
         {/* Secção de Resumos e Estudo - Inline */}
         {contents.length > 0 && (
-          <div className="mt-12">
-            <div className="mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1 sm:mb-2">{t('topicView.summarySection.title')}</h2>
-              <p className="text-muted-foreground text-xs sm:text-sm">
-                {t('topicView.summarySection.description')}
-              </p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="mt-12"
+          >
+            <div className="mb-4 sm:mb-6 flex items-center gap-3">
+              <div className="relative flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-20 rounded-lg" />
+                <div className="relative p-2 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
+                </div>
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">{t('topicView.summarySection.title')}</h2>
+                <p className="text-muted-foreground text-xs sm:text-sm">
+                  {t('topicView.summarySection.description')}
+                </p>
+              </div>
             </div>
 
             {generateSummariesMutation.isPending ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500 rounded-l-md" />
+                <CardContent className="py-12 text-center relative">
+                  <div className="relative inline-flex mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-30 rounded-xl animate-pulse" />
+                    <div className="relative p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                      <Sparkles className="w-10 h-10 text-amber-500 animate-pulse" />
+                    </div>
+                  </div>
                   <p className="text-muted-foreground">{t('summaries.generatingSummary')}</p>
                   <p className="text-xs text-muted-foreground mt-2">{t('summaries.generatingWait')}</p>
                 </CardContent>
               </Card>
             ) : topicSummariesLoading ? (
-              <Card>
-                <CardContent className="py-12 text-center">
+              <Card className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-muted/20" />
+                <CardContent className="py-12 text-center relative">
                   <p className="text-muted-foreground">{t('summaries.loading')}</p>
                 </CardContent>
               </Card>
@@ -698,9 +780,16 @@ export default function TopicView() {
                 
                 if (availableStyles.length === 0) {
                   return (
-                    <Card>
-                      <CardContent className="py-12 text-center space-y-6">
-                        <Sparkles className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <Card className="relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5" />
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-purple-500 rounded-l-md" />
+                      <CardContent className="py-12 text-center space-y-6 relative">
+                        <div className="relative inline-flex">
+                          <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-500 blur-md opacity-20 rounded-xl" />
+                          <div className="relative p-3 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20">
+                            <Sparkles className="w-10 h-10 text-violet-500" />
+                          </div>
+                        </div>
                         <div>
                           <p className="text-sm text-muted-foreground mb-2">
                             {t('topicView.summarySection.noAllowedSummaries')}
@@ -789,8 +878,15 @@ export default function TopicView() {
 
                     {visual ? (
                       <TabsContent value="visual" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
-                        <Card>
-                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                        <Card className="relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-l-md" />
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4 relative">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
                               <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.visual.title')}</CardTitle>
                               <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -832,28 +928,43 @@ export default function TopicView() {
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent className="px-3 sm:px-6">
+                          <CardContent className="px-3 sm:px-6 relative">
                             <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
                               <ReactMarkdown>{preprocessMarkdown(visual.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>
+                        </motion.div>
                         {visual.motivationalMessage ? (
-                          <Card className="bg-primary/5 border-primary/20">
-                            <CardContent className="pt-4">
-                              <p className="text-sm italic text-primary">
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                          >
+                          <Card className="relative overflow-hidden bg-blue-500/5 border-blue-500/20">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-l-md" />
+                            <CardContent className="pt-4 relative">
+                              <p className="text-sm italic text-blue-600 dark:text-blue-400">
                                 {visual.motivationalMessage}
                               </p>
                             </CardContent>
                           </Card>
+                          </motion.div>
                         ) : null}
                         </TabsContent>
                     ) : null}
 
                     {logico ? (
                       <TabsContent value="logico" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
-                        <Card>
-                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                        <Card className="relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-l-md" />
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4 relative">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
                               <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.logico.title')}</CardTitle>
                               <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -893,28 +1004,43 @@ export default function TopicView() {
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent className="px-3 sm:px-6">
+                          <CardContent className="px-3 sm:px-6 relative">
                             <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
                               <ReactMarkdown>{preprocessMarkdown(logico.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>
+                        </motion.div>
                         {logico.motivationalMessage ? (
-                          <Card className="bg-primary/5 border-primary/20">
-                            <CardContent className="pt-4">
-                              <p className="text-sm italic text-primary">
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                          >
+                          <Card className="relative overflow-hidden bg-emerald-500/5 border-emerald-500/20">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-l-md" />
+                            <CardContent className="pt-4 relative">
+                              <p className="text-sm italic text-emerald-600 dark:text-emerald-400">
                                 {logico.motivationalMessage}
                               </p>
                             </CardContent>
                           </Card>
+                          </motion.div>
                         ) : null}
                         </TabsContent>
                     ) : null}
 
                     {conciso ? (
                       <TabsContent value="conciso" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
-                        <Card>
-                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                        <Card className="relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500 rounded-l-md" />
+                          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4 relative">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
                               <CardTitle className="text-base sm:text-lg">{t('topicView.summarySection.conciso.title')}</CardTitle>
                               <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -954,20 +1080,28 @@ export default function TopicView() {
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent className="px-3 sm:px-6">
+                          <CardContent className="px-3 sm:px-6 relative">
                             <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
                               <ReactMarkdown>{preprocessMarkdown(conciso.summary)}</ReactMarkdown>
                             </div>
                           </CardContent>
                         </Card>
+                        </motion.div>
                         {conciso.motivationalMessage ? (
-                          <Card className="bg-primary/5 border-primary/20">
-                            <CardContent className="pt-4">
-                              <p className="text-sm italic text-primary">
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                          >
+                          <Card className="relative overflow-hidden bg-amber-500/5 border-amber-500/20">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-400 rounded-l-md" />
+                            <CardContent className="pt-4 relative">
+                              <p className="text-sm italic text-amber-600 dark:text-amber-400">
                                 {conciso.motivationalMessage}
                               </p>
                             </CardContent>
                           </Card>
+                          </motion.div>
                         ) : null}
                         </TabsContent>
                     ) : null}
@@ -987,9 +1121,16 @@ export default function TopicView() {
               })()
             ) : (
               <>
-                <Card>
-                  <CardContent className="py-12 text-center space-y-6">
-                    <Sparkles className="w-12 h-12 mx-auto text-muted-foreground" />
+                <Card className="relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500 rounded-l-md" />
+                  <CardContent className="py-12 text-center space-y-6 relative">
+                    <div className="relative inline-flex">
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-20 rounded-xl" />
+                      <div className="relative p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                        <Sparkles className="w-10 h-10 text-amber-500" />
+                      </div>
+                    </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">
                         Ainda não há resumos disponíveis para este tópico.
@@ -1048,7 +1189,7 @@ export default function TopicView() {
                 )}
               </>
             )}
-          </div>
+          </motion.div>
         )}
       </div>
 
