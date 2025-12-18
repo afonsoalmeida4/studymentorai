@@ -71,7 +71,7 @@ export default function FlashcardsPage() {
   }, [i18n.language]);
   
   // Fetch all user flashcards (no language filter - flashcards stay in creation language)
-  const { data: flashcardsData, isLoading: isLoadingFlashcards } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
+  const { data: flashcardsData, isLoading: isLoadingFlashcards, isFetching } = useQuery<{ success: boolean; flashcards: Flashcard[] }>({
     queryKey: ["/api/flashcards/user", filterType, filterSubject, filterTopic],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -87,8 +87,8 @@ export default function FlashcardsPage() {
       return response.json();
     },
     enabled: true,
-    staleTime: 0, // Always fetch fresh data - no caching
-    refetchOnMount: "always", // Refetch when component mounts
+    staleTime: 5000, // Cache for 5 seconds to prevent refetch conflicts with Select interactions
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching
   });
 
   // Fetch subjects for filter
