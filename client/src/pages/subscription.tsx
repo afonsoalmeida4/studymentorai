@@ -312,12 +312,7 @@ export default function SubscriptionPage() {
         </motion.div>
       )}
 
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.15 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan, index) => {
           const Icon = plan.icon;
           const isCurrent = plan.id === currentPlan;
@@ -333,34 +328,29 @@ export default function SubscriptionPage() {
             : "from-violet-500 to-purple-500";
 
           return (
-            <motion.div
-              key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 + index * 0.1 }}
-            >
             <Card 
-              className={`relative overflow-hidden h-full ${isCurrent ? "border-primary shadow-md" : ""}`}
+              key={plan.id}
+              className={`relative overflow-hidden ${isCurrent ? "border-primary shadow-md" : ""}`}
               data-testid={`card-plan-${plan.id}`}
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors}`} />
-              <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${accentColors} rounded-l-md`} />
+              <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors} pointer-events-none`} />
+              <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${accentColors} rounded-l-md pointer-events-none`} />
               {plan.popular && !isCurrent && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-primary" data-testid="badge-popular">
+                <div className="absolute top-2 right-2 z-10">
+                  <Badge className="bg-primary text-xs" data-testid="badge-popular">
                     {t("subscription.popular")}
                   </Badge>
                 </div>
               )}
               {isCurrent && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge variant="outline" className="bg-background" data-testid="badge-current">
+                <div className="absolute top-2 right-2 z-10">
+                  <Badge variant="outline" className="bg-background text-xs" data-testid="badge-current">
                     {t("subscription.currentPlan")}
                   </Badge>
                 </div>
               )}
 
-              <CardHeader>
+              <CardHeader className="relative">
                 <div className="flex items-center gap-2">
                   <Icon className={`h-6 w-6 ${plan.color}`} />
                   <CardTitle className="text-lg">{t(`subscription.plans.${plan.id}.name`)}</CardTitle>
@@ -387,10 +377,10 @@ export default function SubscriptionPage() {
                 </div>
               </CardHeader>
 
-              <CardContent>
+              <CardContent className="relative">
                 <ul className="space-y-2">
-                  {plan.featureKeys.map((featureKey, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
+                  {plan.featureKeys.map((featureKey, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-sm">
                       <Check className="h-4 w-4 mt-0.5 text-primary shrink-0" />
                       <span>{t(`subscription.plans.${plan.id}.features.${featureKey}`)}</span>
                     </li>
@@ -398,7 +388,7 @@ export default function SubscriptionPage() {
                 </ul>
               </CardContent>
 
-              <CardFooter>
+              <CardFooter className="relative">
                 {isCurrent ? (
                   <Button 
                     variant="outline" 
@@ -419,7 +409,7 @@ export default function SubscriptionPage() {
                   </Button>
                 ) : (
                   <Button
-                    className="w-full gap-2 hover-elevate active-elevate-2"
+                    className="w-full gap-2"
                     onClick={() => createCheckoutMutation.mutate(plan.id)}
                     disabled={createCheckoutMutation.isPending}
                     data-testid={`button-upgrade-${plan.id}`}
@@ -430,10 +420,9 @@ export default function SubscriptionPage() {
                 )}
               </CardFooter>
             </Card>
-            </motion.div>
           );
         })}
-      </motion.div>
+      </div>
 
       {currentPlan !== "free" && (
         <Card>

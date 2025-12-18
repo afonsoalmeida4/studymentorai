@@ -267,31 +267,34 @@ export default function FlashcardsPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="border-b p-2 sm:p-4 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-amber-500/5 to-orange-500/5"
+        className="border-b p-3 sm:p-4 bg-gradient-to-r from-amber-500/5 to-orange-500/5"
       >
-        <div className="min-w-0 flex-1 flex items-center gap-3">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-30 rounded-xl" />
-            <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 shadow-lg">
-              <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+        <div className="flex items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative flex-shrink-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-30 rounded-xl" />
+              <div className="relative p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 shadow-lg">
+                <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 dark:text-amber-400" />
+              </div>
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-semibold truncate">{t('flashcards.title')}</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">{t('flashcards.description')}</p>
             </div>
           </div>
-          <div>
-            <h1 className="text-lg sm:text-2xl font-semibold">
-              <span className="truncate">{t('flashcards.title')}</span>
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground truncate">
-              {t('flashcards.description')}
-            </p>
-          </div>
+          <Button 
+            onClick={() => {
+              setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: i18n.language || "pt" });
+              setShowCreateDialog(true);
+            }} 
+            data-testid="button-create-flashcard" 
+            size="icon"
+            className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-500/90 hover:to-orange-500/90 text-white shadow-lg shadow-amber-500/25 sm:w-auto sm:px-4"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline sm:ml-2">{t('flashcards.createButton')}</span>
+          </Button>
         </div>
-        <Button onClick={() => {
-          setFormData({ question: "", answer: "", subjectId: "", topicId: "", language: i18n.language || "pt" });
-          setShowCreateDialog(true);
-        }} data-testid="button-create-flashcard" className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-500/90 hover:to-orange-500/90 text-white shadow-lg shadow-amber-500/25">
-          <Plus className="h-4 w-4 sm:mr-2" />
-          <span className="hidden sm:inline">{t('flashcards.createButton')}</span>
-        </Button>
       </motion.div>
 
       {/* Filters */}

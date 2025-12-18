@@ -322,22 +322,28 @@ export default function SubjectView() {
             {subjects.map((subject) => (
               <Card
                 key={subject.id}
-                className="hover-elevate active-elevate-2"
+                className="relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
                 data-testid={`card-subject-${subject.id}`}
+                onClick={() => setLocation(`/subject/${subject.id}`)}
               >
-                <CardHeader>
+                <div 
+                  className="absolute inset-0 opacity-10 pointer-events-none"
+                  style={{ background: `linear-gradient(to bottom right, ${subject.color ?? "#6366f1"}20, transparent)` }}
+                />
+                <div 
+                  className="absolute left-0 top-0 bottom-0 w-1 rounded-l-md pointer-events-none"
+                  style={{ backgroundColor: subject.color ?? "#6366f1" }}
+                />
+                <CardHeader className="relative">
                   <div className="flex items-start justify-between gap-2">
-                    <div 
-                      className="flex items-center gap-3 mb-2 flex-1 cursor-pointer"
-                      onClick={() => setLocation(`/subject/${subject.id}`)}
-                    >
+                    <div className="flex items-center gap-3 mb-2 flex-1">
                       <div
                         className="w-4 h-4 rounded flex-shrink-0"
                         style={{ backgroundColor: subject.color ?? "#6366f1" }}
                       />
                       <CardTitle className="text-lg">{subject.name}</CardTitle>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -351,7 +357,7 @@ export default function SubjectView() {
                         variant="ghost"
                         size="icon"
                         className="flex-shrink-0 text-muted-foreground hover:text-destructive"
-                        onClick={() => setSubjectToDelete(subject)}
+                        onClick={(e) => { e.stopPropagation(); setSubjectToDelete(subject); }}
                         data-testid={`button-delete-subject-${subject.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -359,10 +365,7 @@ export default function SubjectView() {
                     </div>
                   </div>
                   {subject.description && (
-                    <CardDescription 
-                      className="cursor-pointer"
-                      onClick={() => setLocation(`/subject/${subject.id}`)}
-                    >
+                    <CardDescription>
                       {subject.description}
                     </CardDescription>
                   )}
