@@ -231,34 +231,37 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-3 p-3">
+        <SidebarHeader className="border-b border-border/50">
+          <div className="flex items-center gap-3 p-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-violet-600 blur-sm opacity-50 rounded-xl" />
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-lg shadow-primary/25">
-                <GraduationCap className="w-5 h-5 text-white" data-testid="icon-app-logo" />
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-primary to-indigo-600 blur-md opacity-60 rounded-xl animate-pulse" />
+              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 via-primary to-indigo-600 flex items-center justify-center shadow-xl shadow-primary/30 ring-2 ring-white/10">
+                <GraduationCap className="w-6 h-6 text-white drop-shadow-sm" data-testid="icon-app-logo" />
               </div>
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="font-bold text-sm bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">Study Mentor AI</span>
-              <span className="text-xs text-muted-foreground truncate">{t('app.tagline')}</span>
+              <span className="font-bold text-base tracking-tight bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text">Study Mentor AI</span>
+              <span className="text-xs text-muted-foreground/80 truncate font-medium">{t('app.tagline')}</span>
             </div>
           </div>
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className="px-2">
           <SidebarGroup>
-            <SidebarGroupLabel>{t('nav.navigation')}</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-2">{t('nav.navigation')}</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="space-y-0.5">
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
                     isActive={location === "/"}
+                    className={`rounded-lg transition-all duration-200 ${location === "/" ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted/50"}`}
                     data-testid="button-home"
                   >
                     <Link href="/">
-                      <Home className="w-4 h-4" />
+                      <div className={`p-1.5 rounded-md ${location === "/" ? "bg-primary/20" : "bg-muted/50"}`}>
+                        <Home className="w-4 h-4" />
+                      </div>
                       <span>{t('nav.home')}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -267,11 +270,14 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={location === "/flashcards"}
+                    className={`rounded-lg transition-all duration-200 ${location === "/flashcards" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium" : "hover:bg-muted/50"}`}
                     data-testid="button-flashcards"
                     onMouseEnter={prefetchFlashcards}
                   >
                     <Link href="/flashcards">
-                      <CreditCard className="w-4 h-4" />
+                      <div className={`p-1.5 rounded-md ${location === "/flashcards" ? "bg-amber-500/20" : "bg-muted/50"}`}>
+                        <CreditCard className="w-4 h-4" />
+                      </div>
                       <span>{t('nav.flashcards')}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -282,11 +288,14 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={location === "/dashboard"}
+                        className={`rounded-lg transition-all duration-200 ${location === "/dashboard" ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium" : "hover:bg-muted/50"}`}
                         data-testid="button-dashboard"
                         onMouseEnter={prefetchDashboard}
                       >
                         <Link href="/dashboard">
-                          <BarChart3 className="w-4 h-4" />
+                          <div className={`p-1.5 rounded-md ${location === "/dashboard" ? "bg-blue-500/20" : "bg-muted/50"}`}>
+                            <BarChart3 className="w-4 h-4" />
+                          </div>
                           <span>{t('nav.dashboard')}</span>
                         </Link>
                       </SidebarMenuButton>
@@ -295,11 +304,14 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={location === "/ranking"}
+                        className={`rounded-lg transition-all duration-200 ${location === "/ranking" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium" : "hover:bg-muted/50"}`}
                         data-testid="button-ranking"
                         onMouseEnter={prefetchRanking}
                       >
                         <Link href="/ranking">
-                          <Trophy className="w-4 h-4" />
+                          <div className={`p-1.5 rounded-md ${location === "/ranking" ? "bg-emerald-500/20" : "bg-muted/50"}`}>
+                            <Trophy className="w-4 h-4" />
+                          </div>
                           <span>{t('nav.ranking')}</span>
                         </Link>
                       </SidebarMenuButton>
@@ -311,10 +323,13 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={location === "/calendar"}
+                      className={`rounded-lg transition-all duration-200 ${location === "/calendar" ? "bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium" : "hover:bg-muted/50"}`}
                       data-testid="button-calendar"
                     >
                       <Link href="/calendar">
-                        <CalendarDays className="w-4 h-4" />
+                        <div className={`p-1.5 rounded-md ${location === "/calendar" ? "bg-violet-500/20" : "bg-muted/50"}`}>
+                          <CalendarDays className="w-4 h-4" />
+                        </div>
                         <span>{t('nav.calendar')}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -324,10 +339,13 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={location === "/subscription"}
+                    className={`rounded-lg transition-all duration-200 ${location === "/subscription" ? "bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400 font-medium" : "hover:bg-muted/50"}`}
                     data-testid="button-subscription"
                   >
                     <Link href="/subscription">
-                      <Crown className="w-4 h-4" />
+                      <div className={`p-1.5 rounded-md ${location === "/subscription" ? "bg-gradient-to-br from-amber-500/20 to-orange-500/20" : "bg-muted/50"}`}>
+                        <Crown className="w-4 h-4" />
+                      </div>
                       <span>{t('nav.subscription')}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -337,12 +355,12 @@ export function AppSidebar() {
           </SidebarGroup>
 
           <SidebarGroup>
-            <div className="flex items-center justify-between px-2">
-              <SidebarGroupLabel>{t('nav.subjects')}</SidebarGroupLabel>
+            <div className="flex items-center justify-between px-2 mb-1">
+              <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">{t('nav.subjects')}</SidebarGroupLabel>
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-6 w-6"
+                className="h-7 w-7 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
                 onClick={() => setIsSubjectDialogOpen(true)}
                 data-testid="button-add-subject"
               >
@@ -350,51 +368,58 @@ export function AppSidebar() {
               </Button>
             </div>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="space-y-1">
                 {subjects.length === 0 ? (
-                  <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                  <div className="px-3 py-6 text-sm text-muted-foreground text-center rounded-lg bg-muted/30 mx-2">
+                    <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
                     {t('subjects.noSubjects')}
                     <br />
-                    {t('subjects.clickToStart')}
+                    <span className="text-xs opacity-70">{t('subjects.clickToStart')}</span>
                   </div>
                 ) : (
-                  subjects.map((subject) => (
-                    <SidebarMenuItem key={subject.id} className="group">
-                      <SidebarMenuButton
-                        asChild
-                        isActive={location === `/subject/${subject.id}`}
-                        data-testid={`button-subject-${subject.id}`}
-                      >
-                        <Link href={`/subject/${subject.id}`}>
-                          <div
-                            className="w-3 h-3 rounded-sm flex-shrink-0"
-                            style={{ backgroundColor: subject.color ?? "#6366f1" }}
-                          />
-                          <span className="flex-1 truncate">{subject.name}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                      <div className="flex items-center absolute right-1 top-1/2 -translate-y-1/2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={(e) => openEditDialog(subject, e)}
-                          data-testid={`button-edit-subject-${subject.id}`}
+                  subjects.map((subject) => {
+                    const isActive = location === `/subject/${subject.id}`;
+                    return (
+                      <SidebarMenuItem key={subject.id} className="group relative">
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive}
+                          className={`relative overflow-hidden transition-all duration-200 ${isActive ? 'bg-primary/10 border-l-2 border-primary' : 'hover:bg-muted/50'}`}
+                          data-testid={`button-subject-${subject.id}`}
                         >
-                          <Pencil className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-destructive hover:text-destructive"
-                          onClick={(e) => openDeleteDialog(subject, e)}
-                          data-testid={`button-delete-subject-${subject.id}`}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </SidebarMenuItem>
-                  ))
+                          <Link href={`/subject/${subject.id}`}>
+                            <div className="flex items-center gap-3 w-full">
+                              <div
+                                className="w-3.5 h-3.5 rounded-md flex-shrink-0 shadow-sm ring-1 ring-black/5"
+                                style={{ backgroundColor: subject.color ?? "#6366f1" }}
+                              />
+                              <span className="flex-1 truncate font-medium text-sm">{subject.name}</span>
+                            </div>
+                          </Link>
+                        </SidebarMenuButton>
+                        <div className="flex items-center absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-sidebar/80 backdrop-blur-sm rounded-md px-0.5">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                            onClick={(e) => openEditDialog(subject, e)}
+                            data-testid={`button-edit-subject-${subject.id}`}
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => openDeleteDialog(subject, e)}
+                            data-testid={`button-delete-subject-${subject.id}`}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </SidebarMenuItem>
+                    );
+                  })
                 )}
               </SidebarMenu>
             </SidebarGroupContent>
@@ -402,17 +427,20 @@ export function AppSidebar() {
 
           {isPremiumOnly && (
             <SidebarGroup>
-              <SidebarGroupLabel>{t('nav.tools')}</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-2">{t('nav.tools')}</SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="space-y-0.5">
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
                       isActive={location === "/chat"}
+                      className={`rounded-lg transition-all duration-200 ${location === "/chat" ? "bg-gradient-to-r from-violet-500/10 to-purple-500/10 text-violet-600 dark:text-violet-400 font-medium" : "hover:bg-muted/50"}`}
                       data-testid="button-ai-chat"
                     >
                       <Link href="/chat">
-                        <Brain className="w-4 h-4" />
+                        <div className={`p-1.5 rounded-md ${location === "/chat" ? "bg-gradient-to-br from-violet-500/20 to-purple-500/20" : "bg-muted/50"}`}>
+                          <Brain className="w-4 h-4" />
+                        </div>
                         <span>{t('nav.chat')}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -423,12 +451,13 @@ export function AppSidebar() {
           )}
         </SidebarContent>
 
-        <SidebarFooter>
-          <SidebarMenu>
+        <SidebarFooter className="border-t border-border/50 p-2">
+          <SidebarMenu className="space-y-0.5">
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
                 isActive={location === "/privacy"}
+                className={`rounded-lg transition-all duration-200 text-sm ${location === "/privacy" ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
                 data-testid="button-privacy-policy"
               >
                 <Link href="/privacy">
@@ -440,6 +469,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => window.location.href = "/api/logout"}
+                className="rounded-lg transition-all duration-200 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 data-testid="button-logout"
               >
                 <LogOut className="w-4 h-4" />
