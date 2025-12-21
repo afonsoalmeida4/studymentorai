@@ -659,40 +659,39 @@
       "free": {
         "name": "Start Studying",
         "features": {
-          "uploads": "4 uploads per month",
-          "subjects": "Up to 5 subjects",
-          "topics": "Up to 10 topics",
-          "summaries": "Summaries up to 1,000 words",
-          "learningStyles": "2 learning styles",
-          "flashcards": "Manual flashcards",
-          "fileSize": "Files up to 10MB"
+          "monthlySummaries5": "5 summaries per month",
+          "monthlyFlashcards120": "120 flashcards per month",
+          "learningStylesBasic": "2 learning styles",
+          "subjects5": "Up to 5 folders",
+          "topics10": "Up to 10 subfolders"
         }
       },
       "pro": {
         "name": "Study Without Limits",
-        "price": "$5.99",
+        "price": "$3.99",
         "period": "/mo",
         "features": {
-          "uploads": "Unlimited uploads of PDF, Word, PPT and links",
-          "subjects": "Unlimited folders",
-          "topics": "Unlimited subfolders",
-          "summaries": "Unlimited advanced summaries",
-          "learningStyles": "Personalized learning style",
-          "flashcards": "AI-generated flashcards in 6 languages",
-          "dashboard": "Dashboard with very simple KPIs",
+          "monthlySummaries50": "50 summaries per month",
+          "monthlyFlashcards2000": "2,000 flashcards per month",
+          "monthlyQuizzes50": "50 quizzes per month",
+          "learningStylesAll": "All learning styles",
+          "unlimitedSubjects": "Unlimited folders and subfolders",
+          "dashboard": "Dashboard with KPIs",
           "ranking": "XP ranking"
         }
       },
       "premium": {
         "name": "High Performance",
-        "price": "$11.99",
+        "price": "$7.99",
         "period": "/mo",
         "features": {
           "allPro": "Everything from Study Without Limits +",
-          "aiAssistant": "Unlimited AI assistant in Study and Existential modes",
-          "aiSupport": "Emotional support: motivation, focus and anxiety management",
+          "monthlySummaries200": "200 summaries per month",
+          "monthlyFlashcards5000": "5,000 flashcards per month",
+          "monthlyQuizzes150": "150 quizzes per month",
+          "monthlyMessages1500": "1,500 AI assistant messages",
+          "aiAssistant": "AI assistant in Study and Existential modes",
           "pdfExport": "Export summaries to PDF or DOCX",
-          "deepStats": "Advanced dashboard: study hours, streaks and detailed progress",
           "calendar": "Academic calendar for exams and assignments"
         }
       }

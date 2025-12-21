@@ -549,40 +549,39 @@
       "free": {
         "name": "Empieza a Estudiar",
         "features": {
-          "uploads": "4 subidas por mes",
-          "subjects": "Hasta 5 asignaturas",
-          "topics": "Hasta 10 temas",
-          "summaries": "Resúmenes de hasta 1.000 palabras",
-          "learningStyles": "2 estilos de aprendizaje",
-          "flashcards": "Flashcards manuales",
-          "fileSize": "Archivos de hasta 10MB"
+          "monthlySummaries5": "5 resúmenes al mes",
+          "monthlyFlashcards120": "120 flashcards al mes",
+          "learningStylesBasic": "2 estilos de aprendizaje",
+          "subjects5": "Hasta 5 carpetas",
+          "topics10": "Hasta 10 subcarpetas"
         }
       },
       "pro": {
         "name": "Estudia Sin Límites",
-        "price": "5,99€",
+        "price": "3,99€",
         "period": "/mes",
         "features": {
-          "uploads": "Subidas ilimitadas de PDF, Word, PPT y enlaces",
-          "subjects": "Carpetas ilimitadas",
-          "topics": "Subcarpetas ilimitadas",
-          "summaries": "Resúmenes avanzados ilimitados",
-          "learningStyles": "Estilo de aprendizaje personalizado",
-          "flashcards": "Flashcards generadas por IA en 6 idiomas",
-          "dashboard": "Panel con KPIs muy sencillos",
+          "monthlySummaries50": "50 resúmenes al mes",
+          "monthlyFlashcards2000": "2.000 flashcards al mes",
+          "monthlyQuizzes50": "50 quizzes al mes",
+          "learningStylesAll": "Todos los estilos de aprendizaje",
+          "unlimitedSubjects": "Carpetas y subcarpetas ilimitadas",
+          "dashboard": "Panel con KPIs",
           "ranking": "Ranking de XP"
         }
       },
       "premium": {
         "name": "Alto Rendimiento",
-        "price": "11,99€",
+        "price": "7,99€",
         "period": "/mes",
         "features": {
           "allPro": "Todo lo de Estudia Sin Límites +",
-          "aiAssistant": "Asistente IA ilimitado en modos Estudio y Existencial",
-          "aiSupport": "Apoyo emocional: motivación, enfoque y gestión de ansiedad",
+          "monthlySummaries200": "200 resúmenes al mes",
+          "monthlyFlashcards5000": "5.000 flashcards al mes",
+          "monthlyQuizzes150": "150 quizzes al mes",
+          "monthlyMessages1500": "1.500 mensajes del asistente IA",
+          "aiAssistant": "Asistente IA en modos Estudio y Existencial",
           "pdfExport": "Exportar resúmenes en PDF o DOCX",
-          "deepStats": "Panel avanzado: horas de estudio, rachas y progreso detallado",
           "calendar": "Calendario académico para exámenes y tareas"
         }
       }

@@ -547,40 +547,39 @@
       "free": {
         "name": "Beginnen Sie zu Lernen",
         "features": {
-          "uploads": "4 Uploads pro Monat",
-          "subjects": "Bis zu 5 Fächer",
-          "topics": "Bis zu 10 Themen",
-          "summaries": "Zusammenfassungen bis zu 1.000 Wörter",
-          "learningStyles": "2 Lernstile",
-          "flashcards": "Manuelle Flashcards",
-          "fileSize": "Dateien bis zu 10MB"
+          "monthlySummaries5": "5 Zusammenfassungen pro Monat",
+          "monthlyFlashcards120": "120 Flashcards pro Monat",
+          "learningStylesBasic": "2 Lernstile",
+          "subjects5": "Bis zu 5 Ordner",
+          "topics10": "Bis zu 10 Unterordner"
         }
       },
       "pro": {
         "name": "Grenzenlos Lernen",
-        "price": "5,99€",
+        "price": "3,99€",
         "period": "/Monat",
         "features": {
-          "uploads": "Unbegrenzte Uploads von PDF, Word, PPT und Links",
-          "subjects": "Unbegrenzte Ordner",
-          "topics": "Unbegrenzte Unterordner",
-          "summaries": "Unbegrenzte erweiterte Zusammenfassungen",
-          "learningStyles": "Personalisierter Lernstil",
-          "flashcards": "KI-generierte Flashcards in 6 Sprachen",
-          "dashboard": "Dashboard mit sehr einfachen KPIs",
+          "monthlySummaries50": "50 Zusammenfassungen pro Monat",
+          "monthlyFlashcards2000": "2.000 Flashcards pro Monat",
+          "monthlyQuizzes50": "50 Quiz pro Monat",
+          "learningStylesAll": "Alle Lernstile",
+          "unlimitedSubjects": "Unbegrenzte Ordner und Unterordner",
+          "dashboard": "Dashboard mit KPIs",
           "ranking": "XP-Rangliste"
         }
       },
       "premium": {
         "name": "Hohe Leistung",
-        "price": "11,99€",
+        "price": "7,99€",
         "period": "/Monat",
         "features": {
           "allPro": "Alles von Grenzenlos Lernen +",
-          "aiAssistant": "Unbegrenzter KI-Assistent in Lern- und Existenzmodi",
-          "aiSupport": "Emotionale Unterstützung: Motivation, Fokus und Angstbewältigung",
+          "monthlySummaries200": "200 Zusammenfassungen pro Monat",
+          "monthlyFlashcards5000": "5.000 Flashcards pro Monat",
+          "monthlyQuizzes150": "150 Quiz pro Monat",
+          "monthlyMessages1500": "1.500 KI-Assistenten-Nachrichten",
+          "aiAssistant": "KI-Assistent in Lern- und Existenzmodi",
           "pdfExport": "Zusammenfassungen als PDF oder DOCX exportieren",
-          "deepStats": "Erweitertes Dashboard: Lernstunden, Serien und detaillierter Fortschritt",
           "calendar": "Akademischer Kalender für Prüfungen und Aufgaben"
         }
       }

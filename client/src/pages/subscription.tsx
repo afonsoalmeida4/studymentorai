@@ -172,12 +172,12 @@ export default function SubscriptionPage() {
   // Pricing logic: yearly gets ~27% discount
   const pricing = {
     pro: {
-      monthly: 5.99,
-      yearly: 49.99,
+      monthly: 3.99,
+      yearly: 34.99,
     },
     premium: {
-      monthly: 11.99,
-      yearly: 99.99,
+      monthly: 7.99,
+      yearly: 69.99,
     },
   };
 
@@ -206,20 +206,20 @@ export default function SubscriptionPage() {
       id: "free",
       icon: Zap,
       color: "text-muted-foreground",
-      featureKeys: ["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "fileSize"],
+      featureKeys: ["monthlySummaries5", "monthlyFlashcards120", "learningStylesBasic", "subjects5", "topics10"],
     },
     {
       id: "pro",
       icon: Crown,
       color: "text-blue-600 dark:text-blue-400",
       popular: true,
-      featureKeys: ["uploads", "subjects", "topics", "summaries", "learningStyles", "flashcards", "dashboard", "ranking"],
+      featureKeys: ["monthlySummaries50", "monthlyFlashcards2000", "monthlyQuizzes50", "learningStylesAll", "unlimitedSubjects", "dashboard", "ranking"],
     },
     {
       id: "premium",
       icon: Rocket,
       color: "text-purple-600 dark:text-purple-400",
-      featureKeys: ["allPro", "aiAssistant", "aiSupport", "pdfExport", "deepStats", "calendar"],
+      featureKeys: ["allPro", "monthlySummaries200", "monthlyFlashcards5000", "monthlyQuizzes150", "monthlyMessages1500", "aiAssistant", "pdfExport", "calendar"],
     },
   ];
 

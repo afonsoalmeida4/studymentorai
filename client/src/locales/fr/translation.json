@@ -547,40 +547,39 @@
       "free": {
         "name": "Commencer à Étudier",
         "features": {
-          "uploads": "4 téléchargements par mois",
-          "subjects": "Jusqu'à 5 matières",
-          "topics": "Jusqu'à 10 sujets",
-          "summaries": "Résumés jusqu'à 1 000 mots",
-          "learningStyles": "2 styles d'apprentissage",
-          "flashcards": "Flashcards manuelles",
-          "fileSize": "Fichiers jusqu'à 10Mo"
+          "monthlySummaries5": "5 résumés par mois",
+          "monthlyFlashcards120": "120 flashcards par mois",
+          "learningStylesBasic": "2 styles d'apprentissage",
+          "subjects5": "Jusqu'à 5 dossiers",
+          "topics10": "Jusqu'à 10 sous-dossiers"
         }
       },
       "pro": {
         "name": "Étudiez Sans Limites",
-        "price": "5,99€",
+        "price": "3,99€",
         "period": "/mois",
         "features": {
-          "uploads": "Téléchargements illimités de PDF, Word, PPT et liens",
-          "subjects": "Dossiers illimités",
-          "topics": "Sous-dossiers illimités",
-          "summaries": "Résumés avancés illimités",
-          "learningStyles": "Style d'apprentissage personnalisé",
-          "flashcards": "Flashcards générées par IA en 6 langues",
-          "dashboard": "Tableau de bord avec KPIs très simples",
+          "monthlySummaries50": "50 résumés par mois",
+          "monthlyFlashcards2000": "2 000 flashcards par mois",
+          "monthlyQuizzes50": "50 quiz par mois",
+          "learningStylesAll": "Tous les styles d'apprentissage",
+          "unlimitedSubjects": "Dossiers et sous-dossiers illimités",
+          "dashboard": "Tableau de bord avec KPIs",
           "ranking": "Classement XP"
         }
       },
       "premium": {
         "name": "Haute Performance",
-        "price": "11,99€",
+        "price": "7,99€",
         "period": "/mois",
         "features": {
           "allPro": "Tout d'Étudiez Sans Limites +",
-          "aiAssistant": "Assistant IA illimité en modes Étude et Existentiel",
-          "aiSupport": "Soutien émotionnel : motivation, concentration et gestion de l'anxiété",
+          "monthlySummaries200": "200 résumés par mois",
+          "monthlyFlashcards5000": "5 000 flashcards par mois",
+          "monthlyQuizzes150": "150 quiz par mois",
+          "monthlyMessages1500": "1 500 messages de l'assistant IA",
+          "aiAssistant": "Assistant IA en modes Étude et Existentiel",
           "pdfExport": "Exporter les résumés en PDF ou DOCX",
-          "deepStats": "Tableau de bord avancé : heures d'étude, séquences et progrès détaillé",
           "calendar": "Calendrier académique pour examens et devoirs"
         }
       }

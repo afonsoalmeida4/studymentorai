@@ -658,40 +658,39 @@
       "free": {
         "name": "Começa a Estudar",
         "features": {
-          "uploads": "4 uploads por mês",
-          "subjects": "Até 5 disciplinas",
-          "topics": "Até 10 tópicos",
-          "summaries": "Resumos até 1.000 palavras",
-          "learningStyles": "2 estilos de aprendizagem",
-          "flashcards": "Flashcards manuais",
-          "fileSize": "Ficheiros até 10MB"
+          "monthlySummaries5": "5 resumos por mês",
+          "monthlyFlashcards120": "120 flashcards por mês",
+          "learningStylesBasic": "2 estilos de aprendizagem",
+          "subjects5": "Até 5 pastas",
+          "topics10": "Até 10 subpastas"
         }
       },
       "pro": {
         "name": "Estuda Sem Limites",
-        "price": "5,99€",
+        "price": "3,99€",
         "period": "/mês",
         "features": {
-          "uploads": "Uploads ilimitados de PDF, Word, PPT e links",
-          "subjects": "Pastas ilimitadas",
-          "topics": "Subpastas ilimitadas",
-          "summaries": "Resumos avançados ilimitados",
-          "learningStyles": "Estilo personalizado de aprendizagem",
-          "flashcards": "Flashcards gerados por IA em 6 idiomas",
-          "dashboard": "Dashboard com KPIs muito simples",
+          "monthlySummaries50": "50 resumos por mês",
+          "monthlyFlashcards2000": "2.000 flashcards por mês",
+          "monthlyQuizzes50": "50 quizzes por mês",
+          "learningStylesAll": "Todos os estilos de aprendizagem",
+          "unlimitedSubjects": "Pastas e subpastas ilimitadas",
+          "dashboard": "Dashboard com KPIs",
           "ranking": "Ranking de XP"
         }
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "11,99€",
+        "price": "7,99€",
         "period": "/mês",
         "features": {
           "allPro": "Tudo do Estuda Sem Limites +",
-          "aiAssistant": "Assistente IA ilimitado nos modos Estudo e Existencial",
-          "aiSupport": "Apoio emocional: motivação, foco e gestão de ansiedade",
+          "monthlySummaries200": "200 resumos por mês",
+          "monthlyFlashcards5000": "5.000 flashcards por mês",
+          "monthlyQuizzes150": "150 quizzes por mês",
+          "monthlyMessages1500": "1.500 mensagens do assistente IA",
+          "aiAssistant": "Assistente IA nos modos Estudo e Existencial",
           "pdfExport": "Exportar resumos em PDF ou DOCX",
-          "deepStats": "Dashboard avançado: horas de estudo, sequências e progresso detalhado",
           "calendar": "Calendário académico para exames e trabalhos"
         }
       }

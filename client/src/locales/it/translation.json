@@ -547,40 +547,39 @@
       "free": {
         "name": "Inizia a Studiare",
         "features": {
-          "uploads": "4 caricamenti al mese",
-          "subjects": "Fino a 5 materie",
-          "topics": "Fino a 10 argomenti",
-          "summaries": "Riassunti fino a 1.000 parole",
-          "learningStyles": "2 stili di apprendimento",
-          "flashcards": "Flashcards manuali",
-          "fileSize": "File fino a 10MB"
+          "monthlySummaries5": "5 riassunti al mese",
+          "monthlyFlashcards120": "120 flashcard al mese",
+          "learningStylesBasic": "2 stili di apprendimento",
+          "subjects5": "Fino a 5 cartelle",
+          "topics10": "Fino a 10 sottocartelle"
         }
       },
       "pro": {
         "name": "Studia Senza Limiti",
-        "price": "5,99€",
+        "price": "3,99€",
         "period": "/mese",
         "features": {
-          "uploads": "Caricamenti illimitati di PDF, Word, PPT e link",
-          "subjects": "Cartelle illimitate",
-          "topics": "Sottocartelle illimitate",
-          "summaries": "Riassunti avanzati illimitati",
-          "learningStyles": "Stile di apprendimento personalizzato",
-          "flashcards": "Flashcards generate da IA in 6 lingue",
-          "dashboard": "Pannello con KPI molto semplici",
+          "monthlySummaries50": "50 riassunti al mese",
+          "monthlyFlashcards2000": "2.000 flashcard al mese",
+          "monthlyQuizzes50": "50 quiz al mese",
+          "learningStylesAll": "Tutti gli stili di apprendimento",
+          "unlimitedSubjects": "Cartelle e sottocartelle illimitate",
+          "dashboard": "Pannello con KPI",
           "ranking": "Classifica XP"
         }
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "11,99€",
+        "price": "7,99€",
         "period": "/mese",
         "features": {
           "allPro": "Tutto di Studia Senza Limiti +",
-          "aiAssistant": "Assistente IA illimitato in modalità Studio ed Esistenziale",
-          "aiSupport": "Supporto emotivo: motivazione, concentrazione e gestione dell'ansia",
+          "monthlySummaries200": "200 riassunti al mese",
+          "monthlyFlashcards5000": "5.000 flashcard al mese",
+          "monthlyQuizzes150": "150 quiz al mese",
+          "monthlyMessages1500": "1.500 messaggi dell'assistente IA",
+          "aiAssistant": "Assistente IA in modalità Studio ed Esistenziale",
           "pdfExport": "Esportare riassunti in PDF o DOCX",
-          "deepStats": "Pannello avanzato: ore di studio, serie e progressi dettagliati",
           "calendar": "Calendario accademico per esami e compiti"
         }
       }
