@@ -68,6 +68,31 @@ export type SubscriptionPlan = typeof subscriptionPlans[number];
 export const subscriptionStatuses = ["active", "canceled", "past_due", "trialing"] as const;
 export type SubscriptionStatus = typeof subscriptionStatuses[number];
 
+// Monthly usage limits per plan (visible to users as feature caps)
+export const monthlyUsageLimits = {
+  free: {
+    summaries: 5,
+    flashcards: 120,
+    quizzes: 0, // Not available
+    assistantMessages: 0, // Not available
+    tokenBudget: 150000, // Internal - invisible to users
+  },
+  pro: {
+    summaries: 50,
+    flashcards: 2000,
+    quizzes: 50,
+    assistantMessages: 0, // Not available in pro
+    tokenBudget: 1000000, // Internal - invisible to users
+  },
+  premium: {
+    summaries: 200,
+    flashcards: 5000, // Soft limit / fair use
+    quizzes: 150,
+    assistantMessages: 1500,
+    tokenBudget: 3000000, // Internal - invisible to users
+  },
+};
+
 // Plan limits configuration
 export const planLimits = {
   free: {
@@ -87,10 +112,15 @@ export const planLimits = {
     mindMaps: false,
     sharedSpaces: false,
     exportPdf: false,
+    // Monthly limits
+    monthlySummaries: 5,
+    monthlyFlashcards: 120,
+    monthlyQuizzes: 0,
+    monthlyAssistantMessages: 0,
   },
   pro: {
     name: "Estuda Sem Limites",
-    price: 7.99,
+    price: 3.99,
     uploadsPerMonth: -1, // unlimited
     maxSubjects: -1,
     maxTopics: -1,
@@ -105,10 +135,15 @@ export const planLimits = {
     mindMaps: false,
     sharedSpaces: false,
     exportPdf: false,
+    // Monthly limits
+    monthlySummaries: 50,
+    monthlyFlashcards: 2000,
+    monthlyQuizzes: 50,
+    monthlyAssistantMessages: 0,
   },
   premium: {
     name: "Alta Performance",
-    price: 18.99,
+    price: 7.99,
     uploadsPerMonth: -1,
     maxSubjects: -1,
     maxTopics: -1,
@@ -123,6 +158,11 @@ export const planLimits = {
     mindMaps: true,
     sharedSpaces: true,
     exportPdf: true,
+    // Monthly limits
+    monthlySummaries: 200,
+    monthlyFlashcards: 5000, // Soft limit / fair use
+    monthlyQuizzes: 150,
+    monthlyAssistantMessages: 1500,
   },
 } as const;
 
@@ -204,6 +244,9 @@ export const usageTracking = pgTable(
     uploadsCount: integer("uploads_count").default(0).notNull(),
     chatMessagesCount: integer("chat_messages_count").default(0).notNull(),
     summariesGenerated: integer("summaries_generated").default(0).notNull(),
+    flashcardsGenerated: integer("flashcards_generated").default(0).notNull(),
+    quizzesGenerated: integer("quizzes_generated").default(0).notNull(),
+    tokensUsed: integer("tokens_used").default(0).notNull(), // Internal token tracking - invisible to users
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

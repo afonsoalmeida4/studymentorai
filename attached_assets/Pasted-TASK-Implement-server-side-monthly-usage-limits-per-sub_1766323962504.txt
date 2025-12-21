@@ -1,0 +1,41 @@
+TASK:
+Implement **server-side monthly usage limits** per subscription plan.
+The limits must be **invisible for tokens** (internal control) and **visible as feature caps** for UX.
+
+PLANS, FEATURE LIMITS, AND INTERNAL TOKEN BUDGETS:
+
+FREE:
+- summaries: 5 / month
+- flashcards_generated: 120/month
+- internal_token_budget: 150,000 tokens / month
+
+Estudar sem limits (3.99€/month):
+- summaries: 50 / month
+- flashcards_generated: 2,000 / month
+- quizzes_generated: 50 / month
+- internal_token_budget: 1,000,000 tokens / month
+
+High performance (7.99€/month):
+- summaries: 200 / month
+- assistant_messages: 1,500 / month
+- flashcards_generated: 5,000 (soft limit / fair use)
+- quizzes_generated: 150 / month
+- internal_token_budget: 3,000,000 tokens / month
+
+REQUIREMENTS:
+1. Track usage per user per feature and per token internally.
+2. Reset all counters automatically every billing cycle or calendar month.
+3. Before executing any AI request:
+   - Check feature limit (for UX)
+   - Check internal token budget (for cost control)
+4. If a feature limit is reached, block the action and return a friendly response: Upgrade your plan to continue using AI features
+5. If the internal token limit is reached, block the request and return a friendly response: Upgrade your plan to continue using AI features
+6. High performance plan may slightly exceed limits under soft-use/fair-use logic.
+7. Integrate fully with Stripe subscription status (active, trialing, canceled).
+8. Ensure all logic is invisible regarding tokens for users.
+9. Logic must cover all AI features: summaries, assistant, flashcards, quizzes.
+10. Code should be clean, scalable, and easy to integrate with the existing backend
+11. Translate all blocking messages in the language used by user. 
+12. Do not forget to change the pricing in the plan and in stripe
+13. Change the plan description with the limits but, mantain the other features already implemented in each plan
+14. The app is completed and is working, do not modify anything, just implement the limits 
