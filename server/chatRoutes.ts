@@ -12,6 +12,7 @@ import {
 import { chatModes } from "@shared/schema";
 import { subscriptionService } from "./subscriptionService";
 import { getUserLanguage } from "./languageHelper";
+import { usageLimitsService } from "./usageLimitsService";
 
 // Middleware to require Premium subscription for AI Mentor access
 async function requirePremium(req: any, res: any, next: any) {
@@ -131,6 +132,16 @@ export function registerChatRoutes(app: Express) {
       const user = await storage.getUser(userId);
       const userLanguage = getUserLanguage(user?.language);
 
+      // Check monthly usage limit for assistant messages
+      const messageLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "assistantMessages", userLanguage);
+      if (!messageLimitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: messageLimitCheck.message,
+          upgradeRequired: true,
+        });
+      }
+
       const response = await sendMessage({
         threadId,
         userId,
@@ -138,6 +149,9 @@ export function registerChatRoutes(app: Express) {
         language: userLanguage,
       });
 
+      // Record monthly usage for assistant messages
+      await usageLimitsService.recordUsage(userId, "assistantMessages", 1);
+      
       await subscriptionService.incrementChatMessageCount(userId);
 
       res.json({ success: true, ...response });

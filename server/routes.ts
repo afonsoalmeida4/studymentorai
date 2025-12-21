@@ -51,6 +51,7 @@ import { db } from "./db";
 import { and, eq, sql, gt, asc, desc, or, inArray } from "drizzle-orm";
 import { subscriptionService } from "./subscriptionService";
 import { costControlService } from "./costControlService";
+import { usageLimitsService } from "./usageLimitsService";
 
 async function requirePremium(req: any, res: any, next: any) {
   try {
@@ -251,6 +252,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } as GenerateSummaryResponse);
       }
 
+      // Check monthly usage limit for summaries
+      const summaryLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "summaries", userLanguage);
+      if (!summaryLimitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: summaryLimitCheck.message,
+          upgradeRequired: true,
+        } as GenerateSummaryResponse);
+      }
+
       // Extract text from PDF
       let pdfText: string;
       try {
@@ -325,6 +336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await Promise.all([
           subscriptionService.incrementUploadCount(userId),
           subscriptionService.incrementSummaryCount(userId),
+          usageLimitsService.recordUsage(userId, "summaries", 1),
         ]);
 
         // Award XP for generating summary
@@ -772,8 +784,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // INVISIBLE COST CONTROL: Trim summary text based on plan
       const trimmedSummaryText = costControlService.trimInputText(summaryText, planTier);
       
+      // Check monthly usage limit for flashcards before generation
+      // Estimate flashcard count (typically 5-10 per summary)
+      const estimatedFlashcards = maxFlashcards || 10;
+      const flashcardLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "flashcards", userLanguage, estimatedFlashcards);
+      if (!flashcardLimitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: flashcardLimitCheck.message,
+          upgradeRequired: true,
+        } as GenerateFlashcardsResponse);
+      }
+      
       const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, maxFlashcards, flashcardMaxTokens);
       const savedFlashcards = await storage.createFlashcards(flashcardsQuery(flashcardsData));
+      
+      // Record monthly usage for flashcards
+      await usageLimitsService.recordUsage(userId, "flashcards", savedFlashcards.length);
       
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
@@ -884,6 +911,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Trim summary text based on plan
       const trimmedSummaryText = costControlService.trimInputText(topicSummary.summary, planTier);
 
+      // Check monthly usage limit for flashcards before regeneration
+      const flashcardLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "flashcards", flashcardLanguage, 10);
+      if (!flashcardLimitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: flashcardLimitCheck.message,
+          upgradeRequired: true,
+        });
+      }
+
       // Generate flashcards in the summary's language (no forced PT, no translations)
       const flashcardsData = await generateFlashcards(trimmedSummaryText, flashcardLanguage, null, flashcardMaxTokens);
 
@@ -904,6 +941,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // NO automatic translations - flashcards stay in their creation language
 
+      // Record monthly usage for flashcards
+      await usageLimitsService.recordUsage(userId, "flashcards", newFlashcards.length);
+      
       // Increment daily usage counter
       costControlService.incrementDailyUsage(userId, "flashcard");
 
@@ -3087,6 +3127,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Check monthly usage limit for quizzes
+      const quizLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "quizzes", userLanguage);
+      if (!quizLimitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: quizLimitCheck.message,
+          upgradeRequired: true,
+        });
+      }
+
       // Generate new quiz
       console.log("[Quiz] Generating quiz for topic:", topicId, { language: userLanguage, difficulty, questionCount });
 
@@ -3130,6 +3180,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const questions = questionRecords.map(r => r[0]);
 
       console.log("[Quiz] Quiz created successfully:", { quizId: newQuiz.id, questionCount: questions.length });
+
+      // Record monthly usage for quizzes
+      await usageLimitsService.recordUsage(userId, "quizzes", 1);
 
       return res.json({
         success: true,
@@ -3430,6 +3483,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const combinedSummary = summaries.map(s => s.summary).join("\n\n");
 
+      // Check monthly usage limit for quizzes
+      const quizLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "quizzes", userLanguage);
+      if (!quizLimitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: quizLimitCheck.message,
+          upgradeRequired: true,
+        });
+      }
+
       // Generate new questions
       const generatedQuestions = await generateQuiz({
         summaryText: combinedSummary,
@@ -3437,6 +3500,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         difficulty: existingQuiz.difficulty as "easy" | "medium" | "hard",
         questionCount: existingQuiz.questionCount,
       });
+
+      // Record monthly usage for quizzes
+      await usageLimitsService.recordUsage(userId, "quizzes", 1);
 
       // Delete old questions
       await db.delete(quizQuestions).where(eq(quizQuestions.quizId, quizId));
