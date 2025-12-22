@@ -121,15 +121,15 @@ class UsageLimitsService {
   async getUserPlan(userId: string): Promise<SubscriptionPlan> {
     try {
       const { subscription } = await subscriptionService.getSubscriptionDetails(userId);
-      const plan = subscription.plan.toLowerCase() as SubscriptionPlan;
+      const planRaw = subscription.plan.toLowerCase();
       
       // Map educational plans to premium
-      if (plan === "educational" || plan === "educational_student") {
+      if (planRaw === "educational" || planRaw === "educational_student") {
         return "premium";
       }
       
-      if (plan === "pro" || plan === "premium") {
-        return plan;
+      if (planRaw === "pro" || planRaw === "premium") {
+        return planRaw as SubscriptionPlan;
       }
       
       return "free";
