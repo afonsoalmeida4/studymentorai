@@ -94,8 +94,9 @@ const motivationalPrompts: Record<string, Record<string, string>> = {
 };
 
 // Function to generate flashcard system prompts based on limit
-function getFlashcardSystemPrompt(lang: string, maxCards: number | null): string {
+function getFlashcardSystemPrompt(lang: string, maxCards: number | null, existingQuestions: string[] = []): string {
   const isUnlimited = maxCards === null;
+  const hasExisting = existingQuestions.length > 0;
   
   const limitInstructions: Record<string, { limited: string; unlimited: string }> = {
     pt: {
@@ -124,8 +125,19 @@ function getFlashcardSystemPrompt(lang: string, maxCards: number | null): string
     },
   };
 
+  // Duplicate avoidance instructions
+  const duplicateInstructions: Record<string, string> = {
+    pt: `IMPORTANTE: Já existem flashcards para este conteúdo. NÃO cries perguntas iguais ou muito semelhantes às seguintes:\n${existingQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}\n\nCria APENAS flashcards com perguntas DIFERENTES que testem outros aspectos do conteúdo. Se todo o conteúdo relevante já está coberto, retorna um array JSON vazio: []`,
+    en: `IMPORTANT: Flashcards already exist for this content. DO NOT create questions identical or very similar to the following:\n${existingQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}\n\nCreate ONLY flashcards with DIFFERENT questions that test other aspects of the content. If all relevant content is already covered, return an empty JSON array: []`,
+    es: `IMPORTANTE: Ya existen flashcards para este contenido. NO crees preguntas iguales o muy similares a las siguientes:\n${existingQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}\n\nCrea SOLO flashcards con preguntas DIFERENTES que prueben otros aspectos del contenido. Si todo el contenido relevante ya está cubierto, devuelve un array JSON vacío: []`,
+    fr: `IMPORTANT: Des flashcards existent déjà pour ce contenu. NE créez PAS de questions identiques ou très similaires aux suivantes:\n${existingQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}\n\nCréez UNIQUEMENT des flashcards avec des questions DIFFÉRENTES qui testent d'autres aspects du contenu. Si tout le contenu pertinent est déjà couvert, retournez un tableau JSON vide: []`,
+    de: `WICHTIG: Für diesen Inhalt existieren bereits Lernkarten. Erstellen Sie KEINE Fragen, die identisch oder sehr ähnlich zu den folgenden sind:\n${existingQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}\n\nErstellen Sie NUR Lernkarten mit VERSCHIEDENEN Fragen, die andere Aspekte des Inhalts testen. Wenn alle relevanten Inhalte bereits abgedeckt sind, geben Sie ein leeres JSON-Array zurück: []`,
+    it: `IMPORTANTE: Esistono già flashcard per questo contenuto. NON creare domande identiche o molto simili alle seguenti:\n${existingQuestions.map((q, i) => `${i + 1}. ${q}`).join('\n')}\n\nCrea SOLO flashcard con domande DIVERSE che testino altri aspetti del contenuto. Se tutto il contenuto rilevante è già coperto, restituisci un array JSON vuoto: []`,
+  };
+
   const instructions = limitInstructions[lang] || limitInstructions["pt"];
   const limitText = isUnlimited ? instructions.unlimited : instructions.limited;
+  const duplicateText = hasExisting ? `\n\n${duplicateInstructions[lang] || duplicateInstructions["pt"]}` : "";
 
   const basePrompts: Record<string, string> = {
     pt: `Você é um especialista em educação que cria flashcards eficazes para estudo.
@@ -208,7 +220,8 @@ NON includere alcun testo aggiuntivo, markdown o spiegazioni. SOLO l'array JSON.
 RISPONDI IN ITALIANO.`,
   };
 
-  return basePrompts[lang] || basePrompts["pt"];
+  const basePrompt = basePrompts[lang] || basePrompts["pt"];
+  return basePrompt + duplicateText;
 }
 
 const flashcardUserPrompts: Record<string, string> = {
@@ -367,13 +380,16 @@ export async function generateFlashcards(
   summaryText: string, 
   language: string = "pt", 
   maxCards: number | null = 10,
-  maxCompletionTokens: number = 4096
+  maxCompletionTokens: number = 4096,
+  existingQuestions: string[] = []
 ): Promise<FlashcardItem[]> {
   try {
     const lang = normalizeLanguage(language, "pt");
-    const systemPrompt = getFlashcardSystemPrompt(lang, maxCards);
+    const systemPrompt = getFlashcardSystemPrompt(lang, maxCards, existingQuestions);
     const userPrompt = flashcardUserPrompts[lang] || flashcardUserPrompts["pt"];
     const errors = flashcardErrorMessages[lang] || flashcardErrorMessages["pt"];
+    
+    console.log(`[generateFlashcards] Avoiding ${existingQuestions.length} existing questions`);
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -439,6 +455,12 @@ export async function generateFlashcards(
     console.log("[generateFlashcards] Valid flashcards:", validFlashcards.length, "out of", flashcards.length);
     
     if (validFlashcards.length === 0) {
+      // If we had existing questions and got 0 new ones, content is fully covered - return empty array (not an error)
+      if (existingQuestions.length > 0) {
+        console.log("[generateFlashcards] All content already covered by existing flashcards - returning empty array");
+        return [];
+      }
+      // No existing questions but still got 0 flashcards - this is an actual error
       console.error("No valid flashcards after filtering. Total received:", flashcards.length);
       if (flashcards.length > 0) {
         console.error("Sample invalid flashcard:", JSON.stringify(flashcards[0]));
