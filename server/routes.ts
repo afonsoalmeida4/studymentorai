@@ -929,8 +929,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate flashcards in the summary's language, avoiding duplicates
       const flashcardsData = await generateFlashcards(trimmedSummaryText, flashcardLanguage, null, flashcardMaxTokens, existingQuestions);
 
+      // Post-generation filter: remove any duplicates that GPT might have returned despite prompt instructions
+      // Also track accepted questions to prevent intra-batch duplicates
+      const seenQuestionsLower = new Set(existingQuestions.map(q => q.toLowerCase().trim()));
+      const uniqueNewFlashcards = flashcardsData.filter((fc: any) => {
+        const questionLower = fc.question.toLowerCase().trim();
+        if (seenQuestionsLower.has(questionLower)) {
+          console.log(`[Regenerate Flashcards] Filtered duplicate question: "${fc.question.substring(0, 50)}..."`);
+          return false;
+        }
+        // Add this question to seen set to prevent intra-batch duplicates
+        seenQuestionsLower.add(questionLower);
+        return true;
+      });
+      
+      console.log(`[Regenerate Flashcards] Post-filter: ${flashcardsData.length} generated, ${uniqueNewFlashcards.length} unique`);
+
       // If no new flashcards could be generated (all content covered), return success with message
-      if (flashcardsData.length === 0) {
+      if (uniqueNewFlashcards.length === 0) {
         console.log(`[Regenerate Flashcards] All content already covered - no new flashcards generated`);
         return res.json({
           success: true,
@@ -942,9 +958,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Save new flashcards with proper topicId and subjectId set
+      // Save new flashcards with proper topicId and subjectId set (using filtered unique flashcards)
       const newFlashcards = await storage.createFlashcards(
-        flashcardsData.map((fc: any) => ({
+        uniqueNewFlashcards.map((fc: any) => ({
           userId,
           topicSummaryId: topicSummaryId,
           topicId: topicId,
