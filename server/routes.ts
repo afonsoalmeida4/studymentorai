@@ -796,7 +796,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } as GenerateFlashcardsResponse);
       }
       
-      const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, maxFlashcards, flashcardMaxTokens);
+      // For first-time generation, pass empty array (no existing questions to avoid)
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, userLanguage, maxFlashcards, flashcardMaxTokens, []);
       const savedFlashcards = await storage.createFlashcards(flashcardsQuery(flashcardsData));
       
       // Record monthly usage for flashcards
@@ -921,8 +922,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Generate flashcards in the summary's language (no forced PT, no translations)
-      const flashcardsData = await generateFlashcards(trimmedSummaryText, flashcardLanguage, null, flashcardMaxTokens);
+      // Extract existing questions to avoid duplicates (lightweight - just questions, not full flashcards)
+      const existingQuestions = uniqueExisting.map(fc => fc.question);
+      console.log(`[Regenerate Flashcards] Avoiding ${existingQuestions.length} existing questions`);
+
+      // Generate flashcards in the summary's language, avoiding duplicates
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, flashcardLanguage, null, flashcardMaxTokens, existingQuestions);
+
+      // If no new flashcards could be generated (all content covered), return success with message
+      if (flashcardsData.length === 0) {
+        console.log(`[Regenerate Flashcards] All content already covered - no new flashcards generated`);
+        return res.json({
+          success: true,
+          flashcards: [],
+          previousCount: existingCount,
+          newCount: existingCount,
+          addedCount: 0,
+          allContentCovered: true,
+        });
+      }
 
       // Save new flashcards with proper topicId and subjectId set
       const newFlashcards = await storage.createFlashcards(
@@ -966,6 +984,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         previousCount: existingCount,
         newCount: newTotalCount,
         addedCount: newFlashcards.length,
+        allContentCovered: false,
       });
     } catch (error) {
       console.error("Error regenerating flashcards:", error);
