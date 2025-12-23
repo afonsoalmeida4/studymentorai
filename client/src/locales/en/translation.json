@@ -301,6 +301,8 @@
     "generatingDescription": "This may take a few seconds. You can keep using the app.",
     "regenerateSuccessTitle": "Flashcards updated!",
     "regenerateSuccessDescription": "Expanded from {{previousCount}} to {{newCount}} flashcards.",
+    "allContentCoveredTitle": "All content covered!",
+    "allContentCoveredDescription": "Flashcards already exist for all concepts in this summary. Add more content to the topic to generate new questions.",
     "errorRegenerate": "Could not regenerate flashcards.",
     "errorRegenerateTitle": "Error regenerating flashcards",
     "noFlashcards": "No flashcards available for this topic yet.",

@@ -296,6 +296,8 @@
     "generatingDescription": "Cela peut prendre quelques secondes. Vous pouvez continuer à utiliser l'application.",
     "regenerateSuccessTitle": "Cartes mises à jour!",
     "regenerateSuccessDescription": "Étendu de {{previousCount}} à {{newCount}} cartes.",
+    "allContentCoveredTitle": "Tout le contenu couvert!",
+    "allContentCoveredDescription": "Des cartes existent déjà pour tous les concepts de ce résumé. Ajoutez plus de contenu au sujet pour générer de nouvelles questions.",
     "errorRegenerate": "Impossible de régénérer les cartes.",
     "errorRegenerateTitle": "Erreur lors de la régénération des cartes",
     "noFlashcards": "Aucune carte disponible pour ce sujet.",

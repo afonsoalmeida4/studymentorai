@@ -299,6 +299,8 @@
     "generatingDescription": "Esto puede tardar unos segundos. Puedes seguir usando la app.",
     "regenerateSuccessTitle": "¡Tarjetas actualizadas!",
     "regenerateSuccessDescription": "Expandido de {{previousCount}} a {{newCount}} tarjetas.",
+    "allContentCoveredTitle": "¡Todo el contenido cubierto!",
+    "allContentCoveredDescription": "Ya existen tarjetas para todos los conceptos de este resumen. Añade más contenido al tema para generar nuevas preguntas.",
     "errorRegenerate": "No se pudieron regenerar tarjetas.",
     "errorRegenerateTitle": "Error al regenerar tarjetas",
     "noFlashcards": "Aún no hay tarjetas disponibles para este tema.",

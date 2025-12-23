@@ -296,6 +296,8 @@
     "generatingDescription": "Dies kann einige Sekunden dauern. Sie können die App weiter nutzen.",
     "regenerateSuccessTitle": "Karteikarten aktualisiert!",
     "regenerateSuccessDescription": "Erweitert von {{previousCount}} auf {{newCount}} Karteikarten.",
+    "allContentCoveredTitle": "Alle Inhalte abgedeckt!",
+    "allContentCoveredDescription": "Es gibt bereits Karteikarten für alle Konzepte dieser Zusammenfassung. Fügen Sie mehr Inhalte zum Thema hinzu, um neue Fragen zu generieren.",
     "errorRegenerate": "Karteikarten konnten nicht regeneriert werden.",
     "errorRegenerateTitle": "Fehler beim Regenerieren der Karteikarten",
     "noFlashcards": "Noch keine Karteikarten für dieses Thema verfügbar.",

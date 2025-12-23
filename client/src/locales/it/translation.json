@@ -296,6 +296,8 @@
     "generatingDescription": "Potrebbe richiedere qualche secondo. Puoi continuare a usare l'app.",
     "regenerateSuccessTitle": "Schede aggiornate!",
     "regenerateSuccessDescription": "Espanso da {{previousCount}} a {{newCount}} schede.",
+    "allContentCoveredTitle": "Tutto il contenuto coperto!",
+    "allContentCoveredDescription": "Esistono già schede per tutti i concetti di questo riassunto. Aggiungi più contenuto all'argomento per generare nuove domande.",
     "errorRegenerate": "Impossibile rigenerare le schede.",
     "errorRegenerateTitle": "Errore nella rigenerazione delle schede",
     "noFlashcards": "Nessuna scheda disponibile per questo argomento.",

@@ -97,13 +97,22 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
       // Invalidate ALL flashcard queries to update counts everywhere
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
-      toast({
-        title: t('summaryStudy.regenerateSuccessTitle'),
-        description: t('summaryStudy.regenerateSuccessDescription', { 
-          previousCount: data.previousCount || 0, 
-          newCount: data.newCount || 0 
-        }),
-      });
+      
+      // Check if all content is already covered (no new unique flashcards could be generated)
+      if (data.allContentCovered) {
+        toast({
+          title: t('summaryStudy.allContentCoveredTitle'),
+          description: t('summaryStudy.allContentCoveredDescription'),
+        });
+      } else {
+        toast({
+          title: t('summaryStudy.regenerateSuccessTitle'),
+          description: t('summaryStudy.regenerateSuccessDescription', { 
+            previousCount: data.previousCount || 0, 
+            newCount: data.newCount || 0 
+          }),
+        });
+      }
     },
     onError: () => {
       setIsGeneratingInBackground(false);
