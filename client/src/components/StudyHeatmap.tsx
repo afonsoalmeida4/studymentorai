@@ -63,9 +63,27 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
     });
   };
 
+  const thumbRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const scrollStartRef = useRef(0);
+
   const updateScrollInfo = useCallback(() => {
-    if (scrollContainerRef.current) {
+    if (scrollContainerRef.current && thumbRef.current && trackRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const trackWidth = trackRef.current.offsetWidth;
+      const canScroll = scrollWidth > clientWidth;
+      const thumbWidthPercent = canScroll ? Math.max(20, (clientWidth / scrollWidth) * 100) : 100;
+      const thumbWidthPx = (thumbWidthPercent / 100) * trackWidth;
+      const maxScroll = scrollWidth - clientWidth;
+      const thumbLeftPx = canScroll && maxScroll > 0 
+        ? (scrollLeft / maxScroll) * (trackWidth - thumbWidthPx)
+        : 0;
+      
+      thumbRef.current.style.width = `${thumbWidthPercent}%`;
+      thumbRef.current.style.left = `${thumbLeftPx}px`;
+      
       setScrollInfo({ scrollLeft, scrollWidth, clientWidth });
     }
   }, []);
@@ -74,7 +92,7 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
     updateScrollInfo();
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', updateScrollInfo);
+      container.addEventListener('scroll', updateScrollInfo, { passive: true });
       window.addEventListener('resize', updateScrollInfo);
       return () => {
         container.removeEventListener('scroll', updateScrollInfo);
@@ -83,9 +101,11 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
     }
   }, [updateScrollInfo, weeks]);
 
-  const handleScrollbarClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!scrollContainerRef.current) return;
-    const track = e.currentTarget;
+  const handleTrackClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!scrollContainerRef.current || !trackRef.current || isDraggingRef.current) return;
+    if (e.target === thumbRef.current) return;
+    
+    const track = trackRef.current;
     const rect = track.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const percentage = clickX / rect.width;
@@ -93,13 +113,40 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
     scrollContainerRef.current.scrollLeft = percentage * (scrollWidth - clientWidth);
   };
 
+  const handleThumbPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!scrollContainerRef.current || !trackRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+    
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+    scrollStartRef.current = scrollContainerRef.current.scrollLeft;
+    
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleThumbPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current || !scrollContainerRef.current || !trackRef.current) return;
+    e.preventDefault();
+    
+    const deltaX = e.clientX - dragStartXRef.current;
+    const { scrollWidth, clientWidth } = scrollContainerRef.current;
+    const trackWidth = trackRef.current.offsetWidth;
+    const thumbWidthPercent = Math.max(20, (clientWidth / scrollWidth) * 100);
+    const thumbWidthPx = (thumbWidthPercent / 100) * trackWidth;
+    const maxThumbMove = trackWidth - thumbWidthPx;
+    const maxScroll = scrollWidth - clientWidth;
+    
+    const scrollDelta = maxThumbMove > 0 ? (deltaX / maxThumbMove) * maxScroll : 0;
+    scrollContainerRef.current.scrollLeft = scrollStartRef.current + scrollDelta;
+  };
+
+  const handleThumbPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    isDraggingRef.current = false;
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  };
+
   const canScroll = scrollInfo.scrollWidth > scrollInfo.clientWidth;
-  const thumbWidth = canScroll 
-    ? Math.max(30, (scrollInfo.clientWidth / scrollInfo.scrollWidth) * 100)
-    : 100;
-  const thumbPosition = canScroll
-    ? (scrollInfo.scrollLeft / (scrollInfo.scrollWidth - scrollInfo.clientWidth)) * (100 - thumbWidth)
-    : 0;
 
   if (isLoading) {
     return (
@@ -154,16 +201,18 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
         </div>
         {canScroll && (
           <div 
+            ref={trackRef}
             className="h-2 bg-muted rounded-full cursor-pointer relative"
-            onClick={handleScrollbarClick}
+            onClick={handleTrackClick}
             data-testid="heatmap-scrollbar-track"
           >
             <div 
-              className="h-full bg-primary rounded-full absolute transition-all duration-100"
-              style={{ 
-                width: `${thumbWidth}%`,
-                left: `${thumbPosition}%`
-              }}
+              ref={thumbRef}
+              className="h-full bg-primary rounded-full absolute cursor-grab active:cursor-grabbing touch-none"
+              onPointerDown={handleThumbPointerDown}
+              onPointerMove={handleThumbPointerMove}
+              onPointerUp={handleThumbPointerUp}
+              onPointerCancel={handleThumbPointerUp}
               data-testid="heatmap-scrollbar-thumb"
             />
           </div>
