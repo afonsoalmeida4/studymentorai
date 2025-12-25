@@ -20,6 +20,7 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
   const { t, i18n } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [scrollInfo, setScrollInfo] = useState({ scrollLeft: 0, scrollWidth: 0, clientWidth: 0 });
+  const [selectedDay, setSelectedDay] = useState<FlashcardHeatmapData | null>(null);
 
   const weeks = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -186,16 +187,17 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
                 <Tooltip key={dayIndex}>
                   <TooltipTrigger asChild>
                     <div
-                      className={`w-3 h-3 rounded-sm transition-colors cursor-default ${
+                      className={`w-3 h-3 rounded-sm transition-colors cursor-pointer ${
                         day.intensity === -1
                           ? "bg-transparent"
                           : INTENSITY_COLORS[day.intensity] || INTENSITY_COLORS[0]
-                      }`}
+                      } ${selectedDay?.date === day.date && day.date ? "ring-2 ring-primary ring-offset-1" : ""}`}
                       data-testid={`heatmap-day-${day.date || "empty"}`}
+                      onClick={() => day.date && setSelectedDay(selectedDay?.date === day.date ? null : day)}
                     />
                   </TooltipTrigger>
                   {day.date && (
-                    <TooltipContent side="top" className="text-xs">
+                    <TooltipContent side="top" className="text-xs hidden sm:block">
                       <p className="font-medium">{formatDate(day.date)}</p>
                       <p className="text-muted-foreground">
                         {day.cardsReviewed} {t("flashcardStats.cards")}
@@ -223,6 +225,17 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
               onPointerCancel={handleThumbPointerUp}
               data-testid="heatmap-scrollbar-thumb"
             />
+          </div>
+        )}
+        {selectedDay && (
+          <div 
+            className="sm:hidden flex items-center justify-between bg-muted/50 rounded-md px-3 py-2 text-xs"
+            data-testid="heatmap-selected-day-info"
+          >
+            <span className="font-medium">{formatDate(selectedDay.date)}</span>
+            <span className="text-muted-foreground">
+              {selectedDay.cardsReviewed} {t("flashcardStats.cards")}
+            </span>
           </div>
         )}
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
