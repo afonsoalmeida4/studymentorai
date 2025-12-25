@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import type { FlashcardHeatmapData } from "@shared/schema";
 
 interface StudyHeatmapProps {
@@ -18,6 +18,8 @@ const INTENSITY_COLORS = [
 
 export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
   const { t, i18n } = useTranslation();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollInfo, setScrollInfo] = useState({ scrollLeft: 0, scrollWidth: 0, clientWidth: 0 });
 
   const weeks = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -61,6 +63,44 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
     });
   };
 
+  const updateScrollInfo = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setScrollInfo({ scrollLeft, scrollWidth, clientWidth });
+    }
+  }, []);
+
+  useEffect(() => {
+    updateScrollInfo();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', updateScrollInfo);
+      window.addEventListener('resize', updateScrollInfo);
+      return () => {
+        container.removeEventListener('scroll', updateScrollInfo);
+        window.removeEventListener('resize', updateScrollInfo);
+      };
+    }
+  }, [updateScrollInfo, weeks]);
+
+  const handleScrollbarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!scrollContainerRef.current) return;
+    const track = e.currentTarget;
+    const rect = track.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = clickX / rect.width;
+    const { scrollWidth, clientWidth } = scrollContainerRef.current;
+    scrollContainerRef.current.scrollLeft = percentage * (scrollWidth - clientWidth);
+  };
+
+  const canScroll = scrollInfo.scrollWidth > scrollInfo.clientWidth;
+  const thumbWidth = canScroll 
+    ? Math.max(30, (scrollInfo.clientWidth / scrollInfo.scrollWidth) * 100)
+    : 100;
+  const thumbPosition = canScroll
+    ? (scrollInfo.scrollLeft / (scrollInfo.scrollWidth - scrollInfo.clientWidth)) * (100 - thumbWidth)
+    : 0;
+
   if (isLoading) {
     return (
       <div className="flex gap-0.5 overflow-x-auto pb-2">
@@ -81,7 +121,10 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
   return (
     <TooltipProvider>
       <div className="flex flex-col gap-2">
-        <div className="flex gap-0.5 overflow-x-auto pb-2 heatmap-scrollbar">
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-0.5 overflow-x-auto pb-1 hide-scrollbar"
+        >
           {weeks.map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col gap-0.5">
               {week.map((day, dayIndex) => (
@@ -109,6 +152,22 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
             </div>
           ))}
         </div>
+        {canScroll && (
+          <div 
+            className="h-2 bg-muted rounded-full cursor-pointer relative"
+            onClick={handleScrollbarClick}
+            data-testid="heatmap-scrollbar-track"
+          >
+            <div 
+              className="h-full bg-primary rounded-full absolute transition-all duration-100"
+              style={{ 
+                width: `${thumbWidth}%`,
+                left: `${thumbPosition}%`
+              }}
+              data-testid="heatmap-scrollbar-thumb"
+            />
+          </div>
+        )}
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>{t("flashcardStats.less")}</span>
           <div className="flex gap-0.5">

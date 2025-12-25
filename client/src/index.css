@@ -306,27 +306,13 @@
   transform: rotateY(180deg);
 }
 
-/* Custom Heatmap Scrollbar */
-.heatmap-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--primary) / 0.4) hsl(var(--muted) / 0.3);
+/* Hide native scrollbar for custom scrollbar implementation */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.heatmap-scrollbar::-webkit-scrollbar {
-  height: 6px;
-}
-
-.heatmap-scrollbar::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.3);
-  border-radius: 3px;
-}
-
-.heatmap-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.4);
-  border-radius: 3px;
-}
-
-.heatmap-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.6);
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 }
