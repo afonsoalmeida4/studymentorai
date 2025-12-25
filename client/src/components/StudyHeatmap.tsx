@@ -70,21 +70,23 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
   const scrollStartRef = useRef(0);
 
   const updateScrollInfo = useCallback(() => {
-    if (scrollContainerRef.current && thumbRef.current && trackRef.current) {
+    if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      const trackWidth = trackRef.current.offsetWidth;
-      const canScroll = scrollWidth > clientWidth;
-      const thumbWidthPercent = canScroll ? Math.max(20, (clientWidth / scrollWidth) * 100) : 100;
-      const thumbWidthPx = (thumbWidthPercent / 100) * trackWidth;
-      const maxScroll = scrollWidth - clientWidth;
-      const thumbLeftPx = canScroll && maxScroll > 0 
-        ? (scrollLeft / maxScroll) * (trackWidth - thumbWidthPx)
-        : 0;
-      
-      thumbRef.current.style.width = `${thumbWidthPercent}%`;
-      thumbRef.current.style.left = `${thumbLeftPx}px`;
-      
       setScrollInfo({ scrollLeft, scrollWidth, clientWidth });
+      
+      if (thumbRef.current && trackRef.current) {
+        const trackWidth = trackRef.current.offsetWidth;
+        const canScrollNow = scrollWidth > clientWidth;
+        const thumbWidthPercent = canScrollNow ? Math.max(20, (clientWidth / scrollWidth) * 100) : 100;
+        const thumbWidthPx = (thumbWidthPercent / 100) * trackWidth;
+        const maxScroll = scrollWidth - clientWidth;
+        const thumbLeftPx = canScrollNow && maxScroll > 0 
+          ? (scrollLeft / maxScroll) * (trackWidth - thumbWidthPx)
+          : 0;
+        
+        thumbRef.current.style.width = `${thumbWidthPercent}%`;
+        thumbRef.current.style.left = `${thumbLeftPx}px`;
+      }
     }
   }, []);
 
@@ -100,6 +102,12 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
       };
     }
   }, [updateScrollInfo, weeks]);
+
+  useEffect(() => {
+    if (scrollInfo.scrollWidth > scrollInfo.clientWidth) {
+      requestAnimationFrame(updateScrollInfo);
+    }
+  }, [scrollInfo.scrollWidth, scrollInfo.clientWidth, updateScrollInfo]);
 
   const handleTrackClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!scrollContainerRef.current || !trackRef.current || isDraggingRef.current) return;
