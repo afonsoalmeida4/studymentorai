@@ -81,7 +81,7 @@ export function StudyHeatmap({ data, isLoading }: StudyHeatmapProps) {
   return (
     <TooltipProvider>
       <div className="flex flex-col gap-2">
-        <div className="flex gap-0.5 overflow-x-auto pb-2">
+        <div className="flex gap-0.5 overflow-x-auto pb-2 heatmap-scrollbar">
           {weeks.map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col gap-0.5">
               {week.map((day, dayIndex) => (
