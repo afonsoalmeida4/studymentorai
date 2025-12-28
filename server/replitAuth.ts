@@ -6,7 +6,10 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import { storage } from "./storage";
+
+const MemoryStoreSession = MemoryStore(session);
 
 const getOidcConfig = memoize(
   async () => {
@@ -25,13 +28,37 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  
+  let sessionStore: session.Store;
+  
+  // Try to use PostgreSQL session store, fallback to MemoryStore if DB connection fails
+  const databaseUrl = process.env.DATABASE_URL;
+  
+  if (databaseUrl && databaseUrl.includes('://')) {
+    try {
+      const pgStore = connectPg(session);
+      sessionStore = new pgStore({
+        conString: databaseUrl,
+        createTableIfMissing: false,
+        ttl: sessionTtl,
+        tableName: "sessions",
+        errorLog: (err) => {
+          console.error("[SESSION] PG Store error (non-fatal):", err.message);
+        },
+      });
+      console.log("[AUTH] Using PostgreSQL session store");
+    } catch (err) {
+      console.warn("[AUTH] PostgreSQL session store failed, using MemoryStore:", err);
+      sessionStore = new MemoryStoreSession({
+        checkPeriod: 86400000, // prune expired entries every 24h
+      });
+    }
+  } else {
+    console.warn("[AUTH] No valid DATABASE_URL, using MemoryStore for sessions");
+    sessionStore = new MemoryStoreSession({
+      checkPeriod: 86400000,
+    });
+  }
   
   // Replit always uses HTTPS, so secure should be true even in development
   // Use sameSite: "lax" to allow OAuth callbacks (cross-site redirects from replit.com)
