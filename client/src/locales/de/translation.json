@@ -1038,6 +1038,7 @@
     "selectSubjectFirst": "Wählen Sie zuerst ein Fach aus",
     "subjectRequired": "Ein Fach ist erforderlich",
     "topicRequired": "Ein Thema ist erforderlich",
+    "noTopicsAvailable": "Keine Themen für dieses Fach verfügbar",
     "createSuccess": "Lernkarte erstellt!",
     "createSuccessMessage": "Ihre Lernkarte wurde erfolgreich erstellt.",
     "updateSuccess": "Lernkarte aktualisiert!",

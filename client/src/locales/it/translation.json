@@ -1038,6 +1038,7 @@
     "selectSubjectFirst": "Seleziona prima una materia",
     "subjectRequired": "È necessario selezionare una materia",
     "topicRequired": "È necessario selezionare un argomento",
+    "noTopicsAvailable": "Nessun argomento disponibile per questa materia",
     "createSuccess": "Flashcard creata!",
     "createSuccessMessage": "La tua flashcard è stata creata con successo.",
     "updateSuccess": "Flashcard aggiornata!",

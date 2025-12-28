@@ -119,7 +119,7 @@ export default function FlashcardsPage() {
 
   // Fetch topics for form (based on selected subject in form or selected flashcard)
   const formSubjectId = formData.subjectId || selectedFlashcard?.subjectId || "";
-  const { data: formTopics = [] } = useQuery<Topic[]>({
+  const { data: formTopics = [], isLoading: isLoadingFormTopics } = useQuery<Topic[]>({
     queryKey: ["/api/topics/form", formSubjectId],
     queryFn: async () => {
       if (!formSubjectId || formSubjectId === "_none") return [];
@@ -131,6 +131,7 @@ export default function FlashcardsPage() {
       return data.topics || [];
     },
     enabled: !!formSubjectId && formSubjectId !== "_none",
+    staleTime: 0,
   });
 
   const flashcards = flashcardsData?.flashcards || [];
@@ -458,7 +459,7 @@ export default function FlashcardsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="subject">{t('flashcards.subject')}</Label>
-                  <Select value={formData.subjectId} onValueChange={(value) => setFormData({ ...formData, subjectId: value, topicId: "" })} required>
+                  <Select value={formData.subjectId} onValueChange={(value) => setFormData({ ...formData, subjectId: value, topicId: "" })}>
                     <SelectTrigger id="subject" data-testid="select-subject">
                       <SelectValue placeholder={t('flashcards.selectSubject')} />
                     </SelectTrigger>
@@ -473,16 +474,28 @@ export default function FlashcardsPage() {
                 </div>
                 <div>
                   <Label htmlFor="topic">{t('flashcards.topic')}</Label>
-                  <Select value={formData.topicId} onValueChange={(value) => setFormData({ ...formData, topicId: value })} required disabled={!formData.subjectId}>
+                  <Select value={formData.topicId} onValueChange={(value) => setFormData({ ...formData, topicId: value })} disabled={!formData.subjectId || isLoadingFormTopics}>
                     <SelectTrigger id="topic" data-testid="select-topic">
-                      <SelectValue placeholder={formData.subjectId ? t('flashcards.selectTopic') : t('flashcards.selectSubjectFirst')} />
+                      <SelectValue placeholder={
+                        !formData.subjectId 
+                          ? t('flashcards.selectSubjectFirst') 
+                          : isLoadingFormTopics 
+                            ? t('common.loading') 
+                            : t('flashcards.selectTopic')
+                      } />
                     </SelectTrigger>
                     <SelectContent>
-                      {formTopics.map(topic => (
-                        <SelectItem key={topic.id} value={topic.id}>
-                          {topic.name}
+                      {formTopics.length === 0 && formData.subjectId && !isLoadingFormTopics ? (
+                        <SelectItem value="_no_topics" disabled>
+                          {t('flashcards.noTopicsAvailable')}
                         </SelectItem>
-                      ))}
+                      ) : (
+                        formTopics.map(topic => (
+                          <SelectItem key={topic.id} value={topic.id}>
+                            {topic.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -539,7 +552,6 @@ export default function FlashcardsPage() {
                   <Select
                     value={formData.subjectId}
                     onValueChange={(value) => setFormData({ ...formData, subjectId: value, topicId: "" })}
-                    required
                   >
                     <SelectTrigger id="edit-subject" data-testid="select-edit-subject">
                       <SelectValue placeholder={t('flashcards.selectSubject')} />
@@ -558,18 +570,29 @@ export default function FlashcardsPage() {
                   <Select
                     value={formData.topicId}
                     onValueChange={(value) => setFormData({ ...formData, topicId: value })}
-                    required
-                    disabled={!formData.subjectId}
+                    disabled={!formData.subjectId || isLoadingFormTopics}
                   >
                     <SelectTrigger id="edit-topic" data-testid="select-edit-topic">
-                      <SelectValue placeholder={formData.subjectId ? t('flashcards.selectTopic') : t('flashcards.selectSubjectFirst')} />
+                      <SelectValue placeholder={
+                        !formData.subjectId 
+                          ? t('flashcards.selectSubjectFirst') 
+                          : isLoadingFormTopics 
+                            ? t('common.loading') 
+                            : t('flashcards.selectTopic')
+                      } />
                     </SelectTrigger>
                     <SelectContent>
-                      {formTopics.map(topic => (
-                        <SelectItem key={topic.id} value={topic.id}>
-                          {topic.name}
+                      {formTopics.length === 0 && formData.subjectId && !isLoadingFormTopics ? (
+                        <SelectItem value="_no_topics" disabled>
+                          {t('flashcards.noTopicsAvailable')}
                         </SelectItem>
-                      ))}
+                      ) : (
+                        formTopics.map(topic => (
+                          <SelectItem key={topic.id} value={topic.id}>
+                            {topic.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
