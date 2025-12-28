@@ -8,7 +8,6 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import MemoryStore from "memorystore";
 import { storage } from "./storage";
-import { getCleanDatabaseUrl } from "./db";
 
 const MemoryStoreSession = MemoryStore(session);
 
@@ -32,12 +31,13 @@ export function getSession() {
   
   let sessionStore: session.Store;
   
-  // Try to use PostgreSQL session store, fallback to MemoryStore if DB connection fails
-  try {
-    const cleanDbUrl = getCleanDatabaseUrl();
+  // Use PostgreSQL session store
+  const databaseUrl = process.env.DATABASE_URL;
+  
+  if (databaseUrl) {
     const pgStore = connectPg(session);
     sessionStore = new pgStore({
-      conString: cleanDbUrl,
+      conString: databaseUrl,
       createTableIfMissing: false,
       ttl: sessionTtl,
       tableName: "sessions",
@@ -46,16 +46,12 @@ export function getSession() {
       },
     });
     console.log("[AUTH] Using PostgreSQL session store");
-  } catch (err) {
-    console.warn("[AUTH] PostgreSQL session store failed, using MemoryStore:", err);
+  } else {
+    console.warn("[AUTH] No DATABASE_URL, using MemoryStore for sessions");
     sessionStore = new MemoryStoreSession({
-      checkPeriod: 86400000, // prune expired entries every 24h
+      checkPeriod: 86400000,
     });
   }
-  
-  // Replit always uses HTTPS, so secure should be true even in development
-  // Use sameSite: "lax" to allow OAuth callbacks (cross-site redirects from replit.com)
-  // Safari iOS blocks "strict" cookies on OAuth callback, causing infinite login loops
   
   console.log("[AUTH] Session config - secure: true, sameSite: lax (OAuth-compatible)");
   
@@ -66,8 +62,8 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true, // Always true on Replit (HTTPS)
-      sameSite: "lax", // CRITICAL: Must be "lax" for OAuth callbacks to work
+      secure: true,
+      sameSite: "lax",
       maxAge: sessionTtl,
     },
   });
