@@ -8,6 +8,7 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import MemoryStore from "memorystore";
 import { storage } from "./storage";
+import { getCleanDatabaseUrl } from "./db";
 
 const MemoryStoreSession = MemoryStore(session);
 
@@ -32,31 +33,23 @@ export function getSession() {
   let sessionStore: session.Store;
   
   // Try to use PostgreSQL session store, fallback to MemoryStore if DB connection fails
-  const databaseUrl = process.env.DATABASE_URL;
-  
-  if (databaseUrl && databaseUrl.includes('://')) {
-    try {
-      const pgStore = connectPg(session);
-      sessionStore = new pgStore({
-        conString: databaseUrl,
-        createTableIfMissing: false,
-        ttl: sessionTtl,
-        tableName: "sessions",
-        errorLog: (err) => {
-          console.error("[SESSION] PG Store error (non-fatal):", err.message);
-        },
-      });
-      console.log("[AUTH] Using PostgreSQL session store");
-    } catch (err) {
-      console.warn("[AUTH] PostgreSQL session store failed, using MemoryStore:", err);
-      sessionStore = new MemoryStoreSession({
-        checkPeriod: 86400000, // prune expired entries every 24h
-      });
-    }
-  } else {
-    console.warn("[AUTH] No valid DATABASE_URL, using MemoryStore for sessions");
+  try {
+    const cleanDbUrl = getCleanDatabaseUrl();
+    const pgStore = connectPg(session);
+    sessionStore = new pgStore({
+      conString: cleanDbUrl,
+      createTableIfMissing: false,
+      ttl: sessionTtl,
+      tableName: "sessions",
+      errorLog: (err) => {
+        console.error("[SESSION] PG Store error (non-fatal):", err.message);
+      },
+    });
+    console.log("[AUTH] Using PostgreSQL session store");
+  } catch (err) {
+    console.warn("[AUTH] PostgreSQL session store failed, using MemoryStore:", err);
     sessionStore = new MemoryStoreSession({
-      checkPeriod: 86400000,
+      checkPeriod: 86400000, // prune expired entries every 24h
     });
   }
   
