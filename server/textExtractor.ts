@@ -31,16 +31,19 @@ export async function extractTextFromFile(
 }
 
 async function extractFromPDF(buffer: Buffer): Promise<ExtractedContent> {
-  const pdfParseModule = await import("pdf-parse");
-  const pdfParse = pdfParseModule.default || pdfParseModule;
-  const data = await pdfParse(buffer);
+  const { PDFParse } = await import("pdf-parse");
+  
+  // Convert Buffer to Uint8Array for pdf-parse v2
+  const uint8Array = new Uint8Array(buffer);
+  
+  const pdfParser = new PDFParse({ data: uint8Array });
+  const result = await pdfParser.getText();
   
   return {
-    text: data.text.trim(),
-    pageCount: data.numpages,
+    text: result.text.trim(),
+    pageCount: result.pageCount,
     metadata: {
-      info: data.info,
-      version: data.version,
+      extracted: true,
     },
   };
 }
