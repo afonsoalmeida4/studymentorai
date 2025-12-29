@@ -305,8 +305,13 @@ export default function AuthPage() {
                             <div className="relative">
                               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                               <Input
-                                type="email"
+                                type="text"
+                                inputMode="email"
                                 autoComplete="off"
+                                autoCorrect="off"
+                                autoCapitalize="off"
+                                spellCheck="false"
+                                data-form-type="other"
                                 placeholder={t("auth.emailPlaceholder")}
                                 className="pl-10"
                                 {...field}
