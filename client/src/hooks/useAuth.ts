@@ -171,6 +171,86 @@ export function useAuth() {
     return session?.access_token || null;
   }, []);
 
+  const updatePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    // First verify current password by attempting to sign in
+    const currentEmail = session?.user?.email;
+    if (!currentEmail) {
+      throw new Error("No active session");
+    }
+
+    // Check if user is OAuth user (Google)
+    const provider = session?.user?.app_metadata?.provider;
+    if (provider === "google") {
+      throw new Error("Cannot change password for Google accounts");
+    }
+
+    // Verify current password
+    const { data: signInData, error: verifyError } = await supabase.auth.signInWithPassword({
+      email: currentEmail,
+      password: currentPassword,
+    });
+
+    if (verifyError) {
+      throw new Error("Current password is incorrect");
+    }
+
+    // Update to new password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    // Refresh session after password change to get new tokens
+    const { data: refreshData } = await supabase.auth.getSession();
+    if (refreshData?.session) {
+      setSession(refreshData.session);
+      lastTokenRef.current = refreshData.session.access_token;
+    }
+  }, [session]);
+
+  const updateEmail = useCallback(async (currentPassword: string, newEmail: string) => {
+    // First verify current password
+    const currentEmail = session?.user?.email;
+    if (!currentEmail) {
+      throw new Error("No active session");
+    }
+
+    // Check if user is OAuth user (Google)
+    const provider = session?.user?.app_metadata?.provider;
+    if (provider === "google") {
+      throw new Error("Cannot change email for Google accounts");
+    }
+
+    // Verify current password
+    const { data: signInData, error: verifyError } = await supabase.auth.signInWithPassword({
+      email: currentEmail,
+      password: currentPassword,
+    });
+
+    if (verifyError) {
+      throw new Error("Current password is incorrect");
+    }
+
+    // Update email - Supabase will send confirmation to new email
+    const { error: updateError } = await supabase.auth.updateUser({
+      email: newEmail,
+    });
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    // Refresh session after email change request
+    const { data: refreshData } = await supabase.auth.getSession();
+    if (refreshData?.session) {
+      setSession(refreshData.session);
+      lastTokenRef.current = refreshData.session.access_token;
+    }
+  }, [session]);
+
   return {
     user,
     session,
@@ -181,6 +261,8 @@ export function useAuth() {
     logout,
     loginWithGoogle,
     getAccessToken,
+    updatePassword,
+    updateEmail,
   };
 }
 

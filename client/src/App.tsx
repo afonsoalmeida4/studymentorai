@@ -27,6 +27,7 @@ const CalendarPage = lazy(() => import("@/pages/calendar"));
 const SubscriptionPage = lazy(() => import("@/pages/subscription"));
 const PrivacyPolicy = lazy(() => import("@/pages/privacy-policy"));
 const AuthPage = lazy(() => import("@/pages/auth"));
+const SettingsPage = lazy(() => import("@/pages/settings"));
 
 // Fast loading fallback
 function PageLoader() {
@@ -97,6 +98,7 @@ function AuthenticatedRouter() {
                 <Route path="/flashcards" component={FlashcardsPage} />
                 <Route path="/calendar" component={CalendarPage} />
                 <Route path="/subscription" component={SubscriptionPage} />
+                <Route path="/settings" component={SettingsPage} />
                 <Route path="/privacy" component={PrivacyPolicy} />
                 <Route path="/subjects" component={SubjectView} />
                 <Route path="/subject/:id" component={SubjectView} />

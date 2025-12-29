@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays, Pencil, Trash2, Shield } from "lucide-react";
+import { GraduationCap, Plus, BookOpen, Brain, LogOut, Home, BarChart3, Trophy, Crown, CreditCard, CalendarDays, Pencil, Trash2, Shield, Settings } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -462,6 +462,19 @@ export function AppSidebar() {
 
         <SidebarFooter className="border-t border-border/50 p-2">
           <SidebarMenu className="space-y-0.5">
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={location === "/settings"}
+                className={`rounded-lg transition-all duration-200 text-sm ${location === "/settings" ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
+                data-testid="button-settings"
+              >
+                <Link href="/settings">
+                  <Settings className="w-4 h-4" />
+                  <span>{t('nav.settings')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
