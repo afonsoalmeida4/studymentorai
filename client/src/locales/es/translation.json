@@ -187,12 +187,13 @@
       "successDescriptionMultiple": "Los resúmenes han sido creados en los estilos seleccionados."
     },
     "deleteContent": {
-      "title": "¿Eliminar contenido?",
-      "description": "Esta acción no se puede deshacer.",
+      "title": "Eliminar Contenido",
+      "description": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esta acción no se puede deshacer.",
       "deleting": "Eliminando...",
       "delete": "Eliminar",
       "success": "¡Contenido eliminado!",
-      "successDescription": "El contenido ha sido eliminado del tema."
+      "successDescription": "El contenido ha sido eliminado del tema.",
+      "error": "No se pudo eliminar el contenido."
     },
     "pdfExport": {
       "button": "Exportar",

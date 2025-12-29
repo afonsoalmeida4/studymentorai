@@ -94,6 +94,8 @@ export default function TopicView() {
   const [upgradeReason, setUpgradeReason] = useState<"uploads" | "chat" | "summaries" | "features">("uploads");
   const [styleToRegenerate, setStyleToRegenerate] = useState<LearningStyle | null>(null);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [contentToDelete, setContentToDelete] = useState<ContentItem | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const {
     subscription,
@@ -294,6 +296,40 @@ export default function TopicView() {
       });
     },
   });
+
+  const deleteContentMutation = useMutation({
+    mutationFn: async (contentId: string) => {
+      return apiRequest("DELETE", `/api/content/${contentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/content", topicId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries"] });
+      setIsDeleteDialogOpen(false);
+      setContentToDelete(null);
+      toast({
+        title: t('topicView.deleteContent.success'),
+        description: t('topicView.deleteContent.successDescription'),
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: t('topicView.deleteContent.error'),
+      });
+    },
+  });
+
+  const handleDeleteContent = (content: ContentItem) => {
+    setContentToDelete(content);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteContent = () => {
+    if (contentToDelete) {
+      deleteContentMutation.mutate(contentToDelete.id);
+    }
+  };
 
   const handleUpload = (e: React.FormEvent) => {
     e.preventDefault();
@@ -614,17 +650,28 @@ export default function TopicView() {
                               </CardDescription>
                             </div>
                           </div>
-                          {content.contentType === "link" && content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            {content.contentType === "link" && content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => window.open((content.metadata as any)?.url, "_blank")}
+                                data-testid={`button-open-link-${content.id}`}
+                                className="h-8 w-8"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                            ) : null}
                             <Button
                               size="icon"
                               variant="ghost"
-                              onClick={() => window.open((content.metadata as any)?.url, "_blank")}
-                              data-testid={`button-open-link-${content.id}`}
-                              className="flex-shrink-0 h-8 w-8"
+                              onClick={() => handleDeleteContent(content)}
+                              data-testid={`button-delete-content-${content.id}`}
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
                             >
-                              <ExternalLink className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" />
                             </Button>
-                          ) : null}
+                          </div>
                         </div>
                       </CardHeader>
                     </Card>
@@ -648,14 +695,25 @@ export default function TopicView() {
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5" />
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-l-md" />
                         <CardHeader className="p-3 sm:p-6 relative">
-                          <div className="flex items-start gap-2 sm:gap-3 min-w-0">
-                            <div className="flex-shrink-0 p-1.5 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20">{getContentIcon(content.contentType)}</div>
-                            <div className="min-w-0 flex-1">
-                              <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
-                              <CardDescription className="mt-1 text-xs">
-                                {content.contentType.toUpperCase()}
-                              </CardDescription>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                              <div className="flex-shrink-0 p-1.5 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20">{getContentIcon(content.contentType)}</div>
+                              <div className="min-w-0 flex-1">
+                                <CardTitle className="text-sm sm:text-base truncate">{content.title}</CardTitle>
+                                <CardDescription className="mt-1 text-xs">
+                                  {content.contentType.toUpperCase()}
+                                </CardDescription>
+                              </div>
                             </div>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteContent(content)}
+                              data-testid={`button-delete-file-${content.id}`}
+                              className="flex-shrink-0 h-8 w-8 text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </CardHeader>
                       </Card>
@@ -693,17 +751,28 @@ export default function TopicView() {
                                 ) : null}
                               </div>
                             </div>
-                            {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              {content.metadata && typeof content.metadata === "object" && "url" in content.metadata ? (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => window.open((content.metadata as any)?.url, "_blank")}
+                                  data-testid={`button-visit-link-${content.id}`}
+                                  className="h-8 w-8"
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </Button>
+                              ) : null}
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                onClick={() => window.open((content.metadata as any)?.url, "_blank")}
-                                data-testid={`button-visit-link-${content.id}`}
-                                className="flex-shrink-0 h-8 w-8"
+                                onClick={() => handleDeleteContent(content)}
+                                data-testid={`button-delete-link-${content.id}`}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
                               >
-                                <ExternalLink className="w-4 h-4" />
+                                <Trash2 className="w-4 h-4" />
                               </Button>
-                            ) : null}
+                            </div>
                           </div>
                         </CardHeader>
                       </Card>
@@ -1396,6 +1465,29 @@ export default function TopicView() {
               data-testid="button-confirm-regenerate"
             >
               {t('topicView.regenerateDialog.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent data-testid="dialog-confirm-delete">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('topicView.deleteContent.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('topicView.deleteContent.description', { name: contentToDelete?.title })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete" onClick={() => setContentToDelete(null)}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteContent}
+              data-testid="button-confirm-delete"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteContentMutation.isPending ? t('common.deleting') : t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -189,12 +189,13 @@
       "successDescriptionMultiple": "The summaries have been created in the selected styles."
     },
     "deleteContent": {
-      "title": "Delete content?",
-      "description": "This action cannot be undone.",
+      "title": "Delete Content",
+      "description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
       "deleting": "Deleting...",
       "delete": "Delete",
       "success": "Content deleted!",
-      "successDescription": "The content has been removed from the topic."
+      "successDescription": "The content has been removed from the topic.",
+      "error": "Could not delete the content."
     },
     "pdfExport": {
       "button": "Export",

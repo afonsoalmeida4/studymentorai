@@ -184,12 +184,13 @@
       "successDescriptionMultiple": "Die Zusammenfassungen wurden in den ausgewählten Stilen erstellt."
     },
     "deleteContent": {
-      "title": "Inhalt löschen?",
-      "description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "title": "Inhalt Löschen",
+      "description": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
       "deleting": "Löschen...",
       "delete": "Löschen",
       "success": "Inhalt gelöscht!",
-      "successDescription": "Der Inhalt wurde aus dem Thema entfernt."
+      "successDescription": "Der Inhalt wurde aus dem Thema entfernt.",
+      "error": "Inhalt konnte nicht gelöscht werden."
     },
     "pdfExport": {
       "button": "Exportieren",

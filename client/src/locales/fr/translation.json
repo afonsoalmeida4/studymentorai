@@ -184,12 +184,13 @@
       "successDescriptionMultiple": "Les résumés ont été créés dans les styles sélectionnés."
     },
     "deleteContent": {
-      "title": "Supprimer le contenu?",
-      "description": "Cette action ne peut pas être annulée.",
+      "title": "Supprimer le Contenu",
+      "description": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action ne peut pas être annulée.",
       "deleting": "Suppression...",
       "delete": "Supprimer",
-      "success": "Contenu supprimé!",
-      "successDescription": "Le contenu a été retiré du sujet."
+      "success": "Contenu supprimé !",
+      "successDescription": "Le contenu a été retiré du sujet.",
+      "error": "Impossible de supprimer le contenu."
     },
     "pdfExport": {
       "button": "Exporter",

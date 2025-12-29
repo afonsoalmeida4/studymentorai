@@ -169,6 +169,13 @@
       "successDescription": "O link foi adicionado ao tópico.",
       "error": "Não foi possível adicionar o link."
     },
+    "deleteContent": {
+      "title": "Eliminar Conteúdo",
+      "description": "Tens a certeza que queres eliminar \"{{name}}\"? Esta ação não pode ser desfeita.",
+      "success": "Conteúdo eliminado!",
+      "successDescription": "O conteúdo foi removido do tópico.",
+      "error": "Não foi possível eliminar o conteúdo."
+    },
     "generateStylesDialog": {
       "title": "Gerar Estilos de Aprendizagem",
       "description": "Selecione os estilos de aprendizagem que pretende gerar para este tópico.",

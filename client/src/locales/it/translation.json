@@ -184,12 +184,13 @@
       "successDescriptionMultiple": "I riassunti sono stati creati negli stili selezionati."
     },
     "deleteContent": {
-      "title": "Eliminare il contenuto?",
-      "description": "Questa azione non può essere annullata.",
+      "title": "Eliminare Contenuto",
+      "description": "Sei sicuro di voler eliminare \"{{name}}\"? Questa azione non può essere annullata.",
       "deleting": "Eliminazione...",
       "delete": "Elimina",
       "success": "Contenuto eliminato!",
-      "successDescription": "Il contenuto è stato rimosso dall'argomento."
+      "successDescription": "Il contenuto è stato rimosso dall'argomento.",
+      "error": "Impossibile eliminare il contenuto."
     },
     "pdfExport": {
       "button": "Esporta",
