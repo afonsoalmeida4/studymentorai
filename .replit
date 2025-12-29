@@ -40,3 +40,8 @@ integrations = ["javascript_openai:1.0.0", "javascript_log_in_with_replit:1.0.0"
 [[ports]]
 localPort = 5000
 externalPort = 5000
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://vbxqzivpyvsgzngqcbkm.supabase.co"

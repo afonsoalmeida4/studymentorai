@@ -1,6 +1,6 @@
 import type { Express} from "express";
 import { z } from "zod";
-import { isAuthenticated } from "./replitAuth";
+import { isAuthenticated } from "./supabaseAuth";
 import {
   createChatThread,
   getChatHistory,

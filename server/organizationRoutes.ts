@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "./db";
 import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema, topicSummaries, learningStyles } from "@shared/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
-import { isAuthenticated } from "./replitAuth";
+import { isAuthenticated } from "./supabaseAuth";
 import { extractTextFromFile, validateFileType, isValidFileSize } from "./textExtractor";
 import { generateSummary } from "./openai";
 import { awardXP } from "./gamificationService";

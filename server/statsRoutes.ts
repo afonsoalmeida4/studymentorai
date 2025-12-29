@@ -3,7 +3,7 @@ import { db } from "./db";
 import { topicStudyTime, topicStudyEvents, tasks, topicProgress, subjects, topics,
          flashcardAttempts, insertTopicStudyEventSchema, insertTaskSchema } from "@shared/schema";
 import { eq, and, gte, lt, sql, desc, count as countFn } from "drizzle-orm";
-import { isAuthenticated } from "./replitAuth";
+import { isAuthenticated } from "./supabaseAuth";
 import { z } from "zod";
 
 export function registerStatsRoutes(app: Express) {

@@ -41,7 +41,7 @@ import {
   type CalendarEvent,
 } from "@shared/schema";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./supabaseAuth";
 import { awardXP, getGamificationProfile, getLeaderboard, activatePremium } from "./gamificationService";
 import { registerOrganizationRoutes } from "./organizationRoutes";
 import { registerChatRoutes } from "./chatRoutes";
