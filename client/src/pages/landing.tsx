@@ -55,7 +55,7 @@ export default function Landing() {
     if (user) {
       setLocation("/");
     } else {
-      window.location.href = "/api/login";
+      setLocation("/auth");
     }
   };
   
