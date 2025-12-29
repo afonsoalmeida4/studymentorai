@@ -78,7 +78,12 @@
     "invalidCredentials": "Invalid credentials. Check your email and password.",
     "signupSuccess": "Account created!",
     "checkEmail": "Check your email to confirm your account.",
-    "signupError": "Error creating account"
+    "signupError": "Error creating account",
+    "emailNotConfirmed": "Email not yet confirmed. Please check your inbox.",
+    "userAlreadyExists": "This email is already registered.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "invalidEmailFormat": "Invalid email format.",
+    "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again."
   },
   "subjects": {
     "title": "My Subjects",

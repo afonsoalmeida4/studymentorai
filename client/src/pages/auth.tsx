@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
+import { translateSupabaseError } from "@/lib/errorTranslation";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
@@ -68,7 +69,7 @@ export default function AuthPage() {
     } catch (error: any) {
       toast({
         title: t("auth.loginError"),
-        description: error.message || t("auth.invalidCredentials"),
+        description: translateSupabaseError(t, error.message) || t("auth.invalidCredentials"),
         variant: "destructive",
       });
     } finally {
@@ -91,7 +92,7 @@ export default function AuthPage() {
     } catch (error: any) {
       toast({
         title: t("auth.signupError"),
-        description: error.message,
+        description: translateSupabaseError(t, error.message),
         variant: "destructive",
       });
     } finally {
@@ -106,7 +107,7 @@ export default function AuthPage() {
     } catch (error: any) {
       toast({
         title: t("auth.loginError"),
-        description: error.message,
+        description: translateSupabaseError(t, error.message),
         variant: "destructive",
       });
       setIsLoading(false);

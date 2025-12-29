@@ -76,7 +76,12 @@
     "invalidCredentials": "Credenciales inválidas. Verifica tu correo y contraseña.",
     "signupSuccess": "¡Cuenta creada!",
     "checkEmail": "Revisa tu correo para confirmar tu cuenta.",
-    "signupError": "Error al crear cuenta"
+    "signupError": "Error al crear cuenta",
+    "emailNotConfirmed": "El correo aún no ha sido confirmado. Revisa tu bandeja de entrada.",
+    "userAlreadyExists": "Este correo ya está registrado.",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "invalidEmailFormat": "Formato de correo inválido.",
+    "rateLimitExceeded": "Demasiados intentos. Espera un momento antes de volver a intentar."
   },
   "subjects": {
     "title": "Mis Materias",

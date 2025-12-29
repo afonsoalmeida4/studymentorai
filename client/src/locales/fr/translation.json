@@ -73,7 +73,12 @@
     "invalidCredentials": "Identifiants invalides. Vérifiez votre e-mail et mot de passe.",
     "signupSuccess": "Compte créé !",
     "checkEmail": "Vérifiez votre e-mail pour confirmer votre compte.",
-    "signupError": "Erreur lors de la création du compte"
+    "signupError": "Erreur lors de la création du compte",
+    "emailNotConfirmed": "L'e-mail n'a pas encore été confirmé. Vérifiez votre boîte de réception.",
+    "userAlreadyExists": "Cet e-mail est déjà enregistré.",
+    "passwordTooShort": "Le mot de passe doit comporter au moins 6 caractères.",
+    "invalidEmailFormat": "Format d'e-mail invalide.",
+    "rateLimitExceeded": "Trop de tentatives. Veuillez patienter avant de réessayer."
   },
   "subjects": {
     "title": "Mes Matières",

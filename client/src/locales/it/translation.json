@@ -73,7 +73,12 @@
     "invalidCredentials": "Credenziali non valide. Verifica email e password.",
     "signupSuccess": "Account creato!",
     "checkEmail": "Controlla la tua email per confermare l'account.",
-    "signupError": "Errore durante la creazione dell'account"
+    "signupError": "Errore durante la creazione dell'account",
+    "emailNotConfirmed": "Email non ancora confermata. Controlla la tua casella di posta.",
+    "userAlreadyExists": "Questa email è già registrata.",
+    "passwordTooShort": "La password deve contenere almeno 6 caratteri.",
+    "invalidEmailFormat": "Formato email non valido.",
+    "rateLimitExceeded": "Troppi tentativi. Attendi un momento prima di riprovare."
   },
   "subjects": {
     "title": "Le Mie Materie",

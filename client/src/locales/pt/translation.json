@@ -73,7 +73,12 @@
     "invalidCredentials": "Credenciais inválidas. Verifica o email e palavra-passe.",
     "signupSuccess": "Conta criada!",
     "checkEmail": "Verifica o teu email para confirmar a conta.",
-    "signupError": "Erro ao criar conta"
+    "signupError": "Erro ao criar conta",
+    "emailNotConfirmed": "O email ainda não foi confirmado. Verifica a tua caixa de entrada.",
+    "userAlreadyExists": "Este email já está registado.",
+    "passwordTooShort": "A palavra-passe deve ter pelo menos 6 caracteres.",
+    "invalidEmailFormat": "Formato de email inválido.",
+    "rateLimitExceeded": "Demasiadas tentativas. Aguarda um momento antes de tentar novamente."
   },
   "subjects": {
     "title": "As Minhas Matérias",

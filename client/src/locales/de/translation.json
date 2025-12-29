@@ -73,7 +73,12 @@
     "invalidCredentials": "Ungültige Anmeldedaten. Überprüfen Sie E-Mail und Passwort.",
     "signupSuccess": "Konto erstellt!",
     "checkEmail": "Überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen.",
-    "signupError": "Fehler beim Erstellen des Kontos"
+    "signupError": "Fehler beim Erstellen des Kontos",
+    "emailNotConfirmed": "E-Mail noch nicht bestätigt. Überprüfen Sie Ihren Posteingang.",
+    "userAlreadyExists": "Diese E-Mail ist bereits registriert.",
+    "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen haben.",
+    "invalidEmailFormat": "Ungültiges E-Mail-Format.",
+    "rateLimitExceeded": "Zu viele Versuche. Bitte warten Sie einen Moment, bevor Sie es erneut versuchen."
   },
   "subjects": {
     "title": "Meine Fächer",
