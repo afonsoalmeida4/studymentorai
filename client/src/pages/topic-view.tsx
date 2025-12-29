@@ -261,10 +261,17 @@ export default function TopicView() {
           description: translatedError,
         });
       } else {
+        // Translate error message for all error types
+        const translatedError = translateError(t, {
+          errorCode: error.errorCode,
+          params: error.params,
+          error: error.message
+        });
+        
         toast({
           variant: "destructive",
           title: t('topicView.uploadDialog.error'),
-          description: error.message,
+          description: translatedError,
         });
       }
     },

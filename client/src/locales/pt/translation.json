@@ -733,7 +733,8 @@
     "CHAT_LIMIT_REACHED": "Atingiste o limite de {{limit}} mensagens por dia do plano {{planName}}. Faz upgrade para chat ilimitado!",
     "CHAT_MODE_NOT_AVAILABLE": "O modo {{mode}} não está disponível no plano {{planName}}. Faz upgrade para desbloquear!",
     "LEARNING_STYLE_NOT_AVAILABLE": "O estilo \"{{learningStyle}}\" não está disponível no plano {{planName}}. Faz upgrade para aceder a todos os estilos!",
-    "SUMMARY_WORD_LIMIT_EXCEEDED": "O resumo tem {{wordCount}} palavras, mas o plano {{planName}} permite até {{limit}} palavras. Faz upgrade para resumos maiores!"
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "O resumo tem {{wordCount}} palavras, mas o plano {{planName}} permite até {{limit}} palavras. Faz upgrade para resumos maiores!",
+    "uploadFailed": "Não foi possível processar o ficheiro. Verifica o formato e tenta novamente."
   },
   "myClasses": {
     "title": "As Minhas Turmas",

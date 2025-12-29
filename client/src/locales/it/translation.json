@@ -616,7 +616,8 @@
     "CHAT_LIMIT_REACHED": "Hai raggiunto il limite di {{limit}} messaggi al giorno del piano {{planName}}. Aggiorna per chat illimitata!",
     "CHAT_MODE_NOT_AVAILABLE": "La modalità {{mode}} non è disponibile nel piano {{planName}}. Aggiorna per sbloccarla!",
     "LEARNING_STYLE_NOT_AVAILABLE": "Lo stile \"{{learningStyle}}\" non è disponibile nel piano {{planName}}. Aggiorna per accedere a tutti gli stili!",
-    "SUMMARY_WORD_LIMIT_EXCEEDED": "Il riassunto ha {{wordCount}} parole, ma il piano {{planName}} consente fino a {{limit}} parole. Aggiorna per riassunti più grandi!"
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "Il riassunto ha {{wordCount}} parole, ma il piano {{planName}} consente fino a {{limit}} parole. Aggiorna per riassunti più grandi!",
+    "uploadFailed": "Impossibile elaborare il file. Controlla il formato e riprova."
   },
   "app": {
     "tagline": "Organizza. Bilancia."

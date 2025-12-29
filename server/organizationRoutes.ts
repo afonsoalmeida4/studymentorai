@@ -663,7 +663,11 @@ export function registerOrganizationRoutes(app: Express) {
       res.json({ success: true, contentItem: contentItem[0] });
     } catch (error) {
       console.error("Error uploading content:", error);
-      res.status(500).json({ success: false, error: "Erro ao carregar ficheiro" });
+      res.status(500).json({ 
+        success: false, 
+        error: "Upload failed",
+        errorCode: "uploadFailed"
+      });
     }
   });
 

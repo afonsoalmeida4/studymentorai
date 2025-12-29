@@ -616,7 +616,8 @@
     "CHAT_LIMIT_REACHED": "Vous avez atteint la limite de {{limit}} messages par jour du plan {{planName}}. Mettez à niveau pour chat illimité !",
     "CHAT_MODE_NOT_AVAILABLE": "Le mode {{mode}} n'est pas disponible dans le plan {{planName}}. Mettez à niveau pour débloquer !",
     "LEARNING_STYLE_NOT_AVAILABLE": "Le style \"{{learningStyle}}\" n'est pas disponible dans le plan {{planName}}. Mettez à niveau pour accéder à tous les styles !",
-    "SUMMARY_WORD_LIMIT_EXCEEDED": "Le résumé contient {{wordCount}} mots, mais le plan {{planName}} permet jusqu'à {{limit}} mots. Mettez à niveau pour des résumés plus grands !"
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "Le résumé contient {{wordCount}} mots, mais le plan {{planName}} permet jusqu'à {{limit}} mots. Mettez à niveau pour des résumés plus grands !",
+    "uploadFailed": "Impossible de traiter le fichier. Vérifiez le format et réessayez."
   },
   "app": {
     "tagline": "Organise. Équilibre."

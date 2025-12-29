@@ -38,19 +38,33 @@ async function extractFromPDF(buffer: Buffer): Promise<ExtractedContent> {
   
   const pdfParser = new PDFParse({ data: uint8Array });
   
-  // Use getRaw() for v1 compatibility - getText() may return only page markers
-  // getRaw() is available in pdf-parse v2 but not in TypeScript types
-  const result = await (pdfParser as any).getRaw();
+  // Use getText() - the v2 API method
+  const result = await pdfParser.getText();
   
   // Clean up parser resources
   await pdfParser.destroy();
   
+  // result.text contains the extracted text
+  // Filter out page markers like "-- 1 of 4 --" that getText() sometimes includes
+  let extractedText = result.text || "";
+  
+  // Remove page marker lines (e.g., "-- 1 of 4 --", "-- Page 1 --")
+  extractedText = extractedText
+    .split('\n')
+    .filter(line => !line.match(/^--\s*\d+\s*(of|de)\s*\d+\s*--$/i))
+    .filter(line => !line.match(/^--\s*Page\s*\d+\s*--$/i))
+    .join('\n')
+    .trim();
+  
+  // Type assertion to access properties not in TypeScript types
+  const resultAny = result as any;
+  
   return {
-    text: result.text?.trim() || "",
-    pageCount: result.numpages,
+    text: extractedText,
+    pageCount: resultAny.numpages,
     metadata: {
       extracted: true,
-      info: result.info,
+      info: resultAny.info,
     },
   };
 }

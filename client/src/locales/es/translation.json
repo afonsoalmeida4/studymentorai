@@ -618,7 +618,8 @@
     "CHAT_LIMIT_REACHED": "Has alcanzado el límite de {{limit}} mensajes por día del plan {{planName}}. ¡Actualiza para chat ilimitado!",
     "CHAT_MODE_NOT_AVAILABLE": "El modo {{mode}} no está disponible en el plan {{planName}}. ¡Actualiza para desbloquear!",
     "LEARNING_STYLE_NOT_AVAILABLE": "El estilo \"{{learningStyle}}\" no está disponible en el plan {{planName}}. ¡Actualiza para acceder a todos los estilos!",
-    "SUMMARY_WORD_LIMIT_EXCEEDED": "El resumen tiene {{wordCount}} palabras, pero el plan {{planName}} permite hasta {{limit}} palabras. ¡Actualiza para resúmenes más grandes!"
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "El resumen tiene {{wordCount}} palabras, pero el plan {{planName}} permite hasta {{limit}} palabras. ¡Actualiza para resúmenes más grandes!",
+    "uploadFailed": "No se pudo procesar el archivo. Verifica el formato e inténtalo de nuevo."
   },
   "landing": {
     "hero": {

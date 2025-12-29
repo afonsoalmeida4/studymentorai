@@ -616,7 +616,8 @@
     "CHAT_LIMIT_REACHED": "Sie haben das Limit von {{limit}} Nachrichten pro Tag im {{planName}}-Plan erreicht. Upgraden Sie für unbegrenzten Chat!",
     "CHAT_MODE_NOT_AVAILABLE": "Der {{mode}}-Modus ist im {{planName}}-Plan nicht verfügbar. Upgraden Sie, um ihn freizuschalten!",
     "LEARNING_STYLE_NOT_AVAILABLE": "Der Stil \"{{learningStyle}}\" ist im {{planName}}-Plan nicht verfügbar. Upgraden Sie, um auf alle Stile zuzugreifen!",
-    "SUMMARY_WORD_LIMIT_EXCEEDED": "Die Zusammenfassung hat {{wordCount}} Wörter, aber der {{planName}}-Plan erlaubt bis zu {{limit}} Wörter. Upgraden Sie für größere Zusammenfassungen!"
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "Die Zusammenfassung hat {{wordCount}} Wörter, aber der {{planName}}-Plan erlaubt bis zu {{limit}} Wörter. Upgraden Sie für größere Zusammenfassungen!",
+    "uploadFailed": "Die Datei konnte nicht verarbeitet werden. Bitte überprüfen Sie das Format und versuchen Sie es erneut."
   },
   "app": {
     "tagline": "Organisiere. Balanciere."

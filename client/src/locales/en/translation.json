@@ -728,7 +728,8 @@
     "CHAT_LIMIT_REACHED": "You've reached the limit of {{limit}} messages per day in the {{planName}} plan. Upgrade for unlimited chat!",
     "CHAT_MODE_NOT_AVAILABLE": "The {{mode}} mode is not available in the {{planName}} plan. Upgrade to unlock!",
     "LEARNING_STYLE_NOT_AVAILABLE": "The \"{{learningStyle}}\" style is not available in the {{planName}} plan. Upgrade to access all styles!",
-    "SUMMARY_WORD_LIMIT_EXCEEDED": "The summary has {{wordCount}} words, but the {{planName}} plan allows up to {{limit}} words. Upgrade for larger summaries!"
+    "SUMMARY_WORD_LIMIT_EXCEEDED": "The summary has {{wordCount}} words, but the {{planName}} plan allows up to {{limit}} words. Upgrade for larger summaries!",
+    "uploadFailed": "Could not process the file. Please check the format and try again."
   },
   "myClasses": {
     "title": "My Classes",
