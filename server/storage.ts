@@ -7,6 +7,15 @@ import {
   topicSummaries,
   topics,
   flashcardDailyMetrics,
+  subjects,
+  chatThreads,
+  subscriptions,
+  usageTracking,
+  tasks,
+  topicStudyEvents,
+  topicStudyTime,
+  topicProgress,
+  calendarEvents,
   type User,
   type UpsertUser,
   type Summary,
@@ -87,18 +96,90 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // First, check if a user with this email already exists (migration from old auth system)
+    if (userData.email) {
+      const existingByEmail = await db.select().from(users).where(eq(users.email, userData.email)).limit(1);
+      if (existingByEmail.length > 0 && existingByEmail[0].id !== userData.id) {
+        // User exists with different ID - update their ID to the new Supabase ID
+        const [updatedUser] = await db
+          .update(users)
+          .set({
+            id: userData.id,
+            firstName: userData.firstName || existingByEmail[0].firstName,
+            lastName: userData.lastName || existingByEmail[0].lastName,
+            profileImageUrl: userData.profileImageUrl || existingByEmail[0].profileImageUrl,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.email, userData.email))
+          .returning();
+        
+        // Also update all related records to use the new user ID
+        if (existingByEmail[0].id && userData.id) {
+          await this.migrateUserReferences(existingByEmail[0].id, userData.id);
+        }
+        
+        return updatedUser;
+      }
+    }
+
+    // Normal upsert - either new user or same ID
     const [user] = await db
       .insert(users)
       .values(userData)
       .onConflictDoUpdate({
         target: users.id,
         set: {
-          ...userData,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
           updatedAt: new Date(),
         },
       })
       .returning();
     return user;
+  }
+
+  private async migrateUserReferences(oldUserId: string, newUserId: string): Promise<void> {
+    // Update all foreign key references from old user ID to new user ID
+    console.log(`[MIGRATION] Migrating user references from ${oldUserId} to ${newUserId}`);
+    
+    try {
+      // Update subjects
+      await db.update(subjects).set({ userId: newUserId }).where(eq(subjects.userId, oldUserId));
+      
+      // Update chat threads
+      await db.update(chatThreads).set({ userId: newUserId }).where(eq(chatThreads.userId, oldUserId));
+      
+      // Update subscriptions
+      await db.update(subscriptions).set({ userId: newUserId }).where(eq(subscriptions.userId, oldUserId));
+      
+      // Update usage tracking
+      await db.update(usageTracking).set({ userId: newUserId }).where(eq(usageTracking.userId, oldUserId));
+      
+      // Update tasks
+      await db.update(tasks).set({ userId: newUserId }).where(eq(tasks.userId, oldUserId));
+      
+      // Update flashcard daily metrics
+      await db.update(flashcardDailyMetrics).set({ userId: newUserId }).where(eq(flashcardDailyMetrics.userId, oldUserId));
+      
+      // Update topic study events
+      await db.update(topicStudyEvents).set({ userId: newUserId }).where(eq(topicStudyEvents.userId, oldUserId));
+      
+      // Update topic study time
+      await db.update(topicStudyTime).set({ userId: newUserId }).where(eq(topicStudyTime.userId, oldUserId));
+      
+      // Update topic progress
+      await db.update(topicProgress).set({ userId: newUserId }).where(eq(topicProgress.userId, oldUserId));
+      
+      // Update calendar events
+      await db.update(calendarEvents).set({ userId: newUserId }).where(eq(calendarEvents.userId, oldUserId));
+      
+      console.log(`[MIGRATION] Successfully migrated all user references`);
+    } catch (error) {
+      console.error(`[MIGRATION] Error migrating user references:`, error);
+      throw error;
+    }
   }
 
   async getOrCreateUser(id: string, claims: any): Promise<User> {
