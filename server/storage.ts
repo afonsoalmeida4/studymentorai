@@ -16,6 +16,7 @@ import {
   topicStudyTime,
   topicProgress,
   calendarEvents,
+  contentItems,
   type User,
   type UpsertUser,
   type Summary,
@@ -100,7 +101,16 @@ export class DatabaseStorage implements IStorage {
     if (userData.email) {
       const existingByEmail = await db.select().from(users).where(eq(users.email, userData.email)).limit(1);
       if (existingByEmail.length > 0 && existingByEmail[0].id !== userData.id) {
-        // User exists with different ID - update their ID to the new Supabase ID
+        // User exists with different ID - migrate all references FIRST before updating user ID
+        const oldUserId = existingByEmail[0].id;
+        const newUserId = userData.id;
+        
+        if (oldUserId && newUserId) {
+          // First, migrate all foreign key references to use the new user ID
+          await this.migrateUserReferences(oldUserId, newUserId);
+        }
+        
+        // Now update the user's ID
         const [updatedUser] = await db
           .update(users)
           .set({
@@ -112,11 +122,6 @@ export class DatabaseStorage implements IStorage {
           })
           .where(eq(users.email, userData.email))
           .returning();
-        
-        // Also update all related records to use the new user ID
-        if (existingByEmail[0].id && userData.id) {
-          await this.migrateUserReferences(existingByEmail[0].id, userData.id);
-        }
         
         return updatedUser;
       }
@@ -174,6 +179,9 @@ export class DatabaseStorage implements IStorage {
       
       // Update calendar events
       await db.update(calendarEvents).set({ userId: newUserId }).where(eq(calendarEvents.userId, oldUserId));
+      
+      // Update content items
+      await db.update(contentItems).set({ userId: newUserId }).where(eq(contentItems.userId, oldUserId));
       
       console.log(`[MIGRATION] Successfully migrated all user references`);
     } catch (error) {

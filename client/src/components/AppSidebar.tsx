@@ -56,7 +56,7 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const typedUser = user as User | null;
   const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState("");
@@ -477,7 +477,14 @@ export function AppSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
-                onClick={() => window.location.href = "/api/logout"}
+                onClick={async () => {
+                  try {
+                    await logout();
+                    setLocation("/");
+                  } catch (error) {
+                    console.error("Logout error:", error);
+                  }
+                }}
                 className="rounded-lg transition-all duration-200 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 data-testid="button-logout"
               >
