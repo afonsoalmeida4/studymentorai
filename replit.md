@@ -19,45 +19,31 @@ The backend is an Express.js application written in TypeScript, using ESM module
 PostgreSQL (Neon) is the primary database, managed with Drizzle ORM. The schema includes tables for `subjects`, `topics`, `content_items` (supporting files and links), `summaries`, `flashcards`, `flashcard_translations`, `flashcard_reviews`, `flashcard_daily_metrics`, `chat_threads`, `chat_messages`, `users`, `subscriptions`, `usage_tracking`, `topicStudyTime`, `topicStudyEvents`, `tasks`, `topicProgress`, and `calendar_events`. Strict foreign key relationships and `ON DELETE CASCADE` ensure data integrity. All users are students by default. The `flashcard_translations` table supports multi-language SM-2 spaced repetition progress across different languages by mapping translated flashcards to a base Portuguese flashcard ID, ensuring shared progress tracking. The `calendar_events` table stores academic calendar events (exams and assignments) with optional associations to subjects/topics and completion tracking.
 
 ### Authentication & Authorization
-Authentication uses Replit OIDC with session-based authentication via `express-session`. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
+Authentication has been **migrated from Replit OIDC to Supabase Authentication** with JWT-based tokens and Google OAuth provider. Authorization is granular, scoping all resources to `userId` and validating parent resource ownership throughout the hierarchy. All users are students by default with no role selection required.
 
-**OAuth Loop Fix** (RESOLVED): Fixed infinite OAuth login loop on production/published app (Safari iOS).
+**Supabase Authentication Architecture**:
+- **Backend**: JWT validation via `supabaseAdmin.auth.getUser()` with Bearer token in Authorization headers
+- **Frontend**: `authFetch()` helper function automatically adds Authorization headers from Supabase session
+- **User Migration Strategy**: Clears old user email → inserts new Supabase user → migrates FK references across 18+ tables → deletes old user (bypasses unique constraint violations)
+- **Auto-upsert**: New users are automatically created in the app database when they first authenticate via Supabase
 
-**Root Cause**: Session cookies with `sameSite: "strict"` were being blocked by Safari on OAuth callback redirects:
-1. User clicks login → redirects to `https://replit.com/oidc` (Replit OAuth)
-2. User clicks "Allow" → OAuth redirects back to `https://your-app.replit.app/api/callback`
-3. This is a **cross-site redirect** (replit.com → your-app.replit.app)
-4. Safari iOS **blocks** cookies with `sameSite: "strict"` on cross-site redirects
-5. `/api/callback` receives no session cookie → `req.login()` fails silently
-6. User redirected back to `/api/login` → **INFINITE LOOP**
+**Key Files**:
+- `server/supabaseAuth.ts`: Authentication middleware and user upsert logic
+- `client/src/hooks/useAuth.ts`: React hook for auth state management with `isMounted` flag for cleanup
+- `client/src/lib/supabase.ts`: Supabase client configuration
+- `client/src/lib/queryClient.ts`: `authFetch()` helper for authenticated API requests
 
-**Technical Analysis** (via architect tool):
-- `sameSite: "strict"` prevents CSRF but also blocks legitimate OAuth callbacks
-- Safari is more aggressive than Chrome in enforcing SameSite policies
-- Session cookie must survive the round-trip: login → OAuth provider → callback
+**Frontend Auth Pattern**:
+- All API calls use `authFetch()` which automatically adds `Authorization: Bearer {token}` headers
+- `useAuth` hook uses `onAuthStateChange` listener for real-time session updates
+- Loading state shown during auth initialization (prevents flash of Landing page)
 
-**Solution Implemented** (server/replitAuth.ts lines 39-56):
-```typescript
-cookie: {
-  httpOnly: true,
-  secure: true,
-  sameSite: "lax", // CRITICAL: Must be "lax" for OAuth callbacks
-  maxAge: sessionTtl,
-}
-```
+**Supabase Configuration Required**:
+- Email/password and Google OAuth providers enabled in Supabase dashboard
+- Site URL and Redirect URLs must match app domain
+- Environment variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 
-**Why "lax" is Safe**:
-- Still protects against CSRF on state-changing requests (POST, PUT, DELETE)
-- Allows cookies on "safe" cross-site navigations (GET redirects from OAuth)
-- Industry standard for OAuth flows
-- Maintains security while enabling authentication
-
-**Frontend Fix** (client/src/pages/landing.tsx):
-- Removed conflicting useEffect that caused frontend redirect loops
-- App.tsx is sole routing controller based on authentication state
-- Login buttons check authentication before forcing OAuth redirect
-
-**Testing**: Session cookies now persist through OAuth callback, authentication works on Safari iOS
+**Tables NOT Needing Migration**: `topicSummaries`, `flashcardTranslations`, `chatMessages` cascade via parent table FKs
 
 ### Key Features
 - **Flashcard System**: Manual flashcard creation and management, integrated with the SM-2 spaced repetition system, supporting multi-language progress tracking. Includes CRUD operations and filtering. SM-2 scheduler includes guards against negative intervals (minimum 1 day).
