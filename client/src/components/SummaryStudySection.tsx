@@ -6,7 +6,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import AnkiFlashcardDeck from "./AnkiFlashcardDeck";
 import { Loader2, Brain, Calendar, Dumbbell, BookOpen, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Flashcard type - stays in its creation language (no translations)
@@ -70,7 +70,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   const { data: summariesData } = useQuery<{ success: boolean; summaries: any[] }>({
     queryKey: ["/api/topics", topicId, "summaries", i18n.language],
     queryFn: async () => {
-      const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
+      const res = await authFetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
       if (!res.ok) throw new Error("Failed to fetch summaries");
       return res.json();
     },
@@ -130,7 +130,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
     
     if (!summaryId) {
       try {
-        const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
+        const res = await authFetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
         if (res.ok) {
           const data = await res.json();
           const summariesObj = data.summaries;
@@ -159,9 +159,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   const { data: bundledData, isLoading, error } = useQuery<BundledFlashcardsResponse>({
     queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`, {
-        credentials: "include",
-      });
+      const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
       if (!res.ok) throw new Error("Failed to fetch flashcards");
       return res.json();
     },

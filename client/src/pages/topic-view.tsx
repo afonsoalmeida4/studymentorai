@@ -3,7 +3,7 @@ import { useParams } from "wouter";
 import { Upload, Link2, FileText, Sparkles, Trash2, ExternalLink, RefreshCw, Download, BookOpen } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -119,7 +119,7 @@ export default function TopicView() {
   const { data: topic } = useQuery<Topic>({
     queryKey: ["/api/topics", topicId],
     queryFn: async () => {
-      const res = await fetch(`/api/topics/${topicId}`);
+      const res = await authFetch(`/api/topics/${topicId}`);
       if (!res.ok) throw new Error("Failed to fetch topic");
       const data = await res.json();
       return data.topic;
@@ -129,7 +129,7 @@ export default function TopicView() {
   const { data: contents = [] } = useQuery<ContentItem[]>({
     queryKey: ["/api/content", topicId],
     queryFn: async () => {
-      const res = await fetch(`/api/content/${topicId}`);
+      const res = await authFetch(`/api/content/${topicId}`);
       if (!res.ok) throw new Error("Failed to fetch contents");
       const data = await res.json();
       return data.content || [];
@@ -140,7 +140,7 @@ export default function TopicView() {
     queryKey: ["/api/topics", topicId, "summaries", i18n.language],
     queryFn: async () => {
       if (!topicId) throw new Error("Topic ID required");
-      const res = await fetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
+      const res = await authFetch(`/api/topics/${topicId}/summaries?language=${i18n.language}`);
       if (!res.ok) throw new Error("Failed to fetch topic summaries");
       return res.json();
     },
@@ -152,7 +152,7 @@ export default function TopicView() {
     queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
       if (!topicId) throw new Error("Topic ID required");
-      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`);
+      const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
       if (!res.ok) throw new Error("Failed to fetch flashcards");
       return res.json();
     },
@@ -214,7 +214,7 @@ export default function TopicView() {
       formData.append("topicId", topicId);
       formData.append("generateSummary", generateSummary.toString());
 
-      const res = await fetch("/api/content/upload", {
+      const res = await authFetch("/api/content/upload", {
         method: "POST",
         body: formData,
       });

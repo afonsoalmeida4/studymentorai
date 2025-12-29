@@ -30,7 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -85,9 +85,7 @@ export default function FlashcardsPage() {
       if (deferredFilterSubject && deferredFilterSubject !== "_all") params.set("subjectId", deferredFilterSubject);
       if (deferredFilterTopic && deferredFilterTopic !== "_all") params.set("topicId", deferredFilterTopic);
       
-      const response = await fetch(`/api/flashcards/user?${params.toString()}`, {
-        credentials: "include",
-      });
+      const response = await authFetch(`/api/flashcards/user?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch flashcards");
       return response.json();
     },
@@ -107,9 +105,7 @@ export default function FlashcardsPage() {
     queryKey: ["/api/topics", filterSubject],
     queryFn: async () => {
       if (!filterSubject || filterSubject === "_all") return [];
-      const response = await fetch(`/api/topics?subjectId=${filterSubject}`, {
-        credentials: "include",
-      });
+      const response = await authFetch(`/api/topics?subjectId=${filterSubject}`);
       if (!response.ok) throw new Error("Failed to fetch topics");
       const data = await response.json();
       return data.topics || [];
@@ -123,9 +119,7 @@ export default function FlashcardsPage() {
     queryKey: ["/api/topics/form", formSubjectId],
     queryFn: async () => {
       if (!formSubjectId || formSubjectId === "_none") return [];
-      const response = await fetch(`/api/topics?subjectId=${formSubjectId}`, {
-        credentials: "include",
-      });
+      const response = await authFetch(`/api/topics?subjectId=${formSubjectId}`);
       if (!response.ok) throw new Error("Failed to fetch topics");
       const data = await response.json();
       return data.topics || [];

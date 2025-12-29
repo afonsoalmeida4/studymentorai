@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RotateCw, Check, Clock } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
@@ -65,9 +65,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const { data: bundledData, isLoading } = useQuery<BundledFlashcardsResponse>({
     queryKey: ["/api/flashcards/topic", topicId, "bundled"],
     queryFn: async () => {
-      const res = await fetch(`/api/flashcards/topic/${topicId}/bundled`, {
-        credentials: "include",
-      });
+      const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
       if (!res.ok) throw new Error("Erro ao carregar flashcards");
       return res.json();
     },

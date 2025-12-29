@@ -1,7 +1,7 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from "./supabase";
 
-async function getAuthHeaders(): Promise<HeadersInit> {
+export async function getAuthHeaders(): Promise<HeadersInit> {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session?.access_token) {
@@ -11,6 +11,19 @@ async function getAuthHeaders(): Promise<HeadersInit> {
   return {
     Authorization: `Bearer ${session.access_token}`,
   };
+}
+
+// Helper function to make authenticated fetch requests
+export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const authHeaders = await getAuthHeaders();
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...authHeaders,
+      ...options.headers,
+    },
+    credentials: "include",
+  });
 }
 
 async function throwIfResNotOk(res: Response) {

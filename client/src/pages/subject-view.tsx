@@ -3,7 +3,7 @@ import { useParams } from "wouter";
 import { Plus, Pencil, Trash2, BookOpen, CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { translateError } from "@/lib/errorTranslation";
@@ -62,7 +62,7 @@ export default function SubjectView() {
     queryKey: ["/api/topics", subjectId],
     queryFn: async () => {
       if (!subjectId) return [];
-      const res = await fetch(`/api/topics?subjectId=${subjectId}`);
+      const res = await authFetch(`/api/topics?subjectId=${subjectId}`);
       if (!res.ok) throw new Error("Failed to fetch topics");
       const data = await res.json();
       return data.topics || [];
@@ -73,7 +73,7 @@ export default function SubjectView() {
   const { data: topicProgressData = [] } = useQuery<Array<{ topicId: string; completed: boolean }>>({
     queryKey: ["/api/topic-progress"],
     queryFn: async () => {
-      const res = await fetch("/api/topic-progress");
+      const res = await authFetch("/api/topic-progress");
       if (!res.ok) return [];
       const data = await res.json();
       return data.progress || [];

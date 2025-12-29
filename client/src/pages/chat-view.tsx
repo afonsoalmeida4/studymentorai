@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Brain, Sparkles, Trash2, Plus, Lock, Pencil, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
@@ -164,7 +164,7 @@ export default function ChatView() {
   const { data: studyThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "study"],
     queryFn: async () => {
-      const res = await fetch("/api/chat/threads?mode=study");
+      const res = await authFetch("/api/chat/threads?mode=study");
       if (!res.ok) throw new Error("Failed to fetch study threads");
       const data = await res.json();
       return data.threads || [];
@@ -175,7 +175,7 @@ export default function ChatView() {
   const { data: existentialThreads = [] } = useQuery<ChatThread[]>({
     queryKey: ["/api/chat/threads", "existential"],
     queryFn: async () => {
-      const res = await fetch("/api/chat/threads?mode=existential");
+      const res = await authFetch("/api/chat/threads?mode=existential");
       if (!res.ok) throw new Error("Failed to fetch existential threads");
       const data = await res.json();
       return data.threads || [];
@@ -187,7 +187,7 @@ export default function ChatView() {
   const { data: topics = [] } = useQuery<Topic[]>({
     queryKey: ["/api/topics"],
     queryFn: async () => {
-      const res = await fetch("/api/topics");
+      const res = await authFetch("/api/topics");
       if (!res.ok) throw new Error("Failed to fetch topics");
       const data = await res.json();
       return data.topics || [];
@@ -199,7 +199,7 @@ export default function ChatView() {
     queryKey: ["/api/chat/threads", selectedThreadId],
     queryFn: async () => {
       if (!selectedThreadId) throw new Error("No thread selected");
-      const res = await fetch(`/api/chat/threads/${selectedThreadId}`);
+      const res = await authFetch(`/api/chat/threads/${selectedThreadId}`);
       if (!res.ok) throw new Error("Failed to fetch thread");
       const data = await res.json();
       return data.thread;

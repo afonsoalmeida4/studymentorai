@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { authFetch } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import type { Subject, Topic } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
@@ -47,7 +48,7 @@ export default function Home() {
   const { data: allTopics = [] } = useQuery<Topic[]>({
     queryKey: ["/api/topics"],
     queryFn: async () => {
-      const res = await fetch("/api/topics");
+      const res = await authFetch("/api/topics");
       if (!res.ok) throw new Error("Failed to fetch topics");
       const data = await res.json();
       return data.topics || [];
