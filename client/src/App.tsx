@@ -85,6 +85,7 @@ function AuthenticatedRouter() {
                 <Route path="/flashcards" component={FlashcardsPage} />
                 <Route path="/calendar" component={CalendarPage} />
                 <Route path="/subscription" component={SubscriptionPage} />
+                <Route path="/privacy" component={PrivacyPolicy} />
                 <Route path="/subjects" component={SubjectView} />
                 <Route path="/subject/:id" component={SubjectView} />
                 <Route path="/topic/:id" component={TopicView} />

@@ -9,6 +9,7 @@ import {
   flashcardDailyMetrics,
   subjects,
   chatThreads,
+  chatMessages,
   subscriptions,
   usageTracking,
   tasks,
@@ -17,6 +18,9 @@ import {
   topicProgress,
   calendarEvents,
   contentItems,
+  xpEvents,
+  quizzes,
+  flashcardTranslations,
   type User,
   type UpsertUser,
   type Summary,
@@ -101,29 +105,67 @@ export class DatabaseStorage implements IStorage {
     if (userData.email) {
       const existingByEmail = await db.select().from(users).where(eq(users.email, userData.email)).limit(1);
       if (existingByEmail.length > 0 && existingByEmail[0].id !== userData.id) {
-        // User exists with different ID - migrate all references FIRST before updating user ID
-        const oldUserId = existingByEmail[0].id;
-        const newUserId = userData.id;
+        // User exists with different ID - need to migrate their data to the new Supabase ID
+        const oldUser = existingByEmail[0];
+        const oldUserId = oldUser.id!;
+        const newUserId = userData.id!;
         
-        if (oldUserId && newUserId) {
-          // First, migrate all foreign key references to use the new user ID
-          await this.migrateUserReferences(oldUserId, newUserId);
+        console.log(`[MIGRATION] Starting user migration from ${oldUserId} to ${newUserId}`);
+        
+        // Strategy (to avoid unique email constraint violation):
+        // 1. Temporarily clear email from old user
+        // 2. Insert new user with email  
+        // 3. Migrate all FK references from old user to new user
+        // 4. Delete the old user
+        
+        try {
+          // Step 1: Temporarily clear email from old user to avoid unique constraint
+          await db.update(users)
+            .set({ email: `migrating_${oldUserId}@temp.local` })
+            .where(eq(users.id, oldUserId));
+          
+          // Step 2: Insert the new user record with the Supabase ID
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              id: newUserId,
+              email: userData.email,
+              firstName: userData.firstName || oldUser.firstName,
+              lastName: userData.lastName || oldUser.lastName,
+              profileImageUrl: userData.profileImageUrl || oldUser.profileImageUrl,
+              language: oldUser.language,
+              displayName: oldUser.displayName,
+              totalXp: oldUser.totalXp,
+              currentLevel: oldUser.currentLevel,
+              premiumActive: oldUser.premiumActive,
+            })
+            .onConflictDoNothing()
+            .returning();
+          
+          // If insert succeeded (newUser exists), proceed with migration
+          if (newUser) {
+            // Step 3: Migrate all FK references
+            await this.migrateUserReferences(oldUserId, newUserId);
+            
+            // Step 4: Delete the old user record
+            await db.delete(users).where(eq(users.id, oldUserId));
+            
+            console.log(`[MIGRATION] Successfully migrated user from ${oldUserId} to ${newUserId}`);
+            return newUser;
+          } else {
+            // New user already exists (maybe previous migration attempt), just update and clean up
+            const [existingNewUser] = await db.select().from(users).where(eq(users.id, newUserId)).limit(1);
+            if (existingNewUser) {
+              // Migrate any remaining references and delete old user
+              await this.migrateUserReferences(oldUserId, newUserId);
+              await db.delete(users).where(eq(users.id, oldUserId));
+              return existingNewUser;
+            }
+          }
+        } catch (error) {
+          console.error(`[MIGRATION] Error during user migration:`, error);
+          throw error;
         }
-        
-        // Now update the user's ID
-        const [updatedUser] = await db
-          .update(users)
-          .set({
-            id: userData.id,
-            firstName: userData.firstName || existingByEmail[0].firstName,
-            lastName: userData.lastName || existingByEmail[0].lastName,
-            profileImageUrl: userData.profileImageUrl || existingByEmail[0].profileImageUrl,
-            updatedAt: new Date(),
-          })
-          .where(eq(users.email, userData.email))
-          .returning();
-        
-        return updatedUser;
       }
     }
 
@@ -147,41 +189,49 @@ export class DatabaseStorage implements IStorage {
 
   private async migrateUserReferences(oldUserId: string, newUserId: string): Promise<void> {
     // Update all foreign key references from old user ID to new user ID
+    // This covers ALL tables with userId foreign keys
     console.log(`[MIGRATION] Migrating user references from ${oldUserId} to ${newUserId}`);
     
     try {
-      // Update subjects
+      // Core user-owned tables (tables with direct userId FK)
       await db.update(subjects).set({ userId: newUserId }).where(eq(subjects.userId, oldUserId));
+      await db.update(topics).set({ userId: newUserId }).where(eq(topics.userId, oldUserId));
+      await db.update(contentItems).set({ userId: newUserId }).where(eq(contentItems.userId, oldUserId));
+      await db.update(summaries).set({ userId: newUserId }).where(eq(summaries.userId, oldUserId));
+      // Note: topicSummaries has topicId FK (cascades via topics), not direct userId
       
-      // Update chat threads
+      // Flashcard-related tables
+      await db.update(flashcards).set({ userId: newUserId }).where(eq(flashcards.userId, oldUserId));
+      await db.update(flashcardAttempts).set({ userId: newUserId }).where(eq(flashcardAttempts.userId, oldUserId));
+      await db.update(flashcardDailyMetrics).set({ userId: newUserId }).where(eq(flashcardDailyMetrics.userId, oldUserId));
+      // Note: flashcardTranslations has baseFlashcardId FK (cascades via flashcards), not direct userId
+      
+      // Study sessions
+      await db.update(studySessions).set({ userId: newUserId }).where(eq(studySessions.userId, oldUserId));
+      
+      // Chat - only chatThreads has userId, chatMessages has threadId FK
       await db.update(chatThreads).set({ userId: newUserId }).where(eq(chatThreads.userId, oldUserId));
       
-      // Update subscriptions
+      // Subscriptions and billing
       await db.update(subscriptions).set({ userId: newUserId }).where(eq(subscriptions.userId, oldUserId));
-      
-      // Update usage tracking
       await db.update(usageTracking).set({ userId: newUserId }).where(eq(usageTracking.userId, oldUserId));
       
-      // Update tasks
+      // Tasks and progress
       await db.update(tasks).set({ userId: newUserId }).where(eq(tasks.userId, oldUserId));
-      
-      // Update flashcard daily metrics
-      await db.update(flashcardDailyMetrics).set({ userId: newUserId }).where(eq(flashcardDailyMetrics.userId, oldUserId));
-      
-      // Update topic study events
-      await db.update(topicStudyEvents).set({ userId: newUserId }).where(eq(topicStudyEvents.userId, oldUserId));
-      
-      // Update topic study time
-      await db.update(topicStudyTime).set({ userId: newUserId }).where(eq(topicStudyTime.userId, oldUserId));
-      
-      // Update topic progress
       await db.update(topicProgress).set({ userId: newUserId }).where(eq(topicProgress.userId, oldUserId));
       
-      // Update calendar events
+      // Study time tracking
+      await db.update(topicStudyEvents).set({ userId: newUserId }).where(eq(topicStudyEvents.userId, oldUserId));
+      await db.update(topicStudyTime).set({ userId: newUserId }).where(eq(topicStudyTime.userId, oldUserId));
+      
+      // Calendar
       await db.update(calendarEvents).set({ userId: newUserId }).where(eq(calendarEvents.userId, oldUserId));
       
-      // Update content items
-      await db.update(contentItems).set({ userId: newUserId }).where(eq(contentItems.userId, oldUserId));
+      // XP and gamification
+      await db.update(xpEvents).set({ userId: newUserId }).where(eq(xpEvents.userId, oldUserId));
+      
+      // Quizzes
+      await db.update(quizzes).set({ userId: newUserId }).where(eq(quizzes.userId, oldUserId));
       
       console.log(`[MIGRATION] Successfully migrated all user references`);
     } catch (error) {
