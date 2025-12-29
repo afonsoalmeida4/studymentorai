@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { Session, User } from "@supabase/supabase-js";
@@ -20,27 +20,16 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const queryClient = useQueryClient();
-  const initializingRef = useRef(false);
 
   useEffect(() => {
-    // Prevent double initialization in React strict mode
-    if (initializingRef.current) return;
-    initializingRef.current = true;
+    let isMounted = true;
 
     const initializeAuth = async () => {
       try {
-        // Check for OAuth callback (hash fragment with access_token)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const hasOAuthCallback = hashParams.has('access_token') || hashParams.has('error');
-        
-        if (hasOAuthCallback) {
-          // Wait for Supabase to process the OAuth callback
-          // This happens automatically via onAuthStateChange, so we just need to wait
-          console.log('[AUTH] Detected OAuth callback, waiting for session...');
-        }
-        
         // Get the current session
         const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (!isMounted) return;
         
         if (error) {
           console.error('[AUTH] Error getting session:', error);
@@ -50,9 +39,13 @@ export function useAuth() {
         }
       } catch (e) {
         console.error('[AUTH] Init error:', e);
-        setSession(null);
+        if (isMounted) {
+          setSession(null);
+        }
       } finally {
-        setIsSessionLoading(false);
+        if (isMounted) {
+          setIsSessionLoading(false);
+        }
       }
     };
 
@@ -61,13 +54,17 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
       console.log('[AUTH] Auth state changed:', _event, session?.user?.email);
       setSession(session);
       setIsSessionLoading(false);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [queryClient]);
 
   const { data: user, isLoading: isUserLoading } = useQuery<AppUser | null>({
