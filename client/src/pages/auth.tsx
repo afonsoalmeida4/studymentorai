@@ -201,6 +201,8 @@ export default function AuthPage() {
                             <div className="relative">
                               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
+                                type="email"
+                                autoComplete="email"
                                 placeholder={t("auth.emailPlaceholder")}
                                 className="pl-10"
                                 {...field}
@@ -223,6 +225,7 @@ export default function AuthPage() {
                               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
                                 type="password"
+                                autoComplete="current-password"
                                 placeholder={t("auth.passwordPlaceholder")}
                                 className="pl-10"
                                 {...field}
@@ -259,6 +262,8 @@ export default function AuthPage() {
                               <div className="relative">
                                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
+                                  type="text"
+                                  autoComplete="given-name"
                                   placeholder={t("auth.firstNamePlaceholder")}
                                   className="pl-10"
                                   {...field}
@@ -278,6 +283,8 @@ export default function AuthPage() {
                             <FormLabel>{t("auth.lastName")}</FormLabel>
                             <FormControl>
                               <Input
+                                type="text"
+                                autoComplete="family-name"
                                 placeholder={t("auth.lastNamePlaceholder")}
                                 {...field}
                                 data-testid="input-last-name"
@@ -298,6 +305,8 @@ export default function AuthPage() {
                             <div className="relative">
                               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
+                                type="email"
+                                autoComplete="email"
                                 placeholder={t("auth.emailPlaceholder")}
                                 className="pl-10"
                                 {...field}
@@ -320,6 +329,7 @@ export default function AuthPage() {
                               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
                                 type="password"
+                                autoComplete="new-password"
                                 placeholder={t("auth.passwordPlaceholder")}
                                 className="pl-10"
                                 {...field}
