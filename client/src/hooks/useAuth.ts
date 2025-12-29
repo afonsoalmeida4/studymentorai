@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { Session, User } from "@supabase/supabase-js";
@@ -20,16 +20,48 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const queryClient = useQueryClient();
+  const initializingRef = useRef(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsSessionLoading(false);
-    });
+    // Prevent double initialization in React strict mode
+    if (initializingRef.current) return;
+    initializingRef.current = true;
+
+    const initializeAuth = async () => {
+      try {
+        // Check for OAuth callback (hash fragment with access_token)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasOAuthCallback = hashParams.has('access_token') || hashParams.has('error');
+        
+        if (hasOAuthCallback) {
+          // Wait for Supabase to process the OAuth callback
+          // This happens automatically via onAuthStateChange, so we just need to wait
+          console.log('[AUTH] Detected OAuth callback, waiting for session...');
+        }
+        
+        // Get the current session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('[AUTH] Error getting session:', error);
+          setSession(null);
+        } else {
+          setSession(session);
+        }
+      } catch (e) {
+        console.error('[AUTH] Init error:', e);
+        setSession(null);
+      } finally {
+        setIsSessionLoading(false);
+      }
+    };
+
+    initializeAuth();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('[AUTH] Auth state changed:', _event, session?.user?.email);
       setSession(session);
       setIsSessionLoading(false);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
