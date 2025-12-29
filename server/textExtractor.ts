@@ -37,13 +37,20 @@ async function extractFromPDF(buffer: Buffer): Promise<ExtractedContent> {
   const uint8Array = new Uint8Array(buffer);
   
   const pdfParser = new PDFParse({ data: uint8Array });
-  const result = await pdfParser.getText();
+  
+  // Use getRaw() for v1 compatibility - getText() may return only page markers
+  // getRaw() is available in pdf-parse v2 but not in TypeScript types
+  const result = await (pdfParser as any).getRaw();
+  
+  // Clean up parser resources
+  await pdfParser.destroy();
   
   return {
-    text: result.text.trim(),
-    pageCount: result.pageCount,
+    text: result.text?.trim() || "",
+    pageCount: result.numpages,
     metadata: {
       extracted: true,
+      info: result.info,
     },
   };
 }
