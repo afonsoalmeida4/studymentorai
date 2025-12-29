@@ -295,6 +295,10 @@ export default function AuthPage() {
                         )}
                       />
                     </div>
+                    {/* Hidden honeypot fields to confuse password managers */}
+                    <input type="text" name="username" autoComplete="username" className="sr-only" tabIndex={-1} aria-hidden="true" />
+                    <input type="password" name="pwd" autoComplete="current-password" className="sr-only" tabIndex={-1} aria-hidden="true" />
+                    
                     <FormField
                       control={signupForm.control}
                       name="email"
@@ -302,19 +306,26 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth.email")}</FormLabel>
                           <FormControl>
-                            <div className="relative">
+                            <div className="relative" data-1p-ignore data-lpignore="true" data-form-type="other">
                               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                              <Input
+                              <input
                                 type="text"
                                 inputMode="email"
-                                autoComplete="off"
+                                name="user_contact"
+                                id="user_contact"
+                                autoComplete="nope"
                                 autoCorrect="off"
                                 autoCapitalize="off"
-                                spellCheck="false"
+                                spellCheck={false}
+                                data-1p-ignore
+                                data-lpignore="true"
                                 data-form-type="other"
                                 placeholder={t("auth.emailPlaceholder")}
-                                className="pl-10"
-                                {...field}
+                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                ref={field.ref}
                                 data-testid="input-signup-email"
                               />
                             </div>
@@ -330,14 +341,21 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth.password")}</FormLabel>
                           <FormControl>
-                            <div className="relative">
+                            <div className="relative" data-1p-ignore data-lpignore="true">
                               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                              <Input
+                              <input
                                 type="password"
+                                name="user_secret"
+                                id="user_secret"
                                 autoComplete="new-password"
+                                data-1p-ignore
+                                data-lpignore="true"
                                 placeholder={t("auth.passwordPlaceholder")}
-                                className="pl-10"
-                                {...field}
+                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                ref={field.ref}
                                 data-testid="input-signup-password"
                               />
                             </div>
