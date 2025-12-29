@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { Session, User } from "@supabase/supabase-js";
@@ -20,13 +20,13 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const queryClient = useQueryClient();
+  const lastTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     const initializeAuth = async () => {
       try {
-        // Get the current session
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (!isMounted) return;
@@ -34,13 +34,16 @@ export function useAuth() {
         if (error) {
           console.error('[AUTH] Error getting session:', error);
           setSession(null);
+          lastTokenRef.current = null;
         } else {
           setSession(session);
+          lastTokenRef.current = session?.access_token || null;
         }
       } catch (e) {
         console.error('[AUTH] Init error:', e);
         if (isMounted) {
           setSession(null);
+          lastTokenRef.current = null;
         }
       } finally {
         if (isMounted) {
@@ -53,12 +56,24 @@ export function useAuth() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (!isMounted) return;
-      console.log('[AUTH] Auth state changed:', _event, session?.user?.email);
-      setSession(session);
+      
+      const newToken = newSession?.access_token || null;
+      const tokenChanged = newToken !== lastTokenRef.current;
+      
+      if (!tokenChanged && _event !== 'SIGNED_OUT') {
+        return;
+      }
+      
+      console.log('[AUTH] Auth state changed:', _event, newSession?.user?.email);
+      lastTokenRef.current = newToken;
+      setSession(newSession);
       setIsSessionLoading(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      
+      if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT') {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      }
     });
 
     return () => {

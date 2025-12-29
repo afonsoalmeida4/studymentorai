@@ -572,6 +572,11 @@ export function registerOrganizationRoutes(app: Express) {
 
       const extracted = await extractTextFromFile(req.file.buffer, contentType, req.file.mimetype);
 
+      // Clear existing topic summaries when new content is uploaded
+      // This ensures summaries are regenerated with fresh content
+      await db.delete(topicSummaries).where(eq(topicSummaries.topicId, topicId));
+      console.log(`[CONTENT-UPLOAD] Cleared existing topic summaries for topic ${topicId}`);
+
       // First create the content item (without summaryId)
       const contentItem = await db
         .insert(contentItems)
@@ -726,9 +731,17 @@ export function registerOrganizationRoutes(app: Express) {
         return res.status(404).json({ success: false, error: "Conteúdo não encontrado" });
       }
 
+      const topicId = existing.topicId;
+
       await db.delete(contentItems).where(eq(contentItems.id, id));
 
-      res.json({ success: true });
+      // Clear existing summaries for this topic so they regenerate with fresh content
+      if (topicId) {
+        await db.delete(topicSummaries).where(eq(topicSummaries.topicId, topicId));
+        console.log(`[CONTENT-DELETE] Cleared summaries for topic ${topicId} after content removal`);
+      }
+
+      res.json({ success: true, topicId });
     } catch (error) {
       console.error("Error deleting content:", error);
       res.status(500).json({ success: false, error: "Erro ao eliminar conteúdo" });
