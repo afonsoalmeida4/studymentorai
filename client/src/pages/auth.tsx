@@ -435,12 +435,15 @@ export default function AuthPage() {
                           <FormControl>
                             <div className="relative">
                               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                              <Input
+                              <input
                                 type="email"
                                 autoComplete="email"
                                 placeholder={t("auth.emailPlaceholder")}
-                                className="pl-10"
-                                {...field}
+                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                ref={field.ref}
                                 data-testid="input-forgot-email"
                               />
                             </div>
