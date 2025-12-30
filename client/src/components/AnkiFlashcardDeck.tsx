@@ -140,7 +140,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   // Initialize local deck from filtered data, excluding completed cards
   useEffect(() => {
-    if (filteredFlashcards.length > 0 && progressRestored) {
+    // Initialize deck once progress is restored, even if no flashcards are available
+    if (progressRestored && !isLoading) {
       // Filter out already completed cards
       const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.id));
       
@@ -159,7 +160,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       
       setDeckInitialized(true);
     }
-  }, [filteredFlashcards, completedCardIds, progressRestored]);
+  }, [filteredFlashcards, completedCardIds, progressRestored, isLoading]);
 
   // Session timer with persistence
   useEffect(() => {
