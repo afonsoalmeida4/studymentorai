@@ -7,6 +7,7 @@ import { queryClient, apiRequest, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useBackgroundGeneration } from "@/contexts/BackgroundGenerationContext";
 import ReactMarkdown from "react-markdown";
 import SummaryStudySection from "@/components/SummaryStudySection";
 import QuizSection from "@/components/QuizSection";
@@ -108,6 +109,9 @@ export default function TopicView() {
   } = useSubscription();
 
   const currentPlan = subscription?.plan || "free";
+
+  const { isGenerating: isBackgroundGenerating, startGeneration } = useBackgroundGeneration();
+  const isGeneratingForThisTopic = topicId ? isBackgroundGenerating(topicId) : false;
 
   // Sync selectedLearningStyles with limits when they load
   useEffect(() => {
@@ -366,8 +370,10 @@ export default function TopicView() {
   };
 
   const handleManualGenerate = () => {
-    if (selectedLearningStyles.length > 0) {
-      generateSummariesMutation.mutate(selectedLearningStyles);
+    if (selectedLearningStyles.length > 0 && topicId) {
+      startGeneration(topicId, selectedLearningStyles);
+      setIsGenerateStylesDialogOpen(false);
+      setSelectedLearningStyles([]);
     }
   };
 
@@ -388,8 +394,9 @@ export default function TopicView() {
   };
 
   const confirmRegenerate = () => {
-    if (styleToRegenerate) {
-      generateSummariesMutation.mutate([styleToRegenerate]);
+    if (styleToRegenerate && topicId) {
+      startGeneration(topicId, [styleToRegenerate]);
+      setStyleToRegenerate(null);
     }
   };
 
@@ -814,22 +821,24 @@ export default function TopicView() {
               </div>
             </div>
 
-            {generateSummariesMutation.isPending ? (
-              <Card className="relative overflow-hidden">
+            {isGeneratingForThisTopic && (
+              <Card className="relative overflow-hidden mb-6">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5" />
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500 rounded-l-md" />
-                <CardContent className="py-12 text-center relative">
+                <CardContent className="py-8 text-center relative">
                   <div className="relative inline-flex mb-4">
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-500 blur-md opacity-30 rounded-xl animate-pulse" />
                     <div className="relative p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-                      <Sparkles className="w-10 h-10 text-amber-500 animate-pulse" />
+                      <Sparkles className="w-8 h-8 text-amber-500 animate-pulse" />
                     </div>
                   </div>
                   <p className="text-muted-foreground">{t('summaries.generatingSummary')}</p>
                   <p className="text-xs text-muted-foreground mt-2">{t('summaries.generatingWait')}</p>
                 </CardContent>
               </Card>
-            ) : topicSummariesLoading ? (
+            )}
+            
+            {topicSummariesLoading ? (
               <Card className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-muted/20" />
                 <CardContent className="py-12 text-center relative">
@@ -898,11 +907,11 @@ export default function TopicView() {
                           </div>
                           <Button
                             onClick={handleManualGenerate}
-                            disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
+                            disabled={isGeneratingForThisTopic || selectedLearningStyles.length === 0}
                             data-testid="button-manual-generate"
                             className="w-full"
                           >
-                            {generateSummariesMutation.isPending 
+                            {isGeneratingForThisTopic 
                               ? t('topicView.generateStylesDialog.generating')
                               : t('topicView.generateStylesDialog.generate')
                             }
@@ -993,7 +1002,7 @@ export default function TopicView() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setStyleToRegenerate("visual")}
-                                  disabled={generateSummariesMutation.isPending}
+                                  disabled={isGeneratingForThisTopic}
                                   data-testid="button-regenerate-visual"
                                   className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
@@ -1070,7 +1079,7 @@ export default function TopicView() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setStyleToRegenerate("logico")}
-                                  disabled={generateSummariesMutation.isPending}
+                                  disabled={isGeneratingForThisTopic}
                                   data-testid="button-regenerate-logico"
                                   className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
@@ -1146,7 +1155,7 @@ export default function TopicView() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setStyleToRegenerate("conciso")}
-                                  disabled={generateSummariesMutation.isPending}
+                                  disabled={isGeneratingForThisTopic}
                                   data-testid="button-regenerate-conciso"
                                   className="gap-1 text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                                 >
@@ -1239,11 +1248,11 @@ export default function TopicView() {
                       </div>
                       <Button
                         onClick={handleManualGenerate}
-                        disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
+                        disabled={isGeneratingForThisTopic || selectedLearningStyles.length === 0}
                         data-testid="button-manual-generate"
                         className="w-full"
                       >
-                        {generateSummariesMutation.isPending 
+                        {isGeneratingForThisTopic 
                           ? t('topicView.generateStylesDialog.generating')
                           : t('topicView.generateStylesDialog.generate')
                         }
@@ -1318,10 +1327,10 @@ export default function TopicView() {
             </Button>
             <Button
               onClick={handleManualGenerate}
-              disabled={generateSummariesMutation.isPending || selectedLearningStyles.length === 0}
+              disabled={isGeneratingForThisTopic || selectedLearningStyles.length === 0}
               data-testid="button-submit-generate-styles"
             >
-              {generateSummariesMutation.isPending
+              {isGeneratingForThisTopic
                 ? t('topicView.generateStylesDialog.generating')
                 : t('topicView.generateStylesDialog.generate')
               }

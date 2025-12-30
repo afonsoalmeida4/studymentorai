@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
+import { BackgroundGenerationProvider } from "@/contexts/BackgroundGenerationContext";
 import { useEffect, lazy, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Landing from "@/pages/landing";
@@ -148,8 +149,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Router />
+        <BackgroundGenerationProvider>
+          <Toaster />
+          <Router />
+        </BackgroundGenerationProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
