@@ -17,69 +17,126 @@ export function calculateStudySessionXP(correctCards: number): number {
   return XP_REWARDS.COMPLETE_STUDY_SESSION_BASE + (correctCards * XP_REWARDS.CORRECT_FLASHCARD_BONUS);
 }
 
+// Level definitions - 50 levels with progressive XP requirements
+export const LEVELS = [
+  { level: 1, name: "Curioso", icon: "feather", minXp: 0 },
+  { level: 2, name: "Aprendiz", icon: "feather", minXp: 100 },
+  { level: 3, name: "Estudante", icon: "feather", minXp: 250 },
+  { level: 4, name: "Dedicado", icon: "feather", minXp: 450 },
+  { level: 5, name: "Focado", icon: "book-open", minXp: 700 },
+  { level: 6, name: "Aplicado", icon: "book-open", minXp: 1000 },
+  { level: 7, name: "Persistente", icon: "book-open", minXp: 1350 },
+  { level: 8, name: "Determinado", icon: "book-open", minXp: 1750 },
+  { level: 9, name: "Comprometido", icon: "book-open", minXp: 2200 },
+  { level: 10, name: "Explorador", icon: "compass", minXp: 2700 },
+  { level: 11, name: "Descobridor", icon: "compass", minXp: 3250 },
+  { level: 12, name: "Investigador", icon: "compass", minXp: 3850 },
+  { level: 13, name: "Pesquisador", icon: "compass", minXp: 4500 },
+  { level: 14, name: "Analista", icon: "compass", minXp: 5200 },
+  { level: 15, name: "Estrategista", icon: "target", minXp: 5950 },
+  { level: 16, name: "Metódico", icon: "target", minXp: 6750 },
+  { level: 17, name: "Organizado", icon: "target", minXp: 7600 },
+  { level: 18, name: "Eficiente", icon: "target", minXp: 8500 },
+  { level: 19, name: "Produtivo", icon: "target", minXp: 9450 },
+  { level: 20, name: "Mentor Iniciante", icon: "brain", minXp: 10450 },
+  { level: 21, name: "Mentor", icon: "brain", minXp: 11500 },
+  { level: 22, name: "Mentor Avançado", icon: "brain", minXp: 12600 },
+  { level: 23, name: "Conselheiro", icon: "brain", minXp: 13750 },
+  { level: 24, name: "Guia", icon: "brain", minXp: 14950 },
+  { level: 25, name: "Especialista", icon: "award", minXp: 16200 },
+  { level: 26, name: "Expert", icon: "award", minXp: 17500 },
+  { level: 27, name: "Profissional", icon: "award", minXp: 18850 },
+  { level: 28, name: "Veterano", icon: "award", minXp: 20250 },
+  { level: 29, name: "Mestre Iniciante", icon: "award", minXp: 21700 },
+  { level: 30, name: "Mestre", icon: "trophy", minXp: 23200 },
+  { level: 31, name: "Mestre Avançado", icon: "trophy", minXp: 24750 },
+  { level: 32, name: "Grão-Mestre", icon: "trophy", minXp: 26350 },
+  { level: 33, name: "Sábio Iniciante", icon: "trophy", minXp: 28000 },
+  { level: 34, name: "Sábio", icon: "trophy", minXp: 29700 },
+  { level: 35, name: "Sábio Avançado", icon: "sparkles", minXp: 31450 },
+  { level: 36, name: "Iluminado", icon: "sparkles", minXp: 33250 },
+  { level: 37, name: "Visionário", icon: "sparkles", minXp: 35100 },
+  { level: 38, name: "Génio Iniciante", icon: "sparkles", minXp: 37000 },
+  { level: 39, name: "Génio", icon: "sparkles", minXp: 38950 },
+  { level: 40, name: "Génio Avançado", icon: "crown", minXp: 40950 },
+  { level: 41, name: "Virtuoso", icon: "crown", minXp: 43000 },
+  { level: 42, name: "Prodígio", icon: "crown", minXp: 45100 },
+  { level: 43, name: "Fenómeno", icon: "crown", minXp: 47250 },
+  { level: 44, name: "Elite", icon: "crown", minXp: 49450 },
+  { level: 45, name: "Lenda Iniciante", icon: "rocket", minXp: 51700 },
+  { level: 46, name: "Lenda", icon: "rocket", minXp: 54000 },
+  { level: 47, name: "Lenda Avançada", icon: "rocket", minXp: 56350 },
+  { level: 48, name: "Mito", icon: "rocket", minXp: 58750 },
+  { level: 49, name: "Transcendente", icon: "rocket", minXp: 61200 },
+  { level: 50, name: "Mestre do Foco", icon: "rocket", minXp: 63700 },
+] as const;
+
+export const TOTAL_LEVELS = LEVELS.length;
+
 // Helper function to get current level from XP
 export function getLevelFromXP(totalXp: number): {
   level: string;
-  icon: string; // lucide-react icon name
+  levelNumber: number;
+  icon: string;
   name: string;
-  progress: number; // 0-100%
+  progress: number;
   nextLevelXp: number;
   currentLevelXp: number;
+  totalLevels: number;
 } {
-  if (totalXp >= 2000) {
+  let currentLevelIndex = 0;
+  
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (totalXp >= LEVELS[i].minXp) {
+      currentLevelIndex = i;
+      break;
+    }
+  }
+  
+  const currentLevel = LEVELS[currentLevelIndex];
+  const nextLevel = LEVELS[currentLevelIndex + 1];
+  
+  if (!nextLevel) {
     return {
-      level: "mestre",
-      icon: "rocket",
-      name: "Mestre do Foco",
+      level: `level_${currentLevel.level}`,
+      levelNumber: currentLevel.level,
+      icon: currentLevel.icon,
+      name: currentLevel.name,
       progress: 100,
       nextLevelXp: Infinity,
-      currentLevelXp: 2000,
-    };
-  } else if (totalXp >= 900) {
-    const progress = ((totalXp - 900) / (2000 - 900)) * 100;
-    return {
-      level: "mentor",
-      icon: "brain",
-      name: "Mentor",
-      progress: Math.min(progress, 100),
-      nextLevelXp: 2000,
-      currentLevelXp: 900,
-    };
-  } else if (totalXp >= 300) {
-    const progress = ((totalXp - 300) / (900 - 300)) * 100;
-    return {
-      level: "explorador",
-      icon: "book-open",
-      name: "Explorador",
-      progress: Math.min(progress, 100),
-      nextLevelXp: 900,
-      currentLevelXp: 300,
-    };
-  } else {
-    const progress = (totalXp / 300) * 100;
-    return {
-      level: "iniciante",
-      icon: "feather",
-      name: "Iniciante",
-      progress: Math.min(progress, 100),
-      nextLevelXp: 300,
-      currentLevelXp: 0,
+      currentLevelXp: currentLevel.minXp,
+      totalLevels: TOTAL_LEVELS,
     };
   }
+  
+  const xpInCurrentLevel = totalXp - currentLevel.minXp;
+  const xpNeededForNextLevel = nextLevel.minXp - currentLevel.minXp;
+  const progress = (xpInCurrentLevel / xpNeededForNextLevel) * 100;
+  
+  return {
+    level: `level_${currentLevel.level}`,
+    levelNumber: currentLevel.level,
+    icon: currentLevel.icon,
+    name: currentLevel.name,
+    progress: Math.min(progress, 100),
+    nextLevelXp: nextLevel.minXp,
+    currentLevelXp: currentLevel.minXp,
+    totalLevels: TOTAL_LEVELS,
+  };
 }
 
 // Motivational messages based on ranking position
 export function getMotivationalMessage(position: number, pointsToNext?: number): string {
   if (position === 1) {
-    return `És o número 1! Incrível trabalho! Continue neste ritmo!`;
+    return `You're #1! Incredible work! Keep up this pace!`;
   } else if (position === 2) {
-    return `Em segundo lugar! ${pointsToNext ? `Faltam apenas ${pointsToNext} XP para o 1º lugar!` : "Continua assim!"}`;
+    return `In second place! ${pointsToNext ? `Only ${pointsToNext} XP to reach #1!` : "Keep going!"}`;
   } else if (position === 3) {
-    return `No pódio! ${pointsToNext ? `Só precisas de mais ${pointsToNext} XP para subir!` : "Excelente!"}`;
+    return `On the podium! ${pointsToNext ? `Just ${pointsToNext} XP to move up!` : "Excellent!"}`;
   } else if (position <= 10) {
-    return `No Top 10! ${pointsToNext ? `Faltam ${pointsToNext} XP para ultrapassares o próximo!` : "Continua a estudar!"}`;
+    return `Top 10! ${pointsToNext ? `${pointsToNext} XP to overtake the next!` : "Keep studying!"}`;
   } else {
-    return "Continua a ganhar XP e sobe no ranking! Cada estudo conta!";
+    return "Keep earning XP and climb the rankings! Every study counts!";
   }
 }
 

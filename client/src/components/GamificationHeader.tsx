@@ -14,11 +14,13 @@ interface GamificationProfile {
   };
   levelInfo: {
     level: string;
+    levelNumber: number;
     icon: string;
     name: string;
     progress: number;
     nextLevelXp: number;
     currentLevelXp: number;
+    totalLevels: number;
   };
   rank: number | null;
   totalUsers: number;
@@ -66,7 +68,8 @@ export function GamificationHeader() {
               levelName={levelInfo.name}
               size="lg"
             />
-            <div className="sm:hidden">
+            <div className="sm:hidden flex items-center gap-2">
+              <LevelNumberBadge levelNumber={levelInfo.levelNumber} totalLevels={levelInfo.totalLevels} />
               <RankBadge rank={rank} totalUsers={totalUsers} />
             </div>
           </div>
@@ -81,11 +84,29 @@ export function GamificationHeader() {
             />
           </div>
           
-          <div className="hidden sm:block">
+          <div className="hidden sm:flex items-center gap-2">
+            <LevelNumberBadge levelNumber={levelInfo.levelNumber} totalLevels={levelInfo.totalLevels} />
             <RankBadge rank={rank} totalUsers={totalUsers} />
           </div>
         </div>
       </Card>
+    </motion.div>
+  );
+}
+
+function LevelNumberBadge({ levelNumber, totalLevels }: { levelNumber: number; totalLevels: number }) {
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 0.2, type: "spring" }}
+      whileHover={{ scale: 1.05 }}
+      className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border bg-gradient-to-r from-primary/10 to-primary/5 text-primary border-primary/30"
+      data-testid="text-level-info"
+    >
+      <Star className="h-3 w-3" />
+      <span>#{String(levelNumber).padStart(2, '0')}</span>
+      <span className="text-muted-foreground font-normal">/{totalLevels}</span>
     </motion.div>
   );
 }
