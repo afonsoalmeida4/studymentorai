@@ -488,6 +488,7 @@
     "placeholder": "Posez une question...",
     "send": "Envoyer",
     "newChat": "Nouveau Chat",
+    "newConversation": "Nouvelle Conversation",
     "empty": "Commencez une conversation avec votre assistant IA.",
     "studyMode": "Étude",
     "existentialMode": "Vie",

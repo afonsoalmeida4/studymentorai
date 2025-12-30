@@ -195,12 +195,20 @@ export default function ChatView() {
     // Topics are available for all users
   });
 
-  const { data: currentThread } = useQuery<ThreadWithMessages>({
+  const { data: currentThread, isError: isThreadError } = useQuery<ThreadWithMessages>({
     queryKey: ["/api/chat/threads", selectedThreadId],
     queryFn: async () => {
       if (!selectedThreadId) throw new Error("No thread selected");
       const res = await authFetch(`/api/chat/threads/${selectedThreadId}`);
-      if (!res.ok) throw new Error("Failed to fetch thread");
+      if (!res.ok) {
+        // If thread not found (404), clear selection
+        if (res.status === 404) {
+          console.log("[CHAT] Thread not found, clearing selection");
+          setSelectedThreadId(null);
+          saveSelectedThread(null);
+        }
+        throw new Error("Failed to fetch thread");
+      }
       const data = await res.json();
       return data.thread;
     },
@@ -208,7 +216,17 @@ export default function ChatView() {
     // CRITICAL: localStorage metadata ensures FREE users never select existential threads
     // Hydration effect clears existential threads before this query can mount
     enabled: !!selectedThreadId && subscriptionResolved,
+    retry: false, // Don't retry if thread not found
   });
+
+  // Clear invalid thread selection on error
+  useEffect(() => {
+    if (isThreadError && selectedThreadId) {
+      console.log("[CHAT] Clearing invalid thread selection due to error");
+      setSelectedThreadId(null);
+      saveSelectedThread(null);
+    }
+  }, [isThreadError, selectedThreadId]);
 
 
   const createThreadMutation = useMutation({

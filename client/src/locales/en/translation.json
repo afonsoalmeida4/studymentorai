@@ -601,6 +601,7 @@
     "placeholder": "Ask a question...",
     "send": "Send",
     "newChat": "New Chat",
+    "newConversation": "New Conversation",
     "empty": "Start a conversation with your AI assistant.",
     "studyMode": "Study",
     "existentialMode": "Life",
