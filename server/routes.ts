@@ -2179,6 +2179,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Store topicId before deletion to invalidate cache
+      const topicIdToInvalidate = flashcard.topicId;
+      
       const deleted = await storage.deleteFlashcard(flashcardId, userId);
 
       // This should never be false due to prior validation, but defensive check
@@ -2187,6 +2190,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: false,
           error: "Erro inesperado ao eliminar flashcard",
         });
+      }
+
+      // Invalidate bundled cache for this topic so frontend gets fresh count
+      if (topicIdToInvalidate) {
+        bundledFlashcardsCache.delete(`${topicIdToInvalidate}:${userId}`);
+        console.log(`[DELETE /api/flashcards/:id] Cache invalidated for topic ${topicIdToInvalidate}`);
       }
 
       return res.json({
