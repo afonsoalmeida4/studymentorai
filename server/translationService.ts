@@ -172,6 +172,23 @@ export async function getOrCreateTranslatedFlashcards(
 
   // For non-Portuguese languages, verify these are REAL translations (have flashcard_translations mappings)
   // Note: targetLanguage is guaranteed to be non-"pt" here due to early return above
+  
+  // First, get the PT summary and count PT flashcards to detect if new ones were added
+  const ptSummaryCheck = await db.query.topicSummaries.findFirst({
+    where: and(
+      eq(topicSummaries.topicId, originalSummary.topicId),
+      eq(topicSummaries.learningStyle, originalSummary.learningStyle),
+      eq(topicSummaries.language, "pt")
+    ),
+  });
+  
+  const ptFlashcardsCount = ptSummaryCheck ? await db.query.flashcards.findMany({
+    where: and(
+      eq(flashcards.topicSummaryId, ptSummaryCheck.id),
+      eq(flashcards.language, "pt")
+    ),
+  }).then(fcs => fcs.length) : 0;
+  
   if (existingFlashcards.length > 0) {
     // Check if these flashcards have translation mappings
     const existingIds = existingFlashcards.map(fc => fc.id);
@@ -179,8 +196,15 @@ export async function getOrCreateTranslatedFlashcards(
       where: inArray(flashcardTranslations.translatedFlashcardId, existingIds),
     });
 
-    // If mappings exist and count matches, these are valid translations
-    if (mappings.length === existingFlashcards.length) {
+    // CRITICAL FIX: Also check if there are NEW Portuguese flashcards that need translation
+    // If PT count > translation count, we need to translate the new ones
+    const translatedCount = mappings.length;
+    const needsNewTranslations = ptFlashcardsCount > translatedCount;
+    
+    if (needsNewTranslations) {
+      console.log(`[Translation Cache PARTIAL] Found ${translatedCount} translations but ${ptFlashcardsCount} PT flashcards - need to translate ${ptFlashcardsCount - translatedCount} new cards`);
+      // Fall through to translation logic below - don't delete existing translations
+    } else if (mappings.length === existingFlashcards.length) {
       console.log(`[Translation Cache HIT] ${existingFlashcards.length} validated flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
       
       // CRITICAL: Order translations by base flashcard order (Portuguese order)
@@ -215,31 +239,31 @@ export async function getOrCreateTranslatedFlashcards(
         .filter((fc): fc is Flashcard => fc !== undefined);
       
       return orderedTranslations;
-    }
-
-    // Otherwise, these are legacy flashcards (generated separately, not translated)
-    // Delete them so we can create proper translations
-    console.log(`[Translation Cache STALE] Found ${existingFlashcards.length} legacy flashcards without mappings (${mappings.length} mappings) - regenerating...`);
-    
-    // Delete stale flashcards
-    await db.delete(flashcards).where(inArray(flashcards.id, existingIds));
-    
-    // Delete any orphaned mappings
-    if (mappings.length > 0) {
-      await db.delete(flashcardTranslations).where(
-        inArray(flashcardTranslations.translatedFlashcardId, existingIds)
-      );
+    } else {
+      // Otherwise, these are legacy flashcards (generated separately, not translated)
+      // Delete them so we can create proper translations
+      console.log(`[Translation Cache STALE] Found ${existingFlashcards.length} legacy flashcards without mappings (${mappings.length} mappings) - regenerating...`);
+      
+      // Delete stale flashcards
+      await db.delete(flashcards).where(inArray(flashcards.id, existingIds));
+      
+      // Delete any orphaned mappings
+      if (mappings.length > 0) {
+        await db.delete(flashcardTranslations).where(
+          inArray(flashcardTranslations.translatedFlashcardId, existingIds)
+        );
+      }
     }
   }
 
-  // 4. Cache miss - need to translate flashcards
-  console.log(`[Translation Cache MISS] Flashcards for summary ${topicSummaryId} -> ${targetLanguage} - translating...`);
+  // 4. Cache miss or partial - need to translate flashcards
+  console.log(`[Translation Cache MISS/PARTIAL] Flashcards for summary ${topicSummaryId} -> ${targetLanguage} - translating...`);
 
   // Always translate from Portuguese (base language)
   const sourceLanguage: SupportedLanguage = "pt";
   
-  // Fetch Portuguese flashcards
-  const ptSummary = await db.query.topicSummaries.findFirst({
+  // Fetch Portuguese flashcards - reuse ptSummaryCheck if available
+  const ptSummary = ptSummaryCheck || await db.query.topicSummaries.findFirst({
     where: and(
       eq(topicSummaries.topicId, originalSummary.topicId),
       eq(topicSummaries.learningStyle, originalSummary.learningStyle),
@@ -252,7 +276,7 @@ export async function getOrCreateTranslatedFlashcards(
   }
 
   // CRITICAL: ORDER BY createdAt to ensure deterministic pairing with translated flashcards
-  const sourceFlashcards = await db.query.flashcards.findMany({
+  const allSourceFlashcards = await db.query.flashcards.findMany({
     where: and(
       eq(flashcards.topicSummaryId, ptSummary.id),
       eq(flashcards.language, "pt")
@@ -260,13 +284,36 @@ export async function getOrCreateTranslatedFlashcards(
     orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt), asc(flashcards.id)],
   });
 
-  if (sourceFlashcards.length === 0) {
+  if (allSourceFlashcards.length === 0) {
     // No flashcards to translate - return empty array
     return [];
   }
 
-  // 5. Translate flashcards via GPT-4
-  const flashcardsData = sourceFlashcards.map(fc => ({
+  // Get existing translation mappings to find which PT flashcards already have translations
+  const existingMappings = await db.query.flashcardTranslations.findMany({
+    where: eq(flashcardTranslations.targetLanguage, targetLanguage),
+  });
+  const alreadyTranslatedBaseIds = new Set(existingMappings.map(m => m.baseFlashcardId));
+  
+  // Find PT flashcards that DON'T have translations yet
+  const untranslatedFlashcards = allSourceFlashcards.filter(fc => !alreadyTranslatedBaseIds.has(fc.id));
+  
+  console.log(`[Translation] ${allSourceFlashcards.length} total PT flashcards, ${untranslatedFlashcards.length} need translation`);
+  
+  if (untranslatedFlashcards.length === 0) {
+    // All flashcards already translated - return existing translations
+    const existingTranslatedFlashcards = await db.query.flashcards.findMany({
+      where: and(
+        eq(flashcards.topicSummaryId, translatedSummary.id),
+        eq(flashcards.language, targetLanguage)
+      ),
+    });
+    console.log(`[Translation] All already translated, returning ${existingTranslatedFlashcards.length} existing translations`);
+    return existingTranslatedFlashcards;
+  }
+
+  // 5. Translate only the new flashcards via GPT-4
+  const flashcardsData = untranslatedFlashcards.map(fc => ({
     question: fc.question,
     answer: fc.answer,
   }));
@@ -278,17 +325,17 @@ export async function getOrCreateTranslatedFlashcards(
   );
 
   // Get userId from source flashcards (all should have same userId)
-  const userId = sourceFlashcards[0]?.userId;
+  const userId = untranslatedFlashcards[0]?.userId;
   if (!userId) {
     throw new Error(`Source flashcards have no userId for summary ${topicSummaryId}`);
   }
 
   // 6. Persist translated flashcards to DB
   // Copy topicId and subjectId from source flashcards to enable proper filtering
-  const sourceTopicId = sourceFlashcards[0]?.topicId || null;
-  const sourceSubjectId = sourceFlashcards[0]?.subjectId || null;
+  const sourceTopicId = untranslatedFlashcards[0]?.topicId || null;
+  const sourceSubjectId = untranslatedFlashcards[0]?.subjectId || null;
   
-  const newFlashcards = await db.insert(flashcards).values(
+  const newTranslatedFlashcards = await db.insert(flashcards).values(
     translatedFlashcardsData.map(fc => ({
       userId,
       topicSummaryId: translatedSummary.id,
@@ -301,21 +348,29 @@ export async function getOrCreateTranslatedFlashcards(
   ).returning();
 
   // 7. Create flashcard translation mappings for SM-2 progress sharing
-  // Note: targetLanguage is guaranteed to be non-"pt" here due to early return above
-  if (newFlashcards.length === sourceFlashcards.length) {
-    const translationMappings = newFlashcards.map((translatedFC, index) => ({
-      baseFlashcardId: sourceFlashcards[index].id, // PT flashcard (base)
-      translatedFlashcardId: translatedFC.id,      // Translated flashcard
+  if (newTranslatedFlashcards.length === untranslatedFlashcards.length) {
+    const translationMappings = newTranslatedFlashcards.map((translatedFC, index) => ({
+      baseFlashcardId: untranslatedFlashcards[index].id, // PT flashcard (base)
+      translatedFlashcardId: translatedFC.id,            // Translated flashcard
       targetLanguage,
     }));
 
     await db.insert(flashcardTranslations).values(translationMappings);
-    console.log(`[Translation Mappings CREATED] ${translationMappings.length} mappings for ${targetLanguage}`);
+    console.log(`[Translation Mappings CREATED] ${translationMappings.length} new mappings for ${targetLanguage}`);
   }
 
-  console.log(`[Translation Cache STORED] ${newFlashcards.length} flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
+  console.log(`[Translation Cache STORED] ${newTranslatedFlashcards.length} new flashcards for summary ${topicSummaryId} -> ${targetLanguage}`);
 
-  return newFlashcards;
+  // 8. Return ALL translated flashcards (existing + new)
+  const allTranslatedFlashcards = await db.query.flashcards.findMany({
+    where: and(
+      eq(flashcards.topicSummaryId, translatedSummary.id),
+      eq(flashcards.language, targetLanguage)
+    ),
+    orderBy: (flashcards, { asc }) => [asc(flashcards.createdAt), asc(flashcards.id)],
+  });
+
+  return allTranslatedFlashcards;
 }
 
 /**
