@@ -14,6 +14,7 @@ import { getUserLanguage } from "./languageHelper";
 import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards } from "./translationService";
 import { storage } from "./storage";
 import type { SupportedLanguage } from "@shared/schema";
+import { invalidateBundledCache } from "./flashcardCache";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -795,6 +796,9 @@ export function registerOrganizationRoutes(app: Express) {
           await db.delete(topicSummaries).where(eq(topicSummaries.topicId, topicId));
           console.log(`[CONTENT-DELETE] Cleared summaries for topic ${topicId} after content removal (${remainingContent.length} items remaining)`);
         }
+        
+        // Invalidate bundled flashcards cache for this topic
+        invalidateBundledCache(topicId);
       }
 
       res.json({ success: true, topicId });

@@ -82,21 +82,10 @@ const exportLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// In-memory cache for bundled flashcards (TTL: 60 seconds)
-const bundledFlashcardsCache = new Map<string, { data: any; timestamp: number; userId: string }>();
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds
-
-// Helper to invalidate cache for a topic
-const invalidateBundledCache = (topicId: string) => {
-  const keysToDelete: string[] = [];
-  bundledFlashcardsCache.forEach((_, key) => {
-    if (key.startsWith(`${topicId}:`)) {
-      keysToDelete.push(key);
-    }
-  });
-  keysToDelete.forEach(key => bundledFlashcardsCache.delete(key));
-  console.log(`[Cache] Invalidated bundled cache for topic ${topicId}`);
-};
+// Use shared cache module for bundled flashcards
+import { getCache, getCacheTTL, invalidateBundledCache } from "./flashcardCache";
+const bundledFlashcardsCache = getCache();
+const CACHE_TTL_MS = getCacheTTL();
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
