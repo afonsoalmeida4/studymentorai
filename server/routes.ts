@@ -923,9 +923,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Extract existing questions to avoid duplicates (lightweight - just questions, not full flashcards)
-      const existingQuestions = uniqueExisting.map(fc => fc.question);
-      console.log(`[Regenerate Flashcards] Avoiding ${existingQuestions.length} existing questions`);
+      // Extract existing questions to avoid duplicates - ONLY from the same language
+      // Different languages can have the same content, we only prevent duplicates within the same language
+      const sameLanguageFlashcards = uniqueExisting.filter(fc => fc.language === normalizedTargetLanguage);
+      const existingQuestions = sameLanguageFlashcards.map(fc => fc.question);
+      console.log(`[Regenerate Flashcards] Avoiding ${existingQuestions.length} existing questions in ${normalizedTargetLanguage} (${uniqueExisting.length} total in all languages)`);
 
       // Generate flashcards in the user's selected language, avoiding duplicates
       const flashcardsData = await generateFlashcards(trimmedSummaryText, normalizedTargetLanguage, null, flashcardMaxTokens, existingQuestions);
