@@ -203,13 +203,22 @@ export function useAuth() {
       throw updateError;
     }
 
-    // Refresh session after password change to get new tokens
-    const { data: refreshData } = await supabase.auth.getSession();
-    if (refreshData?.session) {
-      setSession(refreshData.session);
-      lastTokenRef.current = refreshData.session.access_token;
+    // Re-authenticate with the new password to get a fresh session
+    const { data: newLoginData, error: newLoginError } = await supabase.auth.signInWithPassword({
+      email: currentEmail,
+      password: newPassword,
+    });
+
+    if (newLoginError) {
+      console.error('[AUTH] Failed to re-authenticate after password change:', newLoginError);
+      // Session might be invalid, but password was changed successfully
+      // The onAuthStateChange listener will handle session updates
+    } else if (newLoginData?.session) {
+      setSession(newLoginData.session);
+      lastTokenRef.current = newLoginData.session.access_token;
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
     }
-  }, [session]);
+  }, [session, queryClient]);
 
   const updateEmail = useCallback(async (currentPassword: string, newEmail: string) => {
     // First verify current password
