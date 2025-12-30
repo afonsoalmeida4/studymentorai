@@ -83,7 +83,11 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
   // Regenerate flashcards mutation with immediate feedback
   const regenerateMutation = useMutation({
     mutationFn: async (topicSummaryId: string) => {
-      return apiRequest("POST", "/api/flashcards/regenerate", { topicSummaryId });
+      // Send current language so backend can translate flashcards immediately
+      return apiRequest("POST", "/api/flashcards/regenerate", { 
+        topicSummaryId, 
+        targetLanguage: i18n.language 
+      });
     },
     onMutate: () => {
       setIsGeneratingInBackground(true);

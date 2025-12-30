@@ -6,7 +6,7 @@ import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel } from "docx";
 import { generateSummary, generateFlashcards, generateReviewPlan, generateQuiz, type StudyHistoryItem } from "./openai";
-import { getUserLanguage } from "./languageHelper";
+import { getUserLanguage, normalizeLanguage } from "./languageHelper";
 import { getOrCreateTranslatedSummary, getOrCreateTranslatedFlashcards, createManualFlashcardWithTranslations } from "./translationService";
 import { 
   generateSummaryRequestSchema, 
@@ -828,12 +828,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Regenerate flashcards for upgraded users (PRO/PREMIUM only)
-  // Flashcards are generated in the language of the summary (user's current app language)
-  // No automatic translation - flashcards stay in their creation language
+  // Flashcards are generated in Portuguese (base language) and immediately translated
+  // to the target language if different from Portuguese
   app.post("/api/flashcards/regenerate", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { topicSummaryId } = req.body;
+      const { topicSummaryId, targetLanguage } = req.body;
+      
+      // Normalize target language to supported language code
+      const normalizedTargetLanguage = normalizeLanguage(targetLanguage, "pt");
 
       if (!topicSummaryId) {
         return res.status(400).json({
@@ -959,6 +962,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Save new flashcards with proper topicId and subjectId set (using filtered unique flashcards)
+      // Always save in Portuguese (base language) first
       const newFlashcards = await storage.createFlashcards(
         uniqueNewFlashcards.map((fc: any) => ({
           userId,
@@ -966,14 +970,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
           topicId: topicId,
           subjectId: subjectId,
           isManual: false,
-          language: flashcardLanguage,
+          language: "pt", // Always save in Portuguese first
           question: fc.question,
           answer: fc.answer,
           summaryId: null,
         }))
       );
       
-      // NO automatic translations - flashcards stay in their creation language
+      // If target language is not Portuguese, immediately create translations
+      let flashcardsToReturn = newFlashcards;
+      if (normalizedTargetLanguage !== "pt") {
+        console.log(`[Regenerate Flashcards] Creating translations for ${newFlashcards.length} flashcards to ${normalizedTargetLanguage}`);
+        try {
+          // Trigger translation for each new flashcard (this will create translated copies in DB)
+          const translatedFlashcards = await getOrCreateTranslatedFlashcards(topicSummaryId, normalizedTargetLanguage);
+          // Return the translated versions instead of the PT originals
+          flashcardsToReturn = translatedFlashcards.filter(fc => 
+            newFlashcards.some(newFc => 
+              fc.question.toLowerCase().includes(newFc.question.slice(0, 20).toLowerCase()) ||
+              fc.topicSummaryId === newFc.topicSummaryId
+            )
+          );
+          // If we couldn't match translated flashcards, just return the new ones in PT
+          if (flashcardsToReturn.length === 0) {
+            flashcardsToReturn = newFlashcards;
+          }
+          console.log(`[Regenerate Flashcards] Translations created successfully`);
+        } catch (translationError) {
+          console.error(`[Regenerate Flashcards] Failed to create translations:`, translationError);
+          // Fall back to returning PT flashcards
+          flashcardsToReturn = newFlashcards;
+        }
+      }
 
       // Record monthly usage for flashcards
       await usageLimitsService.recordUsage(userId, "flashcards", newFlashcards.length);
@@ -989,11 +1017,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invalidateBundledCache(topicId);
       }
 
-      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards in ${flashcardLanguage} to topic (${existingCount} → ${newTotalCount})`);
+      console.log(`[Regenerate Flashcards] Added ${newFlashcards.length} flashcards (target: ${normalizedTargetLanguage}) to topic (${existingCount} → ${newTotalCount})`);
 
       return res.json({
         success: true,
-        flashcards: newFlashcards.map(fc => ({
+        flashcards: flashcardsToReturn.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
         })),
@@ -1001,6 +1029,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newCount: newTotalCount,
         addedCount: newFlashcards.length,
         allContentCovered: false,
+        language: normalizedTargetLanguage,
       });
     } catch (error) {
       console.error("Error regenerating flashcards:", error);
