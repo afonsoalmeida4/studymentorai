@@ -1,6 +1,7 @@
 import { Feather, BookOpen, Brain, Rocket, Sparkles, Compass, Target, Award, Trophy, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface LevelBadgeProps {
   level: string;
@@ -97,6 +98,7 @@ function getColorScheme(level: string) {
 }
 
 export function LevelBadge({ level, levelName, size = "md", showName = true, animated = true }: LevelBadgeProps) {
+  const { t } = useTranslation();
   const colors = getColorScheme(level);
   
   // Default to Feather icon if not found
@@ -108,6 +110,11 @@ export function LevelBadge({ level, levelName, size = "md", showName = true, ani
     lg: "h-4 w-4 sm:h-5 sm:w-5",
   };
 
+  // Get level number and translate level name
+  const match = level.match(/level_(\d+)/);
+  const levelNum = match ? parseInt(match[1]) : 1;
+  const translatedLevelName = t(`levels.level${levelNum}`, { defaultValue: levelName });
+
   const BadgeContent = (
     <Badge 
       variant="outline" 
@@ -115,7 +122,7 @@ export function LevelBadge({ level, levelName, size = "md", showName = true, ani
       data-testid={`badge-level-${level}`}
     >
       <Icon className={sizeClasses[size]} />
-      {showName && <span className="truncate max-w-[60px] sm:max-w-none">{levelName}</span>}
+      {showName && <span className="truncate max-w-[60px] sm:max-w-none">{translatedLevelName}</span>}
       {colors.isMax && <Sparkles className="h-2.5 w-2.5 text-amber-500" />}
     </Badge>
   );
