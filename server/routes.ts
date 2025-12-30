@@ -416,11 +416,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PDF/DOCX export translations
+  const exportTranslations: Record<string, { learningStyle: string; motivationalMessage: string; generatedOn: string }> = {
+    pt: { learningStyle: "Estilo de Aprendizagem", motivationalMessage: "Mensagem Motivacional", generatedOn: "Gerado em" },
+    en: { learningStyle: "Learning Style", motivationalMessage: "Motivational Message", generatedOn: "Generated on" },
+    es: { learningStyle: "Estilo de Aprendizaje", motivationalMessage: "Mensaje Motivacional", generatedOn: "Generado el" },
+    fr: { learningStyle: "Style d'Apprentissage", motivationalMessage: "Message de Motivation", generatedOn: "Généré le" },
+    de: { learningStyle: "Lernstil", motivationalMessage: "Motivierende Nachricht", generatedOn: "Erstellt am" },
+    it: { learningStyle: "Stile di Apprendimento", motivationalMessage: "Messaggio Motivazionale", generatedOn: "Generato il" },
+  };
+
   // Export topic summary as PDF (Premium only)
   app.get("/api/topic-summaries/:id/export-pdf", isAuthenticated, requirePremium, exportLimiter, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const summaryId = req.params.id;
+      const language = (req.query.language as string) || "en";
+      const t = exportTranslations[language] || exportTranslations.en;
       
       // Get topic summary
       const summary = await storage.getTopicSummary(summaryId, userId);
@@ -471,7 +483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.moveDown(0.5);
       
       doc.fontSize(10).font('Helvetica-Oblique')
-        .text(`Estilo de Aprendizagem: ${summary.learningStyle}`, { align: 'center' });
+        .text(`${t.learningStyle}: ${summary.learningStyle}`, { align: 'center' });
       doc.moveDown(1);
       
       // Add summary content
@@ -486,7 +498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (summary.motivationalMessage) {
         doc.moveDown(2);
         doc.fontSize(11).font('Helvetica-BoldOblique')
-          .text('💡 Mensagem Motivacional', { align: 'left' });
+          .text(t.motivationalMessage, { align: 'left' });
         doc.moveDown(0.5);
         doc.fontSize(10).font('Helvetica-Oblique')
           .text(summary.motivationalMessage, {
@@ -495,10 +507,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
       }
       
-      // Add footer
+      // Add footer with localized date
+      const dateLocales: Record<string, string> = { pt: 'pt-PT', en: 'en-GB', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', it: 'it-IT' };
+      const dateLocale = dateLocales[language] || 'en-GB';
       doc.moveDown(2);
       doc.fontSize(8).font('Helvetica')
-        .text(`Gerado em ${new Date().toLocaleDateString('pt-PT')} via Study Mentor AI`, 
+        .text(`${t.generatedOn} ${new Date().toLocaleDateString(dateLocale)} via Study Mentor AI`, 
           { align: 'center' });
       
       // Finalize PDF
@@ -517,6 +531,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const summaryId = req.params.id;
+      const language = (req.query.language as string) || "en";
+      const t = exportTranslations[language] || exportTranslations.en;
+      const dateLocales: Record<string, string> = { pt: 'pt-PT', en: 'en-GB', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', it: 'it-IT' };
+      const dateLocale = dateLocales[language] || 'en-GB';
       
       // Get topic summary
       const summary = await storage.getTopicSummary(summaryId, userId);
@@ -563,7 +581,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Estilo de Aprendizagem: ${summary.learningStyle}`,
+                  text: `${t.learningStyle}: ${summary.learningStyle}`,
                   italics: true,
                   size: 20,
                 }),
@@ -588,7 +606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: "💡 Mensagem Motivacional",
+                    text: t.motivationalMessage,
                     bold: true,
                     italics: true,
                   }),
@@ -617,7 +635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Gerado em ${new Date().toLocaleDateString('pt-PT')} via Study Mentor AI`,
+                  text: `${t.generatedOn} ${new Date().toLocaleDateString(dateLocale)} via Study Mentor AI`,
                   size: 16,
                 }),
               ],

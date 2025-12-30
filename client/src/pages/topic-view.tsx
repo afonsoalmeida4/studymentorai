@@ -413,8 +413,8 @@ export default function TopicView() {
     setIsExportingPdf(true);
     try {
       const endpoint = format === 'pdf' 
-        ? `/api/topic-summaries/${summaryId}/export-pdf`
-        : `/api/topic-summaries/${summaryId}/export-docx`;
+        ? `/api/topic-summaries/${summaryId}/export-pdf?language=${i18n.language}`
+        : `/api/topic-summaries/${summaryId}/export-docx?language=${i18n.language}`;
       
       const response = await authFetch(endpoint);
       
