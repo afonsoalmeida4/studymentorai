@@ -280,8 +280,8 @@ export default function QuizSection({ topicId, hasSummaries }: QuizSectionProps)
   };
 
   const currentQuestion = quizData?.questions[currentQuestionIndex];
-  const progress = quizData ? ((currentQuestionIndex + 1) / quizData.questions.length) * 100 : 0;
   const answeredCount = Object.keys(answers).length;
+  const progress = quizData ? (answeredCount / quizData.questions.length) * 100 : 0;
   const allAnswered = quizData ? answeredCount === quizData.questions.length : false;
 
   const getMasteryLevel = (percentage: number) => {
