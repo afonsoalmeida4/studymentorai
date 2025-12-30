@@ -266,7 +266,7 @@ export default function SummaryStudySection({ topicId }: SummaryStudySectionProp
             </div>
           </div>
           <div className="flex flex-wrap gap-1 sm:gap-2">
-            {canGenerateMore && (
+            {canGenerateMore && hasSummaries && (
               <Button
                 variant="outline"
                 size="sm"
