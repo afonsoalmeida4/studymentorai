@@ -868,42 +868,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const topicId = topicSummary.topicId;
       
-      // CRITICAL: Always find/use the Portuguese summary for flashcard generation
-      // This ensures consistency in the translation system
-      let ptSummary = topicSummary;
-      let ptSummaryId = topicSummaryId;
-      let hasPtBase = topicSummary.language === "pt";
-      
-      if (topicSummary.language !== "pt") {
-        // Find the Portuguese version of this summary (same topic, same learningStyle)
-        const ptSummaryResult = await db.query.topicSummaries.findFirst({
-          where: and(
-            eq(topicSummaries.topicId, topicId),
-            eq(topicSummaries.learningStyle, topicSummary.learningStyle),
-            eq(topicSummaries.language, "pt")
-          ),
-        });
-        
-        if (ptSummaryResult) {
-          ptSummary = ptSummaryResult;
-          ptSummaryId = ptSummaryResult.id;
-          hasPtBase = true;
-          console.log(`[Regenerate Flashcards] Found Portuguese base summary ${ptSummaryId} for topic ${topicId}`);
-        } else {
-          // No PT summary exists - generate flashcards in the original language
-          // and skip translation (legacy/edge case)
-          console.log(`[Regenerate Flashcards] No Portuguese summary found, generating in original language: ${topicSummary.language}`);
-          hasPtBase = false;
-        }
-      }
-      
       // Get the topic to find subjectId
       const topic = await db.query.topics.findFirst({
         where: eq(topics.id, topicId),
       });
       const subjectId = topic?.subjectId || null;
       
-      console.log(`[Regenerate Flashcards] Generating flashcards from PT summary ${ptSummaryId} for topic ${topicId}, target language: ${normalizedTargetLanguage}`);
+      console.log(`[Regenerate Flashcards] Generating flashcards from summary ${topicSummaryId} for topic ${topicId}, target language: ${normalizedTargetLanguage}`);
 
       // Count existing flashcards for this topic (all languages, no filtering)
       const allTopicSummariesForCount = await db.query.topicSummaries.findMany({
@@ -939,19 +910,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get cost control settings
       const flashcardMaxTokens = costControlService.getMaxCompletionTokens(planTier, "flashcard");
 
-      // Determine which language to use for generation
-      // If we have a PT base, generate in PT (will be translated)
-      // If no PT base, generate directly in the user's target language
-      const generationLanguage = hasPtBase ? "pt" : normalizedTargetLanguage;
-      
-      // Trim summary text based on plan - use the appropriate summary for generation
-      const trimmedSummaryText = costControlService.trimInputText(
-        hasPtBase ? ptSummary.summary : topicSummary.summary, 
-        planTier
-      );
+      // Generate flashcards in the user's selected language
+      const trimmedSummaryText = costControlService.trimInputText(topicSummary.summary, planTier);
 
       // Check monthly usage limit for flashcards before regeneration
-      const flashcardLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "flashcards", generationLanguage, 10);
+      const flashcardLimitCheck = await usageLimitsService.checkFeatureLimit(userId, "flashcards", normalizedTargetLanguage, 10);
       if (!flashcardLimitCheck.allowed) {
         return res.status(403).json({
           success: false,
@@ -964,8 +927,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingQuestions = uniqueExisting.map(fc => fc.question);
       console.log(`[Regenerate Flashcards] Avoiding ${existingQuestions.length} existing questions`);
 
-      // Generate flashcards from the summary, avoiding duplicates
-      const flashcardsData = await generateFlashcards(trimmedSummaryText, generationLanguage, null, flashcardMaxTokens, existingQuestions);
+      // Generate flashcards in the user's selected language, avoiding duplicates
+      const flashcardsData = await generateFlashcards(trimmedSummaryText, normalizedTargetLanguage, null, flashcardMaxTokens, existingQuestions);
 
       // Post-generation filter: remove any duplicates that GPT might have returned despite prompt instructions
       // Also track accepted questions to prevent intra-batch duplicates
@@ -996,42 +959,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Save new flashcards with proper topicId and subjectId set (using filtered unique flashcards)
-      // If we have a PT base, save in Portuguese attached to PT summary for translation system
-      // Otherwise, save in the original language
+      // Save new flashcards in the user's selected language
       const newFlashcards = await storage.createFlashcards(
         uniqueNewFlashcards.map((fc: any) => ({
           userId,
-          topicSummaryId: hasPtBase ? ptSummaryId : topicSummaryId,
+          topicSummaryId: topicSummaryId,
           topicId: topicId,
           subjectId: subjectId,
           isManual: false,
-          language: generationLanguage,
+          language: normalizedTargetLanguage,
           question: fc.question,
           answer: fc.answer,
           summaryId: null,
         }))
       );
       
-      // If we have a PT base and target language is not Portuguese, create translations
-      let flashcardsToReturn = newFlashcards;
-      if (hasPtBase && normalizedTargetLanguage !== "pt") {
-        console.log(`[Regenerate Flashcards] Creating translations for ${newFlashcards.length} flashcards to ${normalizedTargetLanguage}`);
-        try {
-          // Trigger translation using the PT summary ID (which the translation service expects)
-          const translatedFlashcards = await getOrCreateTranslatedFlashcards(ptSummaryId, normalizedTargetLanguage);
-          // Return all translated flashcards (includes existing + new)
-          flashcardsToReturn = translatedFlashcards;
-          console.log(`[Regenerate Flashcards] Translations created successfully: ${translatedFlashcards.length} flashcards in ${normalizedTargetLanguage}`);
-        } catch (translationError) {
-          console.error(`[Regenerate Flashcards] Failed to create translations:`, translationError);
-          // Fall back to returning the generated flashcards
-          flashcardsToReturn = newFlashcards;
-        }
-      } else if (!hasPtBase) {
-        // No PT base - return flashcards in the original generation language
-        console.log(`[Regenerate Flashcards] No PT base, returning ${newFlashcards.length} flashcards in ${generationLanguage}`);
-      }
+      console.log(`[Regenerate Flashcards] Created ${newFlashcards.length} flashcards in ${normalizedTargetLanguage}`);
 
       // Record monthly usage for flashcards
       await usageLimitsService.recordUsage(userId, "flashcards", newFlashcards.length);
@@ -1051,7 +994,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       return res.json({
         success: true,
-        flashcards: flashcardsToReturn.map(fc => ({
+        flashcards: newFlashcards.map(fc => ({
           ...fc,
           createdAt: fc.createdAt?.toISOString() || new Date().toISOString(),
         })),
