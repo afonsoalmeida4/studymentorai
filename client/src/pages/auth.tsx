@@ -172,10 +172,10 @@ export default function AuthPage() {
         </div>
       </header>
 
-      <div className="flex-1 flex items-center justify-center px-4 pt-20 pb-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-violet-500/5 to-rose-500/5 pointer-events-none" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative flex-1 flex items-center justify-center px-4 pt-20 pb-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-violet-500/5 to-rose-500/5 pointer-events-none -z-10" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
