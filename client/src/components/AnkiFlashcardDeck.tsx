@@ -362,8 +362,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
             {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
         </div>
-        {/* Show countdown and study early option in spaced mode */}
-        {mode === "spaced" && nextAvailableAt && !studyEarly && (
+        {/* Show countdown in spaced mode */}
+        {mode === "spaced" && nextAvailableAt && (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
               <p className="text-sm text-muted-foreground">{t('flashcards.anki.nextReviewIn')}</p>
@@ -371,18 +371,35 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
                 {countdown || t('flashcards.anki.tomorrow')}
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={handleStudyEarly}
-              data-testid="button-study-early"
-              className="gap-2"
-            >
-              <RotateCw className="w-4 h-4" />
-              {t('flashcards.anki.studyEarly')}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              {t('flashcards.anki.studyEarlyNote')}
-            </p>
+            {/* Show study early button only if not already studying early */}
+            {!studyEarly && (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleStudyEarly}
+                  data-testid="button-study-early"
+                  className="gap-2"
+                >
+                  <RotateCw className="w-4 h-4" />
+                  {t('flashcards.anki.studyEarly')}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  {t('flashcards.anki.studyEarlyNote')}
+                </p>
+              </>
+            )}
+            {/* Show study again button after early study session */}
+            {studyEarly && (
+              <Button 
+                variant="outline" 
+                onClick={handleStudyEarly}
+                data-testid="button-study-again"
+                className="gap-2"
+              >
+                <RotateCw className="w-4 h-4" />
+                {t('flashcards.anki.studyAgain')}
+              </Button>
+            )}
           </div>
         )}
         {/* Only show "Practice again" in practice mode - spaced mode has no replay option */}

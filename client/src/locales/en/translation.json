@@ -1148,6 +1148,7 @@
       "nextAvailable": "Next available in",
       "nextReviewIn": "Next review in",
       "studyEarly": "Study Now",
+      "studyAgain": "Study Again",
       "studyEarlyNote": "Studying early doesn't affect the spaced repetition algorithm.",
       "tomorrow": "Tomorrow",
       "sessionComplete": "You're done with flashcards for today!",
