@@ -69,8 +69,12 @@ export function BackgroundGenerationProvider({ children }: { children: ReactNode
       const failureCount = results.filter(r => !r.success).length;
 
       const currentLanguage = i18n.language;
+      // Always invalidate Portuguese (base language) since summaries are generated in PT first
+      queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries", "pt"] });
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries", currentLanguage] });
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries"] });
+      // Invalidate all language variants for flashcards
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled", "pt"] });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled", currentLanguage] });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
