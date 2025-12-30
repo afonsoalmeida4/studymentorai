@@ -415,7 +415,7 @@ export default function TopicView() {
         ? `/api/topic-summaries/${summaryId}/export-pdf`
         : `/api/topic-summaries/${summaryId}/export-docx`;
       
-      const response = await fetch(endpoint);
+      const response = await authFetch(endpoint);
       
       if (!response.ok) {
         const error = await response.json();
