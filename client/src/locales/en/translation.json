@@ -224,7 +224,9 @@
       "successOne": "Summary generated!",
       "successMultiple": "{{count}} summaries generated!",
       "successDescriptionOne": "The topic summary has been created in the selected style.",
-      "successDescriptionMultiple": "The summaries have been created in the selected styles."
+      "successDescriptionMultiple": "The summaries have been created in the selected styles.",
+      "partialSuccess": "{{success}} generated, {{failed}} failed",
+      "partialSuccessDescription": "Some summaries were created, but others failed. Please try again."
     },
     "deleteContent": {
       "title": "Delete Content",

@@ -222,7 +222,9 @@
       "successOne": "¡Resumen generado!",
       "successMultiple": "{{count}} resúmenes generados!",
       "successDescriptionOne": "El resumen del tema ha sido creado en el estilo seleccionado.",
-      "successDescriptionMultiple": "Los resúmenes han sido creados en los estilos seleccionados."
+      "successDescriptionMultiple": "Los resúmenes han sido creados en los estilos seleccionados.",
+      "partialSuccess": "{{success}} generados, {{failed}} fallaron",
+      "partialSuccessDescription": "Algunos resúmenes fueron creados, pero otros fallaron. Inténtalo de nuevo."
     },
     "deleteContent": {
       "title": "Eliminar Contenido",

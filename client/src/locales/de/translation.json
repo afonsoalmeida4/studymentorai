@@ -219,7 +219,9 @@
       "successOne": "Zusammenfassung generiert!",
       "successMultiple": "{{count}} Zusammenfassungen generiert!",
       "successDescriptionOne": "Die Themenzusammenfassung wurde im ausgewählten Stil erstellt.",
-      "successDescriptionMultiple": "Die Zusammenfassungen wurden in den ausgewählten Stilen erstellt."
+      "successDescriptionMultiple": "Die Zusammenfassungen wurden in den ausgewählten Stilen erstellt.",
+      "partialSuccess": "{{success}} generiert, {{failed}} fehlgeschlagen",
+      "partialSuccessDescription": "Einige Zusammenfassungen wurden erstellt, aber andere sind fehlgeschlagen. Bitte versuchen Sie es erneut."
     },
     "deleteContent": {
       "title": "Inhalt Löschen",

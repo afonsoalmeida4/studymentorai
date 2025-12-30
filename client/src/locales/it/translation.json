@@ -219,7 +219,9 @@
       "successOne": "Riassunto generato!",
       "successMultiple": "{{count}} riassunti generati!",
       "successDescriptionOne": "Il riassunto dell'argomento è stato creato nello stile selezionato.",
-      "successDescriptionMultiple": "I riassunti sono stati creati negli stili selezionati."
+      "successDescriptionMultiple": "I riassunti sono stati creati negli stili selezionati.",
+      "partialSuccess": "{{success}} generati, {{failed}} falliti",
+      "partialSuccessDescription": "Alcuni riassunti sono stati creati, ma altri sono falliti. Riprova."
     },
     "deleteContent": {
       "title": "Eliminare Contenuto",

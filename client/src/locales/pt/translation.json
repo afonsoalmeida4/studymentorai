@@ -227,7 +227,9 @@
       "successOne": "Resumo gerado!",
       "successMultiple": "{{count}} resumos gerados!",
       "successDescriptionOne": "O resumo do tópico foi criado no estilo selecionado.",
-      "successDescriptionMultiple": "Os resumos foram criados nos estilos selecionados."
+      "successDescriptionMultiple": "Os resumos foram criados nos estilos selecionados.",
+      "partialSuccess": "{{success}} gerados, {{failed}} falharam",
+      "partialSuccessDescription": "Alguns resumos foram criados, mas outros falharam. Tente novamente."
     },
     "deleteContent": {
       "title": "Eliminar conteúdo?",

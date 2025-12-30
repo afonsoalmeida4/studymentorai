@@ -219,7 +219,9 @@
       "successOne": "Résumé généré!",
       "successMultiple": "{{count}} résumés générés!",
       "successDescriptionOne": "Le résumé du sujet a été créé dans le style sélectionné.",
-      "successDescriptionMultiple": "Les résumés ont été créés dans les styles sélectionnés."
+      "successDescriptionMultiple": "Les résumés ont été créés dans les styles sélectionnés.",
+      "partialSuccess": "{{success}} générés, {{failed}} ont échoué",
+      "partialSuccessDescription": "Certains résumés ont été créés, mais d'autres ont échoué. Veuillez réessayer."
     },
     "deleteContent": {
       "title": "Supprimer le Contenu",
