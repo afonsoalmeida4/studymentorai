@@ -78,7 +78,15 @@
     "userAlreadyExists": "Este email já está registado.",
     "passwordTooShort": "A palavra-passe deve ter pelo menos 6 caracteres.",
     "invalidEmailFormat": "Formato de email inválido.",
-    "rateLimitExceeded": "Demasiadas tentativas. Aguarda um momento antes de tentar novamente."
+    "rateLimitExceeded": "Demasiadas tentativas. Aguarda um momento antes de tentar novamente.",
+    "forgotPassword": "Esqueceste a palavra-passe?",
+    "forgotPasswordTitle": "Recuperar palavra-passe",
+    "forgotPasswordDesc": "Introduz o teu email para receber um link de recuperação",
+    "sendResetLink": "Enviar link de recuperação",
+    "resetPasswordSent": "Email enviado!",
+    "resetPasswordSentDesc": "Verifica a tua caixa de entrada para o link de recuperação.",
+    "resetPasswordError": "Erro ao enviar email",
+    "backToLogin": "Voltar ao login"
   },
   "subjects": {
     "title": "As Minhas Matérias",

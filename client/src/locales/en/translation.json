@@ -83,7 +83,15 @@
     "userAlreadyExists": "This email is already registered.",
     "passwordTooShort": "Password must be at least 6 characters.",
     "invalidEmailFormat": "Invalid email format.",
-    "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again."
+    "rateLimitExceeded": "Too many attempts. Please wait a moment before trying again.",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset password",
+    "forgotPasswordDesc": "Enter your email to receive a recovery link",
+    "sendResetLink": "Send reset link",
+    "resetPasswordSent": "Email sent!",
+    "resetPasswordSentDesc": "Check your inbox for the recovery link.",
+    "resetPasswordError": "Error sending email",
+    "backToLogin": "Back to login"
   },
   "subjects": {
     "title": "My Subjects",

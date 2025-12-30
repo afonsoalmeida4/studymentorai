@@ -78,7 +78,15 @@
     "userAlreadyExists": "Questa email è già registrata.",
     "passwordTooShort": "La password deve contenere almeno 6 caratteri.",
     "invalidEmailFormat": "Formato email non valido.",
-    "rateLimitExceeded": "Troppi tentativi. Attendi un momento prima di riprovare."
+    "rateLimitExceeded": "Troppi tentativi. Attendi un momento prima di riprovare.",
+    "forgotPassword": "Password dimenticata?",
+    "forgotPasswordTitle": "Reimposta password",
+    "forgotPasswordDesc": "Inserisci la tua email per ricevere un link di recupero",
+    "sendResetLink": "Invia link di recupero",
+    "resetPasswordSent": "Email inviata!",
+    "resetPasswordSentDesc": "Controlla la tua casella di posta per il link di recupero.",
+    "resetPasswordError": "Errore nell'invio dell'email",
+    "backToLogin": "Torna all'accesso"
   },
   "subjects": {
     "title": "Le Mie Materie",

@@ -78,7 +78,15 @@
     "userAlreadyExists": "Diese E-Mail ist bereits registriert.",
     "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen haben.",
     "invalidEmailFormat": "Ungültiges E-Mail-Format.",
-    "rateLimitExceeded": "Zu viele Versuche. Bitte warten Sie einen Moment, bevor Sie es erneut versuchen."
+    "rateLimitExceeded": "Zu viele Versuche. Bitte warten Sie einen Moment, bevor Sie es erneut versuchen.",
+    "forgotPassword": "Passwort vergessen?",
+    "forgotPasswordTitle": "Passwort zurücksetzen",
+    "forgotPasswordDesc": "Geben Sie Ihre E-Mail ein, um einen Wiederherstellungslink zu erhalten",
+    "sendResetLink": "Wiederherstellungslink senden",
+    "resetPasswordSent": "E-Mail gesendet!",
+    "resetPasswordSentDesc": "Überprüfen Sie Ihren Posteingang für den Wiederherstellungslink.",
+    "resetPasswordError": "Fehler beim Senden der E-Mail",
+    "backToLogin": "Zurück zur Anmeldung"
   },
   "subjects": {
     "title": "Meine Fächer",

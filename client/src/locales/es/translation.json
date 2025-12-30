@@ -81,7 +81,15 @@
     "userAlreadyExists": "Este correo ya está registrado.",
     "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
     "invalidEmailFormat": "Formato de correo inválido.",
-    "rateLimitExceeded": "Demasiados intentos. Espera un momento antes de volver a intentar."
+    "rateLimitExceeded": "Demasiados intentos. Espera un momento antes de volver a intentar.",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "forgotPasswordTitle": "Recuperar contraseña",
+    "forgotPasswordDesc": "Introduce tu correo para recibir un enlace de recuperación",
+    "sendResetLink": "Enviar enlace de recuperación",
+    "resetPasswordSent": "¡Correo enviado!",
+    "resetPasswordSentDesc": "Revisa tu bandeja de entrada para el enlace de recuperación.",
+    "resetPasswordError": "Error al enviar correo",
+    "backToLogin": "Volver al inicio de sesión"
   },
   "subjects": {
     "title": "Mis Materias",

@@ -78,7 +78,15 @@
     "userAlreadyExists": "Cet e-mail est déjà enregistré.",
     "passwordTooShort": "Le mot de passe doit comporter au moins 6 caractères.",
     "invalidEmailFormat": "Format d'e-mail invalide.",
-    "rateLimitExceeded": "Trop de tentatives. Veuillez patienter avant de réessayer."
+    "rateLimitExceeded": "Trop de tentatives. Veuillez patienter avant de réessayer.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "forgotPasswordTitle": "Réinitialiser le mot de passe",
+    "forgotPasswordDesc": "Entrez votre e-mail pour recevoir un lien de récupération",
+    "sendResetLink": "Envoyer le lien de récupération",
+    "resetPasswordSent": "E-mail envoyé !",
+    "resetPasswordSentDesc": "Vérifiez votre boîte de réception pour le lien de récupération.",
+    "resetPasswordError": "Erreur lors de l'envoi de l'e-mail",
+    "backToLogin": "Retour à la connexion"
   },
   "subjects": {
     "title": "Mes Matières",

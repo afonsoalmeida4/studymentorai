@@ -16,28 +16,33 @@ import { GraduationCap, Loader2, Mail, Lock, User, ArrowLeft, Sparkles } from "l
 import { SiGoogle } from "react-icons/si";
 import { motion } from "framer-motion";
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
-const signupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  firstName: z.string().min(1).optional(),
-  lastName: z.string().min(1).optional(),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
-type SignupForm = z.infer<typeof signupSchema>;
+type LoginForm = { email: string; password: string };
+type SignupForm = { email: string; password: string; firstName?: string; lastName?: string };
+type ForgotPasswordForm = { email: string };
 
 export default function AuthPage() {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, signup, loginWithGoogle, resetPassword } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  const loginSchema = z.object({
+    email: z.string().email(t("auth.invalidEmailFormat")),
+    password: z.string().min(6, t("auth.passwordTooShort")),
+  });
+
+  const signupSchema = z.object({
+    email: z.string().email(t("auth.invalidEmailFormat")),
+    password: z.string().min(6, t("auth.passwordTooShort")),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+  });
+
+  const forgotPasswordSchema = z.object({
+    email: z.string().email(t("auth.invalidEmailFormat")),
+  });
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -54,6 +59,13 @@ export default function AuthPage() {
       password: "",
       firstName: "",
       lastName: "",
+    },
+  });
+
+  const forgotPasswordForm = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -114,6 +126,27 @@ export default function AuthPage() {
     }
   };
 
+  const handleForgotPassword = async (data: ForgotPasswordForm) => {
+    setIsLoading(true);
+    try {
+      await resetPassword(data.email);
+      toast({
+        title: t("auth.resetPasswordSent"),
+        description: t("auth.resetPasswordSentDesc"),
+      });
+      forgotPasswordForm.reset();
+      setMode("login");
+    } catch (error: any) {
+      toast({
+        title: t("auth.resetPasswordError"),
+        description: translateSupabaseError(t, error.message),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -158,36 +191,40 @@ export default function AuthPage() {
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold">
-                {mode === "login" ? t("auth.loginTitle") : t("auth.signupTitle")}
+                {mode === "login" ? t("auth.loginTitle") : mode === "signup" ? t("auth.signupTitle") : t("auth.forgotPasswordTitle")}
               </CardTitle>
               <CardDescription className="flex items-center justify-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-primary" />
-                {t("auth.subtitle")}
+                {mode === "forgot" ? t("auth.forgotPasswordDesc") : t("auth.subtitle")}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4">
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-                data-testid="button-google-login"
-              >
-                <SiGoogle className="h-4 w-4" />
-                {t("auth.continueWithGoogle")}
-              </Button>
+              {mode !== "forgot" && (
+                <>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={handleGoogleLogin}
+                    disabled={isLoading}
+                    data-testid="button-google-login"
+                  >
+                    <SiGoogle className="h-4 w-4" />
+                    {t("auth.continueWithGoogle")}
+                  </Button>
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    {t("auth.orContinueWith")}
-                  </span>
-                </div>
-              </div>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">
+                        {t("auth.orContinueWith")}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
 
               {mode === "login" ? (
                 <Form {...loginForm}>
@@ -238,6 +275,16 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        className="text-sm text-primary hover:underline"
+                        onClick={() => setMode("forgot")}
+                        data-testid="button-forgot-password"
+                      >
+                        {t("auth.forgotPassword")}
+                      </button>
+                    </div>
                     <Button
                       type="submit"
                       className="w-full bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90"
@@ -249,7 +296,7 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
-              ) : (
+              ) : mode === "signup" ? (
                 <Form {...signupForm}>
                   <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -376,6 +423,43 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
+              ) : (
+                <Form {...forgotPasswordForm}>
+                  <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-4">
+                    <FormField
+                      control={forgotPasswordForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("auth.email")}</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                              <Input
+                                type="email"
+                                autoComplete="email"
+                                placeholder={t("auth.emailPlaceholder")}
+                                className="pl-10"
+                                {...field}
+                                data-testid="input-forgot-email"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90"
+                      disabled={isLoading}
+                      data-testid="button-send-reset"
+                    >
+                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {t("auth.sendResetLink")}
+                    </Button>
+                  </form>
+                </Form>
               )}
 
               <div className="text-center text-sm">
@@ -391,7 +475,7 @@ export default function AuthPage() {
                       {t("auth.signupLink")}
                     </button>
                   </>
-                ) : (
+                ) : mode === "signup" ? (
                   <>
                     {t("auth.hasAccount")}{" "}
                     <button
@@ -401,6 +485,17 @@ export default function AuthPage() {
                       data-testid="button-switch-to-login"
                     >
                       {t("auth.loginLink")}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="text-primary hover:underline font-medium"
+                      onClick={() => setMode("login")}
+                      data-testid="button-back-to-login"
+                    >
+                      {t("auth.backToLogin")}
                     </button>
                   </>
                 )}
