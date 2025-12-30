@@ -176,9 +176,16 @@ export default function FlashcardsPage() {
     },
     onSuccess: () => {
       // Invalidate ALL flashcard queries to update counts everywhere
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && (
+            key[0] === "/api/flashcards/topic" ||
+            key[0] === "/api/flashcards"
+          );
+        }
+      });
       setShowEditDialog(false);
       setSelectedFlashcard(null);
       toast({
@@ -202,9 +209,16 @@ export default function FlashcardsPage() {
     },
     onSuccess: () => {
       // Invalidate ALL flashcard queries to update counts everywhere
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/user"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && (
+            key[0] === "/api/flashcards/topic" ||
+            key[0] === "/api/flashcards"
+          );
+        }
+      });
       setShowDeleteDialog(false);
       setSelectedFlashcard(null);
       toast({
