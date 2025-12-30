@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { translateSupabaseError } from "@/lib/errorTranslation";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Settings, Lock, Mail, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Settings, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 const passwordSchema = z.object({
@@ -22,27 +22,15 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
-const emailSchema = z.object({
-  currentPassword: z.string().min(1, "required"),
-  newEmail: z.string().email("invalidEmail"),
-  confirmEmail: z.string().email("invalidEmail"),
-}).refine((data) => data.newEmail === data.confirmEmail, {
-  message: "emailsDoNotMatch",
-  path: ["confirmEmail"],
-});
-
 type PasswordForm = z.infer<typeof passwordSchema>;
-type EmailForm = z.infer<typeof emailSchema>;
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { user, session, updatePassword, updateEmail } = useAuth();
+  const { session, updatePassword } = useAuth();
   const { toast } = useToast();
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
-  const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showEmailPassword, setShowEmailPassword] = useState(false);
 
   const isGoogleUser = session?.user?.app_metadata?.provider === "google";
 
@@ -55,15 +43,6 @@ export default function SettingsPage() {
     },
   });
 
-  const emailForm = useForm<EmailForm>({
-    resolver: zodResolver(emailSchema),
-    defaultValues: {
-      currentPassword: "",
-      newEmail: "",
-      confirmEmail: "",
-    },
-  });
-
   const translateAuthError = (errorMessage: string): string => {
     if (errorMessage === "Current password is incorrect") {
       return t("settings.currentPasswordIncorrect");
@@ -71,7 +50,7 @@ export default function SettingsPage() {
     if (errorMessage === "No active session") {
       return t("errors.unauthorized");
     }
-    if (errorMessage.includes("Cannot change password") || errorMessage.includes("Cannot change email")) {
+    if (errorMessage.includes("Cannot change password")) {
       return t("settings.googlePasswordNote");
     }
     const translated = translateSupabaseError(t, errorMessage);
@@ -99,42 +78,12 @@ export default function SettingsPage() {
     }
   };
 
-  const handleEmailChange = async (data: EmailForm) => {
-    if (isGoogleUser || isEmailLoading) return;
-    setIsEmailLoading(true);
-    try {
-      await updateEmail(data.currentPassword, data.newEmail);
-      toast({
-        title: t("settings.emailChangeRequested"),
-        description: t("settings.emailChangeRequestedDesc"),
-      });
-      emailForm.reset();
-    } catch (error: any) {
-      toast({
-        title: t("settings.emailChangeError"),
-        description: translateAuthError(error.message),
-        variant: "destructive",
-      });
-    } finally {
-      setIsEmailLoading(false);
-    }
-  };
-
   const getPasswordFormError = (field: keyof PasswordForm): string | undefined => {
     const error = passwordForm.formState.errors[field]?.message;
     if (!error) return undefined;
     if (error === "required") return t("settings.fieldRequired");
     if (error === "min6") return t("settings.passwordMin6");
     if (error === "passwordsDoNotMatch") return t("settings.passwordsDoNotMatch");
-    return error;
-  };
-
-  const getEmailFormError = (field: keyof EmailForm): string | undefined => {
-    const error = emailForm.formState.errors[field]?.message;
-    if (!error) return undefined;
-    if (error === "required") return t("settings.fieldRequired");
-    if (error === "invalidEmail") return t("settings.invalidEmail");
-    if (error === "emailsDoNotMatch") return t("settings.emailsDoNotMatch");
     return error;
   };
 
@@ -284,131 +233,6 @@ export default function SettingsPage() {
                   >
                     {isPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("settings.changePasswordButton")}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          )}
-        </Card>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <CardTitle className="text-lg">{t("settings.changeEmail")}</CardTitle>
-            </div>
-            <CardDescription>
-              {isGoogleUser 
-                ? t("settings.googleEmailNote")
-                : t("settings.changeEmailDesc")}
-            </CardDescription>
-            {!isGoogleUser && (
-              <p className="text-sm text-muted-foreground mt-2">
-                {t("settings.currentEmail")}: <span className="font-medium">{user?.email || session?.user?.email}</span>
-              </p>
-            )}
-          </CardHeader>
-          {!isGoogleUser && (
-            <CardContent>
-              <Form {...emailForm}>
-                <form onSubmit={emailForm.handleSubmit(handleEmailChange)} className="space-y-4">
-                  <FormField
-                    control={emailForm.control}
-                    name="currentPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("settings.currentPassword")}</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type={showEmailPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              data-testid="input-email-current-password"
-                              autoComplete="current-password"
-                              data-1p-ignore="true"
-                              data-lpignore="true"
-                              disabled={isEmailLoading}
-                              {...field}
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-0 top-0 h-full px-3"
-                              onClick={() => setShowEmailPassword(!showEmailPassword)}
-                              data-testid="button-toggle-email-password"
-                            >
-                              {showEmailPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </FormControl>
-                        {emailForm.formState.errors.currentPassword && (
-                          <p className="text-sm text-destructive">{getEmailFormError("currentPassword")}</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={emailForm.control}
-                    name="newEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("settings.newEmail")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder={t("settings.newEmailPlaceholder")}
-                            data-testid="input-new-email"
-                            autoComplete="off"
-                            data-1p-ignore="true"
-                            data-lpignore="true"
-                            disabled={isEmailLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        {emailForm.formState.errors.newEmail && (
-                          <p className="text-sm text-destructive">{getEmailFormError("newEmail")}</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={emailForm.control}
-                    name="confirmEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("settings.confirmEmail")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder={t("settings.confirmEmailPlaceholder")}
-                            data-testid="input-confirm-email"
-                            autoComplete="off"
-                            data-1p-ignore="true"
-                            data-lpignore="true"
-                            disabled={isEmailLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        {emailForm.formState.errors.confirmEmail && (
-                          <p className="text-sm text-destructive">{getEmailFormError("confirmEmail")}</p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                  <Button 
-                    type="submit" 
-                    disabled={isEmailLoading}
-                    data-testid="button-change-email"
-                  >
-                    {isEmailLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t("settings.changeEmailButton")}
                   </Button>
                 </form>
               </Form>
