@@ -54,9 +54,10 @@ export function BackgroundGenerationProvider({ children }: { children: ReactNode
     const results: GenerationResult[] = [];
 
     try {
+      const currentLanguage = i18n.language;
       for (const style of stylesToProcess) {
         try {
-          await apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle: style });
+          await apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle: style, language: currentLanguage });
           results.push({ style, success: true });
         } catch (error: any) {
           console.error(`[BackgroundGeneration] Error generating ${style}:`, error);
@@ -68,8 +69,7 @@ export function BackgroundGenerationProvider({ children }: { children: ReactNode
       const successCount = results.filter(r => r.success).length;
       const failureCount = results.filter(r => !r.success).length;
 
-      const currentLanguage = i18n.language;
-      // Always invalidate Portuguese (base language) since summaries are generated in PT first
+      // Invalidate cache for current language
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries", "pt"] });
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries", currentLanguage] });
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries"] });

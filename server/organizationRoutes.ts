@@ -92,7 +92,8 @@ interface SummaryGenerationResult {
 async function generateTopicSummaries(
   topicId: string, 
   userId: string,
-  specificStyle?: "visual" | "logico" | "conciso"
+  specificStyle?: "visual" | "logico" | "conciso",
+  userLanguage?: string
 ): Promise<SummaryGenerationResult> {
   try {
     let aggregatedContent = await aggregateTopicContent(topicId);
@@ -111,10 +112,10 @@ async function generateTopicSummaries(
     const planTier = await costControlService.getUserPlanTier(userId);
     aggregatedContent = costControlService.trimInputText(aggregatedContent, planTier);
 
-    // Always generate summaries in Portuguese (base language) for translation system
-    // The translation system will handle displaying in user's language
-    const baseLanguage = "pt";
-    console.log(`[TopicSummary] Generating in base language: ${baseLanguage} (user lang: ${await getUserLanguage(userId)})`);
+    // Use the user's app language for generating summaries
+    // Fall back to stored user language preference, then default to English
+    const targetLanguage = userLanguage || await getUserLanguage(userId) || "en";
+    console.log(`[TopicSummary] Generating summaries in user's language: ${targetLanguage}`);
 
     // Get allowed learning styles for user's plan
     const subscription = await subscriptionService.getUserSubscription(userId);
@@ -132,7 +133,7 @@ async function generateTopicSummaries(
     let wordLimitReached = false;
 
     // INVISIBLE COST CONTROL: Get plan-based depth modifier and token limits
-    const depthModifier = costControlService.getSummaryDepthModifier(planTier, baseLanguage);
+    const depthModifier = costControlService.getSummaryDepthModifier(planTier, targetLanguage);
     const maxTokens = costControlService.getMaxCompletionTokens(planTier, "summary");
 
     for (const style of stylesToGenerate) {
@@ -146,7 +147,7 @@ async function generateTopicSummaries(
         const result = await generateSummary({
           text: aggregatedContent,
           learningStyle: style,
-          language: baseLanguage,
+          language: targetLanguage,
           depthModifier,
           maxCompletionTokens: maxTokens,
         });
@@ -169,7 +170,7 @@ async function generateTopicSummaries(
           .values({
             topicId,
             learningStyle: style,
-            language: baseLanguage,
+            language: targetLanguage,
             summary: result.summary,
             motivationalMessage: result.motivationalMessage,
           })
@@ -808,7 +809,7 @@ export function registerOrganizationRoutes(app: Express) {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
-      const { learningStyle } = req.body; // Optional: specific style to generate
+      const { learningStyle, language: requestedLanguage } = req.body; // Optional: specific style and language
 
       // Verify topic belongs to user
       const topic = await db.query.topics.findFirst({
@@ -831,7 +832,11 @@ export function registerOrganizationRoutes(app: Express) {
         }
       }
 
-      const result = await generateTopicSummaries(id, userId, learningStyle);
+      // Get user's language preference - prioritize requested language, then user profile
+      const user = await storage.getUser(userId);
+      const userLanguage = requestedLanguage || user?.language || "en";
+
+      const result = await generateTopicSummaries(id, userId, learningStyle, userLanguage);
 
       if (result.overallSuccess) {
         // Increment summary count after successful generation

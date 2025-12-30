@@ -171,7 +171,7 @@ export default function TopicView() {
       if (!topicId) throw new Error("Topic ID required");
       const results = [];
       for (const style of learningStyles) {
-        const result = await apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle: style });
+        const result = await apiRequest("POST", `/api/topics/${topicId}/summaries`, { learningStyle: style, language: i18n.language });
         results.push(result);
       }
       return results;
