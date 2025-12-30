@@ -509,7 +509,7 @@ export default function Dashboard() {
                       transition={{ delay: 0.6 }}
                     >
                       {streakData?.hasStudiedToday ? (
-                        <Badge className="text-[10px] sm:text-xs bg-gradient-to-r from-emerald-500/20 to-green-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-600">
+                        <Badge className="text-[10px] sm:text-xs bg-emerald-600 dark:bg-emerald-700 text-white border-emerald-700 dark:border-emerald-600">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
                           {t("dashboard.kpi.studiedToday")}
                         </Badge>
