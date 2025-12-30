@@ -2,8 +2,8 @@ import type { Express } from "express";
 import multer from "multer";
 import { z } from "zod";
 import { db } from "./db";
-import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema, topicSummaries, learningStyles } from "@shared/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { subjects, topics, contentItems, contentAssets, contentLinks, insertSubjectSchema, insertTopicSchema, insertContentItemSchema, topicSummaries, learningStyles, flashcards, flashcardTranslations, flashcardAttempts } from "@shared/schema";
+import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { isAuthenticated } from "./supabaseAuth";
 import { extractTextFromFile, validateFileType, isValidFileSize } from "./textExtractor";
 import { generateSummary } from "./openai";
@@ -735,10 +735,65 @@ export function registerOrganizationRoutes(app: Express) {
 
       await db.delete(contentItems).where(eq(contentItems.id, id));
 
-      // Clear existing summaries for this topic so they regenerate with fresh content
+      // Check if there's any remaining content for this topic
       if (topicId) {
-        await db.delete(topicSummaries).where(eq(topicSummaries.topicId, topicId));
-        console.log(`[CONTENT-DELETE] Cleared summaries for topic ${topicId} after content removal`);
+        const remainingContent = await db.query.contentItems.findMany({
+          where: eq(contentItems.topicId, topicId),
+        });
+
+        if (remainingContent.length === 0) {
+          // No more content - delete summaries and automatic flashcards
+          console.log(`[CONTENT-DELETE] Topic ${topicId} has no more content - cascade deleting summaries and automatic flashcards`);
+          
+          // Get all summary IDs for this topic before deleting them
+          const topicSummaryList = await db.query.topicSummaries.findMany({
+            where: eq(topicSummaries.topicId, topicId),
+          });
+          const summaryIds = topicSummaryList.map(s => s.id);
+          
+          // Delete automatic flashcards (preserve manual ones)
+          if (summaryIds.length > 0) {
+            // Delete flashcard translations first (foreign key constraint)
+            const flashcardsToDelete = await db.query.flashcards.findMany({
+              where: and(
+                inArray(flashcards.topicSummaryId, summaryIds),
+                eq(flashcards.isManual, false)
+              ),
+            });
+            const flashcardIds = flashcardsToDelete.map(f => f.id);
+            
+            if (flashcardIds.length > 0) {
+              await db.delete(flashcardTranslations).where(inArray(flashcardTranslations.baseFlashcardId, flashcardIds));
+              await db.delete(flashcardAttempts).where(inArray(flashcardAttempts.flashcardId, flashcardIds));
+              await db.delete(flashcards).where(inArray(flashcards.id, flashcardIds));
+              console.log(`[CONTENT-DELETE] Deleted ${flashcardIds.length} automatic flashcards for topic ${topicId}`);
+            }
+          }
+          
+          // Also delete automatic flashcards linked directly to topic (not via summary)
+          const directFlashcards = await db.query.flashcards.findMany({
+            where: and(
+              eq(flashcards.topicId, topicId),
+              eq(flashcards.isManual, false)
+            ),
+          });
+          const directFlashcardIds = directFlashcards.map(f => f.id);
+          
+          if (directFlashcardIds.length > 0) {
+            await db.delete(flashcardTranslations).where(inArray(flashcardTranslations.baseFlashcardId, directFlashcardIds));
+            await db.delete(flashcardAttempts).where(inArray(flashcardAttempts.flashcardId, directFlashcardIds));
+            await db.delete(flashcards).where(inArray(flashcards.id, directFlashcardIds));
+            console.log(`[CONTENT-DELETE] Deleted ${directFlashcardIds.length} additional automatic flashcards for topic ${topicId}`);
+          }
+          
+          // Delete summaries
+          await db.delete(topicSummaries).where(eq(topicSummaries.topicId, topicId));
+          console.log(`[CONTENT-DELETE] Deleted summaries for topic ${topicId}`);
+        } else {
+          // Still has content - just clear summaries so they regenerate with remaining content
+          await db.delete(topicSummaries).where(eq(topicSummaries.topicId, topicId));
+          console.log(`[CONTENT-DELETE] Cleared summaries for topic ${topicId} after content removal (${remainingContent.length} items remaining)`);
+        }
       }
 
       res.json({ success: true, topicId });
