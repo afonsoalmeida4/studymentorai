@@ -119,6 +119,17 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   // Track which cards have been completed in this session (by id)
   const [completedCardIds, setCompletedCardIds] = useState<Set<string>>(new Set());
+  
+  // State for studying early (bypass nextReviewDate filter)
+  const [studyEarly, setStudyEarly] = useState(false);
+  
+  // Override filtered flashcards when studying early
+  const effectiveFlashcards = useMemo((): DisplayFlashcard[] => {
+    if (studyEarly && mode === "spaced") {
+      return allDisplayFlashcards; // Show all flashcards when studying early
+    }
+    return filteredFlashcards;
+  }, [studyEarly, mode, allDisplayFlashcards, filteredFlashcards]);
 
   // Restore progress from localStorage when loaded
   useEffect(() => {
@@ -143,7 +154,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     // Initialize deck once progress is restored, even if no flashcards are available
     if (progressRestored && !isLoading) {
       // Filter out already completed cards
-      const remainingCards = filteredFlashcards.filter(fc => !completedCardIds.has(fc.id));
+      const remainingCards = effectiveFlashcards.filter(fc => !completedCardIds.has(fc.id));
       
       // Find current card's id and locate it in the new deck
       const currentCardId = localDeck[currentIndex]?.id;
@@ -160,7 +171,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       
       setDeckInitialized(true);
     }
-  }, [filteredFlashcards, completedCardIds, progressRestored, isLoading]);
+  }, [effectiveFlashcards, completedCardIds, progressRestored, isLoading]);
 
   // Session timer with persistence
   useEffect(() => {
@@ -232,6 +243,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   };
 
   const [countdown, setCountdown] = useState<string | null>(null);
+  
   useEffect(() => {
     const getTimeUntilNext = () => {
       if (!nextAvailableAt) return null;
@@ -242,25 +254,42 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       
       if (diffMs <= 0) return t('flashcards.anki.availableNow');
       
-      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
       
-      if (hours > 0) {
-        return `${hours}h ${minutes}m`;
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
       }
-      return `${minutes}m`;
+      if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      }
+      return `${minutes}m ${seconds}s`;
     };
 
     if (mode === "spaced" && nextAvailableAt) {
       setCountdown(getTimeUntilNext());
+      // Update every second for real-time countdown
       const interval = setInterval(() => {
         setCountdown(getTimeUntilNext());
-      }, 60000);
+      }, 1000);
       return () => clearInterval(interval);
     } else {
       setCountdown(null);
     }
   }, [mode, nextAvailableAt, t]);
+  
+  // Handle study early - force reload flashcards ignoring nextReviewDate
+  const handleStudyEarly = () => {
+    setStudyEarly(true);
+    setDeckInitialized(false);
+    setLocalDeck([]);
+    setCompletedCardIds(new Set());
+    setCurrentIndex(0);
+    setCompletedCount(0);
+    resetProgress();
+  };
 
   const handleRating = (rating: number) => {
     if (!currentFlashcard || recordAttemptMutation.isPending) return;
@@ -322,7 +351,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   if (completed) {
     return (
-      <div className="text-center py-12 space-y-4">
+      <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
         <div>
           <h3 className="text-xl font-semibold mb-2">{t('flashcards.anki.sessionComplete')}</h3>
@@ -332,16 +361,30 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           <p className="text-sm text-muted-foreground mt-2">
             {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
-          {/* Show next available time in spaced mode */}
-          {mode === "spaced" && nextAvailableAt && (
-            <div className="mt-4">
-              <Badge variant="outline" className="gap-1.5 text-base px-3 py-1.5">
-                <Clock className="w-4 h-4" />
-                {t('flashcards.anki.nextAvailable')}: {countdown || t('flashcards.anki.tomorrow')}
-              </Badge>
-            </div>
-          )}
         </div>
+        {/* Show countdown and study early option in spaced mode */}
+        {mode === "spaced" && nextAvailableAt && !studyEarly && (
+          <div className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+              <p className="text-sm text-muted-foreground">{t('flashcards.anki.nextReviewIn')}</p>
+              <div className="text-2xl font-mono font-bold text-primary" data-testid="countdown-timer">
+                {countdown || t('flashcards.anki.tomorrow')}
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={handleStudyEarly}
+              data-testid="button-study-early"
+              className="gap-2"
+            >
+              <RotateCw className="w-4 h-4" />
+              {t('flashcards.anki.studyEarly')}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              {t('flashcards.anki.studyEarlyNote')}
+            </p>
+          </div>
+        )}
         {/* Only show "Practice again" in practice mode - spaced mode has no replay option */}
         {mode === "practice" && (
           <Button onClick={handleRestart} data-testid="button-restart-study">
