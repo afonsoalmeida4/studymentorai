@@ -95,6 +95,10 @@ export function GamificationHeader() {
 }
 
 function LevelNumberBadge({ levelNumber, totalLevels }: { levelNumber: number; totalLevels: number }) {
+  // Fallback to 50 total levels if not provided
+  const displayLevelNumber = levelNumber || 1;
+  const displayTotalLevels = totalLevels || 50;
+  
   return (
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
@@ -105,8 +109,8 @@ function LevelNumberBadge({ levelNumber, totalLevels }: { levelNumber: number; t
       data-testid="text-level-info"
     >
       <Star className="h-3 w-3" />
-      <span>#{String(levelNumber).padStart(2, '0')}</span>
-      <span className="text-muted-foreground font-normal">/{totalLevels}</span>
+      <span>#{String(displayLevelNumber).padStart(2, '0')}</span>
+      <span className="text-muted-foreground font-normal">/{displayTotalLevels}</span>
     </motion.div>
   );
 }
