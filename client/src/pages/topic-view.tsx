@@ -315,6 +315,7 @@ export default function TopicView() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/content", topicId] });
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId, "summaries"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       setIsDeleteDialogOpen(false);
       setContentToDelete(null);
       toast({
