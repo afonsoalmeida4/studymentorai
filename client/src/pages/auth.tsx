@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,19 +15,34 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { GraduationCap, Loader2, Mail, Lock, User, ArrowLeft, Sparkles } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
 import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 type LoginForm = { email: string; password: string };
 type SignupForm = { email: string; password: string; firstName?: string; lastName?: string };
 
 export default function AuthPage() {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot" | "reset">("login");
   const [isLoading, setIsLoading] = useState(false);
   const { login, signup, loginWithGoogle, resetPassword } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotEmailError, setForgotEmailError] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetError, setResetError] = useState("");
+
+  // Detect reset mode from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace("#", "?"));
+    
+    // Check for reset=true in query params or access_token in hash (Supabase recovery flow)
+    if (urlParams.get("reset") === "true" || hashParams.get("type") === "recovery") {
+      setMode("reset");
+    }
+  }, []);
 
   const loginSchema = z.object({
     email: z.string().email(t("auth.invalidEmailFormat")),
@@ -146,6 +161,49 @@ export default function AuthPage() {
     }
   };
 
+  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError("");
+    
+    if (newPassword.length < 6) {
+      setResetError(t("auth.passwordTooShort"));
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setResetError(t("auth.passwordsDoNotMatch"));
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: t("auth.passwordResetSuccess"),
+        description: t("auth.passwordResetSuccessDesc"),
+      });
+      
+      // Clear URL params and redirect to login
+      window.history.replaceState({}, document.title, "/auth");
+      setNewPassword("");
+      setConfirmPassword("");
+      setMode("login");
+    } catch (error: any) {
+      toast({
+        title: t("auth.resetPasswordError"),
+        description: translateSupabaseError(t, error.message),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -190,16 +248,16 @@ export default function AuthPage() {
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold">
-                {mode === "login" ? t("auth.loginTitle") : mode === "signup" ? t("auth.signupTitle") : t("auth.forgotPasswordTitle")}
+                {mode === "login" ? t("auth.loginTitle") : mode === "signup" ? t("auth.signupTitle") : mode === "forgot" ? t("auth.forgotPasswordTitle") : t("auth.resetPasswordTitle")}
               </CardTitle>
               <CardDescription className="flex items-center justify-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-primary" />
-                {mode === "forgot" ? t("auth.forgotPasswordDesc") : t("auth.subtitle")}
+                {mode === "forgot" ? t("auth.forgotPasswordDesc") : mode === "reset" ? t("auth.resetPasswordDesc") : t("auth.subtitle")}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4">
-              {mode !== "forgot" && (
+              {mode !== "forgot" && mode !== "reset" && (
                 <>
                   <Button
                     variant="outline"
@@ -422,7 +480,7 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
-              ) : (
+              ) : mode === "forgot" ? (
                 <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <label className={`text-sm font-medium leading-none ${forgotEmailError ? 'text-destructive' : ''}`}>
@@ -455,6 +513,61 @@ export default function AuthPage() {
                   >
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("auth.sendResetLink")}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium leading-none">
+                      {t("auth.newPassword")}
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                      <input
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder={t("auth.newPasswordPlaceholder")}
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10"
+                        value={newPassword}
+                        onChange={(e) => {
+                          setNewPassword(e.target.value);
+                          if (resetError) setResetError("");
+                        }}
+                        data-testid="input-new-password"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium leading-none">
+                      {t("auth.confirmPassword")}
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                      <input
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder={t("auth.confirmPasswordPlaceholder")}
+                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10"
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          if (resetError) setResetError("");
+                        }}
+                        data-testid="input-confirm-password"
+                      />
+                    </div>
+                  </div>
+                  {resetError && (
+                    <p className="text-sm font-medium text-destructive">{resetError}</p>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90"
+                    disabled={isLoading}
+                    data-testid="button-reset-password"
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t("auth.resetPassword")}
                   </Button>
                 </form>
               )}

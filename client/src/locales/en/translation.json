@@ -91,7 +91,17 @@
     "resetPasswordSent": "Email sent!",
     "resetPasswordSentDesc": "Check your inbox for the recovery link.",
     "resetPasswordError": "Error sending email",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "resetPasswordTitle": "Set new password",
+    "resetPasswordDesc": "Enter your new password",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "Minimum 6 characters",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Repeat password",
+    "resetPassword": "Reset password",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "passwordResetSuccess": "Password changed!",
+    "passwordResetSuccessDesc": "Your password has been changed successfully. You can now log in with your new password."
   },
   "subjects": {
     "title": "My Subjects",

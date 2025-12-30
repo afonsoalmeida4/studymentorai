@@ -86,7 +86,17 @@
     "resetPasswordSent": "E-mail envoyé !",
     "resetPasswordSentDesc": "Vérifiez votre boîte de réception pour le lien de récupération.",
     "resetPasswordError": "Erreur lors de l'envoi de l'e-mail",
-    "backToLogin": "Retour à la connexion"
+    "backToLogin": "Retour à la connexion",
+    "resetPasswordTitle": "Définir un nouveau mot de passe",
+    "resetPasswordDesc": "Entrez votre nouveau mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Minimum 6 caractères",
+    "confirmPassword": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Répétez le mot de passe",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas.",
+    "passwordResetSuccess": "Mot de passe modifié !",
+    "passwordResetSuccessDesc": "Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe."
   },
   "subjects": {
     "title": "Mes Matières",

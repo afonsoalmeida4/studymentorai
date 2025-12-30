@@ -86,7 +86,17 @@
     "resetPasswordSent": "Email inviata!",
     "resetPasswordSentDesc": "Controlla la tua casella di posta per il link di recupero.",
     "resetPasswordError": "Errore nell'invio dell'email",
-    "backToLogin": "Torna all'accesso"
+    "backToLogin": "Torna all'accesso",
+    "resetPasswordTitle": "Imposta nuova password",
+    "resetPasswordDesc": "Inserisci la tua nuova password",
+    "newPassword": "Nuova password",
+    "newPasswordPlaceholder": "Minimo 6 caratteri",
+    "confirmPassword": "Conferma password",
+    "confirmPasswordPlaceholder": "Ripeti la password",
+    "resetPassword": "Reimposta password",
+    "passwordsDoNotMatch": "Le password non corrispondono.",
+    "passwordResetSuccess": "Password modificata!",
+    "passwordResetSuccessDesc": "La tua password è stata modificata con successo. Ora puoi accedere con la tua nuova password."
   },
   "subjects": {
     "title": "Le Mie Materie",

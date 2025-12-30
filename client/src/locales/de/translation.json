@@ -86,7 +86,17 @@
     "resetPasswordSent": "E-Mail gesendet!",
     "resetPasswordSentDesc": "Überprüfen Sie Ihren Posteingang für den Wiederherstellungslink.",
     "resetPasswordError": "Fehler beim Senden der E-Mail",
-    "backToLogin": "Zurück zur Anmeldung"
+    "backToLogin": "Zurück zur Anmeldung",
+    "resetPasswordTitle": "Neues Passwort festlegen",
+    "resetPasswordDesc": "Geben Sie Ihr neues Passwort ein",
+    "newPassword": "Neues Passwort",
+    "newPasswordPlaceholder": "Mindestens 6 Zeichen",
+    "confirmPassword": "Passwort bestätigen",
+    "confirmPasswordPlaceholder": "Passwort wiederholen",
+    "resetPassword": "Passwort zurücksetzen",
+    "passwordsDoNotMatch": "Die Passwörter stimmen nicht überein.",
+    "passwordResetSuccess": "Passwort geändert!",
+    "passwordResetSuccessDesc": "Ihr Passwort wurde erfolgreich geändert. Sie können sich jetzt mit Ihrem neuen Passwort anmelden."
   },
   "subjects": {
     "title": "Meine Fächer",
