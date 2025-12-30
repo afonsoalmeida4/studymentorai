@@ -331,10 +331,22 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           <p className="text-sm text-muted-foreground mt-2">
             {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
+          {/* Show next available time in spaced mode */}
+          {mode === "spaced" && nextAvailableAt && (
+            <div className="mt-4">
+              <Badge variant="outline" className="gap-1.5 text-base px-3 py-1.5">
+                <Clock className="w-4 h-4" />
+                {t('flashcards.anki.nextAvailable')}: {countdown || t('flashcards.anki.tomorrow')}
+              </Badge>
+            </div>
+          )}
         </div>
-        <Button onClick={handleRestart} data-testid="button-restart-study">
-          {mode === "spaced" ? t('flashcards.anki.reviewAgain') : t('flashcards.anki.practiceAgain')}
-        </Button>
+        {/* Only show "Practice again" in practice mode - spaced mode has no replay option */}
+        {mode === "practice" && (
+          <Button onClick={handleRestart} data-testid="button-restart-study">
+            {t('flashcards.anki.practiceAgain')}
+          </Button>
+        )}
       </div>
     );
   }
