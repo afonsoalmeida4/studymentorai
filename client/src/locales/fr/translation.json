@@ -1008,7 +1008,7 @@
   "ranking": {
     "title": "Classement Global",
     "subtitle": "Les meilleurs étudiants de la communauté",
-    "topUsers": "Top 10 Utilisateurs",
+    "topUsers": "Top Utilisateurs",
     "rankedBy": "Classés par XP total cumulé",
     "empty": "Pas encore d'utilisateurs dans le classement",
     "anonymousUser": "Utilisateur Anonyme",

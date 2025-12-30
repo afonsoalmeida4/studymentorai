@@ -1009,7 +1009,7 @@
   "ranking": {
     "title": "Global Ranking",
     "subtitle": "The best students in the community",
-    "topUsers": "Top 10 Users",
+    "topUsers": "Top Users",
     "rankedBy": "Ranked by total XP accumulated",
     "empty": "No users in the ranking yet",
     "anonymousUser": "Anonymous User",
