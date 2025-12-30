@@ -1203,6 +1203,7 @@
     "deleteConfirm": "Sei sicuro di voler eliminare questo evento?",
     "deleteDialogTitle": "Elimina Evento",
     "deleteDialogDescription": "Questa azione non può essere annullata.",
+    "cancel": "Annulla",
     "createError": "Errore nella creazione dell'evento",
     "updateError": "Errore nell'aggiornamento dell'evento",
     "deleteError": "Errore nell'eliminazione dell'evento",

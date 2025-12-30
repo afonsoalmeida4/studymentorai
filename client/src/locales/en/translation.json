@@ -1204,6 +1204,7 @@
     "deleteConfirm": "Are you sure you want to delete this event?",
     "deleteDialogTitle": "Delete Event",
     "deleteDialogDescription": "This action cannot be undone.",
+    "cancel": "Cancel",
     "createError": "Error creating event",
     "updateError": "Error updating event",
     "deleteError": "Error deleting event",

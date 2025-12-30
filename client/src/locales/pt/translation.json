@@ -1209,6 +1209,7 @@
     "deleteConfirm": "Tens a certeza que queres eliminar este evento?",
     "deleteDialogTitle": "Eliminar Evento",
     "deleteDialogDescription": "Esta ação não pode ser revertida.",
+    "cancel": "Cancelar",
     "createError": "Erro ao criar evento",
     "updateError": "Erro ao atualizar evento",
     "deleteError": "Erro ao eliminar evento",

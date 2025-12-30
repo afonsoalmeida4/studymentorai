@@ -1203,6 +1203,7 @@
     "deleteConfirm": "Möchten Sie dieses Ereignis wirklich löschen?",
     "deleteDialogTitle": "Ereignis Löschen",
     "deleteDialogDescription": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "cancel": "Abbrechen",
     "createError": "Fehler beim Erstellen des Ereignisses",
     "updateError": "Fehler beim Aktualisieren des Ereignisses",
     "deleteError": "Fehler beim Löschen des Ereignisses",
