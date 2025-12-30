@@ -139,6 +139,8 @@
     "title": "Tema",
     "uploadFile": "Subir Archivo",
     "addLink": "Añadir Enlace",
+    "noSummaries": "Aún no hay resúmenes disponibles para este tema.",
+    "selectStylesHint": "Selecciona uno o más estilos de aprendizaje para generar resúmenes.",
     "tabs": {
       "all": "Todos",
       "files": "Archivos",

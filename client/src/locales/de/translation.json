@@ -136,6 +136,8 @@
     "title": "Thema",
     "uploadFile": "Datei Hochladen",
     "addLink": "Link Hinzufügen",
+    "noSummaries": "Noch keine Zusammenfassungen für dieses Thema verfügbar.",
+    "selectStylesHint": "Wählen Sie einen oder mehrere Lernstile aus, um Zusammenfassungen zu generieren.",
     "tabs": {
       "all": "Alle",
       "files": "Dateien",

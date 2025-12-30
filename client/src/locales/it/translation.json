@@ -136,6 +136,8 @@
     "title": "Argomento",
     "uploadFile": "Carica File",
     "addLink": "Aggiungi Link",
+    "noSummaries": "Nessun riassunto disponibile per questo argomento.",
+    "selectStylesHint": "Seleziona uno o più stili di apprendimento per generare riassunti.",
     "tabs": {
       "all": "Tutti",
       "files": "File",

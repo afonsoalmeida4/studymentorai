@@ -1219,10 +1219,10 @@ export default function TopicView() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">
-                        Ainda não há resumos disponíveis para este tópico.
+                        {t('topicView.noSummaries')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Escolhe um ou mais estilos de aprendizagem para gerar resumos.
+                        {t('topicView.selectStylesHint')}
                       </p>
                     </div>
                     <div className="max-w-sm mx-auto space-y-4">

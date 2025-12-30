@@ -136,6 +136,8 @@
     "title": "Sujet",
     "uploadFile": "Télécharger un Fichier",
     "addLink": "Ajouter un Lien",
+    "noSummaries": "Aucun résumé disponible pour ce sujet.",
+    "selectStylesHint": "Sélectionnez un ou plusieurs styles d'apprentissage pour générer des résumés.",
     "tabs": {
       "all": "Tous",
       "files": "Fichiers",

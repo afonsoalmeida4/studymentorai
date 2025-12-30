@@ -141,6 +141,8 @@
     "title": "Topic",
     "uploadFile": "Upload File",
     "addLink": "Add Link",
+    "noSummaries": "No summaries available for this topic yet.",
+    "selectStylesHint": "Select one or more learning styles to generate summaries.",
     "tabs": {
       "all": "All",
       "files": "Files",

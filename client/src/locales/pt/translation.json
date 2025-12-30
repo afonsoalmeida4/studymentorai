@@ -136,6 +136,8 @@
     "title": "Tópico",
     "uploadFile": "Carregar Ficheiro",
     "addLink": "Adicionar Link",
+    "noSummaries": "Ainda não há resumos disponíveis para este tópico.",
+    "selectStylesHint": "Escolhe um ou mais estilos de aprendizagem para gerar resumos.",
     "tabs": {
       "all": "Todos",
       "files": "Ficheiros",
