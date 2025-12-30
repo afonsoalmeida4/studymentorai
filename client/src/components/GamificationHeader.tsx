@@ -70,7 +70,6 @@ export function GamificationHeader() {
             />
             <div className="sm:hidden flex items-center gap-2">
               <LevelNumberBadge levelNumber={levelInfo.levelNumber} totalLevels={levelInfo.totalLevels} />
-              <RankBadge rank={rank} totalUsers={totalUsers} />
             </div>
           </div>
           
@@ -86,7 +85,6 @@ export function GamificationHeader() {
           
           <div className="hidden sm:flex items-center gap-2">
             <LevelNumberBadge levelNumber={levelInfo.levelNumber} totalLevels={levelInfo.totalLevels} />
-            <RankBadge rank={rank} totalUsers={totalUsers} />
           </div>
         </div>
       </Card>
