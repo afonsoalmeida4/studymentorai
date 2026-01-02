@@ -4,6 +4,7 @@ import multer from "multer";
 import Stripe from "stripe";
 import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
+import subscriptionRoutes from "./subscriptionRoutes";
 import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel } from "docx";
 import { generateSummary, generateFlashcards, generateReviewPlan, generateQuiz, type StudyHistoryItem } from "./openai";
 import { getUserLanguage, normalizeLanguage } from "./languageHelper";
@@ -301,8 +302,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         costControlService.incrementDailyUsage(userId, "summary");
 
         // Check summary word count against plan limits
-        const summaryWordCount = summary.split(/\s+/).length;
-        const summaryCheck = await subscriptionService.canGenerateSummary(userId, summaryWordCount);
+        summaryWordCount = summary.split(/\s+/).length;
+        summaryCheck = await subscriptionService.canGenerateSummary(userId, summaryWordCount);
         if (!summaryCheck.allowed) {
           return res.status(403).json({
             success: false,
@@ -312,7 +313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Save to database
-        const savedSummary = await storage.createSummary({
+        savedSummary = await storage.createSummary({
           userId,
           fileName: req.file.originalname,
           learningStyle,
@@ -360,8 +361,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user's summary history
   app.get("/api/summaries", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const summaries = await storage.getUserSummaries(userId);
+      userId = req.user.claims.sub;
+      summaries = await storage.getUserSummaries(userId);
       res.json(summaries);
     } catch (error) {
       console.error("Error fetching summaries:", error);
@@ -372,10 +373,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle favorite
   app.patch("/api/summaries/:id/favorite", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const summaryId = req.params.id;
+      userId = req.user.claims.sub;
+      summaryId = req.params.id;
       
-      const updated = await storage.toggleFavorite(summaryId, userId);
+      updated = await storage.toggleFavorite(summaryId, userId);
       if (!updated) {
         return res.status(404).json({ error: "Summary not found" });
       }
@@ -390,10 +391,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete summary
   app.delete("/api/summaries/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const summaryId = req.params.id;
+      userId = req.user.claims.sub;
+      summaryId = req.params.id;
       
-      const success = await storage.deleteSummary(summaryId, userId);
+      success = await storage.deleteSummary(summaryId, userId);
       if (!success) {
         return res.status(404).json({ error: "Summary not found" });
       }
@@ -406,7 +407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PDF/DOCX export translations
-  const exportTranslations: Record<string, { learningStyle: string; motivationalMessage: string; generatedOn: string }> = {
+  exportTranslations: Record<string, { learningStyle: string; motivationalMessage: string; generatedOn: string }> = {
     pt: { learningStyle: "Estilo de Aprendizagem", motivationalMessage: "Mensagem Motivacional", generatedOn: "Gerado em" },
     en: { learningStyle: "Learning Style", motivationalMessage: "Motivational Message", generatedOn: "Generated on" },
     es: { learningStyle: "Estilo de Aprendizaje", motivationalMessage: "Mensaje Motivacional", generatedOn: "Generado el" },
@@ -418,13 +419,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export topic summary as PDF (Premium only)
   app.get("/api/topic-summaries/:id/export-pdf", isAuthenticated, requirePremium, exportLimiter, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const summaryId = req.params.id;
-      const language = (req.query.language as string) || "en";
-      const t = exportTranslations[language] || exportTranslations.en;
+      userId = req.user.claims.sub;
+      summaryId = req.params.id;
+      language = (req.query.language as string) || "en";
+      t = exportTranslations[language] || exportTranslations.en;
       
       // Get topic summary
-      const summary = await storage.getTopicSummary(summaryId, userId);
+      summary = await storage.getTopicSummary(summaryId, userId);
       if (!summary) {
         return res.status(404).json({ error: "Resumo não encontrado" });
       }
@@ -2452,12 +2453,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create Stripe checkout session for subscription upgrade
-  app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
+app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
   try {
     const userId = req.user.claims.sub;
-    const { plan, billingPeriod = "monthly", currency = "EUR" } = req.body;
+    const { plan, billingPeriod = "monthly" } = req.body;
 
-    if (!["pro", "premium"].includes(plan)) {
+    // 1️⃣ Validar plano
+    if (!plan || !["pro", "premium"].includes(plan)) {
       return res.status(400).json({ error: "Plano inválido" });
     }
 
@@ -2465,13 +2467,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ error: "Período inválido" });
     }
 
+    // 2️⃣ Obter utilizador
     const user = await storage.getUser(userId);
     if (!user?.email) {
-      return res.status(400).json({ error: "Utilizador sem email" });
+      return res.status(400).json({ error: "Utilizador sem email válido" });
     }
 
+    // 3️⃣ Garantir subscrição existe
     const subscription = await subscriptionService.getOrCreateSubscription(userId);
 
+    // 4️⃣ Garantir customer Stripe
     let customerId = subscription.stripeCustomerId;
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -2479,23 +2484,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: { userId },
       });
       customerId = customer.id;
+
+      await subscriptionService.updateSubscriptionPlan(userId, subscription.plan as any, {
+        customerId,
+      });
     }
 
-    const priceId = subscriptionService.getStripePriceId(
-      plan,
-      billingPeriod,
-      currency
-    );
+    // 5️⃣ MOEDA — FORÇAR EUR (resolve 100% dos bugs atuais)
+    const currency: "EUR" = "EUR";
 
+    // 6️⃣ Resolver Price ID corretamente
+    const priceId =
+      STRIPE_PRICE_MAP[plan]?.[billingPeriod]?.[currency];
+
+    if (!priceId) {
+      return res.status(400).json({
+        error: "Stripe price não configurado",
+        debug: { plan, billingPeriod, currency },
+      });
+    }
+
+    // 7️⃣ URLs corretos
     const protocol =
-      req.get("x-forwarded-proto") || (req.secure ? "https" : "http");
-    const host = req.get("host");
+      req.get("x-forwarded-proto") ||
+      (req.secure ? "https" : "http");
+
+    let host =
+      req.get("x-forwarded-host") ||
+      req.get("host") ||
+      "localhost:5000";
+
+    if (process.env.NODE_ENV !== "production" && !host.includes(":")) {
+      host = `${host}:5000`;
+    }
+
     const baseUrl = `${protocol}://${host}`;
 
+    // 8️⃣ Criar sessão Stripe
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
       customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
+      mode: "subscription",
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
       success_url: `${baseUrl}/subscription?success=true`,
       cancel_url: `${baseUrl}/subscription?canceled=true`,
       metadata: {
@@ -2506,12 +2540,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       },
     });
 
-    res.json({ url: session.url });
-  } catch (err: any) {
-    console.error("Stripe checkout error:", err);
-    res.status(500).json({ error: err.message });
+    // 9️⃣ Responder ao frontend
+    return res.json({ url: session.url });
+  } catch (error: any) {
+    console.error("Stripe checkout error:", error);
+    return res.status(500).json({
+      error: "Erro ao criar sessão de pagamento",
+    });
   }
 });
+
 
 
   // Stripe webhook handler
