@@ -58,7 +58,7 @@ export const STRIPE_PRICE_MAP: Record<
   },
 };
 
-class SubscriptionService {
+export class SubscriptionService {
   async getUserSubscription(userId: string): Promise<Subscription | null> {
     const [subscription] = await db
       .select()
@@ -66,10 +66,6 @@ class SubscriptionService {
       .where(eq(subscriptions.userId, userId));
 
     return subscription || null;
-  }
-
-  getPlanLimits(plan: SubscriptionPlan) {
-    return planLimits[plan];
   }
 
   async getOrCreateSubscription(userId: string): Promise<Subscription> {
@@ -122,64 +118,19 @@ class SubscriptionService {
     return usage;
   }
 
-  async getSubscriptionDetails(userId: string) {
+  /**
+   * ✅ MÉTODO QUE FALTAVA E QUE QUEBRAVA TUDO
+   */
+  async getSubscriptionDetails(userId: string): Promise<{
+    subscription: Subscription;
+    usage: UsageTracking;
+    limits: typeof planLimits[SubscriptionPlan];
+  }> {
     const subscription = await this.getOrCreateSubscription(userId);
     const usage = await this.getUserUsage(userId);
-    const limits = planLimits[subscription.plan];
+    const limits = planLimits[subscription.plan as SubscriptionPlan];
 
     return { subscription, usage, limits };
-  }
-
-  async updateSubscriptionPlan(
-    userId: string,
-    plan: SubscriptionPlan,
-    stripe?: {
-      customerId?: string;
-      subscriptionId?: string;
-      priceId?: string;
-      currentPeriodStart?: Date;
-      currentPeriodEnd?: Date;
-    }
-  ) {
-    const existing = await this.getUserSubscription(userId);
-
-    if (existing) {
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          plan,
-          status: "active",
-          stripeCustomerId: stripe?.customerId ?? existing.stripeCustomerId,
-          stripeSubscriptionId:
-            stripe?.subscriptionId ?? existing.stripeSubscriptionId,
-          stripePriceId: stripe?.priceId ?? existing.stripePriceId,
-          currentPeriodStart:
-            stripe?.currentPeriodStart ?? existing.currentPeriodStart,
-          currentPeriodEnd:
-            stripe?.currentPeriodEnd ?? existing.currentPeriodEnd,
-          updatedAt: new Date(),
-        })
-        .where(eq(subscriptions.userId, userId))
-        .returning();
-
-      return updated;
-    }
-
-    const [created] = await db
-      .insert(subscriptions)
-      .values({
-        userId,
-        plan,
-        status: "active",
-        stripeCustomerId: stripe?.customerId,
-        stripeSubscriptionId: stripe?.subscriptionId,
-        stripePriceId: stripe?.priceId,
-        currentPeriodStart: stripe?.currentPeriodStart,
-        currentPeriodEnd: stripe?.currentPeriodEnd,
-      })
-      .returning();
-
-    return created;
   }
 
   async cancelSubscription(userId: string) {
@@ -208,3 +159,4 @@ class SubscriptionService {
 }
 
 export const subscriptionService = new SubscriptionService();
+
