@@ -58,42 +58,7 @@ export const STRIPE_PRICE_MAP: Record<
   },
 };
 
-export class SubscriptionService {
-  /* -------------------- HELPERS -------------------- */
-
-  normalizeCurrency(currency?: string): "EUR" | "USD" | "BRL" | "INR" {
-    switch ((currency || "").toLowerCase()) {
-      case "usd":
-        return "USD";
-      case "brl":
-        return "BRL";
-      case "inr":
-        return "INR";
-      default:
-        return "EUR";
-    }
-  }
-
-  getStripePriceId(
-    plan: SubscriptionPlan,
-    billingPeriod: "monthly" | "yearly",
-    currency: string
-  ): string {
-    const normalizedCurrency = this.normalizeCurrency(currency);
-    const priceId =
-      STRIPE_PRICE_MAP[plan]?.[billingPeriod]?.[normalizedCurrency];
-
-    if (!priceId) {
-      throw new Error(
-        `Missing Stripe Price ID for ${plan} / ${billingPeriod} / ${normalizedCurrency}`
-      );
-    }
-
-    return priceId;
-  }
-
-  /* -------------------- SUBSCRIPTION -------------------- */
-
+class SubscriptionService {
   async getUserSubscription(userId: string): Promise<Subscription | null> {
     const [subscription] = await db
       .select()
@@ -101,6 +66,10 @@ export class SubscriptionService {
       .where(eq(subscriptions.userId, userId));
 
     return subscription || null;
+  }
+
+  getPlanLimits(plan: SubscriptionPlan) {
+    return planLimits[plan];
   }
 
   async getOrCreateSubscription(userId: string): Promise<Subscription> {
@@ -120,6 +89,45 @@ export class SubscriptionService {
     }
 
     return subscription;
+  }
+
+  async getUserUsage(userId: string): Promise<UsageTracking> {
+    const month = new Date().toISOString().slice(0, 7);
+
+    const [usage] = await db
+      .select()
+      .from(usageTracking)
+      .where(
+        and(
+          eq(usageTracking.userId, userId),
+          eq(usageTracking.month, month)
+        )
+      );
+
+    if (!usage) {
+      const [created] = await db
+        .insert(usageTracking)
+        .values({
+          userId,
+          month,
+          uploadsCount: 0,
+          chatMessagesCount: 0,
+          summariesGenerated: 0,
+        })
+        .returning();
+
+      return created;
+    }
+
+    return usage;
+  }
+
+  async getSubscriptionDetails(userId: string) {
+    const subscription = await this.getOrCreateSubscription(userId);
+    const usage = await this.getUserUsage(userId);
+    const limits = planLimits[subscription.plan];
+
+    return { subscription, usage, limits };
   }
 
   async updateSubscriptionPlan(
@@ -197,41 +205,6 @@ export class SubscriptionService {
 
     return updated;
   }
-
-  /* -------------------- USAGE / LIMITS -------------------- */
-
-  async getUserUsage(userId: string): Promise<UsageTracking> {
-    const month = new Date().toISOString().slice(0, 7);
-
-    const [usage] = await db
-      .select()
-      .from(usageTracking)
-      .where(
-        and(eq(usageTracking.userId, userId), eq(usageTracking.month, month))
-      );
-
-    if (!usage) {
-      const [created] = await db
-        .insert(usageTracking)
-        .values({
-          userId,
-          month,
-          uploadsCount: 0,
-          chatMessagesCount: 0,
-          summariesGenerated: 0,
-        })
-        .returning();
-
-      return created;
-    }
-
-    return usage;
-  }
-
-  getPlanLimits(plan: SubscriptionPlan) {
-    return planLimits[plan];
-  }
 }
 
 export const subscriptionService = new SubscriptionService();
-
