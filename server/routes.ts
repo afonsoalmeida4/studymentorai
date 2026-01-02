@@ -2453,117 +2453,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create Stripe checkout session for subscription upgrade
   app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { plan, billingPeriod = "monthly" } = req.body;
+  try {
+    const userId = req.user.claims.sub;
+    const { plan, billingPeriod = "monthly", currency = "EUR" } = req.body;
 
-      if (!plan || !["pro", "premium"].includes(plan)) {
-        return res.status(400).json({
-          error: "Plano inválido",
-        });
-      }
-
-      if (!["monthly", "yearly"].includes(billingPeriod)) {
-        return res.status(400).json({
-          error: "Período de faturação inválido",
-        });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user || !user.email) {
-        return res.status(400).json({
-          error: "Utilizador sem email válido",
-        });
-      }
-
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
-
-      let customerId = subscription.stripeCustomerId;
-
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
-          metadata: {
-            userId: user.id,
-          },
-        });
-        customerId = customer.id;
-
-        await subscriptionService.updateSubscriptionPlan(userId, subscription.plan as any, {
-          customerId,
-        });
-      }
-
-      // Map plan + billing period to Stripe Price IDs
-      const priceIds: Record<string, Record<string, string>> = {
-        pro: {
-          monthly: process.env.STRIPE_PRICE_ID_PRO || "",
-          yearly: process.env.STRIPE_PRICE_ID_PRO_YEARLY || process.env.STRIPE_PRICE_ID_PRO || "",
-        },
-        premium: {
-          monthly: process.env.STRIPE_PRICE_ID_PREMIUM || "",
-          yearly: process.env.STRIPE_PRICE_ID_PREMIUM_YEARLY || process.env.STRIPE_PRICE_ID_PREMIUM || "",
-        },
-      };
-
-      const priceId = priceIds[plan]?.[billingPeriod];
-      
-      if (!priceId) {
-        return res.status(400).json({
-          error: "Price ID não configurado para este plano",
-        });
-      }
-
-      // Build URLs using the actual host from the request to avoid stale domains
-      const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
-      let host = req.get('host') || req.get('x-forwarded-host') || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
-      
-      // In development, ensure port :5000 is included if not already present
-      const isProduction = process.env.NODE_ENV === "production";
-      if (!isProduction && host && !host.includes(':')) {
-        host = `${host}:5000`;
-      }
-      
-      const fullBaseUrl = `${protocol}://${host}`;
-
-      console.log('[Stripe Checkout] Creating session with URLs:', {
-        success: `${fullBaseUrl}/subscription?success=true`,
-        cancel: `${fullBaseUrl}/subscription?canceled=true`,
-        protocol,
-        host,
-        fullBaseUrl,
-      });
-
-      const session = await stripe.checkout.sessions.create({
-        customer: customerId,
-        mode: "subscription",
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        success_url: `${fullBaseUrl}/subscription?success=true`,
-        cancel_url: `${fullBaseUrl}/subscription?canceled=true`,
-        metadata: {
-          userId,
-          plan,
-          billingPeriod,
-        },
-      });
-
-      console.log('[Stripe Checkout] Session created:', session.id);
-
-      return res.json({
-        url: session.url,
-      });
-    } catch (error: any) {
-      console.error("Error creating checkout session:", error);
-      return res.status(500).json({
-        error: "Erro ao criar sessão de pagamento",
-      });
+    if (!["pro", "premium"].includes(plan)) {
+      return res.status(400).json({ error: "Plano inválido" });
     }
-  });
+
+    if (!["monthly", "yearly"].includes(billingPeriod)) {
+      return res.status(400).json({ error: "Período inválido" });
+    }
+
+    const user = await storage.getUser(userId);
+    if (!user?.email) {
+      return res.status(400).json({ error: "Utilizador sem email" });
+    }
+
+    const subscription = await subscriptionService.getOrCreateSubscription(userId);
+
+    let customerId = subscription.stripeCustomerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { userId },
+      });
+      customerId = customer.id;
+    }
+
+    const priceId = subscriptionService.getStripePriceId(
+      plan,
+      billingPeriod,
+      currency
+    );
+
+    const protocol =
+      req.get("x-forwarded-proto") || (req.secure ? "https" : "http");
+    const host = req.get("host");
+    const baseUrl = `${protocol}://${host}`;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: customerId,
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${baseUrl}/subscription?success=true`,
+      cancel_url: `${baseUrl}/subscription?canceled=true`,
+      metadata: {
+        userId,
+        plan,
+        billingPeriod,
+        currency,
+      },
+    });
+
+    res.json({ url: session.url });
+  } catch (err: any) {
+    console.error("Stripe checkout error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
