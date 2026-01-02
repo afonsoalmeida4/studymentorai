@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { getCurrencyFromRequest, getStripePriceId } from "./stripePricing";
 import multer from "multer";
 import Stripe from "stripe";
 import rateLimit from "express-rate-limit";
@@ -2495,24 +2496,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Map plan + billing period to Stripe Price IDs
-      const priceIds: Record<string, Record<string, string>> = {
-        pro: {
-          monthly: process.env.STRIPE_PRICE_ID_PRO || "",
-          yearly: process.env.STRIPE_PRICE_ID_PRO_YEARLY || process.env.STRIPE_PRICE_ID_PRO || "",
-        },
-        premium: {
-          monthly: process.env.STRIPE_PRICE_ID_PREMIUM || "",
-          yearly: process.env.STRIPE_PRICE_ID_PREMIUM_YEARLY || process.env.STRIPE_PRICE_ID_PREMIUM || "",
-        },
-      };
-
-      const priceId = priceIds[plan]?.[billingPeriod];
-      
-      if (!priceId) {
-        return res.status(400).json({
-          error: "Price ID não configurado para este plano",
-        });
-      }
+      const currency = getCurrencyFromRequest(req);
+      const priceId = getStripePriceId(
+        plan,
+        billingPeriod,
+        currency
+      );
 
       // Build URLs using the actual host from the request to avoid stale domains
       const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
