@@ -2554,6 +2554,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/pricing", (req, res) => {
+  const currency = getCurrencyFromRequest(req);
+
+  const symbols: Record<string, string> = {
+    EUR: "€",
+    USD: "$",
+    BRL: "R$",
+    INR: "₹",
+  };
+
+  const prices = {
+    pro: {
+      monthly: {
+        EUR: 3.99,
+        USD: 4.99,
+        BRL: 19.9,
+        INR: 199,
+      },
+      yearly: {
+        EUR: 39.99,
+        USD: 49.99,
+        BRL: 199,
+        INR: 1999,
+      },
+    },
+    premium: {
+      monthly: {
+        EUR: 7.99,
+        USD: 9.99,
+        BRL: 39.9,
+        INR: 399,
+      },
+      yearly: {
+        EUR: 79.99,
+        USD: 99.99,
+        BRL: 399,
+        INR: 3999,
+      },
+    },
+  };
+
+  res.json({
+    currency,
+    symbol: symbols[currency],
+    plans: {
+      pro: {
+        monthly: prices.pro.monthly[currency],
+        yearly: prices.pro.yearly[currency],
+      },
+      premium: {
+        monthly: prices.premium.monthly[currency],
+        yearly: prices.premium.yearly[currency],
+      },
+    },
+  });
+});
+
+
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
     const sig = req.headers["stripe-signature"];
