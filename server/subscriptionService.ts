@@ -348,6 +348,21 @@ export class SubscriptionService {
 
     return updated;
   }
+  /**
+ * Get subscription details with usage stats
+ */
+  async getSubscriptionDetails(userId: string): Promise<{
+    subscription: Subscription;
+    usage: UsageTracking;
+    limits: typeof planLimits[SubscriptionPlan];
+  }> {
+    const subscription = await this.getOrCreateSubscription(userId);
+    const usage = await this.getUserUsage(userId);
+    const limits = planLimits[subscription.plan as SubscriptionPlan];
+  
+    return { subscription, usage, limits };
+  }
+
 }
 
 export const subscriptionService = new SubscriptionService();
