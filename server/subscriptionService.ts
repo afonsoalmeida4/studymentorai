@@ -12,10 +12,9 @@ import { eq, and, sql } from "drizzle-orm";
 
 /**
  * Stripe Price mapping
- * Alinhado com:
- * - Planos: free | pro | premium
- * - Moedas: EUR | USD | BRL | INR
- * - Períodos: monthly | yearly
+ * Planos: free | pro | premium
+ * Moedas: EUR | USD | BRL | INR
+ * Períodos: monthly | yearly
  */
 export const STRIPE_PRICE_MAP: Record<
   SubscriptionPlan,
@@ -60,9 +59,41 @@ export const STRIPE_PRICE_MAP: Record<
 };
 
 export class SubscriptionService {
-  /**
-   * Get user's current subscription
-   */
+  /* -------------------- HELPERS -------------------- */
+
+  normalizeCurrency(currency?: string): "EUR" | "USD" | "BRL" | "INR" {
+    switch ((currency || "").toLowerCase()) {
+      case "usd":
+        return "USD";
+      case "brl":
+        return "BRL";
+      case "inr":
+        return "INR";
+      default:
+        return "EUR";
+    }
+  }
+
+  getStripePriceId(
+    plan: SubscriptionPlan,
+    billingPeriod: "monthly" | "yearly",
+    currency: string
+  ): string {
+    const normalizedCurrency = this.normalizeCurrency(currency);
+    const priceId =
+      STRIPE_PRICE_MAP[plan]?.[billingPeriod]?.[normalizedCurrency];
+
+    if (!priceId) {
+      throw new Error(
+        `Missing Stripe Price ID for ${plan} / ${billingPeriod} / ${normalizedCurrency}`
+      );
+    }
+
+    return priceId;
+  }
+
+  /* -------------------- SUBSCRIPTION -------------------- */
+
   async getUserSubscription(userId: string): Promise<Subscription | null> {
     const [subscription] = await db
       .select()
@@ -72,16 +103,6 @@ export class SubscriptionService {
     return subscription || null;
   }
 
-  /**
-   * Get plan limits for a given plan
-   */
-  getPlanLimits(plan: string) {
-    return planLimits[plan as SubscriptionPlan];
-  }
-
-  /**
-   * Get or create subscription (defaults to free)
-   */
   async getOrCreateSubscription(userId: string): Promise<Subscription> {
     let subscription = await this.getUserSubscription(userId);
 
@@ -101,178 +122,6 @@ export class SubscriptionService {
     return subscription;
   }
 
-  /**
-   * Get current month's usage
-   */
-  async getUserUsage(userId: string): Promise<UsageTracking> {
-    const month = new Date().toISOString().slice(0, 7);
-
-    const [usage] = await db
-      .select()
-      .from(usageTracking)
-      .where(
-        and(
-          eq(usageTracking.userId, userId),
-          eq(usageTracking.month, month)
-        )
-      );
-
-    if (!usage) {
-      const [created] = await db
-        .insert(usageTracking)
-        .values({
-          userId,
-          month,
-          uploadsCount: 0,
-          chatMessagesCount: 0,
-          summariesGenerated: 0,
-        })
-        .returning();
-
-      return created;
-    }
-
-    return usage;
-  }
-
-  /**
-   * Upload permissions
-   */
-  async canUpload(userId: string) {
-    const subscription = await this.getOrCreateSubscription(userId);
-    const usage = await this.getUserUsage(userId);
-    const limits = planLimits[subscription.plan];
-
-    if (limits.uploadsPerMonth === -1) return { allowed: true };
-
-    if (usage.uploadsCount >= limits.uploadsPerMonth) {
-      return {
-        allowed: false,
-        errorCode: "UPLOAD_LIMIT_REACHED",
-        params: { limit: limits.uploadsPerMonth, planName: limits.name },
-      };
-    }
-
-    return { allowed: true };
-  }
-
-  async incrementUploadCount(userId: string) {
-    const month = new Date().toISOString().slice(0, 7);
-
-    await db
-      .insert(usageTracking)
-      .values({
-        userId,
-        month,
-        uploadsCount: 1,
-        chatMessagesCount: 0,
-        summariesGenerated: 0,
-      })
-      .onConflictDoUpdate({
-        target: [usageTracking.userId, usageTracking.month],
-        set: {
-          uploadsCount: sql`${usageTracking.uploadsCount} + 1`,
-          updatedAt: new Date(),
-        },
-      });
-  }
-
-  /**
-   * Chat permissions
-   */
-  async canSendChatMessage(userId: string, mode: ChatMode) {
-    const subscription = await this.getOrCreateSubscription(userId);
-    const usage = await this.getUserUsage(userId);
-    const limits = planLimits[subscription.plan];
-
-    if (!limits.chatModes.includes(mode)) {
-      return {
-        allowed: false,
-        errorCode: "CHAT_MODE_NOT_AVAILABLE",
-        params: { mode, planName: limits.name },
-      };
-    }
-
-    if (limits.dailyChatLimit !== -1 && usage.chatMessagesCount >= limits.dailyChatLimit) {
-      return {
-        allowed: false,
-        errorCode: "CHAT_LIMIT_REACHED",
-        params: { limit: limits.dailyChatLimit, planName: limits.name },
-      };
-    }
-
-    return { allowed: true };
-  }
-
-  async incrementChatMessageCount(userId: string) {
-    const month = new Date().toISOString().slice(0, 7);
-
-    await db
-      .insert(usageTracking)
-      .values({
-        userId,
-        month,
-        uploadsCount: 0,
-        chatMessagesCount: 1,
-        summariesGenerated: 0,
-      })
-      .onConflictDoUpdate({
-        target: [usageTracking.userId, usageTracking.month],
-        set: {
-          chatMessagesCount: sql`${usageTracking.chatMessagesCount} + 1`,
-          updatedAt: new Date(),
-        },
-      });
-  }
-
-  /**
-   * Summary permissions
-   */
-  async canGenerateSummary(userId: string, wordCount: number) {
-    const subscription = await this.getOrCreateSubscription(userId);
-    const limits = planLimits[subscription.plan];
-
-    if (limits.maxSummaryWords === -1) return { allowed: true };
-
-    if (wordCount > limits.maxSummaryWords) {
-      return {
-        allowed: false,
-        errorCode: "SUMMARY_WORD_LIMIT_EXCEEDED",
-        params: {
-          wordCount,
-          limit: limits.maxSummaryWords,
-          planName: limits.name,
-        },
-      };
-    }
-
-    return { allowed: true };
-  }
-
-  async incrementSummaryCount(userId: string) {
-    const month = new Date().toISOString().slice(0, 7);
-
-    await db
-      .insert(usageTracking)
-      .values({
-        userId,
-        month,
-        uploadsCount: 0,
-        chatMessagesCount: 0,
-        summariesGenerated: 1,
-      })
-      .onConflictDoUpdate({
-        target: [usageTracking.userId, usageTracking.month],
-        set: {
-          summariesGenerated: sql`${usageTracking.summariesGenerated} + 1`,
-          updatedAt: new Date(),
-        },
-      });
-  }
-
-  /**
-   * Update subscription after Stripe checkout / webhook
-   */
   async updateSubscriptionPlan(
     userId: string,
     plan: SubscriptionPlan,
@@ -293,10 +142,13 @@ export class SubscriptionService {
           plan,
           status: "active",
           stripeCustomerId: stripe?.customerId ?? existing.stripeCustomerId,
-          stripeSubscriptionId: stripe?.subscriptionId ?? existing.stripeSubscriptionId,
+          stripeSubscriptionId:
+            stripe?.subscriptionId ?? existing.stripeSubscriptionId,
           stripePriceId: stripe?.priceId ?? existing.stripePriceId,
-          currentPeriodStart: stripe?.currentPeriodStart ?? existing.currentPeriodStart,
-          currentPeriodEnd: stripe?.currentPeriodEnd ?? existing.currentPeriodEnd,
+          currentPeriodStart:
+            stripe?.currentPeriodStart ?? existing.currentPeriodStart,
+          currentPeriodEnd:
+            stripe?.currentPeriodEnd ?? existing.currentPeriodEnd,
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.userId, userId))
@@ -322,9 +174,6 @@ export class SubscriptionService {
     return created;
   }
 
-  /**
-   * Cancel subscription (revert to free)
-   */
   async cancelSubscription(userId: string) {
     const sub = await this.getUserSubscription(userId);
     if (!sub || sub.plan === "free") {
@@ -348,21 +197,41 @@ export class SubscriptionService {
 
     return updated;
   }
-  /**
- * Get subscription details with usage stats
- */
-  async getSubscriptionDetails(userId: string): Promise<{
-    subscription: Subscription;
-    usage: UsageTracking;
-    limits: typeof planLimits[SubscriptionPlan];
-  }> {
-    const subscription = await this.getOrCreateSubscription(userId);
-    const usage = await this.getUserUsage(userId);
-    const limits = planLimits[subscription.plan as SubscriptionPlan];
-  
-    return { subscription, usage, limits };
+
+  /* -------------------- USAGE / LIMITS -------------------- */
+
+  async getUserUsage(userId: string): Promise<UsageTracking> {
+    const month = new Date().toISOString().slice(0, 7);
+
+    const [usage] = await db
+      .select()
+      .from(usageTracking)
+      .where(
+        and(eq(usageTracking.userId, userId), eq(usageTracking.month, month))
+      );
+
+    if (!usage) {
+      const [created] = await db
+        .insert(usageTracking)
+        .values({
+          userId,
+          month,
+          uploadsCount: 0,
+          chatMessagesCount: 0,
+          summariesGenerated: 0,
+        })
+        .returning();
+
+      return created;
+    }
+
+    return usage;
   }
 
+  getPlanLimits(plan: SubscriptionPlan) {
+    return planLimits[plan];
+  }
 }
 
 export const subscriptionService = new SubscriptionService();
+
