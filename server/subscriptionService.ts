@@ -16,17 +16,7 @@ import { eq, and, sql } from "drizzle-orm";
  * Moedas: EUR | USD | BRL | INR
  * Períodos: monthly | yearly
  */
-export const STRIPE_PRICE_MAP: Record<
-  SubscriptionPlan,
-  Partial<
-    Record<
-      "monthly" | "yearly",
-      Partial<Record<"EUR" | "USD" | "BRL" | "INR", string>>
-    >
-  >
-> = {
-  free: {},
-
+export const STRIPE_PRICE_MAP = {
   pro: {
     monthly: {
       EUR: process.env.STRIPE_PRICE_PRO_EUR_MONTH!,
@@ -41,7 +31,6 @@ export const STRIPE_PRICE_MAP: Record<
       INR: process.env.STRIPE_PRICE_PRO_INR_YEAR!,
     },
   },
-
   premium: {
     monthly: {
       EUR: process.env.STRIPE_PRICE_PREMIUM_EUR_MONTH!,
@@ -56,35 +45,27 @@ export const STRIPE_PRICE_MAP: Record<
       INR: process.env.STRIPE_PRICE_PREMIUM_INR_YEAR!,
     },
   },
-};
+} as const;
 
 export class SubscriptionService {
   async getUserSubscription(userId: string): Promise<Subscription | null> {
-    const [subscription] = await db
+    const [sub] = await db
       .select()
       .from(subscriptions)
       .where(eq(subscriptions.userId, userId));
-
-    return subscription || null;
+    return sub ?? null;
   }
 
   async getOrCreateSubscription(userId: string): Promise<Subscription> {
-    let subscription = await this.getUserSubscription(userId);
+    const existing = await this.getUserSubscription(userId);
+    if (existing) return existing;
 
-    if (!subscription) {
-      const [created] = await db
-        .insert(subscriptions)
-        .values({
-          userId,
-          plan: "free",
-          status: "active",
-        })
-        .returning();
+    const [created] = await db
+      .insert(subscriptions)
+      .values({ userId, plan: "free", status: "active" })
+      .returning();
 
-      subscription = created;
-    }
-
-    return subscription;
+    return created;
   }
 
   async getUserUsage(userId: string): Promise<UsageTracking> {
@@ -100,45 +81,60 @@ export class SubscriptionService {
         )
       );
 
-    if (!usage) {
-      const [created] = await db
-        .insert(usageTracking)
-        .values({
-          userId,
-          month,
-          uploadsCount: 0,
-          chatMessagesCount: 0,
-          summariesGenerated: 0,
-        })
-        .returning();
+    if (usage) return usage;
 
-      return created;
-    }
+    const [created] = await db
+      .insert(usageTracking)
+      .values({
+        userId,
+        month,
+        uploadsCount: 0,
+        chatMessagesCount: 0,
+        summariesGenerated: 0,
+      })
+      .returning();
 
-    return usage;
+    return created;
   }
 
-  /**
-   * ✅ MÉTODO QUE FALTAVA E QUE QUEBRAVA TUDO
-   */
-  async getSubscriptionDetails(userId: string): Promise<{
-    subscription: Subscription;
-    usage: UsageTracking;
-    limits: typeof planLimits[SubscriptionPlan];
-  }> {
+  async getSubscriptionDetails(userId: string) {
     const subscription = await this.getOrCreateSubscription(userId);
     const usage = await this.getUserUsage(userId);
-    const limits = planLimits[subscription.plan as SubscriptionPlan];
+    const limits = planLimits[subscription.plan];
 
     return { subscription, usage, limits };
   }
 
-  async cancelSubscription(userId: string) {
-    const sub = await this.getUserSubscription(userId);
-    if (!sub || sub.plan === "free") {
-      throw new Error("No active paid subscription");
+  async updateSubscriptionPlan(
+    userId: string,
+    plan: SubscriptionPlan,
+    stripe?: {
+      customerId?: string;
+      subscriptionId?: string;
+      priceId?: string;
+      currentPeriodStart?: Date;
+      currentPeriodEnd?: Date;
     }
+  ) {
+    const [updated] = await db
+      .update(subscriptions)
+      .set({
+        plan,
+        status: "active",
+        stripeCustomerId: stripe?.customerId ?? null,
+        stripeSubscriptionId: stripe?.subscriptionId ?? null,
+        stripePriceId: stripe?.priceId ?? null,
+        currentPeriodStart: stripe?.currentPeriodStart ?? null,
+        currentPeriodEnd: stripe?.currentPeriodEnd ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.userId, userId))
+      .returning();
 
+    return updated;
+  }
+
+  async cancelSubscription(userId: string) {
     const [updated] = await db
       .update(subscriptions)
       .set({
@@ -159,4 +155,6 @@ export class SubscriptionService {
 }
 
 export const subscriptionService = new SubscriptionService();
+
+
 
