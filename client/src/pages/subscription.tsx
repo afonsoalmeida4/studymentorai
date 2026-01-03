@@ -351,9 +351,9 @@ export default function SubscriptionPage() {
                       </span>
                     )}
                   </div>
-                  {getSavings(plan.id) && (
+                  {billingPeriod === "yearly" && (
                     <div className="text-sm text-green-600 dark:text-green-400 font-medium">
-                      {t("subscription.billing.saveMoney", { amount: getSavings(plan.id) })}
+                      {t("subscription.billing.yearlyPromo")}
                     </div>
                   )}
                 </div>
