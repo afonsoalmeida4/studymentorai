@@ -612,7 +612,7 @@
       },
       "pro": {
         "name": "Grenzenlos Lernen",
-        "price": "3,99€",
+        "price": "{{price}}",
         "period": "/Monat",
         "features": {
           "monthlySummaries50": "50 Zusammenfassungen pro Monat",
@@ -626,7 +626,7 @@
       },
       "premium": {
         "name": "Hohe Leistung",
-        "price": "7,99€",
+        "price": "{{price}}",
         "period": "/Monat",
         "features": {
           "allPro": "Alles von Grenzenlos Lernen +",

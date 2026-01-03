@@ -729,7 +729,7 @@
       },
       "pro": {
         "name": "Estuda Sem Limites",
-        "price": "3,99€",
+        "price": "{{price}}",
         "period": "/mês",
         "features": {
           "monthlySummaries50": "50 resumos por mês",
@@ -743,7 +743,7 @@
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "7,99€",
+        "price": "{{price}}",
         "period": "/mês",
         "features": {
           "allPro": "Tudo do Estuda Sem Limites +",

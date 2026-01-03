@@ -724,7 +724,7 @@
       },
       "pro": {
         "name": "Study Without Limits",
-        "price": "$3.99",
+        "price": "{{price}}",
         "period": "/mo",
         "features": {
           "monthlySummaries50": "50 summaries per month",
@@ -738,7 +738,7 @@
       },
       "premium": {
         "name": "High Performance",
-        "price": "$7.99",
+        "price": "{{price}}",
         "period": "/mo",
         "features": {
           "allPro": "Everything from Study Without Limits +",

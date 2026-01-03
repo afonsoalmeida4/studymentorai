@@ -612,7 +612,7 @@
       },
       "pro": {
         "name": "Studia Senza Limiti",
-        "price": "3,99€",
+        "price": "{{price}}",
         "period": "/mese",
         "features": {
           "monthlySummaries50": "50 riassunti al mese",
@@ -626,7 +626,7 @@
       },
       "premium": {
         "name": "Alta Performance",
-        "price": "7,99€",
+        "price": "{{price}}",
         "period": "/mese",
         "features": {
           "allPro": "Tutto di Studia Senza Limiti +",

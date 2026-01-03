@@ -614,7 +614,7 @@
       },
       "pro": {
         "name": "Estudia Sin Límites",
-        "price": "3,99€",
+        "price": "{{price}}",
         "period": "/mes",
         "features": {
           "monthlySummaries50": "50 resúmenes al mes",
@@ -628,7 +628,7 @@
       },
       "premium": {
         "name": "Alto Rendimiento",
-        "price": "7,99€",
+        "price": "{{price}}",
         "period": "/mes",
         "features": {
           "allPro": "Todo lo de Estudia Sin Límites +",

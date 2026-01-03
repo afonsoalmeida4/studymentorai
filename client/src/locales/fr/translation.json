@@ -612,7 +612,7 @@
       },
       "pro": {
         "name": "Étudiez Sans Limites",
-        "price": "3,99€",
+        "price": "{{price}}",
         "period": "/mois",
         "features": {
           "monthlySummaries50": "50 résumés par mois",
@@ -626,7 +626,7 @@
       },
       "premium": {
         "name": "Haute Performance",
-        "price": "7,99€",
+        "price": "{{price}}",
         "period": "/mois",
         "features": {
           "allPro": "Tout d'Étudiez Sans Limites +",
