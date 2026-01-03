@@ -165,15 +165,16 @@ export function UpgradeDialog({
 
           <Button
             onClick={() => createCheckoutMutation.mutate(recommendedPlan)}
-            disabled={createCheckoutMutation.isPending || loading}
+            disabled={createCheckoutMutation.isPending}
             className="gap-2"
             data-testid="button-confirm-upgrade"
           >
             <Crown className="h-4 w-4" />
             {createCheckoutMutation.isPending
               ? t("upgradeDialog.processing")
-              : t("upgradeDialog.upgradeButton", { price: priceText })}
+              : t("upgradeDialog.upgradeNow")}
           </Button>
+
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -376,6 +376,7 @@
     "notNow": "Not Now",
     "processing": "Processing...",
     "upgradeButton": "Upgrade ({{price}}/month)",
+    "upgradeNow": "Upgrade now",
     "uploads": {
       "title": "Upload Limit Reached",
       "description": "You've reached the 4 uploads per month limit of the Free plan. Upgrade to continue uploading documents unlimited!",
@@ -677,7 +678,8 @@
       "month": "month",
       "year": "year",
       "save": "Save {{percent}}%",
-      "saveMoney": "Save {{amount}}€"
+      "saveMoney": "Save {{amount}}€",
+      "yearlyPromo": "2 months free on yearly plan"
     },
     "currentUsage": "Current Usage",
     "currentUsageSubtitle": "{{planName}} plan progress this month",

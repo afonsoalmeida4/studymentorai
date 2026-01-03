@@ -381,6 +381,7 @@
     "notNow": "Agora Não",
     "processing": "A processar...",
     "upgradeButton": "Fazer Upgrade ({{price}}/mês)",
+    "upgradeNow": "Fazer upgrade agora",
     "uploads": {
       "title": "Limite de Uploads Atingido",
       "description": "Atingiste o limite de 4 uploads por mês do plano Free. Faz upgrade para continuar a carregar documentos ilimitadamente!",
@@ -682,7 +683,8 @@
       "month": "mês",
       "year": "ano",
       "save": "Poupa {{percent}}%",
-      "saveMoney": "Poupa {{amount}}€"
+      "saveMoney": "Poupa {{amount}}€",
+      "yearlyPromo": "2 meses grátis no plano anual"
     },
     "currentUsage": "Utilização Atual",
     "currentUsageSubtitle": "Progresso do plano {{planName}} este mês",

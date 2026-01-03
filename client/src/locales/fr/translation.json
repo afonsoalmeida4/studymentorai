@@ -371,6 +371,7 @@
     "notNow": "Pas Maintenant",
     "processing": "Traitement...",
     "upgradeButton": "Mettre à Niveau ({{price}}/mois)",
+    "upgradeNow": "Passer au plan supérieur",
     "uploads": {
       "title": "Limite de Téléchargements Atteinte",
       "description": "Vous avez atteint la limite de 4 téléchargements par mois du plan Free. Mettez à niveau pour continuer à télécharger des documents de manière illimitée!",
@@ -565,7 +566,8 @@
       "month": "mois",
       "year": "an",
       "save": "Économise {{percent}}%",
-      "saveMoney": "Économise {{amount}}€"
+      "saveMoney": "Économise {{amount}}€",
+      "yearlyPromo": "2 mois offerts avec l’abonnement annuel"
     },
     "currentUsage": "Utilisation Actuelle",
     "currentUsageSubtitle": "Progrès du plan {{planName}} ce mois-ci",

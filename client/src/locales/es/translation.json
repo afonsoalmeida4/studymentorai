@@ -374,6 +374,7 @@
     "notNow": "Ahora No",
     "processing": "Procesando...",
     "upgradeButton": "Actualizar ({{price}}/mes)",
+    "upgradeNow": "Actualizar ahora",
     "uploads": {
       "title": "Límite de Subidas Alcanzado",
       "description": "Has alcanzado el límite de 4 subidas por mes del plan Free. ¡Actualiza para continuar subiendo documentos ilimitadamente!",
@@ -567,7 +568,8 @@
       "month": "mes",
       "year": "año",
       "save": "Ahorra {{percent}}%",
-      "saveMoney": "Ahorra {{amount}}€"
+      "saveMoney": "Ahorra {{amount}}€",
+      "yearlyPromo": "2 meses gratis en el plan anual"
     },
     "currentUsage": "Uso Actual",
     "currentUsageSubtitle": "Progreso del plan {{planName}} este mes",

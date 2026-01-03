@@ -371,6 +371,7 @@
     "notNow": "Non Ora",
     "processing": "Elaborazione...",
     "upgradeButton": "Aggiorna ({{price}}/mese)",
+    "upgradeNow": "Passa al piano superiore",
     "uploads": {
       "title": "Limite di Caricamenti Raggiunto",
       "description": "Hai raggiunto il limite di 4 caricamenti al mese del piano Free. Aggiorna per continuare a caricare documenti illimitatamente!",
@@ -565,7 +566,8 @@
       "month": "mese",
       "year": "anno",
       "save": "Risparmia {{percent}}%",
-      "saveMoney": "Risparmia {{amount}}€"
+      "saveMoney": "Risparmia {{amount}}€",
+      "yearlyPromo": "2 mesi gratis con il piano annuale"
     },
     "currentUsage": "Utilizzo Attuale",
     "currentUsageSubtitle": "Progresso del piano {{planName}} questo mese",
