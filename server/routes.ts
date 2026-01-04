@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { getCurrencyFromRequest, getStripePriceId } from "./stripePricing";
 import multer from "multer";
+import bodyParser from "body-parser";
 import Stripe from "stripe";
 import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
@@ -2628,7 +2629,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
-    console.log("🔔 STRIPE WEBHOOK RECEIVED");
     const sig = req.headers["stripe-signature"];
 
     if (!sig) {
@@ -2639,14 +2639,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       event = stripe.webhooks.constructEvent(
-        req.body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET || ""
+        req.rawBody as Buffer,   // ✅ ISTO
+        sig as string,
+        process.env.STRIPE_WEBHOOK_SECRET!
       );
     } catch (err: any) {
-      console.error("Webhook signature verification failed:", err.message);
+      console.error("❌ Stripe webhook signature failed:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
+
+    console.log("✅ STRIPE EVENT RECEIVED:", event.type);
 
     try {
       switch (event.type) {
