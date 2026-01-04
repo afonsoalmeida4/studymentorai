@@ -2629,7 +2629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
-    const sig = req.headers["stripe-signature"];
+    const sig = req.headers["stripe-signature"] as string;
 
     if (!sig) {
       return res.status(400).send("Missing stripe signature");
@@ -2639,8 +2639,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       event = stripe.webhooks.constructEvent(
-        req.rawBody as Buffer,   // ✅ ISTO
-        sig as string,
+        (req as any).rawBody,
+        sig,
         process.env.STRIPE_WEBHOOK_SECRET!
       );
     } catch (err: any) {
