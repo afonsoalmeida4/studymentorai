@@ -2629,7 +2629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
     console.log("🔔 STRIPE WEBHOOK RECEIVED");
-
+    const sig = req.headers["stripe-signature"];
 
     if (!sig) {
       return res.status(400).send("Missing stripe signature");
@@ -2654,43 +2654,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log("✅ EVENT: checkout.session.completed");
 
           const session = event.data.object as Stripe.Checkout.Session;
-
-          console.log("📦 SESSION ID:", session.id);
-          console.log("👤 USER ID:", session.metadata?.userId);
-          console.log("📦 PLAN:", session.metadata?.plan);
-          console.log("📦 BILLING:", session.metadata?.billingPeriod);
-          console.log("📦 SUBSCRIPTION:", session.subscription);
-
           const userId = session.metadata?.userId;
           const plan = session.metadata?.plan;
 
-          if (userId && plan && session.subscription) {
-            const subscription = await stripe.subscriptions.retrieve(
-              session.subscription as string
-            );
-
-            console.log("💳 PRICE ID:", subscription.items.data[0].price.id);
-
-            await subscriptionService.updateSubscriptionPlan(
-              userId,
-              plan as any,
-              {
-                customerId: session.customer as string,
-                subscriptionId: subscription.id,
-                priceId: subscription.items.data[0].price.id,
-                currentPeriodStart: new Date(subscription.current_period_start * 1000),
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-              }
-            );
-
-            console.log("✅ DB UPDATED FOR USER:", userId);
-          } else {
-            console.log("❌ Missing metadata in session");
+          if (!userId || !plan || !session.subscription) {
+            console.log("❌ Missing metadata or subscription");
+            break;
           }
 
+          // 🔑 BUSCAR SUBSCRIPTION REAL NO STRIPE
+          const stripeSubscription = await stripe.subscriptions.retrieve(
+            session.subscription as string
+          );
+
+          // 🔑 CAST ÚNICO (resolve o TS)
+          const stripeSubscriptionAny = stripeSubscription as any;
+
+          await subscriptionService.updateSubscriptionPlan(
+            userId,
+            plan as any,
+            {
+              customerId: session.customer as string,
+              subscriptionId: stripeSubscription.id,
+              priceId: stripeSubscription.items.data[0].price.id,
+              currentPeriodStart: new Date(
+                stripeSubscriptionAny.current_period_start * 1000
+              ),
+              currentPeriodEnd: new Date(
+                stripeSubscriptionAny.current_period_end * 1000
+              ),
+            }
+          );
+
+          console.log("✅ DB UPDATED FOR USER:", userId);
           break;
         }
-
 
         case "customer.subscription.updated": {
           const subscription = event.data.object as Stripe.Subscription;
