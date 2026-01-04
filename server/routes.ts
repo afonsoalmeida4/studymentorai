@@ -2526,20 +2526,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: "subscription",
+
         line_items: [
           {
             price: priceId,
             quantity: 1,
           },
         ],
-        success_url: `${fullBaseUrl}/subscription?success=true`,
-        cancel_url: `${fullBaseUrl}/subscription?canceled=true`,
+
+        // 👇 METADATA DO CHECKOUT (útil para logs)
         metadata: {
           userId,
           plan,
           billingPeriod,
         },
+
+        // 👇👇👇 ISTO É O QUE FALTAVA 👇👇👇
+        subscription_data: {
+          metadata: {
+            userId,
+            plan,
+            billingPeriod,
+          },
+        },
+
+        success_url: `${fullBaseUrl}/subscription?success=true`,
+        cancel_url: `${fullBaseUrl}/subscription?canceled=true`,
       });
+
 
       console.log('[Stripe Checkout] Session created:', session.id);
 
