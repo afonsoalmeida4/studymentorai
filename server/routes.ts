@@ -2628,7 +2628,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
-    const sig = req.headers["stripe-signature"];
+    console.log("🔔 STRIPE WEBHOOK RECEIVED");
+
 
     if (!sig) {
       return res.status(400).send("Missing stripe signature");
@@ -2650,7 +2651,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       switch (event.type) {
         case "checkout.session.completed": {
+          console.log("✅ EVENT: checkout.session.completed");
+
           const session = event.data.object as Stripe.Checkout.Session;
+
+          console.log("📦 SESSION ID:", session.id);
+          console.log("👤 USER ID:", session.metadata?.userId);
+          console.log("📦 PLAN:", session.metadata?.plan);
+          console.log("📦 BILLING:", session.metadata?.billingPeriod);
+          console.log("📦 SUBSCRIPTION:", session.subscription);
+
           const userId = session.metadata?.userId;
           const plan = session.metadata?.plan;
 
@@ -2659,16 +2669,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
               session.subscription as string
             );
 
-            await subscriptionService.updateSubscriptionPlan(userId, plan as any, {
-              customerId: session.customer as string,
-              subscriptionId: subscription.id,
-              priceId: subscription.items.data[0].price.id,
-              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            });
+            console.log("💳 PRICE ID:", subscription.items.data[0].price.id);
+
+            await subscriptionService.updateSubscriptionPlan(
+              userId,
+              plan as any,
+              {
+                customerId: session.customer as string,
+                subscriptionId: subscription.id,
+                priceId: subscription.items.data[0].price.id,
+                currentPeriodStart: new Date(subscription.current_period_start * 1000),
+                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              }
+            );
+
+            console.log("✅ DB UPDATED FOR USER:", userId);
+          } else {
+            console.log("❌ Missing metadata in session");
           }
+
           break;
         }
+
 
         case "customer.subscription.updated": {
           const subscription = event.data.object as Stripe.Subscription;
