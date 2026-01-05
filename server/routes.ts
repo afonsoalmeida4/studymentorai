@@ -2569,6 +2569,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post(
+  "/api/subscription/cancel",
+  isAuthenticated,
+  async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // 1️⃣ Buscar subscrição local
+      const subscription =
+        await subscriptionService.getOrCreateSubscription(userId);
+
+      if (!subscription.stripeSubscriptionId) {
+        return res.status(400).json({
+          error: "Subscrição ativa não encontrada",
+        });
+      }
+
+      // 2️⃣ Cancelar no Stripe NO FIM DO PERÍODO
+      await stripe.subscriptions.update(
+        subscription.stripeSubscriptionId,
+        {
+          cancel_at_period_end: true,
+        }
+      );
+
+      // 3️⃣ NÃO mudar plano para free
+      // Apenas marcar que vai cancelar
+      await subscriptionService.markCancelAtPeriodEnd(userId);
+
+      return res.json({
+        success: true,
+        message: "Subscrição será cancelada no fim do período atual",
+      });
+    } catch (error) {
+      console.error("Erro ao cancelar subscrição:", error);
+      return res.status(500).json({
+        error: "Erro ao cancelar subscrição",
+      });
+    }
+  }
+);
+
+
   app.get("/api/pricing", (req, res) => {
   const currency = getCurrencyFromRequest(req);
 

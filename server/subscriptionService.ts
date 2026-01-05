@@ -15,6 +15,16 @@ export class SubscriptionService {
     return subscription || null;
   }
 
+  async markCancelAtPeriodEnd(userId: string) {
+  await db
+    .update(subscriptions)
+    .set({
+      cancelAtPeriodEnd: true,
+    })
+    .where(eq(subscriptions.userId, userId));
+  }
+
+
   /**
    * Get plan limits for a given plan
    */
