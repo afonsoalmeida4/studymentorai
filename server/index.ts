@@ -17,21 +17,14 @@ declare module 'http' {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-app.use(express.json({
-  limit: "50mb",
-  verify: (req: any, _res, buf) => {
-    req.rawBody = buf;
-  },
-}));
-
 app.post("/api/webhooks/stripe", async (req: any, res) => {
-  const sig = req.headers["stripe-signature"];
+  const sig = req.headers["stripe-signature"] as string;
 
   let event: Stripe.Event;
 
   try {
     event = stripe.webhooks.constructEvent(
-      req.rawBody, // 👈 MUITO IMPORTANTE
+      req.rawBody,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
@@ -45,9 +38,9 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
   try {
     switch (event.type) {
 
-      // =============================
-      // CHECKOUT COMPLETED
-      // =============================
+      // =====================================
+      // CHECKOUT COMPLETED → ATIVA PLANO
+      // =====================================
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
 
@@ -55,85 +48,77 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         const plan = session.metadata?.plan;
         const subscriptionId = session.subscription as string | null;
 
-        if (!userId || !plan || !subscriptionId) {
-          console.log("❌ Missing metadata or subscription");
-          break;
-        }
+        if (!userId || !plan || !subscriptionId) break;
 
-        // 🔑 Copiar metadata para a subscription
         await stripe.subscriptions.update(subscriptionId, {
           metadata: { userId, plan },
         });
 
-        // Ativar plano SEM datas (ainda)
-        await subscriptionService.updateSubscriptionPlan(
-          userId,
-          plan as any,
-          {
-            customerId: session.customer as string,
-            subscriptionId,
-            priceId: undefined,
-            currentPeriodStart: undefined,
-            currentPeriodEnd: undefined,
-          }
-        );
+        await subscriptionService.updateSubscriptionPlan(userId, plan as any, {
+          customerId: session.customer as string,
+          subscriptionId,
+        });
 
-        console.log("✅ PLAN ACTIVATED (dates pending)");
         break;
       }
 
-      // =============================
+      // =====================================
       // SUBSCRIPTION UPDATED
-      // =============================
+      // (inclui cancel_at_period_end)
+      // =====================================
       case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
+        const sub = event.data.object as any;
 
-        const userId = subscription.metadata?.userId;
-        const plan = subscription.metadata?.plan;
+        const userId = sub.metadata?.userId;
+        const plan = sub.metadata?.plan;
 
         if (!userId || !plan) break;
 
-        const start = (subscription as any).current_period_start;
-        const end = (subscription as any).current_period_end;
+        await subscriptionService.updateSubscriptionPlan(userId, plan as any, {
+          currentPeriodStart: sub.current_period_start
+            ? new Date(sub.current_period_start * 1000)
+            : undefined,
+          currentPeriodEnd: sub.current_period_end
+            ? new Date(sub.current_period_end * 1000)
+            : undefined,
+        });
 
-        await subscriptionService.updateSubscriptionPlan(
-          userId,
-          plan as any,
-          {
-            currentPeriodStart: start ? new Date(start * 1000) : undefined,
-            currentPeriodEnd: end ? new Date(end * 1000) : undefined,
-          }
-        );
-
-        console.log("✅ SUBSCRIPTION DATES UPDATED");
         break;
       }
 
-      // =============================
-      // SUBSCRIPTION DELETED
-      // =============================
+      // =====================================
+      // SUBSCRIPTION DELETED → AGORA SIM FREE
+      // =====================================
       case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const userId = subscription.metadata?.userId;
+        const sub = event.data.object as any;
+        const userId = sub.metadata?.userId;
 
-        if (userId) {
-          await subscriptionService.updateSubscriptionPlan(userId, "free");
-          console.log("🧹 SUBSCRIPTION CANCELED → FREE");
-        }
+        if (!userId) break;
+
+        await subscriptionService.updateSubscriptionPlan(userId, "free");
+
         break;
       }
 
       default:
-        console.log("ℹ️ Event ignored:", event.type);
+        console.log("ℹ️ Ignored event:", event.type);
     }
 
     res.json({ received: true });
-
-  } catch (error) {
-    console.error("🔥 Error handling webhook:", error);
-    res.status(500).json({ error: "Webhook handler failed" });
+  } catch (err) {
+    console.error("🔥 Webhook handler failed:", err);
+    res.status(500).json({ error: "Webhook failed" });
   }
 });
+
+
+
+app.use(express.json({
+  limit: "50mb",
+  verify: (req: any, _res, buf) => {
+    req.rawBody = buf;
+  },
+}));
 
 
 
