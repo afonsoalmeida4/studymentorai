@@ -2464,22 +2464,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("[CREATE CHECKOUT] BODY:", req.body);
 
-      // 🔒 NORMALIZAR PLAN (ISTO É O QUE FALTAVA)
-      const normalizedPlan =
-        plan === "pro" || plan === "premium" ? plan : null;
-
-      if (!normalizedPlan) {
-        return res.status(400).json({
-          error: "Plano inválido",
-        });
+      // ===============================
+      // ✅ NORMALIZAÇÃO SEGURA DO PLAN
+      // ===============================
+      if (typeof plan !== "string") {
+        console.error("[CREATE CHECKOUT] plan não é string:", plan);
+        return res.status(400).json({ error: "Plano inválido" });
       }
 
+      const normalizedPlan = plan.toLowerCase().trim();
+
+      if (normalizedPlan !== "pro" && normalizedPlan !== "premium") {
+        console.error("[CREATE CHECKOUT] plano inválido após normalização:", normalizedPlan);
+        return res.status(400).json({ error: "Plano inválido" });
+      }
+
+      // ===============================
+      // ✅ BILLING PERIOD
+      // ===============================
       if (!["monthly", "yearly"].includes(billingPeriod)) {
         return res.status(400).json({
           error: "Período de faturação inválido",
         });
       }
 
+      // ===============================
+      // ✅ USER
+      // ===============================
       const user = await storage.getUser(userId);
       if (!user || !user.email) {
         return res.status(400).json({
@@ -2487,6 +2498,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // ===============================
+      // ✅ SUBSCRIPTION
+      // ===============================
       const subscription =
         await subscriptionService.getOrCreateSubscription(userId);
 
@@ -2500,6 +2514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         customerId = customer.id;
 
+        // ⚠️ NÃO mudar plano aqui
         await subscriptionService.updateSubscriptionPlan(
           userId,
           subscription.plan as any,
@@ -2507,15 +2522,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
       }
 
-      // 💰 PRICE ID (AGORA COM TIPO CORRETO)
+      // ===============================
+      // 💰 PRICE ID (TIPO CORRETO)
+      // ===============================
       const currency = getCurrencyFromRequest(req);
+
       const priceId = getStripePriceId(
-        normalizedPlan,
+        normalizedPlan as "pro" | "premium",
         billingPeriod,
         currency
       );
 
+      // ===============================
       // 🌍 URLs
+      // ===============================
       const protocol =
         req.get("x-forwarded-proto") || (req.secure ? "https" : "http");
 
@@ -2532,6 +2552,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const fullBaseUrl = `${protocol}://${host}`;
 
+      // ===============================
+      // 🧾 STRIPE CHECKOUT
+      // ===============================
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: "subscription",
@@ -2570,6 +2593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }
 );
+
 
 
 
