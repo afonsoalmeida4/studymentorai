@@ -29,87 +29,93 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
-    console.error("❌ Stripe webhook signature failed:", err.message);
+    console.error("❌ Webhook signature failed:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-
-  console.log("✅ STRIPE EVENT RECEIVED:", event.type);
 
   try {
     switch (event.type) {
 
-      // =====================================
-      // CHECKOUT COMPLETED → ATIVA PLANO
-      // =====================================
+      // =============================
+      // CHECKOUT COMPLETED
+      // =============================
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
 
         const userId = session.metadata?.userId;
         const plan = session.metadata?.plan;
-        const subscriptionId = session.subscription as string | null;
+        const subscriptionId = session.subscription as string;
 
         if (!userId || !plan || !subscriptionId) break;
 
-        await stripe.subscriptions.update(subscriptionId, {
-          metadata: { userId, plan },
-        });
-
-        await subscriptionService.updateSubscriptionPlan(userId, plan as any, {
-          customerId: session.customer as string,
-          subscriptionId,
-        });
-
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          plan as any,
+          {
+            customerId: session.customer as string,
+            subscriptionId: subscriptionId,
+          }
+        );
         break;
       }
 
-      // =====================================
+      // =============================
       // SUBSCRIPTION UPDATED
-      // (inclui cancel_at_period_end)
-      // =====================================
+      // =============================
       case "customer.subscription.updated": {
-        const sub = event.data.object as any;
-
+        const sub = event.data.object as Stripe.Subscription;
         const userId = sub.metadata?.userId;
         const plan = sub.metadata?.plan;
 
         if (!userId || !plan) break;
 
-        await subscriptionService.updateSubscriptionPlan(userId, plan as any, {
-          currentPeriodStart: sub.current_period_start
-            ? new Date(sub.current_period_start * 1000)
-            : undefined,
-          currentPeriodEnd: sub.current_period_end
-            ? new Date(sub.current_period_end * 1000)
-            : undefined,
-        });
+        const stripeSub = sub as any;
+
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          plan as any,
+          {
+            currentPeriodStart: stripeSub.current_period_start
+              ? new Date(stripeSub.current_period_start * 1000)
+              : undefined,
+
+            currentPeriodEnd: stripeSub.current_period_end
+              ? new Date(stripeSub.current_period_end * 1000)
+              : undefined,
+
+            cancelAtPeriodEnd: stripeSub.cancel_at_period_end ?? false,
+          }
+        );
 
         break;
       }
 
-      // =====================================
-      // SUBSCRIPTION DELETED → AGORA SIM FREE
-      // =====================================
+      // =============================
+      // SUBSCRIPTION ENDED
+      // =============================
       case "customer.subscription.deleted": {
-        const sub = event.data.object as any;
+        const sub = event.data.object as Stripe.Subscription;
         const userId = sub.metadata?.userId;
 
         if (!userId) break;
 
-        await subscriptionService.updateSubscriptionPlan(userId, "free");
+        // ✅ AQUI SIM PASSA PARA FREE
+        await subscriptionService.updateSubscriptionPlan(userId, "free", {
+          subscriptionId: sub.id,
+          cancelAtPeriodEnd: false,
+        });
 
         break;
       }
-
-      default:
-        console.log("ℹ️ Ignored event:", event.type);
     }
 
     res.json({ received: true });
-  } catch (err) {
-    console.error("🔥 Webhook handler failed:", err);
-    res.status(500).json({ error: "Webhook failed" });
+  } catch (error) {
+    console.error("Webhook handler error:", error);
+    res.status(500).json({ error: "Webhook handler failed" });
   }
 });
+
 
 
 

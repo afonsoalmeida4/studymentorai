@@ -2576,17 +2576,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
 
-      // 1️⃣ Buscar subscrição local
       const subscription =
         await subscriptionService.getOrCreateSubscription(userId);
 
-      if (!subscription.stripeSubscriptionId) {
+      if (!subscription?.stripeSubscriptionId) {
         return res.status(400).json({
-          error: "Subscrição ativa não encontrada",
+          error: "Subscrição Stripe não encontrada",
         });
       }
 
-      // 2️⃣ Cancelar no Stripe NO FIM DO PERÍODO
+      // 1️⃣ CANCELAR NO STRIPE (no fim do período)
       await stripe.subscriptions.update(
         subscription.stripeSubscriptionId,
         {
@@ -2594,22 +2593,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       );
 
-      // 3️⃣ NÃO mudar plano para free
-      // Apenas marcar que vai cancelar
+      // 2️⃣ MARCAR NA DB (SEM mudar plano)
       await subscriptionService.markCancelAtPeriodEnd(userId);
 
       return res.json({
         success: true,
-        message: "Subscrição será cancelada no fim do período atual",
+        message: "Subscrição será cancelada no final do período",
       });
-    } catch (error) {
-      console.error("Erro ao cancelar subscrição:", error);
+    } catch (err) {
+      console.error("Erro ao cancelar subscrição:", err);
       return res.status(500).json({
         error: "Erro ao cancelar subscrição",
       });
     }
   }
 );
+
 
 
   app.get("/api/pricing", (req, res) => {

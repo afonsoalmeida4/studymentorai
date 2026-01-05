@@ -325,53 +325,68 @@ export class SubscriptionService {
    * Update user's subscription plan
    */
   async updateSubscriptionPlan(
-    userId: string,
-    plan: SubscriptionPlan,
-    stripeData?: {
-      customerId?: string;
-      subscriptionId?: string;
-      priceId?: string;
-      currentPeriodStart?: Date;
-      currentPeriodEnd?: Date;
-    }
-  ): Promise<Subscription> {
-    const existing = await this.getUserSubscription(userId);
-
-    if (existing) {
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          plan,
-          status: "active",
-          stripeCustomerId: stripeData?.customerId || existing.stripeCustomerId,
-          stripeSubscriptionId: stripeData?.subscriptionId || existing.stripeSubscriptionId,
-          stripePriceId: stripeData?.priceId || existing.stripePriceId,
-          currentPeriodStart: stripeData?.currentPeriodStart || existing.currentPeriodStart,
-          currentPeriodEnd: stripeData?.currentPeriodEnd || existing.currentPeriodEnd,
-          updatedAt: new Date(),
-        })
-        .where(eq(subscriptions.userId, userId))
-        .returning();
-
-      return updated;
-    } else {
-      const [newSub] = await db
-        .insert(subscriptions)
-        .values({
-          userId,
-          plan,
-          status: "active",
-          stripeCustomerId: stripeData?.customerId,
-          stripeSubscriptionId: stripeData?.subscriptionId,
-          stripePriceId: stripeData?.priceId,
-          currentPeriodStart: stripeData?.currentPeriodStart,
-          currentPeriodEnd: stripeData?.currentPeriodEnd,
-        })
-        .returning();
-
-      return newSub;
-    }
+  userId: string,
+  plan: SubscriptionPlan,
+  stripeData?: {
+    customerId?: string;
+    subscriptionId?: string;
+    priceId?: string;
+    currentPeriodStart?: Date;
+    currentPeriodEnd?: Date;
+    cancelAtPeriodEnd?: boolean;
+    status?: "active" | "canceled" | "past_due";
   }
+): Promise<Subscription> {
+  const existing = await this.getUserSubscription(userId);
+
+  if (existing) {
+    const [updated] = await db
+      .update(subscriptions)
+      .set({
+        plan,
+        status: stripeData?.status ?? existing.status,
+        cancelAtPeriodEnd:
+          stripeData?.cancelAtPeriodEnd ?? existing.cancelAtPeriodEnd,
+
+        stripeCustomerId:
+          stripeData?.customerId ?? existing.stripeCustomerId,
+        stripeSubscriptionId:
+          stripeData?.subscriptionId ?? existing.stripeSubscriptionId,
+        stripePriceId:
+          stripeData?.priceId ?? existing.stripePriceId,
+
+        currentPeriodStart:
+          stripeData?.currentPeriodStart ?? existing.currentPeriodStart,
+        currentPeriodEnd:
+          stripeData?.currentPeriodEnd ?? existing.currentPeriodEnd,
+
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.userId, userId))
+      .returning();
+
+    return updated;
+  }
+
+  // 👉 NOVA subscrição
+  const [newSub] = await db
+    .insert(subscriptions)
+    .values({
+      userId,
+      plan,
+      status: stripeData?.status ?? "active",
+      cancelAtPeriodEnd: stripeData?.cancelAtPeriodEnd ?? false,
+      stripeCustomerId: stripeData?.customerId,
+      stripeSubscriptionId: stripeData?.subscriptionId,
+      stripePriceId: stripeData?.priceId,
+      currentPeriodStart: stripeData?.currentPeriodStart,
+      currentPeriodEnd: stripeData?.currentPeriodEnd,
+    })
+    .returning();
+
+  return newSub;
+}
+
 
   /**
    * Cancel subscription and immediately revert to free plan
