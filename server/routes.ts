@@ -2454,33 +2454,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create Stripe checkout session for subscription upgrade
-  app.post("/api/subscription/create-checkout", isAuthenticated, async (req: any, res) => {
+  app.post(
+  "/api/subscription/create-checkout",
+  isAuthenticated,
+  async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { plan, billingPeriod = "monthly" } = req.body;
 
-      // DEBUG TEMPORÁRIO
-      console.log("[CREATE CHECKOUT] plan recebido:", plan);
+      // 🔥 NORMALIZAÇÃO À PROVA DE ERRO
+      const rawPlan = req.body?.plan;
+      const rawBillingPeriod = req.body?.billingPeriod ?? "monthly";
 
-      // NORMALIZAR
-      const normalizedPlan =
-        typeof plan === "string"
-          ? (plan.toLowerCase() as "pro" | "premium")
+      const plan =
+        typeof rawPlan === "string"
+          ? rawPlan.toLowerCase()
           : undefined;
 
+      const billingPeriod =
+        rawBillingPeriod === "monthly" || rawBillingPeriod === "yearly"
+          ? rawBillingPeriod
+          : "monthly";
 
-      // VALIDAR
-      if (!normalizedPlan || !["pro", "premium"].includes(normalizedPlan)) {
+      console.log("[CREATE CHECKOUT] body recebido:", req.body);
+      console.log("[CREATE CHECKOUT] plan normalizado:", plan);
+      console.log("[CREATE CHECKOUT] billingPeriod:", billingPeriod);
+
+      // ✅ VALIDAÇÃO FINAL
+      if (plan !== "pro" && plan !== "premium") {
         return res.status(400).json({
           error: "Plano inválido",
-          received: plan,
-        });
-      }
-
-
-      if (!["monthly", "yearly"].includes(billingPeriod)) {
-        return res.status(400).json({
-          error: "Período de faturação inválido",
         });
       }
 
@@ -2491,53 +2493,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const subscription = await subscriptionService.getOrCreateSubscription(userId);
+      const subscription =
+        await subscriptionService.getOrCreateSubscription(userId);
 
       let customerId = subscription.stripeCustomerId;
 
+      // 👤 CRIAR CUSTOMER SE NÃO EXISTIR
       if (!customerId) {
         const customer = await stripe.customers.create({
           email: user.email,
-          metadata: {
-            userId: user.id,
-          },
+          metadata: { userId },
         });
+
         customerId = customer.id;
 
-        await subscriptionService.updateSubscriptionPlan(userId, subscription.plan as any, {
-          customerId,
-        });
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          subscription.plan as "pro" | "premium" | "free",
+          {
+            customerId,
+          }
+        );
+
       }
 
-      // Map plan + billing period to Stripe Price IDs
+      // 💰 PRICE ID
       const currency = getCurrencyFromRequest(req);
       const priceId = getStripePriceId(
-      normalizedPlan,
-      billingPeriod,
-      currency
-    );
+        plan as "pro" | "premium",
+        billingPeriod,
+        currency
+      );
 
+      // 🌍 URLs
+      const protocol =
+        req.get("x-forwarded-proto") ||
+        (req.secure ? "https" : "http");
 
-      // Build URLs using the actual host from the request to avoid stale domains
-      const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
-      let host = req.get('host') || req.get('x-forwarded-host') || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
-      
-      // In development, ensure port :5000 is included if not already present
-      const isProduction = process.env.NODE_ENV === "production";
-      if (!isProduction && host && !host.includes(':')) {
+      let host =
+        req.get("host") ||
+        req.get("x-forwarded-host") ||
+        "localhost:5000";
+
+      if (
+        process.env.NODE_ENV !== "production" &&
+        !host.includes(":")
+      ) {
         host = `${host}:5000`;
       }
-      
-      const fullBaseUrl = `${protocol}://${host}`;
 
-      console.log('[Stripe Checkout] Creating session with URLs:', {
-        success: `${fullBaseUrl}/subscription?success=true`,
-        cancel: `${fullBaseUrl}/subscription?canceled=true`,
-        protocol,
-        host,
-        fullBaseUrl,
-      });
+      const baseUrl = `${protocol}://${host}`;
 
+      // 🧾 CHECKOUT SESSION
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: "subscription",
@@ -2549,41 +2556,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
 
-        // 👇 METADATA DO CHECKOUT (útil para logs)
-        metadata: {
-        userId,
-        plan: normalizedPlan,
-        billingPeriod,
-      },
-
-
-        // 👇👇👇 ISTO É O QUE FALTAVA 👇👇👇
-        subscription_data: {
         metadata: {
           userId,
-          plan: normalizedPlan,
+          plan,
           billingPeriod,
         },
-      },
 
+        subscription_data: {
+          metadata: {
+            userId,
+            plan,
+            billingPeriod,
+          },
+        },
 
-        success_url: `${fullBaseUrl}/subscription?success=true`,
-        cancel_url: `${fullBaseUrl}/subscription?canceled=true`,
+        success_url: `${baseUrl}/subscription?success=true`,
+        cancel_url: `${baseUrl}/subscription?canceled=true`,
       });
 
+      console.log("[Stripe Checkout] Session criada:", session.id);
 
-      console.log('[Stripe Checkout] Session created:', session.id);
-
-      return res.json({
-        url: session.url,
-      });
-    } catch (error: any) {
-      console.error("Error creating checkout session:", error);
+      return res.json({ url: session.url });
+    } catch (err) {
+      console.error("Erro create-checkout:", err);
       return res.status(500).json({
         error: "Erro ao criar sessão de pagamento",
       });
     }
-  });
+  }
+);
+
 
   app.post(
   "/api/subscription/cancel",
