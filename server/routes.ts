@@ -2460,29 +2460,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      const { plan, billingPeriod = "monthly" } = req.body;
 
-      // 🔥 NORMALIZAÇÃO À PROVA DE ERRO
-      const rawPlan = req.body?.plan;
-      const rawBillingPeriod = req.body?.billingPeriod ?? "monthly";
+      console.log("[CREATE CHECKOUT] BODY:", req.body);
 
-      const plan =
-        typeof rawPlan === "string"
-          ? rawPlan.toLowerCase()
-          : undefined;
+      // 🔒 NORMALIZAR PLAN (ISTO É O QUE FALTAVA)
+      const normalizedPlan =
+        plan === "pro" || plan === "premium" ? plan : null;
 
-      const billingPeriod =
-        rawBillingPeriod === "monthly" || rawBillingPeriod === "yearly"
-          ? rawBillingPeriod
-          : "monthly";
-
-      console.log("[CREATE CHECKOUT] body recebido:", req.body);
-      console.log("[CREATE CHECKOUT] plan normalizado:", plan);
-      console.log("[CREATE CHECKOUT] billingPeriod:", billingPeriod);
-
-      // ✅ VALIDAÇÃO FINAL
-      if (plan !== "pro" && plan !== "premium") {
+      if (!normalizedPlan) {
         return res.status(400).json({
           error: "Plano inválido",
+        });
+      }
+
+      if (!["monthly", "yearly"].includes(billingPeriod)) {
+        return res.status(400).json({
+          error: "Período de faturação inválido",
         });
       }
 
@@ -2498,7 +2492,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let customerId = subscription.stripeCustomerId;
 
-      // 👤 CRIAR CUSTOMER SE NÃO EXISTIR
       if (!customerId) {
         const customer = await stripe.customers.create({
           email: user.email,
@@ -2509,42 +2502,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         await subscriptionService.updateSubscriptionPlan(
           userId,
-          subscription.plan as "pro" | "premium" | "free",
-          {
-            customerId,
-          }
+          subscription.plan as any,
+          { customerId }
         );
-
       }
 
-      // 💰 PRICE ID
+      // 💰 PRICE ID (AGORA COM TIPO CORRETO)
       const currency = getCurrencyFromRequest(req);
       const priceId = getStripePriceId(
-        plan as "pro" | "premium",
+        normalizedPlan,
         billingPeriod,
         currency
       );
 
       // 🌍 URLs
       const protocol =
-        req.get("x-forwarded-proto") ||
-        (req.secure ? "https" : "http");
+        req.get("x-forwarded-proto") || (req.secure ? "https" : "http");
 
       let host =
         req.get("host") ||
         req.get("x-forwarded-host") ||
+        process.env.REPLIT_DEV_DOMAIN ||
         "localhost:5000";
 
-      if (
-        process.env.NODE_ENV !== "production" &&
-        !host.includes(":")
-      ) {
+      const isProduction = process.env.NODE_ENV === "production";
+      if (!isProduction && host && !host.includes(":")) {
         host = `${host}:5000`;
       }
 
-      const baseUrl = `${protocol}://${host}`;
+      const fullBaseUrl = `${protocol}://${host}`;
 
-      // 🧾 CHECKOUT SESSION
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: "subscription",
@@ -2558,33 +2545,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         metadata: {
           userId,
-          plan,
+          plan: normalizedPlan,
           billingPeriod,
         },
 
         subscription_data: {
           metadata: {
             userId,
-            plan,
+            plan: normalizedPlan,
             billingPeriod,
           },
         },
 
-        success_url: `${baseUrl}/subscription?success=true`,
-        cancel_url: `${baseUrl}/subscription?canceled=true`,
+        success_url: `${fullBaseUrl}/subscription?success=true`,
+        cancel_url: `${fullBaseUrl}/subscription?canceled=true`,
       });
 
-      console.log("[Stripe Checkout] Session criada:", session.id);
-
       return res.json({ url: session.url });
-    } catch (err) {
-      console.error("Erro create-checkout:", err);
+    } catch (error: any) {
+      console.error("Error creating checkout session:", error);
       return res.status(500).json({
         error: "Erro ao criar sessão de pagamento",
       });
     }
   }
 );
+
 
 
   app.post(
