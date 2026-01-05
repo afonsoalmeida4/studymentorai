@@ -328,25 +328,38 @@ export class SubscriptionService {
   userId: string,
   plan: SubscriptionPlan,
   stripeData?: {
-    customerId?: string;
-    subscriptionId?: string;
-    priceId?: string;
-    currentPeriodStart?: Date;
-    currentPeriodEnd?: Date;
+    customerId?: string | null;
+    subscriptionId?: string | null;
+    priceId?: string | null;
+    currentPeriodStart?: Date | null;
+    currentPeriodEnd?: Date | null;
     cancelAtPeriodEnd?: boolean;
-    status?: "active" | "canceled" | "past_due";
+    status?: "active" | "canceling" | "canceled" | "past_due";
   }
 ): Promise<Subscription> {
   const existing = await this.getUserSubscription(userId);
 
+  // =============================
+  // UPDATE
+  // =============================
   if (existing) {
+    const nextCancelAtPeriodEnd =
+      stripeData?.cancelAtPeriodEnd ?? existing.cancelAtPeriodEnd;
+
+    // 🔑 STATUS DERIVADO (NÃO herdado)
+    const nextStatus =
+      plan === "free"
+        ? "canceled"
+        : nextCancelAtPeriodEnd
+        ? "canceling"
+        : "active";
+
     const [updated] = await db
       .update(subscriptions)
       .set({
         plan,
-        status: stripeData?.status ?? existing.status,
-        cancelAtPeriodEnd:
-          stripeData?.cancelAtPeriodEnd ?? existing.cancelAtPeriodEnd,
+        status: stripeData?.status ?? nextStatus,
+        cancelAtPeriodEnd: nextCancelAtPeriodEnd,
 
         stripeCustomerId:
           stripeData?.customerId ?? existing.stripeCustomerId,
@@ -368,24 +381,36 @@ export class SubscriptionService {
     return updated;
   }
 
-  // 👉 NOVA subscrição
-  const [newSub] = await db
+  // =============================
+  // INSERT
+  // =============================
+  const initialStatus =
+    plan === "free"
+      ? "canceled"
+      : stripeData?.cancelAtPeriodEnd
+      ? "canceling"
+      : "active";
+
+  const [created] = await db
     .insert(subscriptions)
     .values({
       userId,
       plan,
-      status: stripeData?.status ?? "active",
+      status: initialStatus,
       cancelAtPeriodEnd: stripeData?.cancelAtPeriodEnd ?? false,
+
       stripeCustomerId: stripeData?.customerId,
       stripeSubscriptionId: stripeData?.subscriptionId,
       stripePriceId: stripeData?.priceId,
+
       currentPeriodStart: stripeData?.currentPeriodStart,
       currentPeriodEnd: stripeData?.currentPeriodEnd,
     })
     .returning();
 
-  return newSub;
+  return created;
 }
+
 
 
   /**
