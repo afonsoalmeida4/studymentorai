@@ -2459,11 +2459,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { plan, billingPeriod = "monthly" } = req.body;
 
-      if (!plan || !["pro", "premium"].includes(plan)) {
+      // DEBUG TEMPORÁRIO
+      console.log("[CREATE CHECKOUT] plan recebido:", plan);
+
+      // NORMALIZAR
+      const normalizedPlan =
+        typeof plan === "string"
+          ? (plan.toLowerCase() as "pro" | "premium")
+          : undefined;
+
+
+      // VALIDAR
+      if (!normalizedPlan || !["pro", "premium"].includes(normalizedPlan)) {
         return res.status(400).json({
           error: "Plano inválido",
+          received: plan,
         });
       }
+
 
       if (!["monthly", "yearly"].includes(billingPeriod)) {
         return res.status(400).json({
@@ -2499,10 +2512,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Map plan + billing period to Stripe Price IDs
       const currency = getCurrencyFromRequest(req);
       const priceId = getStripePriceId(
-        plan,
-        billingPeriod,
-        currency
-      );
+      normalizedPlan,
+      billingPeriod,
+      currency
+    );
+
 
       // Build URLs using the actual host from the request to avoid stale domains
       const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
@@ -2537,19 +2551,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // 👇 METADATA DO CHECKOUT (útil para logs)
         metadata: {
-          userId,
-          plan,
-          billingPeriod,
-        },
+        userId,
+        plan: normalizedPlan,
+        billingPeriod,
+      },
+
 
         // 👇👇👇 ISTO É O QUE FALTAVA 👇👇👇
         subscription_data: {
-          metadata: {
-            userId,
-            plan,
-            billingPeriod,
-          },
+        metadata: {
+          userId,
+          plan: normalizedPlan,
+          billingPeriod,
         },
+      },
+
 
         success_url: `${fullBaseUrl}/subscription?success=true`,
         cancel_url: `${fullBaseUrl}/subscription?canceled=true`,
