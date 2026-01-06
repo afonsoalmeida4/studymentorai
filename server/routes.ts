@@ -2484,13 +2484,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { plan, billingPeriod = "monthly" } = req.body;
+      const plan = req.body?.plan;
+      const billingPeriod = req.body?.billingPeriod ?? "monthly";
+
+      console.log("[CREATE CHECKOUT] BODY:", req.body);
 
       if (plan !== "pro" && plan !== "premium") {
         return res.status(400).json({ error: "Plano inválido" });
       }
 
-      if (!["monthly", "yearly"].includes(billingPeriod)) {
+      if (billingPeriod !== "monthly" && billingPeriod !== "yearly") {
         return res.status(400).json({ error: "Período inválido" });
       }
 
@@ -2509,17 +2512,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: user.email,
           metadata: { userId },
         });
+
         customerId = customer.id;
+
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          subscription.plan as "free" | "pro" | "premium",
+          { customerId }
+        );
       }
 
-      const priceId = getStripePriceId(
-        plan,
-        billingPeriod,
-        getCurrencyFromRequest(req)
-      );
+      const currency = getCurrencyFromRequest(req);
+      const priceId = getStripePriceId(plan, billingPeriod, currency);
 
       const protocol =
         req.get("x-forwarded-proto") || (req.secure ? "https" : "http");
+
       const host = req.get("host");
       const baseUrl = `${protocol}://${host}`;
 
@@ -2527,67 +2535,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customer: customerId,
         mode: "subscription",
         line_items: [{ price: priceId, quantity: 1 }],
-
-        // 🔑 METADATA CORRETA
         subscription_data: {
-          metadata: { userId, plan },
+          metadata: { userId, plan, billingPeriod },
         },
-
+        metadata: { userId, plan, billingPeriod },
         success_url: `${baseUrl}/subscription?success=true`,
         cancel_url: `${baseUrl}/subscription?canceled=true`,
       });
 
       return res.json({ url: session.url });
     } catch (err) {
-      console.error("Erro no checkout:", err);
-      return res.status(500).json({ error: "Erro no checkout" });
+      console.error(err);
+      return res.status(500).json({ error: "Erro checkout" });
     }
   }
 );
 
-
-
-
-
-  app.post(
-  "/api/subscription/cancel",
-  isAuthenticated,
-  async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-
-      const subscription =
-        await subscriptionService.getOrCreateSubscription(userId);
-
-      if (!subscription?.stripeSubscriptionId) {
-        return res.status(400).json({
-          error: "Subscrição Stripe não encontrada",
-        });
-      }
-
-      // 1️⃣ CANCELAR NO STRIPE (no fim do período)
-      await stripe.subscriptions.update(
-        subscription.stripeSubscriptionId,
-        {
-          cancel_at_period_end: true,
-        }
-      );
-
-      // 2️⃣ MARCAR NA DB (SEM mudar plano)
-      await subscriptionService.markCancelAtPeriodEnd(userId);
-
-      return res.json({
-        success: true,
-        message: "Subscrição será cancelada no final do período",
-      });
-    } catch (err) {
-      console.error("Erro ao cancelar subscrição:", err);
-      return res.status(500).json({
-        error: "Erro ao cancelar subscrição",
-      });
-    }
-  }
-);
 
 
 

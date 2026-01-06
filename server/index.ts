@@ -62,49 +62,48 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         break;
       }
 
-
-
-
-
       case "customer.subscription.updated": {
-        const sub = event.data.object as any;
+        const sub = event.data.object as Stripe.Subscription & {
+          current_period_start?: number;
+          current_period_end?: number;
+          cancel_at_period_end?: boolean;
+        };
 
         const userId = sub.metadata?.userId;
         const plan = sub.metadata?.plan as "pro" | "premium" | undefined;
 
         if (!userId || !plan) break;
 
-        await subscriptionService.updateSubscriptionPlan(
-          userId,
-          plan,
-          {
-            subscriptionId: sub.id,
-            priceId: sub.items.data[0].price.id,
-            currentPeriodStart: new Date(sub.current_period_start * 1000),
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
-            cancelAtPeriodEnd: sub.cancel_at_period_end,
-          }
-        );
-
-        break;
-      }
-
-
-
-
-
-      case "customer.subscription.deleted": {
-        const sub = event.data.object as any;
-        const userId = sub.metadata?.userId;
-
-        if (!userId) break;
-
-        await subscriptionService.updateSubscriptionPlan(userId, "free", {
-          cancelAtPeriodEnd: false,
+        await subscriptionService.updateSubscriptionPlan(userId, plan, {
+          subscriptionId: sub.id,
+          priceId: sub.items.data[0]?.price.id,
+          currentPeriodStart: sub.current_period_start
+            ? new Date(sub.current_period_start * 1000)
+            : undefined,
+          currentPeriodEnd: sub.current_period_end
+            ? new Date(sub.current_period_end * 1000)
+            : undefined,
+          cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
         });
 
         break;
       }
+
+      case "customer.subscription.deleted": {
+        const sub = event.data.object as Stripe.Subscription;
+        const userId = sub.metadata?.userId;
+        if (!userId) break;
+
+        await subscriptionService.updateSubscriptionPlan(userId, "free", {
+          status: "canceled",
+          cancelAtPeriodEnd: false,
+          subscriptionId: null,
+          priceId: null,
+        });
+
+        break;
+      }
+
     }
 
     res.json({ received: true });
