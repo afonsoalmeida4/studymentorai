@@ -672,6 +672,7 @@
     "free": "Free",
     "popular": "Most Popular",
     "active": "Active",
+
     "billing": {
       "monthly": "Monthly",
       "yearly": "Yearly",
@@ -681,13 +682,21 @@
       "saveMoney": "Save {{amount}}€",
       "yearlyPromo": "2 months free on yearly plan"
     },
+
+    "cancelingTitle": "Subscription is ending",
+    "cancelingSubtitle": "Your {{planName}} plan has been canceled and will remain active until the end of the current billing period.",
+    "accessUntil": "Access until",
+    "cancelingInfo": "You will keep full access until the end of the paid period.",
+
     "currentUsage": "Current Usage",
     "currentUsageSubtitle": "{{planName}} plan progress this month",
     "uploads": "Uploads",
     "chatMessages": "Chat messages (today)",
+
     "activeSubscription": "Active Subscription",
     "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",
     "nextRenewal": "Next renewal",
+
     "features": "Features",
     "uploadLimit": "{{count}} uploads per month",
     "uploadUnlimited": "Unlimited uploads",
@@ -697,22 +706,26 @@
     "existentialChat": "Existential chat",
     "studyPlans": "Study plans",
     "subscribe": "Subscribe",
+
     "toasts": {
-      "paymentSuccess": "✅ Payment Processed!",
-      "paymentSuccessMessage": "Your subscription will be activated soon. Thank you!",
-      "paymentCanceled": "Payment Canceled",
+      "paymentSuccess": "✅ Payment processed!",
+      "paymentSuccessMessage": "Your subscription will be activated shortly. Thank you!",
+      "paymentCanceled": "Payment canceled",
       "paymentCanceledMessage": "You can try again whenever you want.",
       "checkoutError": "Error",
-      "checkoutErrorMessage": "Could not start payment process",
+      "checkoutErrorMessage": "Could not start the payment process",
       "noUrl": "Payment URL not received",
-      "cancelSuccess": "Subscription Canceled",
-      "cancelSuccessMessage": "Your subscription has been canceled and you're back on the Free plan.",
-      "cancelError": "Error Canceling",
-      "cancelErrorMessage": "Could not cancel subscription. Please try again."
+
+      "cancelSuccess": "Subscription canceled",
+      "cancelSuccessMessage": "Your subscription has been canceled and will remain active until the end of the current billing period.",
+      "cancelError": "Cancellation error",
+      "cancelErrorMessage": "Could not cancel the subscription. Please try again."
     },
-    "cancelButton": "Cancel Subscription",
-    "canceling": "Canceling...",
-    "cancelConfirmation": "Are you sure you want to cancel your subscription? You will return to the Free plan.",
+
+    "cancelButton": "Cancel subscription",
+    "canceling": "Canceling…",
+    "cancelConfirmation": "Are you sure you want to cancel your subscription? You will keep full access until the end of the current billing period.",
+
     "plans": {
       "free": {
         "name": "Start Studying",

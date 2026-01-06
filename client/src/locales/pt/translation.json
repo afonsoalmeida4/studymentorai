@@ -677,6 +677,7 @@
     "free": "Grátis",
     "popular": "Mais Popular",
     "active": "Ativo",
+
     "billing": {
       "monthly": "Mensal",
       "yearly": "Anual",
@@ -686,13 +687,21 @@
       "saveMoney": "Poupa {{amount}}€",
       "yearlyPromo": "2 meses grátis no plano anual"
     },
+
+    "cancelingTitle": "Subscrição em cancelamento",
+    "cancelingSubtitle": "O teu plano {{planName}} foi cancelado e continuará ativo até ao fim do período de faturação atual.",
+    "accessUntil": "Acesso até",
+    "cancelingInfo": "Continuas a ter acesso total até ao final do período já pago.",
+
     "currentUsage": "Utilização Atual",
     "currentUsageSubtitle": "Progresso do plano {{planName}} este mês",
     "uploads": "Uploads",
     "chatMessages": "Mensagens de chat (hoje)",
+
     "activeSubscription": "Subscrição Ativa",
-    "activeSubscriptionSubtitle": "O teu plano {{planName}} está ativo e renovará automaticamente",
+    "activeSubscriptionSubtitle": "O teu plano {{planName}} está ativo e será renovado automaticamente",
     "nextRenewal": "Próxima renovação",
+
     "features": "Funcionalidades",
     "uploadLimit": "{{count}} uploads por mês",
     "uploadUnlimited": "Uploads ilimitados",
@@ -702,22 +711,26 @@
     "existentialChat": "Chat existencial",
     "studyPlans": "Planos de estudo",
     "subscribe": "Subscrever",
+
     "toasts": {
-      "paymentSuccess": "✅ Pagamento Processado!",
+      "paymentSuccess": "✅ Pagamento processado!",
       "paymentSuccessMessage": "A tua subscrição será ativada em breve. Obrigado!",
-      "paymentCanceled": "Pagamento Cancelado",
+      "paymentCanceled": "Pagamento cancelado",
       "paymentCanceledMessage": "Podes tentar novamente quando quiseres.",
       "checkoutError": "Erro",
       "checkoutErrorMessage": "Não foi possível iniciar o processo de pagamento",
-      "noUrl": "URL de pagamento não recebido",
-      "cancelSuccess": "Subscrição Cancelada",
-      "cancelSuccessMessage": "A tua subscrição foi cancelada e voltaste para o plano Free.",
-      "cancelError": "Erro ao Cancelar",
+      "noUrl": "URL de pagamento não recebida",
+
+      "cancelSuccess": "Subscrição cancelada",
+      "cancelSuccessMessage": "A tua subscrição foi cancelada e continuará ativa até ao fim do período de faturação atual.",
+      "cancelError": "Erro ao cancelar",
       "cancelErrorMessage": "Não foi possível cancelar a subscrição. Por favor, tenta novamente."
     },
+
     "cancelButton": "Cancelar Subscrição",
-    "canceling": "A cancelar...",
-    "cancelConfirmation": "Tens a certeza que queres cancelar a tua subscrição? Voltarás para o plano Free.",
+    "canceling": "A cancelar…",
+    "cancelConfirmation": "Tens a certeza que queres cancelar a subscrição? Continuarás a ter acesso até ao fim do período de faturação atual.",
+
     "plans": {
       "free": {
         "name": "Começa a Estudar",
@@ -760,6 +773,7 @@
       }
     }
   },
+
   "settings": {
     "title": "Definições",
     "subtitle": "Gere a tua conta e preferências",

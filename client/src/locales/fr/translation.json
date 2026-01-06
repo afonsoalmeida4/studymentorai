@@ -560,67 +560,80 @@
     "free": "Gratuit",
     "popular": "Plus Populaire",
     "active": "Actif",
+
     "billing": {
       "monthly": "Mensuel",
       "yearly": "Annuel",
       "month": "mois",
       "year": "an",
-      "save": "Économise {{percent}}%",
-      "saveMoney": "Économise {{amount}}€",
+      "save": "Économisez {{percent}}%",
+      "saveMoney": "Économisez {{amount}}€",
       "yearlyPromo": "2 mois offerts avec l’abonnement annuel"
     },
+
+    "cancelingTitle": "L’abonnement est en cours de résiliation",
+    "cancelingSubtitle": "Votre plan {{planName}} a été résilié et restera actif jusqu’à la fin de la période de facturation en cours.",
+    "accessUntil": "Accès jusqu’au",
+    "cancelingInfo": "Vous conservez un accès complet jusqu’à la fin de la période déjà payée.",
+
     "currentUsage": "Utilisation Actuelle",
-    "currentUsageSubtitle": "Progrès du plan {{planName}} ce mois-ci",
-    "uploads": "Téléchargements",
-    "chatMessages": "Messages de chat (aujourd'hui)",
+    "currentUsageSubtitle": "Progression du plan {{planName}} ce mois-ci",
+    "uploads": "Téléversements",
+    "chatMessages": "Messages de chat (aujourd’hui)",
+
     "activeSubscription": "Abonnement Actif",
-    "activeSubscriptionSubtitle": "Votre plan {{planName}} est actif et se renouvellera automatiquement",
+    "activeSubscriptionSubtitle": "Votre plan {{planName}} est actif et sera renouvelé automatiquement",
     "nextRenewal": "Prochain renouvellement",
+
     "features": "Fonctionnalités",
-    "uploadLimit": "{{count}} téléchargements par mois",
-    "uploadUnlimited": "Téléchargements illimités",
-    "summaryLimit": "Résumés jusqu'à {{count}} mots",
+    "uploadLimit": "{{count}} téléversements par mois",
+    "uploadUnlimited": "Téléversements illimités",
+    "summaryLimit": "Résumés jusqu’à {{count}} mots",
     "summaryUnlimited": "Résumés illimités",
     "advancedFlashcards": "Cartes avancées",
     "existentialChat": "Chat existentiel",
     "studyPlans": "Plans d'étude",
-    "subscribe": "S'abonner",
+    "subscribe": "S’abonner",
+
     "toasts": {
-      "paymentSuccess": "✅ Paiement Traité !",
-      "paymentSuccessMessage": "Votre abonnement sera activé bientôt. Merci !",
-      "paymentCanceled": "Paiement Annulé",
-      "paymentCanceledMessage": "Vous pouvez réessayer quand vous voulez.",
+      "paymentSuccess": "✅ Paiement traité !",
+      "paymentSuccessMessage": "Votre abonnement sera activé sous peu. Merci !",
+      "paymentCanceled": "Paiement annulé",
+      "paymentCanceledMessage": "Vous pouvez réessayer à tout moment.",
       "checkoutError": "Erreur",
-      "checkoutErrorMessage": "Impossible de démarrer le processus de paiement",
+      "checkoutErrorMessage": "Impossible de lancer le processus de paiement",
       "noUrl": "URL de paiement non reçue",
-      "cancelSuccess": "Abonnement Annulé",
-      "cancelSuccessMessage": "Votre abonnement a été annulé et vous êtes de retour au plan Gratuit.",
-      "cancelError": "Erreur d'Annulation",
-      "cancelErrorMessage": "Impossible d'annuler l'abonnement. Veuillez réessayer."
+
+      "cancelSuccess": "Abonnement résilié",
+      "cancelSuccessMessage": "Votre abonnement a été résilié et restera actif jusqu’à la fin de la période de facturation en cours.",
+      "cancelError": "Erreur de résiliation",
+      "cancelErrorMessage": "Impossible de résilier l’abonnement. Veuillez réessayer."
     },
-    "cancelButton": "Annuler l'Abonnement",
-    "canceling": "Annulation en cours...",
-    "cancelConfirmation": "Êtes-vous sûr de vouloir annuler votre abonnement ? Vous reviendrez au plan Gratuit.",
+
+    "cancelButton": "Résilier l’abonnement",
+    "canceling": "Résiliation en cours…",
+    "cancelConfirmation": "Êtes-vous sûr de vouloir résilier votre abonnement ? Vous conserverez l’accès jusqu’à la fin de la période de facturation en cours.",
+
     "plans": {
       "free": {
         "name": "Commencer à Étudier",
         "features": {
           "monthlySummaries5": "5 résumés par mois",
           "monthlyFlashcards120": "120 flashcards par mois",
-          "learningStylesBasic": "2 styles d'apprentissage",
-          "subjects5": "Jusqu'à 5 dossiers",
-          "topics10": "Jusqu'à 10 sous-dossiers"
+          "learningStylesBasic": "2 styles d’apprentissage",
+          "subjects5": "Jusqu’à 5 dossiers",
+          "topics10": "Jusqu’à 10 sous-dossiers"
         }
       },
       "pro": {
-        "name": "Étudiez Sans Limites",
+        "name": "Étudier Sans Limites",
         "price": "{{price}}",
         "period": "/mois",
         "features": {
           "monthlySummaries50": "50 résumés par mois",
           "monthlyFlashcards2000": "2 000 flashcards par mois",
           "monthlyQuizzes50": "50 quiz par mois",
-          "learningStylesAll": "Tous les styles d'apprentissage",
+          "learningStylesAll": "Tous les styles d’apprentissage",
           "unlimitedSubjects": "Dossiers et sous-dossiers illimités",
           "dashboard": "Tableau de bord avec KPIs",
           "ranking": "Classement XP"
@@ -631,11 +644,11 @@
         "price": "{{price}}",
         "period": "/mois",
         "features": {
-          "allPro": "Tout d'Étudiez Sans Limites +",
+          "allPro": "Tout d’Étudier Sans Limites +",
           "monthlySummaries200": "200 résumés par mois",
           "monthlyFlashcards5000": "5 000 flashcards par mois",
           "monthlyQuizzes150": "150 quiz par mois",
-          "monthlyMessages1500": "1 500 messages de l'assistant IA",
+          "monthlyMessages1500": "1 500 messages de l’assistant IA",
           "aiAssistant": "Assistant IA en modes Étude et Existentiel",
           "pdfExport": "Exporter les résumés en PDF ou DOCX",
           "calendar": "Calendrier académique pour examens et devoirs"
@@ -643,6 +656,7 @@
       }
     }
   },
+
   "settings": {
     "title": "Paramètres",
     "subtitle": "Gérez votre compte et vos préférences",

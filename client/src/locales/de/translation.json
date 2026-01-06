@@ -555,11 +555,12 @@
     "title": "Ihr Plan",
     "subtitle": "Wählen Sie den idealen Plan für Ihre Lernziele",
     "currentPlan": "Aktueller Plan",
-    "upgrade": "Plan Upgraden",
+    "upgrade": "Plan upgraden",
     "manage": "Abonnement verwalten",
     "free": "Kostenlos",
     "popular": "Am Beliebtesten",
     "active": "Aktiv",
+
     "billing": {
       "monthly": "Monatlich",
       "yearly": "Jährlich",
@@ -569,13 +570,21 @@
       "saveMoney": "Spare {{amount}}€",
       "yearlyPromo": "2 Monate gratis beim Jahresplan"
     },
+
+    "cancelingTitle": "Abonnement wird beendet",
+    "cancelingSubtitle": "Dein {{planName}}-Plan wurde gekündigt und bleibt bis zum Ende des aktuellen Abrechnungszeitraums aktiv.",
+    "accessUntil": "Zugriff bis",
+    "cancelingInfo": "Du hast weiterhin vollen Zugriff bis zum Ende des bezahlten Zeitraums.",
+
     "currentUsage": "Aktuelle Nutzung",
     "currentUsageSubtitle": "Fortschritt des {{planName}}-Plans in diesem Monat",
     "uploads": "Uploads",
     "chatMessages": "Chat-Nachrichten (heute)",
+
     "activeSubscription": "Aktives Abonnement",
     "activeSubscriptionSubtitle": "Ihr {{planName}}-Plan ist aktiv und wird automatisch verlängert",
     "nextRenewal": "Nächste Verlängerung",
+
     "features": "Funktionen",
     "uploadLimit": "{{count}} Uploads pro Monat",
     "uploadUnlimited": "Unbegrenzte Uploads",
@@ -585,25 +594,29 @@
     "existentialChat": "Existenzieller Chat",
     "studyPlans": "Lernpläne",
     "subscribe": "Abonnieren",
+
     "toasts": {
-      "paymentSuccess": "✅ Zahlung Verarbeitet!",
-      "paymentSuccessMessage": "Ihr Abonnement wird bald aktiviert. Vielen Dank!",
-      "paymentCanceled": "Zahlung Abgebrochen",
+      "paymentSuccess": "✅ Zahlung verarbeitet!",
+      "paymentSuccessMessage": "Ihr Abonnement wird in Kürze aktiviert. Vielen Dank!",
+      "paymentCanceled": "Zahlung abgebrochen",
       "paymentCanceledMessage": "Sie können es jederzeit erneut versuchen.",
       "checkoutError": "Fehler",
       "checkoutErrorMessage": "Zahlungsvorgang konnte nicht gestartet werden",
       "noUrl": "Zahlungs-URL nicht erhalten",
-      "cancelSuccess": "Abonnement Gekündigt",
-      "cancelSuccessMessage": "Ihr Abonnement wurde gekündigt und Sie sind zurück im kostenlosen Plan.",
+
+      "cancelSuccess": "Abonnement gekündigt",
+      "cancelSuccessMessage": "Ihr Abonnement wurde gekündigt und bleibt bis zum Ende des aktuellen Abrechnungszeitraums aktiv.",
       "cancelError": "Kündigungsfehler",
       "cancelErrorMessage": "Abonnement konnte nicht gekündigt werden. Bitte versuchen Sie es erneut."
     },
-    "cancelButton": "Abonnement Kündigen",
-    "canceling": "Wird gekündigt...",
-    "cancelConfirmation": "Sind Sie sicher, dass Sie Ihr Abonnement kündigen möchten? Sie kehren zum kostenlosen Plan zurück.",
+
+    "cancelButton": "Abonnement kündigen",
+    "canceling": "Wird gekündigt…",
+    "cancelConfirmation": "Möchten Sie Ihr Abonnement wirklich kündigen? Sie behalten den vollen Zugriff bis zum Ende des aktuellen Abrechnungszeitraums.",
+
     "plans": {
       "free": {
-        "name": "Beginnen Sie zu Lernen",
+        "name": "Beginnen Sie zu lernen",
         "features": {
           "monthlySummaries5": "5 Zusammenfassungen pro Monat",
           "monthlyFlashcards120": "120 Flashcards pro Monat",
@@ -613,7 +626,7 @@
         }
       },
       "pro": {
-        "name": "Grenzenlos Lernen",
+        "name": "Grenzenlos lernen",
         "price": "{{price}}",
         "period": "/Monat",
         "features": {
@@ -631,7 +644,7 @@
         "price": "{{price}}",
         "period": "/Monat",
         "features": {
-          "allPro": "Alles von Grenzenlos Lernen +",
+          "allPro": "Alles aus Grenzenlos lernen +",
           "monthlySummaries200": "200 Zusammenfassungen pro Monat",
           "monthlyFlashcards5000": "5.000 Flashcards pro Monat",
           "monthlyQuizzes150": "150 Quiz pro Monat",
@@ -643,6 +656,7 @@
       }
     }
   },
+
   "settings": {
     "title": "Einstellungen",
     "subtitle": "Verwalten Sie Ihr Konto und Ihre Einstellungen",

@@ -409,38 +409,75 @@ export default function SubscriptionPage() {
       {currentPlan !== "free" && (
         <Card>
           <CardHeader>
-            <CardTitle>{t("subscription.activeSubscription")}</CardTitle>
-            <CardDescription>
-              {t("subscription.activeSubscriptionSubtitle", { planName: t(`subscription.plans.${currentPlan}.name`) })}
-            </CardDescription>
+            {/* ================= ACTIVE ================= */}
+            {data.subscription.status === "active" && (
+              <>
+                <CardTitle>{t("subscription.activeSubscription")}</CardTitle>
+                <CardDescription>
+                  {t("subscription.activeSubscriptionSubtitle", {
+                    planName: t(`subscription.plans.${currentPlan}.name`),
+                  })}
+                </CardDescription>
+              </>
+            )}
+
+            {/* ================= CANCELING ================= */}
+            {data.subscription.status === "canceling" && (
+              <>
+                <CardTitle>{t("subscription.cancelingTitle")}</CardTitle>
+                <CardDescription>
+                  {t("subscription.cancelingSubtitle", {
+                    planName: t(`subscription.plans.${currentPlan}.name`),
+                  })}
+                </CardDescription>
+              </>
+            )}
           </CardHeader>
+
           <CardContent className="space-y-4">
+            {/* NEXT PERIOD END */}
             {data.subscription.currentPeriodEnd && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{t("subscription.nextRenewal")}</span>
+                <span className="text-sm text-muted-foreground">
+                  {data.subscription.status === "canceling"
+                    ? t("subscription.accessUntil")
+                    : t("subscription.nextRenewal")}
+                </span>
                 <span className="font-medium">
                   {new Date(data.subscription.currentPeriodEnd).toLocaleDateString(dateLocale)}
                 </span>
               </div>
             )}
-            <div className="pt-4 border-t">
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (confirm(t("subscription.cancelConfirmation"))) {
-                    cancelSubscriptionMutation.mutate();
-                  }
-                }}
-                disabled={cancelSubscriptionMutation.isPending}
-                data-testid="button-cancel-subscription"
-                className="w-full"
-              >
-                {cancelSubscriptionMutation.isPending ? t("subscription.canceling") : t("subscription.cancelButton")}
-              </Button>
-            </div>
+
+            {/* BUTTONS */}
+            {data.subscription.status === "active" && (
+              <div className="pt-4 border-t">
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (confirm(t("subscription.cancelConfirmation"))) {
+                      cancelSubscriptionMutation.mutate();
+                    }
+                  }}
+                  disabled={cancelSubscriptionMutation.isPending}
+                  className="w-full"
+                >
+                  {cancelSubscriptionMutation.isPending
+                    ? t("subscription.canceling")
+                    : t("subscription.cancelButton")}
+                </Button>
+              </div>
+            )}
+
+            {data.subscription.status === "canceling" && (
+              <div className="pt-4 border-t text-sm text-muted-foreground text-center">
+                {t("subscription.cancelingInfo")}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
+
     </div>
   );
 }
