@@ -1,8 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import Stripe from "stripe";
 import { subscriptionService } from "./subscriptionService";
+import Stripe from "stripe";
 
 
 const app = express();
@@ -17,102 +17,103 @@ declare module 'http' {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-app.post(
-  "/api/webhooks/stripe",
-  express.raw({ type: "application/json" }),
-  async (req: any, res) => {
+app.post("/api/webhooks/stripe", async (req: any, res) => {
+  const sig = req.headers["stripe-signature"] as string;
+  let event: Stripe.Event;
 
-    const sig = req.headers["stripe-signature"] as string;
-    let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.rawBody,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+  } catch (err: any) {
+    console.error("Webhook signature failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET!
-      );
-    } catch (err: any) {
-      console.error("❌ Stripe webhook signature failed:", err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as any;
 
-    try {
-      switch (event.type) {
+        const userId = session.metadata?.userId;
+        const plan = session.metadata?.plan as "pro" | "premium" | undefined;
 
-        // =============================
-        // CHECKOUT COMPLETED
-        // =============================
-        case "checkout.session.completed": {
-          const session = event.data.object as Stripe.Checkout.Session;
+        if (!userId || !plan || !session.subscription) break;
 
-          const userId = session.metadata?.userId;
-          const plan = session.metadata?.plan;
-          const subscriptionId = session.subscription as string;
+        const sub = await stripe.subscriptions.retrieve(
+          session.subscription
+        ) as any;
 
-          if (!userId || !plan || !subscriptionId) break;
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          plan,
+          {
+            customerId: session.customer,
+            subscriptionId: sub.id,
+            priceId: sub.items.data[0].price.id,
+            currentPeriodStart: new Date(sub.current_period_start * 1000),
+            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+          }
+        );
 
-          await subscriptionService.updateSubscriptionPlan(
-            userId,
-            plan as any,
-            {
-              customerId: session.customer as string,
-              subscriptionId,
-            }
-          );
-
-          break;
-        }
-
-        // =============================
-        // SUBSCRIPTION UPDATED
-        // =============================
-        case "customer.subscription.updated": {
-          const sub = event.data.object as any;
-
-          const userId = sub.metadata?.userId;
-          const plan = sub.metadata?.plan;
-
-          if (!userId || !plan) break;
-
-          await subscriptionService.updateSubscriptionPlan(
-            userId,
-            plan,
-            {
-              currentPeriodStart: sub.current_period_start
-                ? new Date(sub.current_period_start * 1000)
-                : undefined,
-
-              currentPeriodEnd: sub.current_period_end
-                ? new Date(sub.current_period_end * 1000)
-                : undefined,
-            }
-          );
-
-          break;
-        }
-
-        // =============================
-        // SUBSCRIPTION ENDED (AQUI PASSA PARA FREE)
-        // =============================
-        case "customer.subscription.deleted": {
-          const sub = event.data.object as any;
-          const userId = sub.metadata?.userId;
-
-          if (!userId) break;
-
-          await subscriptionService.updateSubscriptionPlan(userId, "free");
-          break;
-        }
+        break;
       }
 
-      res.json({ received: true });
 
-    } catch (error) {
-      console.error("🔥 Webhook handler error:", error);
-      res.status(500).json({ error: "Webhook handler failed" });
+
+
+
+      case "customer.subscription.updated": {
+        const sub = event.data.object as any;
+
+        const userId = sub.metadata?.userId;
+        const plan = sub.metadata?.plan as "pro" | "premium" | undefined;
+
+        if (!userId || !plan) break;
+
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          plan,
+          {
+            subscriptionId: sub.id,
+            priceId: sub.items.data[0].price.id,
+            currentPeriodStart: new Date(sub.current_period_start * 1000),
+            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+          }
+        );
+
+        break;
+      }
+
+
+
+
+
+      case "customer.subscription.deleted": {
+        const sub = event.data.object as any;
+        const userId = sub.metadata?.userId;
+
+        if (!userId) break;
+
+        await subscriptionService.updateSubscriptionPlan(userId, "free", {
+          cancelAtPeriodEnd: false,
+        });
+
+        break;
+      }
     }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error("Webhook handler error:", error);
+    res.status(500).json({ error: "Webhook handler failed" });
   }
-);
+});
+
 
 
 
