@@ -45,32 +45,29 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
-        const session = event.data.object as any;
+        const session = event.data.object as Stripe.Checkout.Session;
 
         const userId = session.metadata?.userId;
         const plan = session.metadata?.plan as "pro" | "premium" | undefined;
 
         if (!userId || !plan || !session.subscription) break;
 
-        const sub = await stripe.subscriptions.retrieve(
-          session.subscription
-        ) as any;
+        // ❗ NÃO buscar subscription aqui
+        // ❗ NÃO usar current_period_start aqui
 
         await subscriptionService.updateSubscriptionPlan(
           userId,
           plan,
           {
-            customerId: session.customer,
-            subscriptionId: sub.id,
-            priceId: sub.items.data[0].price.id,
-            currentPeriodStart: new Date(sub.current_period_start * 1000),
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
-            cancelAtPeriodEnd: sub.cancel_at_period_end,
+            customerId: session.customer as string,
+            subscriptionId: session.subscription as string,
+            status: "active",
           }
         );
 
         break;
       }
+
 
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription & {
