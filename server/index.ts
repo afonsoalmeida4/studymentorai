@@ -13,7 +13,17 @@ declare module 'http' {
   }
 }
 
+app.use(
+  express.json({
+    limit: "50mb",
+    verify: (req: any, _res, buf) => {
+      // 🔑 Necessário para o Stripe webhook
+      req.rawBody = buf;
+    },
+  })
+);
 
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -64,30 +74,32 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
 
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription & {
-          current_period_start?: number;
-          current_period_end?: number;
-          cancel_at_period_end?: boolean;
+          current_period_start: number;
+          current_period_end: number;
+          cancel_at_period_end: boolean;
         };
+
 
         const userId = sub.metadata?.userId;
         const plan = sub.metadata?.plan as "pro" | "premium" | undefined;
 
         if (!userId || !plan) break;
 
-        await subscriptionService.updateSubscriptionPlan(userId, plan, {
-          subscriptionId: sub.id,
-          priceId: sub.items.data[0]?.price.id,
-          currentPeriodStart: sub.current_period_start
-            ? new Date(sub.current_period_start * 1000)
-            : undefined,
-          currentPeriodEnd: sub.current_period_end
-            ? new Date(sub.current_period_end * 1000)
-            : undefined,
-          cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
-        });
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          plan,
+          {
+            subscriptionId: sub.id,
+            priceId: sub.items.data[0]?.price.id,
+            currentPeriodStart: new Date(sub.current_period_start * 1000),
+            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+          }
+        );
 
         break;
       }
+
 
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
@@ -113,11 +125,6 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
   }
 });
 
-
-
-
-
-app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 // Debug logger for ALL requests
 app.use((req, res, next) => {

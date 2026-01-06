@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { getCurrencyFromRequest, getStripePriceId } from "./stripePricing";
 import multer from "multer";
 import bodyParser from "body-parser";
+import type { SubscriptionPlan } from "shared/schema.ts";
 import Stripe from "stripe";
 import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
@@ -2515,11 +2516,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         customerId = customer.id;
 
+        
+
+        const safePlan: SubscriptionPlan =
+          subscription.plan === "free" ||
+          subscription.plan === "pro" ||
+          subscription.plan === "premium"
+            ? subscription.plan
+            : "free";
+
         await subscriptionService.updateSubscriptionPlan(
           userId,
-          subscription.plan as "free" | "pro" | "premium",
+          safePlan,
           { customerId }
-        );
+);
+
       }
 
       const currency = getCurrencyFromRequest(req);
