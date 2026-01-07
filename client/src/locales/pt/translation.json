@@ -243,14 +243,7 @@
       "partialSuccess": "{{success}} gerados, {{failed}} falharam",
       "partialSuccessDescription": "Alguns resumos foram criados, mas outros falharam. Tente novamente."
     },
-    "deleteContent": {
-      "title": "Eliminar conteúdo?",
-      "description": "Esta ação não pode ser revertida.",
-      "deleting": "A eliminar...",
-      "delete": "Eliminar",
-      "success": "Conteúdo eliminado!",
-      "successDescription": "O conteúdo foi removido do tópico."
-    },
+  
     "pdfExport": {
       "button": "Exportar",
       "buttonShort": "Exp.",
@@ -294,8 +287,6 @@
     "upgrade": "Atualiza para desbloquear resumos ilimitados"
   },
   "subjectView": {
-    "topicCreated": "Tópico criado!",
-    "topicCreatedDescription": "O seu novo tópico foi adicionado com sucesso.",
     "errorCreatingTopic": "Não foi possível criar o tópico.",
     "errorTogglingProgress": "Não foi possível atualizar o progresso.",
     "markComplete": "Marcar como concluído",

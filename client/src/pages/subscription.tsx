@@ -161,7 +161,14 @@ export default function SubscriptionPage() {
 
   if (!data) return null;
 
-  const currentPlan = data.subscription.plan as SubscriptionPlan;
+  const subscription = data.subscription;
+  const currentPlan = subscription.plan as SubscriptionPlan;
+
+  const isFree = currentPlan === "free";
+  const isCanceling =
+    subscription.cancelAtPeriodEnd === true ||
+    subscription.status === "canceling";
+
   const usage = data.usage;
   const limits = data.limits;
 
@@ -410,29 +417,31 @@ export default function SubscriptionPage() {
         <Card>
           <CardHeader>
             {/* ================= ACTIVE ================= */}
-            {data.subscription.status === "active" && (
-              <>
-                <CardTitle>{t("subscription.activeSubscription")}</CardTitle>
-                <CardDescription>
-                  {t("subscription.activeSubscriptionSubtitle", {
-                    planName: t(`subscription.plans.${currentPlan}.name`),
-                  })}
-                </CardDescription>
-              </>
-            )}
+            {data.subscription.status === "active" &&
+              !data.subscription.cancelAtPeriodEnd && (
+                <>
+                  <CardTitle>{t("subscription.activeSubscription")}</CardTitle>
+                  <CardDescription>
+                    {t("subscription.activeSubscriptionSubtitle", {
+                      planName: t(`subscription.plans_toggle.${currentPlan}.name`),
+                    })}
+                  </CardDescription>
+                </>
+              )}
 
             {/* ================= CANCELING ================= */}
-            {data.subscription.status === "canceling" && (
+            {data.subscription.cancelAtPeriodEnd && (
               <>
                 <CardTitle>{t("subscription.cancelingTitle")}</CardTitle>
                 <CardDescription>
                   {t("subscription.cancelingSubtitle", {
-                    planName: t(`subscription.plans.${currentPlan}.name`),
+                    planName: t(`subscription.plans_toggle.${currentPlan}.name`),
                   })}
                 </CardDescription>
               </>
             )}
           </CardHeader>
+
 
           <CardContent className="space-y-4">
             {/* NEXT PERIOD END */}
@@ -450,24 +459,32 @@ export default function SubscriptionPage() {
             )}
 
             {/* BUTTONS */}
-            {data.subscription.status === "active" && (
-              <div className="pt-4 border-t">
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    if (confirm(t("subscription.cancelConfirmation"))) {
-                      cancelSubscriptionMutation.mutate();
-                    }
-                  }}
-                  disabled={cancelSubscriptionMutation.isPending}
-                  className="w-full"
-                >
-                  {cancelSubscriptionMutation.isPending
-                    ? t("subscription.canceling")
-                    : t("subscription.cancelButton")}
-                </Button>
+            {data.subscription.status === "active" &&
+              !data.subscription.cancelAtPeriodEnd && (
+                <div className="pt-4 border-t">
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      if (confirm(t("subscription.cancelConfirmation"))) {
+                        cancelSubscriptionMutation.mutate();
+                      }
+                    }}
+                    disabled={cancelSubscriptionMutation.isPending}
+                    className="w-full"
+                  >
+                    {cancelSubscriptionMutation.isPending
+                      ? t("subscription.canceling")
+                      : t("subscription.cancelButton")}
+                  </Button>
+                </div>
+              )}
+
+            {data.subscription.cancelAtPeriodEnd && (
+              <div className="pt-4 border-t text-sm text-muted-foreground text-center">
+                {t("subscription.cancelingInfo")}
               </div>
             )}
+
 
             {data.subscription.status === "canceling" && (
               <div className="pt-4 border-t text-sm text-muted-foreground text-center">
