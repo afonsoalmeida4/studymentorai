@@ -358,7 +358,10 @@ export class SubscriptionService {
       .update(subscriptions)
       .set({
         plan,
-        status: stripeData?.status ?? nextStatus,
+
+        // ✅ STATUS SEMPRE DERIVADO INTERNAMENTE
+        status: nextStatus,
+
         cancelAtPeriodEnd: nextCancelAtPeriodEnd,
 
         stripeCustomerId:
@@ -377,6 +380,7 @@ export class SubscriptionService {
       })
       .where(eq(subscriptions.userId, userId))
       .returning();
+
 
     return updated;
   }
