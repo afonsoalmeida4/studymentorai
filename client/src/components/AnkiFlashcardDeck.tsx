@@ -350,61 +350,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       </div>
     );
   }
-
-  if (localDeck.length === 0 && deckInitialized) {
-    return (
-      <div className="text-center py-12 space-y-6">
-        <Check className="w-16 h-16 mx-auto text-primary" />
-
-        <div>
-          <h3 className="text-xl font-semibold mb-2">
-            {t('flashcards.anki.sessionComplete')}
-          </h3>
-
-          <p className="text-muted-foreground">
-            {t('flashcards.anki.reviewed')} {completedCount || 1} flashcard
-            {completedCount === 1 ? '' : 's'}.
-          </p>
-
-          <p className="text-sm text-muted-foreground mt-2">
-            {t('flashcards.anki.time')}: {formatTime(sessionTime)}
-          </p>
-        </div>
-
-        {/* COUNTDOWN SEMPRE QUE EXISTIR */}
-        {mode === "spaced" && nextAvailableAt && (
-          <div className="space-y-4">
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <p className="text-sm text-muted-foreground">
-                {t('flashcards.anki.nextReviewIn')}
-              </p>
-
-              <div className="text-2xl font-mono font-bold text-primary">
-                {countdown || t('flashcards.anki.tomorrow')}
-              </div>
-            </div>
-
-            {/* BOTÃO SEMPRE DISPONÍVEL */}
-            <Button
-              variant="outline"
-              onClick={handleStudyEarly}
-              className="gap-2"
-            >
-              <RotateCw className="w-4 h-4" />
-              {t('flashcards.anki.studyEarly')}
-            </Button>
-
-            <p className="text-xs text-muted-foreground">
-              {t('flashcards.anki.studyEarlyNote')}
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-
-
+  
   if (completed) {
     return (
       <div className="text-center py-12 space-y-6">
