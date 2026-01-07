@@ -435,7 +435,7 @@ export default function SubscriptionPage() {
                 <CardTitle>{t("subscription.cancelingTitle")}</CardTitle>
                 <CardDescription>
                   {t("subscription.cancelingSubtitle", {
-                    planName: t(`subscription.plans_toggle.${currentPlan}.name`),
+                    planName: t(`subscription.plans.${currentPlan}.name`),
                   })}
                 </CardDescription>
               </>
