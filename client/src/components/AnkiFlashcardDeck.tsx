@@ -361,63 +361,48 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
             {t('flashcards.anki.sessionComplete')}
           </h3>
 
-          {completedCount > 0 && (
-            <>
-              <p className="text-muted-foreground">
-                {t('flashcards.anki.reviewed')} {completedCount} flashcard{completedCount !== 1 ? 's' : ''}.
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                {t('flashcards.anki.time')}: {formatTime(sessionTime)}
-              </p>
-            </>
-          )}
+          <p className="text-muted-foreground">
+            {t('flashcards.anki.reviewed')} {completedCount || 1} flashcard
+            {completedCount === 1 ? '' : 's'}.
+          </p>
+
+          <p className="text-sm text-muted-foreground mt-2">
+            {t('flashcards.anki.time')}: {formatTime(sessionTime)}
+          </p>
         </div>
 
-        {/* Countdown SEMPRE que houver próxima revisão */}
+        {/* COUNTDOWN SEMPRE QUE EXISTIR */}
         {mode === "spaced" && nextAvailableAt && (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
               <p className="text-sm text-muted-foreground">
                 {t('flashcards.anki.nextReviewIn')}
               </p>
+
               <div className="text-2xl font-mono font-bold text-primary">
                 {countdown || t('flashcards.anki.tomorrow')}
               </div>
             </div>
 
-            {/* Estudar antes do tempo NUNCA pode desaparecer */}
-            {!studyEarly && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={handleStudyEarly}
-                  className="gap-2"
-                >
-                  <RotateCw className="w-4 h-4" />
-                  {t('flashcards.anki.studyEarly')}
-                </Button>
+            {/* BOTÃO SEMPRE DISPONÍVEL */}
+            <Button
+              variant="outline"
+              onClick={handleStudyEarly}
+              className="gap-2"
+            >
+              <RotateCw className="w-4 h-4" />
+              {t('flashcards.anki.studyEarly')}
+            </Button>
 
-                <p className="text-xs text-muted-foreground">
-                  {t('flashcards.anki.studyEarlyNote')}
-                </p>
-              </>
-            )}
-
-            {studyEarly && (
-              <Button
-                variant="outline"
-                onClick={handleStudyEarly}
-                className="gap-2"
-              >
-                <RotateCw className="w-4 h-4" />
-                {t('flashcards.anki.studyAgain')}
-              </Button>
-            )}
+            <p className="text-xs text-muted-foreground">
+              {t('flashcards.anki.studyEarlyNote')}
+            </p>
           </div>
         )}
       </div>
     );
   }
+
 
 
   if (completed) {
