@@ -327,27 +327,74 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-  if (localDeck.length === 0 && deckInitialized && completedCount === 0) {
+  if (localDeck.length === 0 && deckInitialized) {
     return (
-      <div className="text-center py-12 space-y-4">
+      <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
+
         <div>
-          <h3 className="text-xl font-semibold mb-2">{t('flashcards.anki.allReviewed')}</h3>
-          <p className="text-muted-foreground">
-            {t('flashcards.anki.noFlashcards')}
-          </p>
-          {mode === "spaced" && countdown && (
-            <div className="mt-4">
-              <Badge variant="outline" className="gap-1.5 text-base px-3 py-1.5">
-                <Clock className="w-4 h-4" />
-                {t('flashcards.anki.nextAvailable')}: {countdown}
-              </Badge>
-            </div>
+          <h3 className="text-xl font-semibold mb-2">
+            {t('flashcards.anki.sessionComplete')}
+          </h3>
+
+          {completedCount > 0 && (
+            <>
+              <p className="text-muted-foreground">
+                {t('flashcards.anki.reviewed')} {completedCount} flashcard{completedCount !== 1 ? 's' : ''}.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {t('flashcards.anki.time')}: {formatTime(sessionTime)}
+              </p>
+            </>
           )}
         </div>
+
+        {/* Countdown SEMPRE que houver próxima revisão */}
+        {mode === "spaced" && nextAvailableAt && (
+          <div className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {t('flashcards.anki.nextReviewIn')}
+              </p>
+              <div className="text-2xl font-mono font-bold text-primary">
+                {countdown || t('flashcards.anki.tomorrow')}
+              </div>
+            </div>
+
+            {/* Estudar antes do tempo NUNCA pode desaparecer */}
+            {!studyEarly && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleStudyEarly}
+                  className="gap-2"
+                >
+                  <RotateCw className="w-4 h-4" />
+                  {t('flashcards.anki.studyEarly')}
+                </Button>
+
+                <p className="text-xs text-muted-foreground">
+                  {t('flashcards.anki.studyEarlyNote')}
+                </p>
+              </>
+            )}
+
+            {studyEarly && (
+              <Button
+                variant="outline"
+                onClick={handleStudyEarly}
+                className="gap-2"
+              >
+                <RotateCw className="w-4 h-4" />
+                {t('flashcards.anki.studyAgain')}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     );
   }
+
 
   if (completed) {
     return (
