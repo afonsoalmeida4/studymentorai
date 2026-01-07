@@ -57,6 +57,15 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const [progressRestored, setProgressRestored] = useState(false);
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
+  // Track which cards have been completed in this session (by id)
+  const [completedCardIds, setCompletedCardIds] = useState<Set<string>>(new Set());
+
+  // State for studying early (bypass nextReviewDate filter)
+  const [studyEarly, setStudyEarly] = useState(false);
+
+  // 🔑 Guarda a próxima revisão quando só existe 1 flashcard
+  const [lastNextReviewDate, setLastNextReviewDate] = useState<string | null>(null);
+
   
   // Persistent progress storage
   const { progress: savedProgress, saveProgress, resetProgress, isLoaded: progressLoaded } = useFlashcardProgress(topicId, mode);
@@ -104,24 +113,27 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   // Calculate next available time for spaced mode
   const nextAvailableAt = useMemo((): string | null => {
-    if (mode !== "spaced" || !bundledData?.flashcards) return null;
-    
+    if (mode !== "spaced") return null;
+
     const now = new Date();
+
+    // 1️⃣ prioridade: revisão acabada de fazer (1 flashcard edge-case)
+    if (lastNextReviewDate && new Date(lastNextReviewDate) > now) {
+      return lastNextReviewDate;
+    }
+
+    // 2️⃣ fallback: dados vindos do backend
+    if (!bundledData?.flashcards) return null;
+
     const futureCards = bundledData.flashcards
       .filter(fc => fc.nextReviewDate && new Date(fc.nextReviewDate) > now)
       .map(fc => new Date(fc.nextReviewDate!));
-    
-    if (futureCards.length === 0) return null;
-    
-    const earliest = new Date(Math.min(...futureCards.map(d => d.getTime())));
-    return earliest.toISOString();
-  }, [bundledData, mode]);
 
-  // Track which cards have been completed in this session (by id)
-  const [completedCardIds, setCompletedCardIds] = useState<Set<string>>(new Set());
-  
-  // State for studying early (bypass nextReviewDate filter)
-  const [studyEarly, setStudyEarly] = useState(false);
+    if (futureCards.length === 0) return null;
+
+    return new Date(Math.min(...futureCards.map(d => d.getTime()))).toISOString();
+  }, [bundledData, mode, lastNextReviewDate]);
+
   
   // Override filtered flashcards when studying early
   const effectiveFlashcards = useMemo((): DisplayFlashcard[] => {
@@ -192,34 +204,46 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     mutationFn: async ({ flashcardId, rating }: { flashcardId: string; rating: number }) => {
       return apiRequest("POST", `/api/flashcards/${flashcardId}/attempt`, { rating });
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       const newCompletedCount = completedCount + 1;
       setCompletedCount(newCompletedCount);
       setIsFlipped(false);
-      
+
       if (mode === "spaced") {
-        // Track completed card by flashcardId
         const newCompletedIds = [...Array.from(completedCardIds), variables.flashcardId];
         setCompletedCardIds(new Set(newCompletedIds));
-        // Persist progress
+
         saveProgress({
           completedCount: newCompletedCount,
           completedCardIds: newCompletedIds,
         });
-        // Invalidate ALL flashcard queries to update counts everywhere
-        queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/flashcards"], exact: false });
+
+        // 🔥 BUSCAR O nextReviewDate ATUALIZADO
+        const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
+        const data = await res.json();
+
+        const updated = data.flashcards.find(
+          (fc: any) => fc.id === variables.flashcardId
+        );
+
+        if (updated?.nextReviewDate) {
+          setLastNextReviewDate(updated.nextReviewDate);
+        }
+
+        queryClient.invalidateQueries({
+          queryKey: ["/api/flashcards/topic", topicId, "bundled"],
+        });
       } else {
-        // Practice mode: just move to next card
         const newIndex = currentIndex + 1;
         setCurrentIndex(newIndex);
-        // Persist progress
+
         saveProgress({
           currentIndex: newIndex,
           completedCount: newCompletedCount,
         });
       }
     },
+
     onError: () => {
       toast({
         title: t('common.error'),
