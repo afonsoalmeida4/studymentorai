@@ -254,9 +254,12 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   });
 
   const currentFlashcard = localDeck[currentIndex];
-  const completed = mode === "spaced" 
-    ? localDeck.length === 0 && completedCount > 0
-    : currentIndex >= localDeck.length && localDeck.length > 0;
+  const completed =
+    mode === "spaced"
+      ? completedCount > 0 &&
+        completedCardIds.size === allDisplayFlashcards.length
+      : currentIndex >= allDisplayFlashcards.length;
+
   const totalFlashcards = allDisplayFlashcards.length;
   const progress = totalFlashcards > 0 ? ((completedCount / totalFlashcards) * 100) : 0;
 
@@ -350,7 +353,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       </div>
     );
   }
-  
+
   if (completed) {
     return (
       <div className="text-center py-12 space-y-6">
