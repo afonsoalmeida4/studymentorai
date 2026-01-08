@@ -62,6 +62,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   // State for studying early (bypass nextReviewDate filter)
   const [studyEarly, setStudyEarly] = useState(false);
+  const [sessionFinished, setSessionFinished] = useState(false);
+
 
   // 🔑 Guarda a próxima revisão quando só existe 1 flashcard
   const [lastNextReviewDate, setLastNextReviewDate] = useState<string | null>(null);
@@ -230,6 +232,10 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           setLastNextReviewDate(updated.nextReviewDate);
         }
 
+        // ✅ só agora a sessão pode ser considerada terminada
+        setSessionFinished(true);
+
+
         queryClient.invalidateQueries({
           queryKey: ["/api/flashcards/topic", topicId, "bundled"],
         });
@@ -254,12 +260,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   });
 
   const currentFlashcard = localDeck[currentIndex];
-  const completed =
-    mode === "spaced"
-      ? completedCount > 0 &&
-        completedCardIds.size === allDisplayFlashcards.length
-      : currentIndex >= allDisplayFlashcards.length;
-
+  
+  
   const totalFlashcards = allDisplayFlashcards.length;
   const progress = totalFlashcards > 0 ? ((completedCount / totalFlashcards) * 100) : 0;
 
@@ -316,6 +318,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     setCurrentIndex(0);
     setCompletedCount(0);
     resetProgress();
+    setSessionFinished(false);
   };
 
   const handleRating = (rating: number) => {
@@ -354,68 +357,56 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-  if (completed) {
+  if (sessionFinished) {
     return (
       <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
+
         <div>
-          <h3 className="text-xl font-semibold mb-2">{t('flashcards.anki.sessionComplete')}</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            {t('flashcards.anki.sessionComplete')}
+          </h3>
+
           <p className="text-muted-foreground">
-            {mode === "spaced" ? t('flashcards.anki.reviewed') : t('flashcards.anki.practiced')} {completedCount} flashcard{completedCount !== 1 ? 's' : ''}.
+            {t('flashcards.anki.reviewed')} {completedCount} flashcard
+            {completedCount === 1 ? '' : 's'}.
           </p>
+
           <p className="text-sm text-muted-foreground mt-2">
             {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
         </div>
-        {/* Show countdown in spaced mode */}
+
         {mode === "spaced" && nextAvailableAt && (
           <div className="space-y-4">
             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <p className="text-sm text-muted-foreground">{t('flashcards.anki.nextReviewIn')}</p>
-              <div className="text-2xl font-mono font-bold text-primary" data-testid="countdown-timer">
-                {countdown || t('flashcards.anki.tomorrow')}
+              <p className="text-sm text-muted-foreground">
+                {t('flashcards.anki.nextReviewIn')}
+              </p>
+
+              <div className="text-2xl font-mono font-bold text-primary">
+                {countdown}
               </div>
             </div>
-            {/* Show study early button only if not already studying early */}
-            {!studyEarly && (
-              <>
-                <Button 
-                  variant="outline" 
-                  onClick={handleStudyEarly}
-                  data-testid="button-study-early"
-                  className="gap-2"
-                >
-                  <RotateCw className="w-4 h-4" />
-                  {t('flashcards.anki.studyEarly')}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  {t('flashcards.anki.studyEarlyNote')}
-                </p>
-              </>
-            )}
-            {/* Show study again button after early study session */}
-            {studyEarly && (
-              <Button 
-                variant="outline" 
-                onClick={handleStudyEarly}
-                data-testid="button-study-again"
-                className="gap-2"
-              >
-                <RotateCw className="w-4 h-4" />
-                {t('flashcards.anki.studyAgain')}
-              </Button>
-            )}
+
+            <Button
+              variant="outline"
+              onClick={handleStudyEarly}
+              className="gap-2"
+            >
+              <RotateCw className="w-4 h-4" />
+              {t('flashcards.anki.studyEarly')}
+            </Button>
+
+            <p className="text-xs text-muted-foreground">
+              {t('flashcards.anki.studyEarlyNote')}
+            </p>
           </div>
-        )}
-        {/* Only show "Practice again" in practice mode - spaced mode has no replay option */}
-        {mode === "practice" && (
-          <Button onClick={handleRestart} data-testid="button-restart-study">
-            {t('flashcards.anki.practiceAgain')}
-          </Button>
         )}
       </div>
     );
   }
+
 
   if (!currentFlashcard) {
     return (
