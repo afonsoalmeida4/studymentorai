@@ -176,7 +176,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   // Initialize local deck from filtered data, excluding completed cards
   useEffect(() => {
     // Initialize deck once progress is restored, even if no flashcards are available
-    if (progressRestored && !isLoading && !deckInitialized) {
+    if (progressRestored && !isLoading) {
       // Filter out already completed cards
       const remainingCards = effectiveFlashcards.filter(fc => !completedCardIds.has(fc.id));
       
@@ -242,16 +242,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
         if (updated?.nextReviewDate) {
           setLastNextReviewDate(updated.nextReviewDate);
-        }
-
-        // verificar se ainda há cartões por estudar
-        const remainingAfter = localDeck.filter(
-          fc => !newCompletedIds.includes(fc.id)
-        );
-
-
-        if (remainingAfter.length === 0) {
-          setSessionFinished(true);
         }
 
         queryClient.invalidateQueries({
@@ -430,7 +420,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
 
   // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
-  if (deckInitialized && noFlashcardsDue) {
+  if (noFlashcardsDue) {
     return (
       <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
