@@ -404,15 +404,17 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
+  if (!currentFlashcard && !sessionFinished) {
+  return (
+    <div className="text-center py-8">
+      <p className="text-muted-foreground">
+        {t('flashcards.anki.loading')}
+      </p>
+    </div>
+  );
+}
 
 
-  if (!currentFlashcard) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">{t('flashcards.anki.loading')}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
