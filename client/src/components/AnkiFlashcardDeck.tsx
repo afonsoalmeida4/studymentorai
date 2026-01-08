@@ -210,6 +210,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       const newCompletedCount = completedCount + 1;
       setCompletedCount(newCompletedCount);
       setIsFlipped(false);
+      // 🔑 GARANTE QUE O COMPONENTE SAI DO "LOADING"
+      setDeckInitialized(true);
 
       if (mode === "spaced") {
         const newCompletedIds = [...Array.from(completedCardIds), variables.flashcardId];
