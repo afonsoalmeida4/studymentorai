@@ -236,6 +236,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
         // ✅ só agora a sessão pode ser considerada terminada
         setSessionFinished(true);
+        setDeckInitialized(true);
+
 
 
         queryClient.invalidateQueries({
@@ -262,6 +264,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   });
 
   const currentFlashcard = localDeck[currentIndex];
+
   
   
   const totalFlashcards = allDisplayFlashcards.length;
@@ -314,14 +317,18 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   // Handle study early - force reload flashcards ignoring nextReviewDate
   const handleStudyEarly = () => {
     setStudyEarly(true);
+    setSessionFinished(false);
     setDeckInitialized(false);
+    setProgressRestored(false);
+
     setLocalDeck([]);
     setCompletedCardIds(new Set());
     setCurrentIndex(0);
     setCompletedCount(0);
+
     resetProgress();
-    setSessionFinished(false);
   };
+
 
   const handleRating = (rating: number) => {
     if (!currentFlashcard || recordAttemptMutation.isPending) return;
@@ -358,13 +365,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       </div>
     );
   }
-
-  // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
+  // 2️⃣ Sessão terminada — estado FINAL
   if (
-    !sessionFinished &&
+    sessionFinished &&
     deckInitialized &&
-    localDeck.length === 0 &&
-    mode === "spaced"
+    localDeck.length === 0
   ) {
     return (
       <div className="text-center py-12 space-y-6">
@@ -372,11 +377,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
         <div>
           <h3 className="text-xl font-semibold mb-2">
-            {t('flashcards.anki.allReviewed')}
+            {t('flashcards.anki.sessionComplete')}
           </h3>
 
           <p className="text-muted-foreground">
-            {t('flashcards.anki.noFlashcards')}
+            {t('flashcards.anki.reviewed')} {completedCount} flashcard
+            {completedCount === 1 ? '' : 's'}.
+          </p>
+
+          <p className="text-sm text-muted-foreground mt-2">
+            {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
         </div>
 
@@ -404,15 +414,47 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-  if (!currentFlashcard && !sessionFinished) {
-  return (
-    <div className="text-center py-8">
-      <p className="text-muted-foreground">
-        {t('flashcards.anki.loading')}
-      </p>
-    </div>
-  );
-}
+
+  // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
+  if (
+    !sessionFinished &&
+    deckInitialized &&
+    localDeck.length === 0 &&
+    mode === "spaced"
+  ) {
+    return (
+      <div className="text-center py-12 space-y-6">
+        <Check className="w-16 h-16 mx-auto text-primary" />
+
+        <div>
+          <h3 className="text-xl font-semibold mb-2">
+            {t('flashcards.anki.allReviewed')}
+          </h3>
+
+          <p className="text-muted-foreground">
+            {t('flashcards.anki.noFlashcards')}
+          </p>
+        </div>
+
+        {nextAvailableAt && (
+          <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {t('flashcards.anki.nextReviewIn')}
+            </p>
+            <div className="text-2xl font-mono font-bold text-primary">
+              {countdown}
+            </div>
+          </div>
+        )}
+
+        <Button variant="outline" onClick={handleStudyEarly} className="gap-2">
+          <RotateCw className="w-4 h-4" />
+          {t('flashcards.anki.studyEarly')}
+        </Button>
+      </div>
+    );
+  }
+
 
 
 
