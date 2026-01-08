@@ -145,6 +145,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     return filteredFlashcards;
   }, [studyEarly, mode, allDisplayFlashcards, filteredFlashcards]);
 
+  // 🔑 Fonte de verdade: backend diz se há cartões por rever
+  const noFlashcardsDue = useMemo(() => {
+    return (
+      mode === "spaced" &&
+      !studyEarly &&
+      filteredFlashcards.length === 0
+    );
+  }, [mode, studyEarly, filteredFlashcards]);
+
+
   // Restore progress from localStorage when loaded
   useEffect(() => {
     if (progressLoaded && !progressRestored) {
@@ -420,12 +430,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
 
   // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
-  if (
-    !sessionFinished &&
-    deckInitialized &&
-    localDeck.length === 0 &&
-    mode === "spaced"
-  ) {
+  if (deckInitialized && noFlashcardsDue) {
     return (
       <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
@@ -445,19 +450,25 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
             <p className="text-sm text-muted-foreground">
               {t('flashcards.anki.nextReviewIn')}
             </p>
+
             <div className="text-2xl font-mono font-bold text-primary">
               {countdown}
             </div>
           </div>
         )}
 
-        <Button variant="outline" onClick={handleStudyEarly} className="gap-2">
+        <Button
+          variant="outline"
+          onClick={handleStudyEarly}
+          className="gap-2"
+        >
           <RotateCw className="w-4 h-4" />
           {t('flashcards.anki.studyEarly')}
         </Button>
       </div>
     );
   }
+
 
 
   if (!currentFlashcard) {
