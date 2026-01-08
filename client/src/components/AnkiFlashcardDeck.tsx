@@ -357,55 +357,51 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-  if (sessionFinished) {
+  // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
+  if (
+    !sessionFinished &&
+    deckInitialized &&
+    localDeck.length === 0 &&
+    mode === "spaced"
+  ) {
     return (
       <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
 
         <div>
           <h3 className="text-xl font-semibold mb-2">
-            {t('flashcards.anki.sessionComplete')}
+            {t('flashcards.anki.allReviewed')}
           </h3>
 
           <p className="text-muted-foreground">
-            {t('flashcards.anki.reviewed')} {completedCount} flashcard
-            {completedCount === 1 ? '' : 's'}.
-          </p>
-
-          <p className="text-sm text-muted-foreground mt-2">
-            {t('flashcards.anki.time')}: {formatTime(sessionTime)}
+            {t('flashcards.anki.noFlashcards')}
           </p>
         </div>
 
-        {mode === "spaced" && nextAvailableAt && (
-          <div className="space-y-4">
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <p className="text-sm text-muted-foreground">
-                {t('flashcards.anki.nextReviewIn')}
-              </p>
-
-              <div className="text-2xl font-mono font-bold text-primary">
-                {countdown}
-              </div>
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={handleStudyEarly}
-              className="gap-2"
-            >
-              <RotateCw className="w-4 h-4" />
-              {t('flashcards.anki.studyEarly')}
-            </Button>
-
-            <p className="text-xs text-muted-foreground">
-              {t('flashcards.anki.studyEarlyNote')}
+        {nextAvailableAt && (
+          <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {t('flashcards.anki.nextReviewIn')}
             </p>
+
+            <div className="text-2xl font-mono font-bold text-primary">
+              {countdown}
+            </div>
           </div>
         )}
+
+        <Button
+          variant="outline"
+          onClick={handleStudyEarly}
+          className="gap-2"
+        >
+          <RotateCw className="w-4 h-4" />
+          {t('flashcards.anki.studyEarly')}
+        </Button>
       </div>
     );
   }
+
 
 
   if (!currentFlashcard) {
