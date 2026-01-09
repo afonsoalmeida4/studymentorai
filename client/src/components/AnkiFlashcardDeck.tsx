@@ -495,8 +495,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   }
 
   if (!currentFlashcard) {
-    return null; // fallback extremo (nunca deve acontecer agora)
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">
+          {t("flashcards.anki.loading")}
+        </p>
+      </div>
+    );
   }
+
+
 
 
   return (
