@@ -50,6 +50,7 @@ interface AnkiFlashcardDeckProps {
 }
 
 export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlashcardDeckProps) {
+  const isDev = Boolean((import.meta as any)?.env?.DEV);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
@@ -270,10 +271,13 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
             if (updated?.nextReviewDate) {
               setForcedNextReviewAt(updated.nextReviewDate);
+              if (isDev) console.debug("set forcedNextReviewAt (updated):", updated.nextReviewDate);
             } else if (earliest) {
               setForcedNextReviewAt(earliest);
+              if (isDev) console.debug("set forcedNextReviewAt (earliest):", earliest);
             } else {
               setForcedNextReviewAt(null);
+              if (isDev) console.debug("no nextReviewDate available after attempt");
             }
           }
         } catch (err) {
@@ -375,6 +379,9 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
         if (futureDates.length > 0) {
           const earliest = new Date(Math.min(...futureDates.map((d: Date) => d.getTime()))).toISOString();
           setForcedNextReviewAt(earliest);
+          if (isDev) console.debug("fetched earliest nextReviewDate on sessionFinished:", earliest);
+        } else {
+          if (isDev) console.debug("no future dates found on sessionFinished fetch");
         }
       } catch (err) {
         // ignore
