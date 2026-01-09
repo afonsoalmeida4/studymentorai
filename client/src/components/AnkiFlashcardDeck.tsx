@@ -288,14 +288,12 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     },
   });
 
-  const currentFlashcard = localDeck[currentIndex];
-  // ⛑️ PROTEÇÃO: nunca renderizar o card se não existir
-  if (!currentFlashcard && !sessionFinished) {
-    return null;
-  }
 
+  const currentFlashcard =
+    localDeck.length > 0 && currentIndex < localDeck.length
+      ? localDeck[currentIndex]
+      : null;
 
-  
   
   const totalFlashcards = allDisplayFlashcards.length;
   const progress = totalFlashcards > 0 ? ((completedCount / totalFlashcards) * 100) : 0;
@@ -399,16 +397,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-  // ⛑️ PROTEÇÃO: o deck ainda não está pronto
-  if (!deckInitialized || !progressRestored) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          {t('flashcards.anki.loading')}
-        </p>
-      </div>
-    );
-  }
 
   // 2️⃣ Sessão terminada — estado FINAL
   if (
@@ -454,6 +442,17 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
+  // ⛑️ PROTEÇÃO: o deck ainda não está pronto
+  if (!deckInitialized || !progressRestored) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">
+          {t('flashcards.anki.loading')}
+        </p>
+      </div>
+    );
+  }
+
 
   // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
   if (noFlashcardsDue && !sessionFinished) {
@@ -494,6 +493,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       </div>
     );
   }
+
+  if (!currentFlashcard) {
+    return null; // fallback extremo (nunca deve acontecer agora)
+  }
+
 
   return (
     <div className="space-y-6">
