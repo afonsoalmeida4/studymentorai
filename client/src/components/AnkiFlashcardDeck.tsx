@@ -351,6 +351,39 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     return () => clearInterval(i);
   }, [nextAvailableAt, mode, t]);
 
+  // If session finished but we don't have a forced next review date yet,
+  // try to fetch bundled data and compute earliest nextReviewDate so the countdown can show.
+  useEffect(() => {
+    if (mode !== "spaced") return;
+    if (!sessionFinished) return;
+    if (forcedNextReviewAt) return;
+
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
+        if (!mounted) return;
+        if (!res.ok) return;
+        const data = await res.json();
+        const now = new Date();
+        const futureDates = data.flashcards
+          .map((fc: any) => fc.nextReviewDate)
+          .filter((d: any) => d)
+          .map((d: string) => new Date(d))
+          .filter((dt: Date) => dt > now);
+
+        if (futureDates.length > 0) {
+          const earliest = new Date(Math.min(...futureDates.map((d: Date) => d.getTime()))).toISOString();
+          setForcedNextReviewAt(earliest);
+        }
+      } catch (err) {
+        // ignore
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [sessionFinished, forcedNextReviewAt, mode, topicId]);
+
 
 
 
