@@ -302,6 +302,7 @@ if (remainingAfter.length === 0) {
   };
 
   const [countdown, setCountdown] = useState<string | null>(null);
+
   useEffect(() => {
     if (!nextAvailableAt || mode !== "spaced") {
       setCountdown(null);
@@ -309,30 +310,41 @@ if (remainingAfter.length === 0) {
     }
 
     const updateCountdown = () => {
-      const now = new Date();
-      const next = new Date(nextAvailableAt);
-      const diffMs = next.getTime() - now.getTime();
+      const now = Date.now();
+      const next = new Date(nextAvailableAt).getTime();
+      const diff = next - now;
 
-      if (diffMs <= 0) {
-        setCountdown(t('flashcards.anki.availableNow'));
+      if (diff <= 0) {
+        setCountdown(t("flashcards.anki.availableNow"));
         return;
       }
 
-      const minutes = Math.floor(diffMs / 60000);
-      const seconds = Math.floor((diffMs % 60000) / 1000);
+      const totalSeconds = Math.floor(diff / 1000);
 
-      setCountdown(
-        `${minutes.toString().padStart(2, '0')}:${seconds
-          .toString()
-          .padStart(2, '0')}`
-      );
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      let formatted = "";
+
+      if (days > 0) {
+        formatted = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      } else if (hours > 0) {
+        formatted = `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        formatted = `${minutes}m ${seconds}s`;
+      }
+
+      setCountdown(formatted);
     };
 
-  updateCountdown(); // 👈 render imediato
-  const interval = setInterval(updateCountdown, 1000);
+    updateCountdown(); // 👈 chamada imediata
+    const interval = setInterval(updateCountdown, 1000);
 
-  return () => clearInterval(interval);
-}, [nextAvailableAt, mode, t]);
+    return () => clearInterval(interval);
+  }, [nextAvailableAt, mode, t]);
+
 
   
   // Handle study early - force reload flashcards ignoring nextReviewDate
