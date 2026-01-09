@@ -304,40 +304,40 @@ if (remainingAfter.length === 0) {
   const [countdown, setCountdown] = useState<string | null>(null);
   
   useEffect(() => {
-    const getTimeUntilNext = () => {
-      if (!nextAvailableAt) return null;
-      
-      const now = new Date();
-      const next = new Date(nextAvailableAt);
-      const diffMs = next.getTime() - now.getTime();
-      
-      if (diffMs <= 0) return t('flashcards.anki.availableNow');
-      
-      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-      
-      if (days > 0) {
-        return `${days}d ${hours}h ${minutes}m`;
-      }
-      if (hours > 0) {
-        return `${hours}h ${minutes}m ${seconds}s`;
-      }
-      return `${minutes}m ${seconds}s`;
-    };
-
-    if (mode === "spaced" && nextAvailableAt) {
-      setCountdown(getTimeUntilNext());
-      // Update every second for real-time countdown
-      const interval = setInterval(() => {
-        setCountdown(getTimeUntilNext());
-      }, 1000);
-      return () => clearInterval(interval);
-    } else {
+    if (!nextAvailableAt) {
       setCountdown(null);
+      return;
     }
-  }, [mode, nextAvailableAt, t]);
+
+    // ⏳ countdown deve continuar mesmo após sessão terminar
+    if (mode === "spaced") {
+      const update = () => {
+        const now = new Date();
+        const next = new Date(nextAvailableAt);
+        const diffMs = next.getTime() - now.getTime();
+
+        if (diffMs <= 0) {
+          setCountdown(t('flashcards.anki.availableNow'));
+          return;
+        }
+
+        const minutes = Math.floor(diffMs / 60000);
+        const seconds = Math.floor((diffMs % 60000) / 1000);
+
+        setCountdown(
+          `${minutes.toString().padStart(2, '0')}:${seconds
+            .toString()
+            .padStart(2, '0')}`
+        );
+      };
+
+      update(); // ⬅️ chamada imediata
+      const interval = setInterval(update, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [mode, nextAvailableAt, sessionFinished, t]);
+
   
   // Handle study early - force reload flashcards ignoring nextReviewDate
   const handleStudyEarly = () => {
