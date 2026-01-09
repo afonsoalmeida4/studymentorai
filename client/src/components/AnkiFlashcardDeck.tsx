@@ -119,24 +119,23 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const nextAvailableAt = useMemo((): string | null => {
     if (mode !== "spaced") return null;
 
-    const now = new Date();
-
-    // 1️⃣ prioridade: revisão acabada de fazer (1 flashcard edge-case)
-    if (lastNextReviewDate && new Date(lastNextReviewDate) > now) {
+    // ✅ PRIORIDADE MÁXIMA: data acabada de receber do backend
+    if (lastNextReviewDate) {
       return lastNextReviewDate;
     }
 
-    // 2️⃣ fallback: dados vindos do backend
     if (!bundledData?.flashcards) return null;
+
+    const now = new Date();
 
     const futureCards = bundledData.flashcards
       .filter(fc => fc.nextReviewDate && new Date(fc.nextReviewDate) > now)
-      .map(fc => new Date(fc.nextReviewDate!));
+      .map(fc => new Date(fc.nextReviewDate!).getTime());
 
     if (futureCards.length === 0) return null;
 
-    return new Date(Math.min(...futureCards.map(d => d.getTime()))).toISOString();
-  }, [bundledData, mode, lastNextReviewDate]);
+    return new Date(Math.min(...futureCards)).toISOString();
+  }, [mode, lastNextReviewDate, bundledData]);
 
   
   // Override filtered flashcards when studying early
@@ -310,41 +309,34 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       return;
     }
 
-    const updateCountdown = () => {
-      const now = Date.now();
-      const next = new Date(nextAvailableAt).getTime();
-      const diff = next - now;
+    const update = () => {
+      const diff = new Date(nextAvailableAt).getTime() - Date.now();
 
       if (diff <= 0) {
         setCountdown(t("flashcards.anki.availableNow"));
         return;
       }
 
-      const totalSeconds = Math.floor(diff / 1000);
+      const total = Math.floor(diff / 1000);
+      const days = Math.floor(total / 86400);
+      const hours = Math.floor((total % 86400) / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      const seconds = total % 60;
 
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-
-      let formatted = "";
-
-      if (days > 0) {
-        formatted = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      } else if (hours > 0) {
-        formatted = `${hours}h ${minutes}m ${seconds}s`;
-      } else {
-        formatted = `${minutes}m ${seconds}s`;
-      }
-
-      setCountdown(formatted);
+      setCountdown(
+        days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s`
+          : hours > 0
+          ? `${hours}h ${minutes}m ${seconds}s`
+          : `${minutes}m ${seconds}s`
+      );
     };
 
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-
-    return () => clearInterval(interval);
+    update();
+    const i = setInterval(update, 1000);
+    return () => clearInterval(i);
   }, [nextAvailableAt, mode, t]);
+
 
 
 
@@ -404,8 +396,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   // 2️⃣ Sessão terminada — estado FINAL
   if (
     sessionFinished &&
-    deckInitialized &&
-    localDeck.length === 0
+    deckInitialized
   ) {
     return (
       <div className="text-center py-12 space-y-6">
