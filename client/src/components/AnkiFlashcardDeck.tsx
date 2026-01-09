@@ -65,6 +65,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const [sessionFinished, setSessionFinished] = useState(false);
 
 
+
+
   // 🔑 Guarda a próxima revisão quando só existe 1 flashcard
   const [lastNextReviewDate, setLastNextReviewDate] = useState<string | null>(null);
 
@@ -154,6 +156,17 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }, [mode, studyEarly, filteredFlashcards]);
 
+  const sessionEffectivelyFinished = useMemo(() => {
+    if (mode !== "spaced") return false;
+
+    // ainda existem cartões por rever
+    if (filteredFlashcards.length > 0) return false;
+
+    // só consideramos sessão terminada se já respondeu a pelo menos 1
+    return completedCount > 0;
+  }, [mode, filteredFlashcards.length, completedCount]);
+
+
 
   // Restore progress from localStorage when loaded
   useEffect(() => {
@@ -226,6 +239,14 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       if (mode === "spaced") {
         const newCompletedIds = [...Array.from(completedCardIds), variables.flashcardId];
         setCompletedCardIds(new Set(newCompletedIds));
+        const remainingAfter = effectiveFlashcards.filter(
+          fc => !newCompletedIds.includes(fc.id)
+        );
+
+if (remainingAfter.length === 0) {
+  setSessionFinished(true);
+}
+
 
         saveProgress({
           completedCount: newCompletedCount,
@@ -329,8 +350,9 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     setCompletedCardIds(new Set());
     setCurrentIndex(0);
     setCompletedCount(0);
-
     resetProgress();
+    setSessionFinished(false);
+
   };
 
 
@@ -420,7 +442,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
 
   // 🟡 Não há flashcards para estudar agora (mas sessão NÃO terminou)
-  if (noFlashcardsDue) {
+  if (noFlashcardsDue && !sessionFinished) {
     return (
       <div className="text-center py-12 space-y-6">
         <Check className="w-16 h-16 mx-auto text-primary" />
@@ -461,10 +483,9 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
 
 
-  if (!currentFlashcard) {
+  if (!currentFlashcard && !sessionFinished) {
     return null;
   }
-
 
   return (
     <div className="space-y-6">

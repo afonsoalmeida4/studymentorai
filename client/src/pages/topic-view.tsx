@@ -1262,10 +1262,11 @@ export default function TopicView() {
                   </CardContent>
                 </Card>
                 {/* Show flashcard section even when no summaries, if there are manual flashcards */}
-                <div className="mt-6">
-                  <SummaryStudySection topicId={topicId} />
-                </div>
-
+                {hasFlashcards && (
+                  <div className="mt-6">
+                    <SummaryStudySection topicId={topicId} />
+                  </div>
+                )}
                 {/* Quiz Section - Premium feature (shows empty state without summaries) */}
                 {currentPlan === "premium" && (
                   <div className="mt-6">
