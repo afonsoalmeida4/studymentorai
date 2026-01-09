@@ -243,10 +243,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           fc => !newCompletedIds.includes(fc.id)
         );
 
-if (remainingAfter.length === 0) {
-  setSessionFinished(true);
-}
-
 
         saveProgress({
           completedCount: newCompletedCount,
@@ -264,6 +260,11 @@ if (remainingAfter.length === 0) {
         if (updated?.nextReviewDate) {
           setLastNextReviewDate(updated.nextReviewDate);
         }
+
+        if (remainingAfter.length === 0) {
+          setSessionFinished(true);
+        }
+
 
         queryClient.invalidateQueries({
           queryKey: ["/api/flashcards/topic", topicId, "bundled"],
@@ -339,11 +340,12 @@ if (remainingAfter.length === 0) {
       setCountdown(formatted);
     };
 
-    updateCountdown(); // 👈 chamada imediata
+    updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
   }, [nextAvailableAt, mode, t]);
+
 
 
   
@@ -417,10 +419,6 @@ if (remainingAfter.length === 0) {
           <p className="text-muted-foreground">
             {t('flashcards.anki.reviewed')} {completedCount} flashcard
             {completedCount === 1 ? '' : 's'}.
-          </p>
-
-          <p className="text-sm text-muted-foreground mt-2">
-            {t('flashcards.anki.time')}: {formatTime(sessionTime)}
           </p>
         </div>
 
