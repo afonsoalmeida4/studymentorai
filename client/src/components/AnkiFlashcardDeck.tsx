@@ -289,6 +289,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   });
 
   const currentFlashcard = localDeck[currentIndex];
+  // ⛑️ PROTEÇÃO: nunca renderizar o card se não existir
+  if (!currentFlashcard && !sessionFinished) {
+    return null;
+  }
+
 
   
   
