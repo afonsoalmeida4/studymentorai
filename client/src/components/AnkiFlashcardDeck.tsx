@@ -9,7 +9,7 @@ import { apiRequest, queryClient, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
-const [forcedNextReviewAt, setForcedNextReviewAt] = useState<string | null>(null);
+
 
 
 // Flashcard type - stays in its creation language (no translations)
@@ -65,6 +65,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   // State for studying early (bypass nextReviewDate filter)
   const [studyEarly, setStudyEarly] = useState(false);
   const [sessionFinished, setSessionFinished] = useState(false);
+  const [forcedNextReviewAt, setForcedNextReviewAt] = useState<string | null>(null);
 
 
 
@@ -261,16 +262,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
         if (updated?.nextReviewDate) {
           setForcedNextReviewAt(updated.nextReviewDate);
-        }
 
-        if (remainingAfter.length === 0) {
-          setSessionFinished(true);
+          if (remainingAfter.length === 0) {
+            setSessionFinished(true);
+          }
         } else {
-          // fallback defensivo (nunca deve acontecer)
           if (remainingAfter.length === 0) {
             setSessionFinished(true);
           }
         }
+
 
 
 
@@ -296,12 +297,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       });
     },
   });
-
-
-  const currentFlashcard =
-    localDeck.length > 0 && currentIndex < localDeck.length
-      ? localDeck[currentIndex]
-      : null;
 
   
   const totalFlashcards = allDisplayFlashcards.length;
@@ -406,6 +401,22 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
+  // ⛑️ PROTEÇÃO: o deck ainda não está pronto
+  if (!deckInitialized || !progressRestored) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">
+          {t('flashcards.anki.loading')}
+        </p>
+      </div>
+    );
+  }
+
+   const currentFlashcard =
+    localDeck.length > 0 && currentIndex < localDeck.length
+      ? localDeck[currentIndex]
+      : null;
+
 
   // 2️⃣ Sessão terminada — estado FINAL
   if (
@@ -447,17 +458,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           <RotateCw className="w-4 h-4" />
           {t('flashcards.anki.studyEarly')}
         </Button>
-      </div>
-    );
-  }
-
-  // ⛑️ PROTEÇÃO: o deck ainda não está pronto
-  if (!deckInitialized || !progressRestored) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          {t('flashcards.anki.loading')}
-        </p>
       </div>
     );
   }
@@ -512,6 +512,7 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       </div>
     );
   }
+
 
 
 
