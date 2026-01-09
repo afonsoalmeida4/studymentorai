@@ -301,33 +301,38 @@ if (remainingAfter.length === 0) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const countdown = useMemo(() => {
-    // 1️⃣ se não houver próxima revisão, não há countdown
-    if (!nextAvailableAt) return null;
-
-    // 2️⃣ hora atual
-    const now = new Date();
-
-    // 3️⃣ hora da próxima revisão
-    const next = new Date(nextAvailableAt);
-
-    // 4️⃣ diferença em milissegundos
-    const diffMs = next.getTime() - now.getTime();
-
-    // 5️⃣ se já passou o tempo
-    if (diffMs <= 0) {
-      return t('flashcards.anki.availableNow');
+  const [countdown, setCountdown] = useState<string | null>(null);
+  useEffect(() => {
+    if (!nextAvailableAt || mode !== "spaced") {
+      setCountdown(null);
+      return;
     }
 
-    // 6️⃣ converter para minutos e segundos
-    const minutes = Math.floor(diffMs / 60000);
-    const seconds = Math.floor((diffMs % 60000) / 1000);
+    const updateCountdown = () => {
+      const now = new Date();
+      const next = new Date(nextAvailableAt);
+      const diffMs = next.getTime() - now.getTime();
 
-    // 7️⃣ devolver string formatada (MM:SS)
-    return `${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`;
-  }, [nextAvailableAt, t]);
+      if (diffMs <= 0) {
+        setCountdown(t('flashcards.anki.availableNow'));
+        return;
+      }
+
+      const minutes = Math.floor(diffMs / 60000);
+      const seconds = Math.floor((diffMs % 60000) / 1000);
+
+      setCountdown(
+        `${minutes.toString().padStart(2, '0')}:${seconds
+          .toString()
+          .padStart(2, '0')}`
+      );
+    };
+
+  updateCountdown(); // 👈 render imediato
+  const interval = setInterval(updateCountdown, 1000);
+
+  return () => clearInterval(interval);
+}, [nextAvailableAt, mode, t]);
 
   
   // Handle study early - force reload flashcards ignoring nextReviewDate
