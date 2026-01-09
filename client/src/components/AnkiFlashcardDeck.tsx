@@ -195,20 +195,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     if (progressRestored && !isLoading) {
       // Filter out already completed cards
       const remainingCards = effectiveFlashcards.filter(fc => !completedCardIds.has(fc.id));
-      
-      // Find current card's id and locate it in the new deck
-      const currentCardId = localDeck[currentIndex]?.id;
-      
       setLocalDeck(remainingCards);
-      
-      // If we had a current card, try to find it in the new deck
-      if (currentCardId && deckInitialized) {
-        const newIndex = remainingCards.findIndex(fc => fc.id === currentCardId);
-        if (newIndex !== -1 && newIndex !== currentIndex) {
-          setCurrentIndex(newIndex);
-        }
-      }
-      
+
+      // Ensure currentIndex is within bounds of the new deck to avoid rendering a null card
+      setCurrentIndex(prev => {
+        if (remainingCards.length === 0) return 0;
+        if (prev < remainingCards.length) return prev;
+        // If previous index is out of bounds, reset to 0 (start of deck)
+        return 0;
+      });
+
       setDeckInitialized(true);
     }
   }, [effectiveFlashcards, completedCardIds, progressRestored, isLoading]);
@@ -252,32 +248,43 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           completedCardIds: newCompletedIds,
         });
 
-        // 🔥 BUSCAR O nextReviewDate ATUALIZADO
-        const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
-        const data = await res.json();
+        // 🔥 BUSCAR O nextReviewDate ATUALIZADO (do cartão atualizado ou do mínimo de todos)
+        try {
+          const res = await authFetch(`/api/flashcards/topic/${topicId}/bundled`);
+          if (res.ok) {
+            const data = await res.json();
 
-        const updated = data.flashcards.find(
-          (fc: any) => fc.id === variables.flashcardId
-        );
+            const updated = data.flashcards.find((fc: any) => fc.id === variables.flashcardId);
 
-        if (updated?.nextReviewDate) {
-          setForcedNextReviewAt(updated.nextReviewDate);
+            // compute earliest future nextReviewDate among all flashcards
+            const now = new Date();
+            const futureDates = data.flashcards
+              .map((fc: any) => fc.nextReviewDate)
+              .filter((d: any) => d)
+              .map((d: string) => new Date(d))
+              .filter((dt: Date) => dt > now);
 
-          if (remainingAfter.length === 0) {
-            setSessionFinished(true);
+            const earliest = futureDates.length
+              ? new Date(Math.min(...futureDates.map((d: Date) => d.getTime()))).toISOString()
+              : null;
+
+            if (updated?.nextReviewDate) {
+              setForcedNextReviewAt(updated.nextReviewDate);
+            } else if (earliest) {
+              setForcedNextReviewAt(earliest);
+            } else {
+              setForcedNextReviewAt(null);
+            }
           }
-        } else {
-          if (remainingAfter.length === 0) {
-            setSessionFinished(true);
-          }
+        } catch (err) {
+          // ignore fetch errors here; query invalidation below will refresh data
         }
 
+        if (remainingAfter.length === 0) {
+          setSessionFinished(true);
+        }
 
-
-
-        queryClient.invalidateQueries({
-          queryKey: ["/api/flashcards/topic", topicId, "bundled"],
-        });
+        queryClient.invalidateQueries({ queryKey: ["/api/flashcards/topic", topicId, "bundled"] });
       } else {
         const newIndex = currentIndex + 1;
         setCurrentIndex(newIndex);
@@ -505,10 +512,19 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
   if (!currentFlashcard) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 space-y-4">
         <p className="text-muted-foreground">
-          {t("flashcards.anki.loading")}
+          {t('flashcards.anki.noFlashcards')}
         </p>
+
+        <div className="flex items-center justify-center gap-2">
+          <Button variant="outline" onClick={handleRestart}>
+            {t('flashcards.anki.restart')}
+          </Button>
+          <Button variant="ghost" onClick={() => { setStudyEarly(true); setDeckInitialized(false); setProgressRestored(true); }}>
+            {t('flashcards.anki.studyEarly')}
+          </Button>
+        </div>
       </div>
     );
   }
