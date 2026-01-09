@@ -258,11 +258,18 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
         if (updated?.nextReviewDate) {
           setLastNextReviewDate(updated.nextReviewDate);
+
+          // ✅ só agora podemos terminar a sessão
+          if (remainingAfter.length === 0) {
+            setSessionFinished(true);
+          }
+        } else {
+          // fallback defensivo (nunca deve acontecer)
+          if (remainingAfter.length === 0) {
+            setSessionFinished(true);
+          }
         }
 
-        if (remainingAfter.length === 0) {
-          setSessionFinished(true);
-        }
 
 
         queryClient.invalidateQueries({
