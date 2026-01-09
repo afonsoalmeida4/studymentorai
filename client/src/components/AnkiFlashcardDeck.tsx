@@ -9,6 +9,8 @@ import { apiRequest, queryClient, authFetch } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
+const [forcedNextReviewAt, setForcedNextReviewAt] = useState<string | null>(null);
+
 
 // Flashcard type - stays in its creation language (no translations)
 interface BundledFlashcard {
@@ -119,9 +121,8 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
   const nextAvailableAt = useMemo((): string | null => {
     if (mode !== "spaced") return null;
 
-    // ✅ PRIORIDADE MÁXIMA: data acabada de receber do backend
-    if (lastNextReviewDate) {
-      return lastNextReviewDate;
+    if (forcedNextReviewAt) {
+      return forcedNextReviewAt;
     }
 
     if (!bundledData?.flashcards) return null;
@@ -129,13 +130,15 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     const now = new Date();
 
     const futureCards = bundledData.flashcards
-      .filter(fc => fc.nextReviewDate && new Date(fc.nextReviewDate) > now)
-      .map(fc => new Date(fc.nextReviewDate!).getTime());
+      .filter(fc => fc.nextReviewDate && new Date(fc.nextReviewDate) > now);
 
     if (futureCards.length === 0) return null;
 
-    return new Date(Math.min(...futureCards)).toISOString();
-  }, [mode, lastNextReviewDate, bundledData]);
+    return new Date(
+      Math.min(...futureCards.map(fc => new Date(fc.nextReviewDate!).getTime()))
+    ).toISOString();
+  }, [mode, forcedNextReviewAt, bundledData]);
+
 
   
   // Override filtered flashcards when studying early
@@ -257,12 +260,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
         );
 
         if (updated?.nextReviewDate) {
-          setLastNextReviewDate(updated.nextReviewDate);
+          setForcedNextReviewAt(updated.nextReviewDate);
+        }
 
-          // ✅ só agora podemos terminar a sessão
-          if (remainingAfter.length === 0) {
-            setSessionFinished(true);
-          }
+        if (remainingAfter.length === 0) {
+          setSessionFinished(true);
         } else {
           // fallback defensivo (nunca deve acontecer)
           if (remainingAfter.length === 0) {
