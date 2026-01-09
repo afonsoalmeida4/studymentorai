@@ -478,12 +478,6 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
     );
   }
 
-
-
-  if (!currentFlashcard && !sessionFinished) {
-    return null;
-  }
-
   return (
     <div className="space-y-6">
       {mode === "practice" ? (
