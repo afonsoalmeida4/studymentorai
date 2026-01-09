@@ -393,6 +393,18 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
       </div>
     );
   }
+
+  // ⛑️ PROTEÇÃO: o deck ainda não está pronto
+  if (!deckInitialized || !progressRestored) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">
+          {t('flashcards.anki.loading')}
+        </p>
+      </div>
+    );
+  }
+
   // 2️⃣ Sessão terminada — estado FINAL
   if (
     sessionFinished &&
