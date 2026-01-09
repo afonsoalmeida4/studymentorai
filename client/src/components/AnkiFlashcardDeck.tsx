@@ -301,42 +301,33 @@ if (remainingAfter.length === 0) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const [countdown, setCountdown] = useState<string | null>(null);
-  
-  useEffect(() => {
-    if (!nextAvailableAt) {
-      setCountdown(null);
-      return;
+  const countdown = useMemo(() => {
+    // 1️⃣ se não houver próxima revisão, não há countdown
+    if (!nextAvailableAt) return null;
+
+    // 2️⃣ hora atual
+    const now = new Date();
+
+    // 3️⃣ hora da próxima revisão
+    const next = new Date(nextAvailableAt);
+
+    // 4️⃣ diferença em milissegundos
+    const diffMs = next.getTime() - now.getTime();
+
+    // 5️⃣ se já passou o tempo
+    if (diffMs <= 0) {
+      return t('flashcards.anki.availableNow');
     }
 
-    // ⏳ countdown deve continuar mesmo após sessão terminar
-    if (mode === "spaced") {
-      const update = () => {
-        const now = new Date();
-        const next = new Date(nextAvailableAt);
-        const diffMs = next.getTime() - now.getTime();
+    // 6️⃣ converter para minutos e segundos
+    const minutes = Math.floor(diffMs / 60000);
+    const seconds = Math.floor((diffMs % 60000) / 1000);
 
-        if (diffMs <= 0) {
-          setCountdown(t('flashcards.anki.availableNow'));
-          return;
-        }
-
-        const minutes = Math.floor(diffMs / 60000);
-        const seconds = Math.floor((diffMs % 60000) / 1000);
-
-        setCountdown(
-          `${minutes.toString().padStart(2, '0')}:${seconds
-            .toString()
-            .padStart(2, '0')}`
-        );
-      };
-
-      update(); // ⬅️ chamada imediata
-      const interval = setInterval(update, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [mode, nextAvailableAt, sessionFinished, t]);
+    // 7️⃣ devolver string formatada (MM:SS)
+    return `${minutes.toString().padStart(2, '0')}:${seconds
+      .toString()
+      .padStart(2, '0')}`;
+  }, [nextAvailableAt, t]);
 
   
   // Handle study early - force reload flashcards ignoring nextReviewDate
