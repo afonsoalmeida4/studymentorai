@@ -276,8 +276,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
               setForcedNextReviewAt(earliest);
               if (isDev) console.debug("set forcedNextReviewAt (earliest):", earliest);
             } else {
-              setForcedNextReviewAt(null);
-              if (isDev) console.debug("no nextReviewDate available after attempt");
+              // No future nextReviewDate available. If the session finished, treat it as available now
+              // so the UI shows "available now" instead of an empty countdown.
+              if (remainingAfter.length === 0) {
+                const nowIso = new Date().toISOString();
+                setForcedNextReviewAt(nowIso);
+                if (isDev) console.debug("set forcedNextReviewAt (now fallback):", nowIso);
+              } else {
+                setForcedNextReviewAt(null);
+                if (isDev) console.debug("no nextReviewDate available after attempt");
+              }
             }
           }
         } catch (err) {
@@ -381,7 +389,10 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           setForcedNextReviewAt(earliest);
           if (isDev) console.debug("fetched earliest nextReviewDate on sessionFinished:", earliest);
         } else {
-          if (isDev) console.debug("no future dates found on sessionFinished fetch");
+          // No future dates found — show available now
+          const nowIso = new Date().toISOString();
+          setForcedNextReviewAt(nowIso);
+          if (isDev) console.debug("no future dates found on sessionFinished fetch, fallback to now:", nowIso);
         }
       } catch (err) {
         // ignore
