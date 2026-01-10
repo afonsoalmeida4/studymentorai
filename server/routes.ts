@@ -1706,26 +1706,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Fetch SM-2 attempts for all flashcards
-      const allIds = uniqueFlashcards.map(fc => fc.id);
+      // Resolve base flashcard IDs for SM-2 progress lookup so attempts
+      // recorded against base flashcards (shared across translations) are found.
+      const baseIdMappings = await Promise.all(
+        uniqueFlashcards.map(async (fc) => ({
+          id: fc.id,
+          baseId: await resolveBaseFlashcardId(fc.id),
+        }))
+      );
+
+      const baseIds = Array.from(new Set(baseIdMappings.map(m => m.baseId)));
+
+      // Fetch SM-2 attempts using BASE flashcard IDs
       const attemptsResult = await db.select()
         .from(flashcardAttempts)
         .where(
           and(
-            inArray(flashcardAttempts.flashcardId, allIds),
+            sql`${flashcardAttempts.flashcardId} IN (${sql.join(baseIds.map(id => sql`${id}`), sql`, `)})`,
             eq(flashcardAttempts.userId, userId)
           )
         )
         .orderBy(desc(flashcardAttempts.attemptDate));
 
-      // Build attempts map - keep only latest attempt per flashcard
-      const attemptsMap = new Map<string, { 
-        nextReviewDate: Date | null; 
-        easeFactor: number; 
+      // Build attempts map keyed by baseId - keep only latest attempt per base flashcard
+      const attemptsMap = new Map<string, {
+        nextReviewDate: Date | null;
+        easeFactor: number;
         intervalDays: number;
         repetitions: number;
       }>();
-      
+
       for (const attempt of attemptsResult) {
         if (!attemptsMap.has(attempt.flashcardId)) {
           attemptsMap.set(attempt.flashcardId, {
@@ -1739,8 +1749,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Build simple response - flashcards in their original creation language (no translations)
       const bundledFlashcards = uniqueFlashcards.map(fc => {
-        const sm2Data = attemptsMap.get(fc.id);
-        
+        // find baseId for this flashcard
+        const mapping = baseIdMappings.find(m => m.id === fc.id);
+        const baseId = mapping?.baseId || fc.id;
+        const sm2Data = attemptsMap.get(baseId);
+
         return {
           id: fc.id,
           topicId: fc.topicId,
