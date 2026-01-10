@@ -1998,7 +1998,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Award small XP for answering flashcard
         await awardXP(userId, "answer_flashcard", { rating, isCorrect });
-        
+
+        // Invalidate bundled cache for this topic so frontend sees updated attempts
+        if (flashcard.topicId) {
+          bundledFlashcardsCache.delete(`${flashcard.topicId}:${userId}`);
+        }
+
         return res.json({
           success: true,
           message: "Resposta registada (plano FREE não tem repetição espaçada)",
@@ -2030,6 +2035,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Award XP for answering flashcard
       await awardXP(userId, "answer_flashcard", { rating, isCorrect });
+
+      // Invalidate bundled cache for this topic so frontend sees updated nextReviewDate
+      if (flashcard.topicId) {
+        bundledFlashcardsCache.delete(`${flashcard.topicId}:${userId}`);
+      }
 
       return res.json({
         success: true,
