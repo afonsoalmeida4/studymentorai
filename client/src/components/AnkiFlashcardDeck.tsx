@@ -497,6 +497,17 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           </div>
         )}
 
+        {isDev && (
+          <div className="mt-4 text-xs text-left bg-slate-50 dark:bg-slate-900 p-3 rounded">
+            <div><strong>DEBUG</strong></div>
+            <div>forcedNextReviewAt: {String(forcedNextReviewAt)}</div>
+            <div>nextAvailableAt: {String(nextAvailableAt)}</div>
+            <div>countdown: {String(countdown)}</div>
+            <div>bundled future nextReviewDates:</div>
+            <pre className="whitespace-pre-wrap text-xs">{JSON.stringify(bundledData?.flashcards?.map((f: any) => f.nextReviewDate) ?? [], null, 2)}</pre>
+          </div>
+        )}
+
         <Button
           variant="outline"
           onClick={handleStudyEarly}
