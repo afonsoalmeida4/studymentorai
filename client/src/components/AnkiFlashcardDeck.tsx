@@ -279,9 +279,10 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
               // No future nextReviewDate available. If the session finished, treat it as available now
               // so the UI shows "available now" instead of an empty countdown.
               if (remainingAfter.length === 0) {
-                const nowIso = new Date().toISOString();
-                setForcedNextReviewAt(nowIso);
-                if (isDev) console.debug("set forcedNextReviewAt (now fallback):", nowIso);
+                // Fallback to 24 hours from now so the UI shows a 24h countdown
+                const fallback = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+                setForcedNextReviewAt(fallback);
+                if (isDev) console.debug("set forcedNextReviewAt (24h fallback):", fallback);
               } else {
                 setForcedNextReviewAt(null);
                 if (isDev) console.debug("no nextReviewDate available after attempt");
@@ -389,10 +390,10 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           setForcedNextReviewAt(earliest);
           if (isDev) console.debug("fetched earliest nextReviewDate on sessionFinished:", earliest);
         } else {
-          // No future dates found — show available now
-          const nowIso = new Date().toISOString();
-          setForcedNextReviewAt(nowIso);
-          if (isDev) console.debug("no future dates found on sessionFinished fetch, fallback to now:", nowIso);
+          // No future dates found — fallback to 24 hours from now so user sees a 24h countdown
+          const fallback = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+          setForcedNextReviewAt(fallback);
+          if (isDev) console.debug("no future dates found on sessionFinished fetch, fallback to 24h:", fallback);
         }
       } catch (err) {
         // ignore
