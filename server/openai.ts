@@ -330,6 +330,13 @@ export async function generateSummary({
 
     const summary = summaryResponse.choices[0].message.content || defaultSummaryMessages[lang] || defaultSummaryMessages["pt"];
 
+    // If the model returned the generic default message (or nothing meaningful), treat it as a failure
+    const normalizedSummary = (summary || "").trim();
+    if (!normalizedSummary || normalizedSummary === (defaultSummaryMessages[lang] || defaultSummaryMessages["pt"])) {
+      console.warn(`[OpenAI] Empty or default summary received for style ${learningStyle} (lang=${lang}). Treating as error.`);
+      throw new Error("Falha ao gerar resumo. Por favor, tente novamente.");
+    }
+
     const motivationalUserPrompts: Record<string, string> = {
       pt: "Gere uma mensagem motivacional para um estudante que acabou de receber este resumo.",
       en: "Generate a motivational message for a student who just received this summary.",
