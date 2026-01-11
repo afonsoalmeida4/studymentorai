@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { subscriptions, usageTracking, users, type Subscription, type UsageTracking, type SubscriptionPlan, planLimits, type ChatMode } from "@shared/schema";
+import { subscriptions, usageTracking, users, pendingSubscriptionChanges, type Subscription, type UsageTracking, type SubscriptionPlan, planLimits, type ChatMode } from "@shared/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 export class SubscriptionService {
@@ -463,6 +463,26 @@ export class SubscriptionService {
     const limits = planLimits[subscription.plan as SubscriptionPlan];
 
     return { subscription, usage, limits };
+  }
+
+  // Pending plan helpers
+  async setPendingPlan(userId: string, plan: SubscriptionPlan, billingPeriod: string, priceId?: string) {
+    await db
+      .insert(pendingSubscriptionChanges)
+      .values({ userId, plan, billingPeriod, priceId })
+      .onConflictDoUpdate({
+        target: [pendingSubscriptionChanges.userId],
+        set: { plan, billingPeriod, priceId, createdAt: new Date() },
+      });
+  }
+
+  async getPendingPlan(userId: string) {
+    const [row] = await db.select().from(pendingSubscriptionChanges).where(eq(pendingSubscriptionChanges.userId, userId));
+    return row || null;
+  }
+
+  async clearPendingPlan(userId: string) {
+    await db.delete(pendingSubscriptionChanges).where(eq(pendingSubscriptionChanges.userId, userId));
   }
 }
 

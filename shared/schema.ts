@@ -225,6 +225,20 @@ export const subscriptions = pgTable(
   ],
 );
 
+// Pending subscription changes (used when scheduling downgrades)
+export const pendingSubscriptionChanges = pgTable(
+  "pending_subscription_changes",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    plan: varchar("plan", { length: 20 }).notNull(),
+    priceId: varchar("price_id"),
+    billingPeriod: varchar("billing_period", { length: 10 }).default("monthly").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_pending_subscription_user").on(table.userId)]
+);
+
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
   id: true,
   createdAt: true,

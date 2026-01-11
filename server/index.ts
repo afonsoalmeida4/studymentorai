@@ -105,6 +105,36 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         const userId = sub.metadata?.userId;
         if (!userId) break;
 
+        // If there's a pending plan for this user (scheduled downgrade), create
+        // the new subscription now using the stored priceId so we never leave
+        // the customer without a single active paid subscription.
+        const pending = await subscriptionService.getPendingPlan(userId);
+        if (pending && pending.priceId) {
+          try {
+            const newSub = await stripe.subscriptions.create({
+              customer: sub.customer as string,
+              items: [{ price: pending.priceId }],
+              metadata: { userId, plan: pending.plan, billingPeriod: pending.billingPeriod },
+            });
+
+            await subscriptionService.updateSubscriptionPlan(userId, pending.plan as any, {
+              status: "active",
+              cancelAtPeriodEnd: false,
+              subscriptionId: newSub.id,
+              priceId: pending.priceId,
+              customerId: sub.customer as string,
+              currentPeriodStart: new Date(((newSub as any).current_period_start || 0) * 1000),
+              currentPeriodEnd: new Date(((newSub as any).current_period_end || 0) * 1000),
+            });
+
+            await subscriptionService.clearPendingPlan(userId);
+            break;
+          } catch (err) {
+            console.error("Failed to apply pending plan after subscription deleted:", err);
+            // Fallback to marking free so the DB remains consistent
+          }
+        }
+
         await subscriptionService.updateSubscriptionPlan(userId, "free", {
           status: "canceled",
           cancelAtPeriodEnd: false,

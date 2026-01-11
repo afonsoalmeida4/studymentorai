@@ -2555,6 +2555,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       }
 
+      // Determine upgrade vs downgrade
+      const planRank: Record<string, number> = { free: 0, pro: 1, premium: 2 };
+      const currentPlan = subscription.plan || "free";
+      const requestedRank = planRank[plan as string];
+      const currentRank = planRank[currentPlan];
+
+      // If upgrading (higher rank), cancel existing Stripe subscription immediately
+      if (requestedRank > currentRank && subscription.stripeSubscriptionId) {
+        try {
+          // Some Stripe typings may not expose `del` — cast to any for safety.
+          await (stripe.subscriptions as any).del(subscription.stripeSubscriptionId);
+        } catch (e) {
+          console.warn("Failed to delete existing Stripe subscription on upgrade:", e);
+        }
+
+        // Update DB immediately to reflect the new active plan and avoid double-billing
+        await subscriptionService.updateSubscriptionPlan(
+          userId,
+          plan as SubscriptionPlan,
+          { customerId, cancelAtPeriodEnd: false, status: "active" }
+        );
+
+      }
+
+      // Prepare priceId early (used for pending plan storage)
+      const currencyEarly = getCurrencyFromRequest(req);
+      const priceIdEarly = getStripePriceId(plan, billingPeriod, currencyEarly);
+
+      // If downgrading (lower rank), schedule cancellation at period end and record pending plan
+      if (requestedRank < currentRank && subscription.stripeSubscriptionId) {
+        try {
+          await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: true });
+        } catch (e) {
+          console.warn("Failed to schedule cancel_at_period_end on Stripe subscription:", e);
+        }
+
+        // Mark DB as canceling
+        await subscriptionService.markCancelAtPeriodEnd(userId);
+
+        // Save pending change so webhook can apply it when the old subscription ends
+        await subscriptionService.setPendingPlan(userId, plan as SubscriptionPlan, billingPeriod, priceIdEarly);
+
+        return res.json({ success: true, message: "Downgrade scheduled; will take effect at period end." });
+      }
+
       const currency = getCurrencyFromRequest(req);
       const priceId = getStripePriceId(plan, billingPeriod, currency);
 
