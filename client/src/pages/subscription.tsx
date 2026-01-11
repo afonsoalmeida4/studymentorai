@@ -423,7 +423,7 @@ export default function SubscriptionPage() {
                   <CardTitle>{t("subscription.activeSubscription")}</CardTitle>
                   <CardDescription>
                     {t("subscription.activeSubscriptionSubtitle", {
-                      planName: t(`subscription.plans_toggle.${currentPlan}.name`),
+                      planName: t(`subscription.plans.${currentPlan}.name`),
                     })}
                   </CardDescription>
                 </>
