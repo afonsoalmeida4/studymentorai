@@ -1176,6 +1176,7 @@
       "studyEarly": "Estudiar Ahora",
       "studyAgain": "Estudiar de Nuevo",
       "studyEarlyNote": "Estudiar antes no afecta el algoritmo de repetición espaciada.",
+        "restart": "Reiniciar",
       "tomorrow": "Mañana",
       "sessionComplete": "¡Has terminado los flashcards por hoy!",
       "reviewed": "Revisaste",
