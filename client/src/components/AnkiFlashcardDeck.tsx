@@ -425,7 +425,30 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
 
 
   const handleRating = (rating: number) => {
-    if (!currentFlashcard || recordAttemptMutation.isPending) return;
+    if (!currentFlashcard) return;
+
+    // In `practice` mode we should NOT record attempts to the backend (do not affect SM-2)
+    if (mode === "practice") {
+      const newCompletedCount = completedCount + 1;
+      setCompletedCount(newCompletedCount);
+      setIsFlipped(false);
+
+      const newCompletedIds = [...Array.from(completedCardIds), currentFlashcard.id];
+      setCompletedCardIds(new Set(newCompletedIds));
+
+      const newIndex = currentIndex + 1;
+      setCurrentIndex(newIndex);
+
+      saveProgress({
+        currentIndex: newIndex,
+        completedCount: newCompletedCount,
+        completedCardIds: newCompletedIds,
+      });
+
+      return;
+    }
+
+    if (recordAttemptMutation.isPending) return;
     recordAttemptMutation.mutate({
       flashcardId: currentFlashcard.id,
       rating,
