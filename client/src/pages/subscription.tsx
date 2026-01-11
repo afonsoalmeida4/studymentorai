@@ -486,7 +486,7 @@ export default function SubscriptionPage() {
             )}
 
 
-            {data.subscription.status === "canceling" && (
+            {data.subscription.status === "canceling" && !data.subscription.cancelAtPeriodEnd && (
               <div className="pt-4 border-t text-sm text-muted-foreground text-center">
                 {t("subscription.cancelingInfo")}
               </div>

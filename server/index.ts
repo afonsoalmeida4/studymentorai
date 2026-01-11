@@ -62,6 +62,8 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
             customerId: session.customer as string,
             subscriptionId: session.subscription as string,
             status: "active",
+            // Clear any previous scheduled cancellation when a new checkout completes
+            cancelAtPeriodEnd: false,
           }
         );
 
