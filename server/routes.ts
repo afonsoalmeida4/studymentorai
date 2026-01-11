@@ -2541,18 +2541,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         
 
-        const safePlan: SubscriptionPlan =
-          subscription.plan === "free" ||
-          subscription.plan === "pro" ||
-          subscription.plan === "premium"
-            ? subscription.plan
-            : "free";
-
+        // When creating a checkout to upgrade, proactively set the user's
+        // subscription plan in the DB to the requested plan and clear any
+        // previously scheduled cancellation. This prevents the UI from
+        // showing the old plan as "canceling" and avoids users paying for
+        // two plans simultaneously if they upgrade after scheduling a
+        // cancellation.
         await subscriptionService.updateSubscriptionPlan(
           userId,
-          safePlan,
-          { customerId }
-);
+          plan as SubscriptionPlan,
+          { customerId, cancelAtPeriodEnd: false, status: "active" }
+        );
 
       }
 
