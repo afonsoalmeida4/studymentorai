@@ -520,14 +520,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           </div>
         )}
 
-        <Button
-          variant="outline"
-          onClick={handleStudyEarly}
-          className="gap-2"
-        >
-          <RotateCw className="w-4 h-4" />
-          {t('flashcards.anki.studyEarly')}
-        </Button>
+        {mode === "spaced" && (
+          <Button
+            variant="outline"
+            onClick={handleStudyEarly}
+            className="gap-2"
+          >
+            <RotateCw className="w-4 h-4" />
+            {t('flashcards.anki.studyEarly')}
+          </Button>
+        )}
       </div>
     );
   }
@@ -561,14 +563,16 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           </div>
         )}
 
-        <Button
-          variant="outline"
-          onClick={handleStudyEarly}
-          className="gap-2"
-        >
-          <RotateCw className="w-4 h-4" />
-          {t('flashcards.anki.studyEarly')}
-        </Button>
+        {mode === "spaced" && (
+          <Button
+            variant="outline"
+            onClick={handleStudyEarly}
+            className="gap-2"
+          >
+            <RotateCw className="w-4 h-4" />
+            {t('flashcards.anki.studyEarly')}
+          </Button>
+        )}
       </div>
     );
   }
@@ -584,9 +588,11 @@ export default function AnkiFlashcardDeck({ topicId, mode = "spaced" }: AnkiFlas
           <Button variant="outline" onClick={handleRestart}>
             {t('flashcards.anki.restart')}
           </Button>
-          <Button variant="ghost" onClick={() => { setStudyEarly(true); setDeckInitialized(false); setProgressRestored(true); }}>
-            {t('flashcards.anki.studyEarly')}
-          </Button>
+          {mode === "spaced" && (
+            <Button variant="ghost" onClick={() => { setStudyEarly(true); setDeckInitialized(false); setProgressRestored(true); }}>
+              {t('flashcards.anki.studyEarly')}
+            </Button>
+          )}
         </div>
       </div>
     );
