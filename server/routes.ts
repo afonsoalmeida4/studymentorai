@@ -2581,7 +2581,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Prepare priceId early (used for pending plan storage)
       const currencyEarly = getCurrencyFromRequest(req);
-      const priceIdEarly = getStripePriceId(plan, billingPeriod, currencyEarly);
+      let priceIdEarly: string;
+      try {
+        priceIdEarly = getStripePriceId(plan, billingPeriod, currencyEarly);
+      } catch (err: any) {
+        console.error("Missing Stripe price config:", err.message);
+        return res.status(500).json({ error: `Stripe price configuration missing: ${err.message}` });
+      }
 
       // If downgrading (lower rank), schedule cancellation at period end and record pending plan
       if (requestedRank < currentRank && subscription.stripeSubscriptionId) {
@@ -2601,7 +2607,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const currency = getCurrencyFromRequest(req);
-      const priceId = getStripePriceId(plan, billingPeriod, currency);
+      let priceId: string;
+      try {
+        priceId = getStripePriceId(plan, billingPeriod, currency);
+      } catch (err: any) {
+        console.error("Missing Stripe price config:", err.message);
+        return res.status(500).json({ error: `Stripe price configuration missing: ${err.message}` });
+      }
 
       const protocol =
         req.get("x-forwarded-proto") || (req.secure ? "https" : "http");
