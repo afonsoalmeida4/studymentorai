@@ -38,8 +38,18 @@
     "navigation": "Navigation",
     "home": "Startseite",
     "dashboard": "Dashboard",
+    "subscription": "Abonnement",
     "ranking": "Rangliste",
     "tools": "Werkzeuge"
+  },
+  "subscription": {
+    "scheduleDowngrade": "Downgrade planen (tritt am Ende des Abrechnungszeitraums in Kraft)",
+    "downgradeBlockedTooltip": "Sie können den Plan nicht ändern, während Sie sich auf Alta Performance mit einer ausstehenden Kündigung befinden.",
+    "changeBlockedTooltip": "Sie können den Plan nicht ändern, bis die aktuelle Abrechnungsperiode endet.",
+    "toasts": {
+      "checkoutHandled": "Anfrage verarbeitet",
+      "noUrl": "Keine Zahlungs-URL empfangen"
+    }
   },
   "auth": {
     "login": "Anmelden",

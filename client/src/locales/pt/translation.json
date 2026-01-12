@@ -1090,6 +1090,15 @@
     },
     "upgradeButton": "Fazer Upgrade"
   },
+  "subscription": {
+    "scheduleDowngrade": "Agendar downgrade (será aplicado no fim do período)",
+    "downgradeBlockedTooltip": "Não é possível alterar o plano enquanto estiver no plano Alta Performance com cancelamento agendado.",
+    "changeBlockedTooltip": "Não é possível alterar o plano até ao final do período atual.",
+    "toasts": {
+      "checkoutHandled": "Pedido processado",
+      "noUrl": "URL de pagamento não recebida"
+    }
+  },
   "flashcards": {
     "title": "Gestão de Flashcards",
     "description": "Cria e edita os teus flashcards manuais ou auto-gerados.",

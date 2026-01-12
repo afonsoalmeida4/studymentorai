@@ -38,8 +38,18 @@
     "navigation": "Navigation",
     "home": "Accueil",
     "dashboard": "Tableau de bord",
+    "subscription": "Abonnement",
     "ranking": "Classement",
     "tools": "Outils"
+  },
+  "subscription": {
+    "scheduleDowngrade": "Planifier une rétrogradation (s'appliquera à la fin de la période)",
+    "downgradeBlockedTooltip": "Vous ne pouvez pas changer de plan pendant que vous êtes en Alta Performance avec une annulation en attente.",
+    "changeBlockedTooltip": "Vous ne pouvez pas changer de plan avant la fin de la période de facturation actuelle.",
+    "toasts": {
+      "checkoutHandled": "Demande traitée",
+      "noUrl": "Aucune URL de paiement reçue"
+    }
   },
   "auth": {
     "login": "Connexion",
