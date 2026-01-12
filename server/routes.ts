@@ -2590,18 +2590,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         customerId = customer.id;
 
-        
-
-        // When creating a checkout to upgrade, proactively set the user's
-        // subscription plan in the DB to the requested plan and clear any
-        // previously scheduled cancellation. This prevents the UI from
-        // showing the old plan as "canceling" and avoids users paying for
-        // two plans simultaneously if they upgrade after scheduling a
-        // cancellation.
+        // Persist the Stripe customer id on the user's subscription record
+        // without changing the user's plan. We avoid touching the plan/status
+        // here because the subscription should only become active after a
+        // successful payment (webhook confirmation).
         await subscriptionService.updateSubscriptionPlan(
           userId,
-          plan as SubscriptionPlan,
-          { customerId, cancelAtPeriodEnd: false, status: "active" }
+          subscription.plan as SubscriptionPlan,
+          { customerId, cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false }
         );
 
       }
@@ -2612,22 +2608,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const requestedRank = planRank[plan as string];
       const currentRank = planRank[currentPlan];
 
-      // If upgrading (higher rank), cancel existing Stripe subscription immediately
+      // If upgrading (higher rank), DO NOT delete the existing Stripe
+      // subscription here. Deleting it can trigger the `customer.subscription.deleted`
+      // webhook which — if a pending plan exists — may create a new subscription
+      // immediately (bypassing Checkout). We persist a pending plan below and
+      // rely on the Checkout/webhook flow to activate the new subscription after
+      // successful payment.
       if (requestedRank > currentRank && subscription.stripeSubscriptionId) {
-        try {
-          // Some Stripe typings may not expose `del` — cast to any for safety.
-          await (stripe.subscriptions as any).del(subscription.stripeSubscriptionId);
-        } catch (e) {
-          console.warn("Failed to delete existing Stripe subscription on upgrade:", e);
-        }
-
-        // Update DB immediately to reflect the new active plan and avoid double-billing
-        await subscriptionService.updateSubscriptionPlan(
-          userId,
-          plan as SubscriptionPlan,
-          { customerId, cancelAtPeriodEnd: false, status: "active" }
-        );
-
+        // Intentionally no-op — keep existing subscription active until the
+        // Checkout flow completes and the webhook marks the new plan active.
       }
 
       // Prepare priceId early (used for pending plan storage)
@@ -2665,6 +2654,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const host = req.get("host");
       const baseUrl = `${protocol}://${host}`;
+
+      // Persist pending plan (safe even if it already exists)
+      try {
+        await subscriptionService.setPendingPlan(userId, plan as SubscriptionPlan, billingPeriod, priceId);
+      } catch (err) {
+        console.warn('Could not persist pending plan:', err);
+      }
 
       const session = await stripe.checkout.sessions.create({
         customer: customerId,

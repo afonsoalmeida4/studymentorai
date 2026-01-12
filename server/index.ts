@@ -105,30 +105,45 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         const userId = sub.metadata?.userId;
         if (!userId) break;
 
-        // If there's a pending plan for this user (scheduled downgrade), create
-        // the new subscription now using the stored priceId so we never leave
-        // the customer without a single active paid subscription.
+        // If there's a pending plan for this user (scheduled downgrade), we
+        // considered creating the new subscription here. That automatic creation
+        // could be triggered by other flows (like a deletion) and inadvertently
+        // create a paid subscription without Checkout. To be safe, only apply
+        // a pending plan automatically if it represents a downgrade relative
+        // to the deleted subscription's metadata.plan. This preserves the
+        // intended scheduled-downgrade behavior while preventing accidental
+        // immediate upgrades.
         const pending = await subscriptionService.getPendingPlan(userId);
         if (pending && pending.priceId) {
           try {
-            const newSub = await stripe.subscriptions.create({
-              customer: sub.customer as string,
-              items: [{ price: pending.priceId }],
-              metadata: { userId, plan: pending.plan, billingPeriod: pending.billingPeriod },
-            });
+            const planRank: Record<string, number> = { free: 0, pro: 1, premium: 2 };
+            const deletedPlan = (sub.metadata && (sub.metadata.plan as string)) || null;
+            const pendingRank = planRank[pending.plan as string] ?? -1;
+            const deletedRank = deletedPlan ? (planRank[deletedPlan] ?? -1) : -1;
 
-            await subscriptionService.updateSubscriptionPlan(userId, pending.plan as any, {
-              status: "active",
-              cancelAtPeriodEnd: false,
-              subscriptionId: newSub.id,
-              priceId: pending.priceId,
-              customerId: sub.customer as string,
-              currentPeriodStart: new Date(((newSub as any).current_period_start || 0) * 1000),
-              currentPeriodEnd: new Date(((newSub as any).current_period_end || 0) * 1000),
-            });
+            // Only auto-create the pending subscription if it's a true downgrade
+            // (pending plan rank < deleted subscription rank). Otherwise skip
+            // automatic creation and let Checkout/webhook handle upgrades.
+            if (deletedRank >= 0 && pendingRank >= 0 && pendingRank < deletedRank) {
+              const newSub = await stripe.subscriptions.create({
+                customer: sub.customer as string,
+                items: [{ price: pending.priceId }],
+                metadata: { userId, plan: pending.plan, billingPeriod: pending.billingPeriod },
+              });
 
-            await subscriptionService.clearPendingPlan(userId);
-            break;
+              await subscriptionService.updateSubscriptionPlan(userId, pending.plan as any, {
+                status: "active",
+                cancelAtPeriodEnd: false,
+                subscriptionId: newSub.id,
+                priceId: pending.priceId,
+                customerId: sub.customer as string,
+                currentPeriodStart: new Date(((newSub as any).current_period_start || 0) * 1000),
+                currentPeriodEnd: new Date(((newSub as any).current_period_end || 0) * 1000),
+              });
+
+              await subscriptionService.clearPendingPlan(userId);
+              break;
+            }
           } catch (err) {
             console.error("Failed to apply pending plan after subscription deleted:", err);
             // Fallback to marking free so the DB remains consistent
