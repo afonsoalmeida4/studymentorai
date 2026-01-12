@@ -223,6 +223,9 @@ export default function SubscriptionPage() {
     },
   ];
 
+  // Plan ranking for UI decisions
+  const planRank: Record<string, number> = { free: 0, pro: 1, premium: 2 };
+
   return (
     <div className="container max-w-6xl mx-auto p-6 space-y-8 bg-gradient-to-br from-background via-background to-muted/30 min-h-screen">
       <motion.div 
@@ -409,15 +412,38 @@ export default function SubscriptionPage() {
                     {t("subscription.free")}
                   </Button>
                 ) : (
-                  <Button
-                    className="w-full gap-2"
-                    onClick={() => createCheckoutMutation.mutate(plan.id)}
-                    disabled={createCheckoutMutation.isPending}
-                    data-testid={`button-upgrade-${plan.id}`}
-                  >
-                    {t("subscription.upgrade")}
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  (() => {
+                    const requestedRank = planRank[plan.id] ?? 0;
+                    const currentRank = planRank[currentPlan] ?? 0;
+
+                    if (requestedRank < currentRank) {
+                      // This is a downgrade. Make intent explicit to the user.
+                      return (
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => createCheckoutMutation.mutate(plan.id)}
+                          disabled={createCheckoutMutation.isPending}
+                          data-testid={`button-downgrade-${plan.id}`}
+                        >
+                          {t("subscription.scheduleDowngrade")}
+                        </Button>
+                      );
+                    }
+
+                    // Normal upgrade path (requestedRank > currentRank)
+                    return (
+                      <Button
+                        className="w-full gap-2"
+                        onClick={() => createCheckoutMutation.mutate(plan.id)}
+                        disabled={createCheckoutMutation.isPending}
+                        data-testid={`button-upgrade-${plan.id}`}
+                      >
+                        {t("subscription.upgrade")}
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    );
+                  })()
                 )}
               </CardFooter>
             </Card>
