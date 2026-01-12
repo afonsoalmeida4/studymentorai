@@ -10,7 +10,7 @@
     "check": "tsc",
     "db:push": "drizzle-kit push"
     ,
-    "migrate": "sh ./scripts/apply-migrations.sh"
+    "migrate": "bash ./scripts/apply-migrations.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
