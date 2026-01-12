@@ -117,9 +117,10 @@ export default function SubscriptionPage() {
     },
     onError: (error) => {
       console.error("Checkout error:", error);
+      const serverMsg = (error as any)?.data?.error || (error as any)?.message || null;
       toast({
         title: t("subscription.toasts.checkoutError"),
-        description: t("subscription.toasts.checkoutErrorMessage"),
+        description: serverMsg || t("subscription.toasts.checkoutErrorMessage"),
         variant: "destructive",
       });
     },
