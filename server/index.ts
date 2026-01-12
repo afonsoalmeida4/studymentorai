@@ -52,8 +52,10 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
 
         if (!userId || !plan || !session.subscription) break;
 
-        // ❗ NÃO buscar subscription aqui
-        // ❗ NÃO usar current_period_start aqui
+        // Fetch existing subscription first so we can cancel it after the new
+        // subscription is activated. This ensures a user never has two active
+        // Stripe subscriptions at the same time (avoids double billing).
+        const existing = await subscriptionService.getUserSubscription(userId);
 
         await subscriptionService.updateSubscriptionPlan(
           userId,
@@ -66,6 +68,25 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
             cancelAtPeriodEnd: false,
           }
         );
+
+        // If there was a different active Stripe subscription for this user,
+        // cancel it to avoid the user being billed for two overlapping plans.
+        try {
+          const oldSubId = existing?.stripeSubscriptionId;
+          const newSubId = session.subscription as string;
+
+          if (oldSubId && oldSubId !== newSubId) {
+            try {
+              await (stripe.subscriptions as any).del(oldSubId);
+              console.log(`Cancelled previous Stripe subscription for user ${userId}: ${oldSubId}`);
+            } catch (err: any) {
+              // Log but don't fail the webhook — we already assigned the new plan.
+              console.error(`Failed to cancel old Stripe subscription ${oldSubId} for user ${userId}:`, err?.message || err);
+            }
+          }
+        } catch (err) {
+          console.error("Error while attempting to cleanup old subscription after checkout:", err);
+        }
 
         break;
       }
