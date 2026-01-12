@@ -719,6 +719,10 @@
       "cancelErrorMessage": "Não foi possível cancelar a subscrição. Por favor, tenta novamente."
     },
 
+    "scheduleDowngrade": "Fazer Upgrade",
+    "downgradeBlockedTooltip": "Não podes alterar o plano enquanto estiveres em Alta Performance com cancelamento pendente.",
+    "changeBlockedTooltip": "Não podes alterar o plano até ao fim do período de faturação atual.",
+
     "cancelButton": "Cancelar Subscrição",
     "canceling": "A cancelar…",
     "cancelConfirmation": "Tens a certeza que queres cancelar a subscrição? Continuarás a ter acesso até ao fim do período de faturação atual.",
