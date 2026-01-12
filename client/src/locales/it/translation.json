@@ -38,19 +38,11 @@
     "navigation": "Navigazione",
     "home": "Home",
     "dashboard": "Dashboard",
-    "subscription": "Abbonamento",
+    
     "ranking": "Classifica",
     "tools": "Strumenti"
   },
-  "subscription": {
-    "scheduleDowngrade": "Pianifica downgrade (verrà applicato a fine periodo)",
-    "downgradeBlockedTooltip": "Non puoi cambiare piano mentre sei su Alta Performance con cancellazione programmata.",
-    "changeBlockedTooltip": "Non puoi cambiare piano fino alla fine del periodo di fatturazione corrente.",
-    "toasts": {
-      "checkoutHandled": "Richiesta elaborata",
-      "noUrl": "Nessuna URL di pagamento ricevuta"
-    }
-  },
+  
   "auth": {
     "login": "Accedi",
     "logout": "Esci",

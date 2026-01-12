@@ -45,15 +45,7 @@
     "privacyPolicy": "Privacidad",
     "logout": "Salir"
   },
-  "subscription": {
-    "scheduleDowngrade": "Programar degradación (se aplicará al final del periodo)",
-    "downgradeBlockedTooltip": "No puedes cambiar de plan mientras estés en Alta Performance con cancelación pendiente.",
-    "changeBlockedTooltip": "No puedes cambiar de plan hasta que termine el periodo de facturación actual.",
-    "toasts": {
-      "checkoutHandled": "Solicitud procesada",
-      "noUrl": "No se recibió URL de pago"
-    }
-  },
+  
   "auth": {
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",

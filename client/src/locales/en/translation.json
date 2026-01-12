@@ -46,13 +46,103 @@
     "logout": "Logout"
   },
   "subscription": {
+    "title": "Your Plan",
+    "subtitle": "Choose the ideal plan for your study goals",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "manage": "Manage Subscription",
+    "free": "Free",
+    "popular": "Most Popular",
+    "active": "Active",
+    "billing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "month": "month",
+      "year": "year",
+      "save": "Save {{percent}}%",
+      "saveMoney": "Save {{amount}}€",
+      "yearlyPromo": "2 months free on yearly plan"
+    },
+    "cancelingTitle": "Subscription is ending",
+    "cancelingSubtitle": "Your {{planName}} plan has been canceled and will remain active until the end of the current billing period.",
+    "accessUntil": "Access until",
+    "cancelingInfo": "You will keep full access until the end of the paid period.",
+    "currentUsage": "Current Usage",
+    "currentUsageSubtitle": "{{planName}} plan progress this month",
+    "uploads": "Uploads",
+    "chatMessages": "Chat messages (today)",
+    "activeSubscription": "Active Subscription",
+    "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",
+    "nextRenewal": "Next renewal",
+    "features": "Features",
+    "uploadLimit": "{{count}} uploads per month",
+    "uploadUnlimited": "Unlimited uploads",
+    "summaryLimit": "Summaries up to {{count}} words",
+    "summaryUnlimited": "Unlimited summaries",
+    "advancedFlashcards": "Advanced flashcards",
+    "existentialChat": "Existential chat",
+    "studyPlans": "Study plans",
+    "subscribe": "Subscribe",
+    "toasts": {
+      "paymentSuccess": "✅ Payment processed!",
+      "paymentSuccessMessage": "Your subscription will be activated shortly. Thank you!",
+      "paymentCanceled": "Payment canceled",
+      "paymentCanceledMessage": "You can try again whenever you want.",
+      "checkoutError": "Error",
+      "checkoutErrorMessage": "Could not start the payment process",
+      "noUrl": "Payment URL not received",
+      "cancelSuccess": "Subscription canceled",
+      "cancelSuccessMessage": "Your subscription has been canceled and will remain active until the end of the current billing period.",
+      "cancelError": "Cancellation error",
+      "cancelErrorMessage": "Could not cancel the subscription. Please try again."
+    },
+    "cancelButton": "Cancel subscription",
+    "canceling": "Canceling…",
+    "cancelConfirmation": "Are you sure you want to cancel your subscription? You will keep full access until the end of the current billing period.",
+    "plans": {
+      "free": {
+        "name": "Start Studying",
+        "features": {
+          "monthlySummaries5": "5 summaries per month",
+          "monthlyFlashcards120": "120 flashcards per month",
+          "learningStylesBasic": "2 learning styles",
+          "subjects5": "Up to 5 folders",
+          "topics10": "Up to 10 subfolders"
+        }
+      },
+      "pro": {
+        "name": "Study Without Limits",
+        "price": "{{price}}",
+        "period": "/mo",
+        "features": {
+          "monthlySummaries50": "50 summaries per month",
+          "monthlyFlashcards2000": "2,000 flashcards per month",
+          "monthlyQuizzes50": "50 quizzes per month",
+          "learningStylesAll": "All learning styles",
+          "unlimitedSubjects": "Unlimited folders and subfolders",
+          "dashboard": "Dashboard with KPIs",
+          "ranking": "XP ranking"
+        }
+      },
+      "premium": {
+        "name": "High Performance",
+        "price": "{{price}}",
+        "period": "/mo",
+        "features": {
+          "allPro": "Everything from Study Without Limits +",
+          "monthlySummaries200": "200 summaries per month",
+          "monthlyFlashcards5000": "5,000 flashcards per month",
+          "monthlyQuizzes150": "150 quizzes per month",
+          "monthlyMessages1500": "1,500 AI assistant messages",
+          "aiAssistant": "AI assistant in Study and Existential modes",
+          "pdfExport": "Export summaries to PDF or DOCX",
+          "calendar": "Academic calendar for exams and assignments"
+        }
+      }
+    },
     "scheduleDowngrade": "Schedule downgrade (will take effect at period end)",
     "downgradeBlockedTooltip": "You cannot change plans while on Alta Performance with a pending cancellation.",
-    "changeBlockedTooltip": "You cannot change plans until the current billing period ends.",
-    "toasts": {
-      "checkoutHandled": "Request processed",
-      "noUrl": "No payment URL received"
-    }
+    "changeBlockedTooltip": "You cannot change plans until the current billing period ends."
   },
   "auth": {
     "login": "Login",
@@ -670,111 +760,6 @@
     "removeStudent": "Remove Student",
     "leaveClass": "Leave Class",
     "copyInviteCode": "Copy Code"
-  },
-  "subscription": {
-    "title": "Your Plan",
-    "subtitle": "Choose the ideal plan for your study goals",
-    "currentPlan": "Current Plan",
-    "upgrade": "Upgrade",
-    "manage": "Manage Subscription",
-    "free": "Free",
-    "popular": "Most Popular",
-    "active": "Active",
-
-    "billing": {
-      "monthly": "Monthly",
-      "yearly": "Yearly",
-      "month": "month",
-      "year": "year",
-      "save": "Save {{percent}}%",
-      "saveMoney": "Save {{amount}}€",
-      "yearlyPromo": "2 months free on yearly plan"
-    },
-
-    "cancelingTitle": "Subscription is ending",
-    "cancelingSubtitle": "Your {{planName}} plan has been canceled and will remain active until the end of the current billing period.",
-    "accessUntil": "Access until",
-    "cancelingInfo": "You will keep full access until the end of the paid period.",
-
-    "currentUsage": "Current Usage",
-    "currentUsageSubtitle": "{{planName}} plan progress this month",
-    "uploads": "Uploads",
-    "chatMessages": "Chat messages (today)",
-
-    "activeSubscription": "Active Subscription",
-    "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",
-    "nextRenewal": "Next renewal",
-
-    "features": "Features",
-    "uploadLimit": "{{count}} uploads per month",
-    "uploadUnlimited": "Unlimited uploads",
-    "summaryLimit": "Summaries up to {{count}} words",
-    "summaryUnlimited": "Unlimited summaries",
-    "advancedFlashcards": "Advanced flashcards",
-    "existentialChat": "Existential chat",
-    "studyPlans": "Study plans",
-    "subscribe": "Subscribe",
-
-    "toasts": {
-      "paymentSuccess": "✅ Payment processed!",
-      "paymentSuccessMessage": "Your subscription will be activated shortly. Thank you!",
-      "paymentCanceled": "Payment canceled",
-      "paymentCanceledMessage": "You can try again whenever you want.",
-      "checkoutError": "Error",
-      "checkoutErrorMessage": "Could not start the payment process",
-      "noUrl": "Payment URL not received",
-
-      "cancelSuccess": "Subscription canceled",
-      "cancelSuccessMessage": "Your subscription has been canceled and will remain active until the end of the current billing period.",
-      "cancelError": "Cancellation error",
-      "cancelErrorMessage": "Could not cancel the subscription. Please try again."
-    },
-
-    "cancelButton": "Cancel subscription",
-    "canceling": "Canceling…",
-    "cancelConfirmation": "Are you sure you want to cancel your subscription? You will keep full access until the end of the current billing period.",
-
-    "plans": {
-      "free": {
-        "name": "Start Studying",
-        "features": {
-          "monthlySummaries5": "5 summaries per month",
-          "monthlyFlashcards120": "120 flashcards per month",
-          "learningStylesBasic": "2 learning styles",
-          "subjects5": "Up to 5 folders",
-          "topics10": "Up to 10 subfolders"
-        }
-      },
-      "pro": {
-        "name": "Study Without Limits",
-        "price": "{{price}}",
-        "period": "/mo",
-        "features": {
-          "monthlySummaries50": "50 summaries per month",
-          "monthlyFlashcards2000": "2,000 flashcards per month",
-          "monthlyQuizzes50": "50 quizzes per month",
-          "learningStylesAll": "All learning styles",
-          "unlimitedSubjects": "Unlimited folders and subfolders",
-          "dashboard": "Dashboard with KPIs",
-          "ranking": "XP ranking"
-        }
-      },
-      "premium": {
-        "name": "High Performance",
-        "price": "{{price}}",
-        "period": "/mo",
-        "features": {
-          "allPro": "Everything from Study Without Limits +",
-          "monthlySummaries200": "200 summaries per month",
-          "monthlyFlashcards5000": "5,000 flashcards per month",
-          "monthlyQuizzes150": "150 quizzes per month",
-          "monthlyMessages1500": "1,500 AI assistant messages",
-          "aiAssistant": "AI assistant in Study and Existential modes",
-          "pdfExport": "Export summaries to PDF or DOCX",
-          "calendar": "Academic calendar for exams and assignments"
-        }
-      }
-    }
   },
   "settings": {
     "title": "Settings",
