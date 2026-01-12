@@ -2527,16 +2527,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // 1️⃣ Cancela no Stripe NO FIM DO PERÍODO
-      await stripe.subscriptions.update(
-        subscription.stripeSubscriptionId,
-        {
-          cancel_at_period_end: true,
-        }
-      );
+      // 1️⃣ Try to cancel on Stripe (at period end). If Stripe subscription
+      // is missing or Stripe returns a recoverable error, fall back to
+      // marking the subscription locally so the user can continue.
+      try {
+        await stripe.subscriptions.update(
+          subscription.stripeSubscriptionId,
+          { cancel_at_period_end: true }
+        );
 
-      // 2️⃣ Marca na DB (SEM mudar plano)
-      await subscriptionService.markCancelAtPeriodEnd(userId);
+        // 2️⃣ Mark in DB (do not change plan)
+        await subscriptionService.markCancelAtPeriodEnd(userId);
+      } catch (err: any) {
+        console.error("Stripe error while setting cancel_at_period_end:", err?.message || err);
+
+        // If Stripe reports the subscription resource is missing, clear local
+        // Stripe identifiers and revert to free so the user isn't stuck.
+        const isResourceMissing =
+          err?.type === "StripeInvalidRequestError" ||
+          err?.code === "resource_missing" ||
+          err?.statusCode === 404;
+
+        if (isResourceMissing) {
+          try {
+            const reverted = await subscriptionService.cancelSubscription(userId);
+            return res.json({
+              success: true,
+              message: "Subscrição Stripe não encontrada; subscrição revertida localmente",
+              subscription: reverted,
+            });
+          } catch (innerErr: any) {
+            console.error("Error reverting local subscription after missing Stripe resource:", innerErr);
+            return res.status(500).json({ error: "Erro ao cancelar subscrição localmente" });
+          }
+        }
+
+        return res.status(500).json({ error: "Erro ao comunicar com Stripe ao cancelar subscrição" });
+      }
 
       return res.json({
         success: true,
