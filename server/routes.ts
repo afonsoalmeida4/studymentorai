@@ -2640,21 +2640,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: `Stripe price configuration missing: ${err.message}` });
       }
 
-      // If downgrading (lower rank), schedule cancellation at period end and record pending plan
-      if (requestedRank < currentRank && subscription.stripeSubscriptionId) {
-        try {
-          await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: true });
-        } catch (e) {
-          console.warn("Failed to schedule cancel_at_period_end on Stripe subscription:", e);
-        }
-
-        // Mark DB as canceling
-        await subscriptionService.markCancelAtPeriodEnd(userId);
-
-        // Save pending change so webhook can apply it when the old subscription ends
-        await subscriptionService.setPendingPlan(userId, plan as SubscriptionPlan, billingPeriod, priceIdEarly);
-
-        return res.json({ success: true, message: "Downgrade scheduled; will take effect at period end." });
+      // Disallow downgrades entirely. Users on a higher plan must wait until
+      // their current subscription ends if they cancelled; we do not allow
+      // scheduling a downgrade via the plan selection UI.
+      if (requestedRank < currentRank) {
+        return res.status(400).json({
+          error: "DOWNSHIFT_NOT_ALLOWED",
+          message:
+            "Downgrades are not allowed. To leave your current plan, cancel the subscription and wait until the period ends.",
+        });
       }
 
       const currency = getCurrencyFromRequest(req);

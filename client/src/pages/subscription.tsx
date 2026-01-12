@@ -181,6 +181,8 @@ export default function SubscriptionPage() {
     subscription.cancelAtPeriodEnd === true ||
     subscription.status === "canceling";
 
+  const blockPlanChangesForPremium = currentPlan === "premium" && isCanceling;
+
   const usage = data.usage;
   const limits = data.limits;
 
@@ -417,13 +419,15 @@ export default function SubscriptionPage() {
                     const currentRank = planRank[currentPlan] ?? 0;
 
                     if (requestedRank < currentRank) {
-                      // This is a downgrade. Make intent explicit to the user.
+                      // Downgrades not allowed. If user is premium and cancelled,
+                      // block changing plans until period end.
                       return (
                         <Button
                           variant="outline"
                           className="w-full"
                           onClick={() => createCheckoutMutation.mutate(plan.id)}
-                          disabled={createCheckoutMutation.isPending}
+                          disabled={createCheckoutMutation.isPending || blockPlanChangesForPremium}
+                          title={blockPlanChangesForPremium ? t("subscription.downgradeBlockedTooltip") : undefined}
                           data-testid={`button-downgrade-${plan.id}`}
                         >
                           {t("subscription.scheduleDowngrade")}
@@ -436,7 +440,8 @@ export default function SubscriptionPage() {
                       <Button
                         className="w-full gap-2"
                         onClick={() => createCheckoutMutation.mutate(plan.id)}
-                        disabled={createCheckoutMutation.isPending}
+                        disabled={createCheckoutMutation.isPending || (blockPlanChangesForPremium && requestedRank !== currentRank)}
+                        title={blockPlanChangesForPremium ? t("subscription.changeBlockedTooltip") : undefined}
                         data-testid={`button-upgrade-${plan.id}`}
                       >
                         {t("subscription.upgrade")}
