@@ -50,7 +50,7 @@ import { registerOrganizationRoutes } from "./organizationRoutes";
 import { registerChatRoutes } from "./chatRoutes";
 import { registerStatsRoutes } from "./statsRoutes";
 import { calculateNextReview } from "./flashcardScheduler";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { and, eq, sql, gt, asc, desc, or, inArray } from "drizzle-orm";
 import { subscriptionService } from "./subscriptionService";
 import { costControlService } from "./costControlService";
@@ -405,6 +405,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting summary:", error);
       res.status(500).json({ error: "Failed to delete summary" });
+    }
+  });
+
+  // Admin debug endpoint for subscription configuration
+  app.get("/api/admin/subscription-debug", isAuthenticated, async (req: any, res) => {
+    try {
+      if (process.env.ADMIN_DEBUG !== "1") {
+        return res.status(403).json({ error: "Admin debug disabled" });
+      }
+
+      const userId = req.user.claims.sub;
+      if (process.env.ADMIN_USER_ID && process.env.ADMIN_USER_ID !== userId) {
+        return res.status(403).json({ error: "Not allowed" });
+      }
+
+      const plans: Array<"pro" | "premium"> = ["pro", "premium"];
+      const currencies = ["EUR", "USD", "BRL", "INR"];
+      const billing: Array<"monthly" | "yearly"> = ["monthly", "yearly"];
+
+      const envChecks: Record<string, boolean> = {};
+      envChecks["STRIPE_SECRET_KEY"] = !!process.env.STRIPE_SECRET_KEY;
+      envChecks["STRIPE_WEBHOOK_SECRET"] = !!process.env.STRIPE_WEBHOOK_SECRET;
+
+      for (const p of plans) {
+        for (const c of currencies) {
+          for (const b of billing) {
+            const key = `STRIPE_PRICE_${p.toUpperCase()}_${c}_${b === "monthly" ? "MONTH" : "YEAR"}`;
+            envChecks[key] = !!process.env[key];
+          }
+        }
+      }
+
+      // Check DB table existence and pending rows count
+      let tableExists = false;
+      let pendingCount = 0;
+      try {
+        const r: any = await pool.query("SELECT to_regclass('public.pending_subscription_changes') as tbl");
+        tableExists = !!(r && r.rows && r.rows[0] && r.rows[0].tbl);
+
+        if (tableExists) {
+          const pc: any = await pool.query("SELECT count(*)::int as cnt FROM pending_subscription_changes");
+          pendingCount = (pc && pc.rows && pc.rows[0] && pc.rows[0].cnt) || 0;
+        }
+      } catch (err) {
+        console.error("Admin debug DB check failed:", err);
+      }
+
+      return res.json({ envChecks, tableExists, pendingCount });
+    } catch (err) {
+      console.error("Admin debug error:", err);
+      return res.status(500).json({ error: "Admin debug failed" });
     }
   });
 

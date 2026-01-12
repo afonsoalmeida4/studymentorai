@@ -1,6 +1,8 @@
 -- Migration: create pending_subscription_changes table
 -- Run this on your Postgres database to add the table used for scheduled subscription changes.
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS pending_subscription_changes (
   id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id varchar NOT NULL,
