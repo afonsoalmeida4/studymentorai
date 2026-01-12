@@ -42,18 +42,17 @@
     "profile": "Profile",
     "settings": "Settings",
     "classes": "Classes",
-    "subscription": "Plan",
     "privacyPolicy": "Privacy",
     "logout": "Logout"
-    "subscription": {
-      "scheduleDowngrade": "Schedule downgrade (will take effect at period end)",
-      "downgradeBlockedTooltip": "You cannot change plans while on Alta Performance with a pending cancellation.",
-      "changeBlockedTooltip": "You cannot change plans until the current billing period ends.",
-      "toasts": {
-        "checkoutHandled": "Request processed",
-        "noUrl": "No payment URL received"
-      }
-    },
+  },
+  "subscription": {
+    "scheduleDowngrade": "Schedule downgrade (will take effect at period end)",
+    "downgradeBlockedTooltip": "You cannot change plans while on Alta Performance with a pending cancellation.",
+    "changeBlockedTooltip": "You cannot change plans until the current billing period ends.",
+    "toasts": {
+      "checkoutHandled": "Request processed",
+      "noUrl": "No payment URL received"
+    }
   },
   "auth": {
     "login": "Login",
