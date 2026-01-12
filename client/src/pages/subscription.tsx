@@ -181,7 +181,9 @@ export default function SubscriptionPage() {
     subscription.cancelAtPeriodEnd === true ||
     subscription.status === "canceling";
 
-  const blockPlanChangesForPremium = currentPlan === "premium" && isCanceling;
+  // Block any plan changes (especially downgrades) while the user is on Premium
+  // (whether active or with a pending cancellation) to avoid accidental downshifts.
+  const blockPlanChangesForPremium = currentPlan === "premium";
 
   const usage = data.usage;
   const limits = data.limits;
