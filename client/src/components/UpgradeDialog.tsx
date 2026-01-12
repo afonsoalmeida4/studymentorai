@@ -38,13 +38,22 @@ export function UpgradeDialog({
     onSuccess: (data) => {
       if (data.url) {
         window.location.href = data.url;
-      } else {
-        toast({
-          title: t("common.error"),
-          description: t("upgradeDialog.errorNoUrl"),
-          variant: "destructive"
-        });
+        return;
       }
+
+      if (data && data.success && data.message) {
+        toast({
+          title: t("subscription.toasts.checkoutHandled") || t("common.success"),
+          description: data.message,
+        });
+        return;
+      }
+
+      toast({
+        title: t("common.error"),
+        description: t("upgradeDialog.errorNoUrl"),
+        variant: "destructive"
+      });
     },
     onError: () => {
       toast({

@@ -106,14 +106,25 @@ export default function SubscriptionPage() {
       if (data.url) {
         console.log("Redirecting to:", data.url);
         window.location.href = data.url;
-      } else {
-        console.error("No URL in response:", data);
-        toast({
-          title: t("subscription.toasts.checkoutError"),
-          description: t("subscription.toasts.noUrl"),
-          variant: "destructive",
-        });
+        return;
       }
+
+      // Some API responses are intentional (e.g., scheduled downgrade)
+      if (data && data.success && data.message) {
+        toast({
+          title: t("subscription.toasts.checkoutHandled"),
+          description: data.message,
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+        return;
+      }
+
+      console.error("No URL in response:", data);
+      toast({
+        title: t("subscription.toasts.checkoutError"),
+        description: t("subscription.toasts.noUrl"),
+        variant: "destructive",
+      });
     },
     onError: (error) => {
       console.error("Checkout error:", error);
