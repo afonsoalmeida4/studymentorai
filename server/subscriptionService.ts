@@ -467,22 +467,36 @@ export class SubscriptionService {
 
   // Pending plan helpers
   async setPendingPlan(userId: string, plan: SubscriptionPlan, billingPeriod: string, priceId?: string) {
-    await db
-      .insert(pendingSubscriptionChanges)
-      .values({ userId, plan, billingPeriod, priceId })
-      .onConflictDoUpdate({
-        target: [pendingSubscriptionChanges.userId],
-        set: { plan, billingPeriod, priceId, createdAt: new Date() },
-      });
+    try {
+      await db
+        .insert(pendingSubscriptionChanges)
+        .values({ userId, plan, billingPeriod, priceId })
+        .onConflictDoUpdate({
+          target: [pendingSubscriptionChanges.userId],
+          set: { plan, billingPeriod, priceId, createdAt: new Date() },
+        });
+    } catch (err: any) {
+      // If the table does not exist (missing migration), log and continue
+      console.warn("setPendingPlan: could not persist pending plan (migration missing?):", err?.message || err);
+    }
   }
 
   async getPendingPlan(userId: string) {
-    const [row] = await db.select().from(pendingSubscriptionChanges).where(eq(pendingSubscriptionChanges.userId, userId));
-    return row || null;
+    try {
+      const [row] = await db.select().from(pendingSubscriptionChanges).where(eq(pendingSubscriptionChanges.userId, userId));
+      return row || null;
+    } catch (err: any) {
+      console.warn("getPendingPlan: could not read pending plan (migration missing?):", err?.message || err);
+      return null;
+    }
   }
 
   async clearPendingPlan(userId: string) {
-    await db.delete(pendingSubscriptionChanges).where(eq(pendingSubscriptionChanges.userId, userId));
+    try {
+      await db.delete(pendingSubscriptionChanges).where(eq(pendingSubscriptionChanges.userId, userId));
+    } catch (err: any) {
+      console.warn("clearPendingPlan: could not clear pending plan (migration missing?):", err?.message || err);
+    }
   }
 }
 
