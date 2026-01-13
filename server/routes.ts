@@ -2699,7 +2699,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: { userId, plan, billingPeriod },
         success_url: `${baseUrl}/subscription?success=true`,
         cancel_url: `${baseUrl}/subscription?canceled=true`,
-      });
+        automatic_payment_methods: { enabled: true },
+      } as any);
 
       return res.json({ url: session.url });
     } catch (err) {

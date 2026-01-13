@@ -141,8 +141,8 @@
       }
     },
     "scheduleDowngrade": "Schedule downgrade (will take effect at period end)",
-    "downgradeBlockedTooltip": "You cannot change plans while on Alta Performance with a pending cancellation.",
-    "changeBlockedTooltip": "You cannot change plans until the current billing period ends."
+    "downgradeBlockedTooltip": "You cannot select a lower plan while on Alta Performance. Cancel your subscription first.",
+    "changeBlockedTooltip": "Plan changes are blocked while your subscription is active. Please cancel first."
   },
   "auth": {
     "login": "Login",
