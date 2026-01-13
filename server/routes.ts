@@ -2704,9 +2704,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       return res.json({ url: session.url });
     } catch (err: any) {
-      console.error("[CREATE CHECKOUT ERROR]", err);
+      console.error("[CREATE CHECKOUT ERROR] Full error:", err);
+      console.error("[CREATE CHECKOUT ERROR] Error type:", err?.type);
+      console.error("[CREATE CHECKOUT ERROR] Error code:", err?.code);
+      console.error("[CREATE CHECKOUT ERROR] Error message:", err?.message);
+      console.error("[CREATE CHECKOUT ERROR] Error raw:", err?.raw);
+      
       const errorMessage = err?.message || "Erro desconhecido";
-      return res.status(500).json({ error: `Erro checkout: ${errorMessage}` });
+      const errorDetails = err?.raw?.message || err?.code || "";
+      
+      return res.status(500).json({ 
+        error: `Erro checkout: ${errorMessage}`,
+        details: errorDetails,
+        type: err?.type
+      });
     }
   }
 );
