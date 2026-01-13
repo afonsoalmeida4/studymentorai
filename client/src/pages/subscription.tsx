@@ -128,10 +128,10 @@ export default function SubscriptionPage() {
     },
     onError: (error) => {
       console.error("Checkout error:", error);
-      const serverMsg = (error as any)?.data?.error || (error as any)?.message || null;
+      // Never show technical error messages to users
       toast({
         title: t("subscription.toasts.checkoutError"),
-        description: serverMsg || t("subscription.toasts.checkoutErrorMessage"),
+        description: t("subscription.toasts.checkoutErrorMessage"),
         variant: "destructive",
       });
     },

@@ -2699,8 +2699,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: { userId, plan, billingPeriod },
         success_url: `${baseUrl}/subscription?success=true`,
         cancel_url: `${baseUrl}/subscription?canceled=true`,
-        automatic_payment_methods: { enabled: true },
-      } as any);
+        payment_method_types: ["card"],
+      });
 
       return res.json({ url: session.url });
     } catch (err: any) {
@@ -2708,15 +2708,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("[CREATE CHECKOUT ERROR] Error type:", err?.type);
       console.error("[CREATE CHECKOUT ERROR] Error code:", err?.code);
       console.error("[CREATE CHECKOUT ERROR] Error message:", err?.message);
-      console.error("[CREATE CHECKOUT ERROR] Error raw:", err?.raw);
+      console.error("[CREATE CHECKOUT ERROR] Error param:", err?.param);
       
-      const errorMessage = err?.message || "Erro desconhecido";
-      const errorDetails = err?.raw?.message || err?.code || "";
-      
+      // User-friendly error messages - never expose technical details
       return res.status(500).json({ 
-        error: `Erro checkout: ${errorMessage}`,
-        details: errorDetails,
-        type: err?.type
+        error: "Não foi possível iniciar o pagamento. Por favor, tenta novamente."
       });
     }
   }
