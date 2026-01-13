@@ -2673,7 +2673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         priceId = getStripePriceId(plan, billingPeriod, currency);
       } catch (err: any) {
         console.error("Missing Stripe price config:", err.message);
-        return res.status(500).json({ error: `Stripe price configuration missing: ${err.message}` });
+        return res.status(500).json({ error: `Configuração Stripe em falta: ${err.message}` });
       }
 
       const protocol =
@@ -2703,9 +2703,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } as any);
 
       return res.json({ url: session.url });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erro checkout" });
+    } catch (err: any) {
+      console.error("[CREATE CHECKOUT ERROR]", err);
+      const errorMessage = err?.message || "Erro desconhecido";
+      return res.status(500).json({ error: `Erro checkout: ${errorMessage}` });
     }
   }
 );
