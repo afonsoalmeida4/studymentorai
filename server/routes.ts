@@ -2635,27 +2635,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const requestedRank = planRank[plan as string];
       const currentRank = planRank[currentPlan];
 
-      // If upgrading (higher rank), DO NOT delete the existing Stripe
-      // subscription here. Deleting it can trigger the `customer.subscription.deleted`
-      // webhook which — if a pending plan exists — may create a new subscription
-      // immediately (bypassing Checkout). We persist a pending plan below and
-      // rely on the Checkout/webhook flow to activate the new subscription after
-      // successful payment.
-      if (requestedRank > currentRank && subscription.stripeSubscriptionId) {
-        // Intentionally no-op — keep existing subscription active until the
-        // Checkout flow completes and the webhook marks the new plan active.
-      }
-
-      // Prepare priceId early (used for pending plan storage)
-      const currencyEarly = getCurrencyFromRequest(req);
-      let priceIdEarly: string;
-      try {
-        priceIdEarly = getStripePriceId(plan, billingPeriod, currencyEarly);
-      } catch (err: any) {
-        console.error("Missing Stripe price config:", err.message);
-        return res.status(500).json({ error: `Stripe price configuration missing: ${err.message}` });
-      }
-
       // Disallow downgrades entirely. Users on a higher plan must wait until
       // their current subscription ends if they cancelled; we do not allow
       // scheduling a downgrade via the plan selection UI.
@@ -2665,6 +2644,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message:
             "Downgrades are not allowed. To leave your current plan, cancel the subscription and wait until the period ends.",
         });
+      }
+
+      // CRITICAL: If user has an active subscription and is upgrading/changing plans,
+      // we MUST cancel the old subscription immediately to prevent having two active
+      // subscriptions. This happens BEFORE creating the checkout session.
+      if (requestedRank >= currentRank && subscription.stripeSubscriptionId && currentPlan !== "free") {
+        console.log(`[CREATE CHECKOUT] Cancelling existing subscription ${subscription.stripeSubscriptionId} before upgrade`);
+        try {
+          await stripe.subscriptions.cancel(subscription.stripeSubscriptionId, {
+            prorate: true, // Credit any unused time
+          });
+          console.log(`[CREATE CHECKOUT] Successfully cancelled previous subscription`);
+        } catch (cancelErr: any) {
+          console.error("[CREATE CHECKOUT] Error cancelling previous subscription:", cancelErr);
+          // Continue anyway - better to have duplicate than block upgrade
+        }
       }
 
       const currency = getCurrencyFromRequest(req);
