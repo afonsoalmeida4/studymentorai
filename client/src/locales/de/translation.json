@@ -1090,6 +1090,7 @@
       "uploads": "{{used}} von {{limit}} Uploads diesen Monat",
       "uploadsUnlimited": "{{used}} Uploads diesen Monat (unbegrenzt)",
       "chatMessages": "{{used}} von {{limit}} Nachrichten heute",
+      "summaries": "{{used}} von {{limit}} Zusammenfassungen in diesem Monat",
       "chatUnlimited": "{{used}} Nachrichten heute (unbegrenzt)",
       "summaries": "{{used}} Zusammenfassungen diesen Monat generiert"
     },

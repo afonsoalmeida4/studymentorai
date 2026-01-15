@@ -1090,6 +1090,7 @@
     "usage": {
       "uploads": "{{used}} de {{limit}} uploads este mês",
       "uploadsUnlimited": "{{used}} uploads este mês (ilimitado)",
+      "summaries": "{{used}} de {{limit}} resumos este mês",
       "chatMessages": "{{used}} de {{limit}} mensagens hoje",
       "chatUnlimited": "{{used}} mensagens hoje (ilimitado)",
       "summaries": "{{used}} resumos gerados este mês"

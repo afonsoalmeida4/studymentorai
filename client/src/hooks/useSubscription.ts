@@ -19,8 +19,8 @@ export function useSubscription() {
   const canUpload = () => {
     if (!data) return false;
     const { usage, limits } = data;
-    if (limits.uploadsPerMonth === -1) return true;
-    return usage.uploadsCount < limits.uploadsPerMonth;
+    // Check summaries limit instead of uploads
+    return usage.summariesGenerated < limits.monthlySummaries;
   };
 
   const canSendChatMessage = () => {
@@ -38,8 +38,8 @@ export function useSubscription() {
   const isUploadLimitReached = () => {
     if (!data) return false;
     const { usage, limits } = data;
-    if (limits.uploadsPerMonth === -1) return false;
-    return usage.uploadsCount >= limits.uploadsPerMonth;
+    // Check summaries limit instead of uploads
+    return usage.summariesGenerated >= limits.monthlySummaries;
   };
 
   const isChatLimitReached = () => {
@@ -52,12 +52,10 @@ export function useSubscription() {
   const getUploadUsageText = (t: (key: string, params?: any) => string) => {
     if (!data) return "";
     const { usage, limits } = data;
-    if (limits.uploadsPerMonth === -1) {
-      return t("limits.usage.uploadsUnlimited", { used: usage.uploadsCount });
-    }
-    return t("limits.usage.uploads", {
-      used: usage.uploadsCount,
-      limit: limits.uploadsPerMonth,
+    // Show summaries instead of uploads
+    return t("limits.usage.summaries", {
+      used: usage.summariesGenerated,
+      limit: limits.monthlySummaries,
     });
   };
 
