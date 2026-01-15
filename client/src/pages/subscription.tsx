@@ -188,9 +188,10 @@ export default function SubscriptionPage() {
   const usage = data.usage;
   const limits = data.limits;
 
-  const uploadPercentage = limits.uploadsPerMonth === -1 
-    ? 0 
-    : (usage.uploadsCount / limits.uploadsPerMonth) * 100;
+  // Use summaries generated instead of uploads for usage tracking
+  const summariesPercentage = limits.monthlySummaries > 0
+    ? (usage.summariesGenerated / limits.monthlySummaries) * 100
+    : 0;
 
   const chatPercentage = limits.dailyChatLimit === -1 
     ? 0 
@@ -299,22 +300,25 @@ export default function SubscriptionPage() {
           <CardContent className="space-y-4 relative">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span>{t("subscription.uploads")}</span>
+                <span>{t("subscription.summariesGenerated")}</span>
                 <span className="text-muted-foreground">
-                  {usage.uploadsCount} / {limits.uploadsPerMonth}
+                  {usage.summariesGenerated} / {limits.monthlySummaries}
                 </span>
               </div>
-              <Progress value={uploadPercentage} data-testid="progress-uploads" />
+              <Progress value={summariesPercentage} data-testid="progress-summaries" />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span>{t("subscription.chatMessages")}</span>
-                <span className="text-muted-foreground">
-                  {usage.chatMessagesCount} / {limits.dailyChatLimit}
-                </span>
+            {/* Only show chat messages for Pro and Premium plans */}
+            {currentPlan !== "free" && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span>{t("subscription.chatMessages")}</span>
+                  <span className="text-muted-foreground">
+                    {usage.chatMessagesCount} / {limits.dailyChatLimit === -1 ? '∞' : limits.dailyChatLimit}
+                  </span>
+                </div>
+                <Progress value={chatPercentage} data-testid="progress-chat" />
               </div>
-              <Progress value={chatPercentage} data-testid="progress-chat" />
-            </div>
+            )}
           </CardContent>
         </Card>
         </motion.div>

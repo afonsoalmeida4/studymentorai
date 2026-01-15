@@ -582,6 +582,7 @@
     "currentUsage": "Uso Actual",
     "currentUsageSubtitle": "Progreso del plan {{planName}} este mes",
     "uploads": "Subidas",
+    "summariesGenerated": "Resúmenes generados",
     "chatMessages": "Mensajes de chat (hoy)",
 
     "activeSubscription": "Suscripción Activa",

@@ -70,6 +70,7 @@
     "currentUsage": "Current Usage",
     "currentUsageSubtitle": "{{planName}} plan progress this month",
     "uploads": "Uploads",
+    "summariesGenerated": "Summaries generated",
     "chatMessages": "Chat messages (today)",
     "activeSubscription": "Active Subscription",
     "activeSubscriptionSubtitle": "Your {{planName}} plan is active and will renew automatically",

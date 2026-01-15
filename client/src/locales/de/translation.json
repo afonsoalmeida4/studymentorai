@@ -581,7 +581,7 @@
     "currentUsage": "Aktuelle Nutzung",
     "currentUsageSubtitle": "Fortschritt des {{planName}}-Plans in diesem Monat",
     "uploads": "Uploads",
-    "chatMessages": "Chat-Nachrichten (heute)",
+      "summariesGenerated": "Generierte Zusammenfassungen",
 
     "activeSubscription": "Aktives Abonnement",
     "activeSubscriptionSubtitle": "Ihr {{planName}}-Plan ist aktiv und wird automatisch verlängert",
