@@ -354,33 +354,51 @@ export class SubscriptionService {
         ? "canceling"
         : "active";
 
+    // Build update object, only including fields that have valid values
+    const updateData: any = {
+      plan,
+      status: nextStatus,
+      cancelAtPeriodEnd: nextCancelAtPeriodEnd,
+      updatedAt: new Date(),
+    };
+
+    // Only update Stripe fields if they have valid values (not null/undefined)
+    if (stripeData?.customerId !== undefined && stripeData.customerId !== null) {
+      updateData.stripeCustomerId = stripeData.customerId;
+    } else if (existing.stripeCustomerId) {
+      updateData.stripeCustomerId = existing.stripeCustomerId;
+    }
+
+    if (stripeData?.subscriptionId !== undefined && stripeData.subscriptionId !== null) {
+      updateData.stripeSubscriptionId = stripeData.subscriptionId;
+    } else if (existing.stripeSubscriptionId) {
+      updateData.stripeSubscriptionId = existing.stripeSubscriptionId;
+    }
+
+    if (stripeData?.priceId !== undefined && stripeData.priceId !== null) {
+      updateData.stripePriceId = stripeData.priceId;
+    } else if (existing.stripePriceId) {
+      updateData.stripePriceId = existing.stripePriceId;
+    }
+
+    // Only update dates if they are valid Date objects
+    if (stripeData?.currentPeriodStart instanceof Date && !isNaN(stripeData.currentPeriodStart.getTime())) {
+      updateData.currentPeriodStart = stripeData.currentPeriodStart;
+    } else if (existing.currentPeriodStart) {
+      updateData.currentPeriodStart = existing.currentPeriodStart;
+    }
+
+    if (stripeData?.currentPeriodEnd instanceof Date && !isNaN(stripeData.currentPeriodEnd.getTime())) {
+      updateData.currentPeriodEnd = stripeData.currentPeriodEnd;
+    } else if (existing.currentPeriodEnd) {
+      updateData.currentPeriodEnd = existing.currentPeriodEnd;
+    }
+
     const [updated] = await db
       .update(subscriptions)
-      .set({
-        plan,
-
-        // ✅ STATUS SEMPRE DERIVADO INTERNAMENTE
-        status: nextStatus,
-
-        cancelAtPeriodEnd: nextCancelAtPeriodEnd,
-
-        stripeCustomerId:
-          stripeData?.customerId ?? existing.stripeCustomerId,
-        stripeSubscriptionId:
-          stripeData?.subscriptionId ?? existing.stripeSubscriptionId,
-        stripePriceId:
-          stripeData?.priceId ?? existing.stripePriceId,
-
-        currentPeriodStart:
-          stripeData?.currentPeriodStart ?? existing.currentPeriodStart,
-        currentPeriodEnd:
-          stripeData?.currentPeriodEnd ?? existing.currentPeriodEnd,
-
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(subscriptions.userId, userId))
       .returning();
-
 
     return updated;
   }
@@ -395,21 +413,39 @@ export class SubscriptionService {
       ? "canceling"
       : "active";
 
+  // Build insert object, ensuring we don't insert invalid dates
+  const insertData: any = {
+    userId,
+    plan,
+    status: initialStatus,
+    cancelAtPeriodEnd: stripeData?.cancelAtPeriodEnd ?? false,
+  };
+
+  // Only include Stripe fields if they have valid values
+  if (stripeData?.customerId) {
+    insertData.stripeCustomerId = stripeData.customerId;
+  }
+
+  if (stripeData?.subscriptionId) {
+    insertData.stripeSubscriptionId = stripeData.subscriptionId;
+  }
+
+  if (stripeData?.priceId) {
+    insertData.stripePriceId = stripeData.priceId;
+  }
+
+  // Only include dates if they are valid Date objects
+  if (stripeData?.currentPeriodStart instanceof Date && !isNaN(stripeData.currentPeriodStart.getTime())) {
+    insertData.currentPeriodStart = stripeData.currentPeriodStart;
+  }
+
+  if (stripeData?.currentPeriodEnd instanceof Date && !isNaN(stripeData.currentPeriodEnd.getTime())) {
+    insertData.currentPeriodEnd = stripeData.currentPeriodEnd;
+  }
+
   const [created] = await db
     .insert(subscriptions)
-    .values({
-      userId,
-      plan,
-      status: initialStatus,
-      cancelAtPeriodEnd: stripeData?.cancelAtPeriodEnd ?? false,
-
-      stripeCustomerId: stripeData?.customerId,
-      stripeSubscriptionId: stripeData?.subscriptionId,
-      stripePriceId: stripeData?.priceId,
-
-      currentPeriodStart: stripeData?.currentPeriodStart,
-      currentPeriodEnd: stripeData?.currentPeriodEnd,
-    })
+    .values(insertData)
     .returning();
 
   return created;

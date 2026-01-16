@@ -71,10 +71,28 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         console.log(`[WEBHOOK] Old subscription ID: ${oldSubId}`);
         console.log(`[WEBHOOK] New subscription ID: ${session.subscription}`);
 
-        // CRITICAL: Cancel the old subscription BEFORE updating to the new one.
-        // This prevents any billing issues and ensures clean transition.
-        // Only cancel if there's an old subscription and it's different from the new one.
+        // CRITICAL: Fetch the full subscription details from Stripe to get accurate dates
+        // The checkout session doesn't include period start/end dates, so we need to
+        // retrieve the subscription object directly
         const newSubId = session.subscription as string;
+        let stripeSubscription: Stripe.Subscription;
+        
+        try {
+          stripeSubscription = await stripe.subscriptions.retrieve(newSubId);
+          console.log(`[WEBHOOK] Retrieved subscription details from Stripe:`, {
+            id: stripeSubscription.id,
+            status: stripeSubscription.status,
+            current_period_start: stripeSubscription.current_period_start,
+            current_period_end: stripeSubscription.current_period_end,
+          });
+        } catch (err: any) {
+          console.error(`[WEBHOOK] Failed to retrieve subscription ${newSubId} from Stripe:`, err);
+          // Don't proceed if we can't get subscription details
+          break;
+        }
+
+        // Cancel the old subscription BEFORE updating to the new one.
+        // This prevents any billing issues and ensures clean transition.
         if (oldSubId && oldSubId !== newSubId) {
           console.log(`[WEBHOOK] Cancelling old subscription ${oldSubId} before activating new plan`);
           try {
@@ -88,17 +106,19 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
           }
         }
 
-        // Now activate the new subscription plan
+        // Now activate the new subscription plan with complete data including dates
         console.log(`[WEBHOOK] Activating new plan ${plan} for user ${userId}`);
         const updatedSub = await subscriptionService.updateSubscriptionPlan(
           userId,
           plan,
           {
             customerId: session.customer as string,
-            subscriptionId: session.subscription as string,
-            status: "active",
-            // Clear any previous scheduled cancellation when a new checkout completes
+            subscriptionId: stripeSubscription.id,
+            priceId: stripeSubscription.items.data[0]?.price.id,
+            currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
             cancelAtPeriodEnd: false,
+            status: "active",
           }
         );
         
