@@ -50,7 +50,16 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         const userId = session.metadata?.userId;
         const plan = session.metadata?.plan as "pro" | "premium" | undefined;
 
-        if (!userId || !plan || !session.subscription) break;
+        console.log(`[WEBHOOK] Received checkout.session.completed`);
+        console.log(`[WEBHOOK] Session ID: ${session.id}`);
+        console.log(`[WEBHOOK] Metadata:`, session.metadata);
+        console.log(`[WEBHOOK] Subscription ID: ${session.subscription}`);
+        console.log(`[WEBHOOK] Customer ID: ${session.customer}`);
+
+        if (!userId || !plan || !session.subscription) {
+          console.error(`[WEBHOOK] Missing required data - userId: ${userId}, plan: ${plan}, subscription: ${session.subscription}`);
+          break;
+        }
 
         // Fetch existing subscription first so we can cancel it after the new
         // subscription is activated. This ensures a user never has two active
@@ -80,7 +89,8 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         }
 
         // Now activate the new subscription plan
-        await subscriptionService.updateSubscriptionPlan(
+        console.log(`[WEBHOOK] Activating new plan ${plan} for user ${userId}`);
+        const updatedSub = await subscriptionService.updateSubscriptionPlan(
           userId,
           plan,
           {
@@ -91,6 +101,13 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
             cancelAtPeriodEnd: false,
           }
         );
+        
+        console.log(`[WEBHOOK] Successfully updated subscription:`, {
+          userId: updatedSub.userId,
+          plan: updatedSub.plan,
+          status: updatedSub.status,
+          stripeSubscriptionId: updatedSub.stripeSubscriptionId,
+        });
 
         // Clear any pending plan since checkout completed successfully
         try {

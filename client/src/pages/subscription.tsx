@@ -71,12 +71,25 @@ export default function SubscriptionPage() {
     const canceled = urlParams.get('canceled');
 
     if (success === 'true') {
-      toast({
-        title: t("subscription.toasts.paymentSuccess"),
-        description: t("subscription.toasts.paymentSuccessMessage"),
-      });
-      // Invalidate subscription query to refresh data
-      queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+      // Sync subscription with Stripe to ensure plan is correct
+      apiRequest("POST", "/api/subscription/sync", {})
+        .then(() => {
+          toast({
+            title: t("subscription.toasts.paymentSuccess"),
+            description: t("subscription.toasts.paymentSuccessMessage"),
+          });
+          // Invalidate subscription query to refresh data
+          queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+        })
+        .catch((err) => {
+          console.error("Failed to sync subscription:", err);
+          toast({
+            title: t("subscription.toasts.paymentSuccess"),
+            description: t("subscription.toasts.paymentSuccessMessage"),
+          });
+          // Still invalidate to show updated data
+          queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+        });
       // Clean URL
       window.history.replaceState({}, '', '/subscription');
     } else if (canceled === 'true') {

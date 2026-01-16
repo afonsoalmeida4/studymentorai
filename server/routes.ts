@@ -2510,6 +2510,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sync subscription with Stripe - useful when webhook fails or for manual recovery
+  app.post("/api/subscription/sync", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      console.log(`[SYNC] Starting subscription sync for user ${userId}`);
+      
+      const subscription = await subscriptionService.getUserSubscription(userId);
+      
+      if (!subscription?.stripeSubscriptionId) {
+        console.log(`[SYNC] No Stripe subscription found for user ${userId}`);
+        return res.json({ 
+          success: true, 
+          message: "Sem subscrição Stripe ativa",
+          subscription 
+        });
+      }
+
+      // Fetch the subscription from Stripe
+      try {
+        const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+        
+        console.log(`[SYNC] Retrieved Stripe subscription:`, {
+          id: stripeSubscription.id,
+          status: stripeSubscription.status,
+          plan: stripeSubscription.metadata?.plan,
+          items: stripeSubscription.items.data.map(item => item.price.id),
+        });
+
+        // Extract plan from metadata
+        const stripePlan = stripeSubscription.metadata?.plan as "pro" | "premium" | undefined;
+        
+        if (!stripePlan) {
+          console.warn(`[SYNC] No plan metadata found in Stripe subscription ${stripeSubscription.id}`);
+          return res.json({ 
+            success: false, 
+            message: "Subscrição Stripe sem metadados de plano" 
+          });
+        }
+
+        // Update local subscription to match Stripe
+        const updated = await subscriptionService.updateSubscriptionPlan(
+          userId,
+          stripePlan,
+          {
+            customerId: stripeSubscription.customer as string,
+            subscriptionId: stripeSubscription.id,
+            priceId: stripeSubscription.items.data[0]?.price.id,
+            currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+            cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+            status: stripeSubscription.status === "active" ? "active" : 
+                    stripeSubscription.cancel_at_period_end ? "canceling" : "active",
+          }
+        );
+
+        console.log(`[SYNC] Successfully synced subscription for user ${userId} to plan ${stripePlan}`);
+
+        return res.json({
+          success: true,
+          message: "Subscrição sincronizada com sucesso",
+          subscription: updated,
+        });
+      } catch (stripeErr: any) {
+        console.error(`[SYNC] Error retrieving Stripe subscription:`, stripeErr);
+        
+        // If subscription not found in Stripe, revert to free
+        if (stripeErr?.code === "resource_missing" || stripeErr?.statusCode === 404) {
+          const reverted = await subscriptionService.cancelSubscription(userId);
+          return res.json({
+            success: true,
+            message: "Subscrição Stripe não encontrada, revertida para plano free",
+            subscription: reverted,
+          });
+        }
+
+        throw stripeErr;
+      }
+    } catch (error) {
+      console.error("[SYNC] Error syncing subscription:", error);
+      return res.status(500).json({
+        error: "Erro ao sincronizar subscrição",
+      });
+    }
+  });
+
   // Cancel subscription and revert to free plan
   app.post(
   "/api/subscription/cancel",
