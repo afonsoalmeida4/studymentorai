@@ -62,6 +62,24 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
         console.log(`[WEBHOOK] Old subscription ID: ${oldSubId}`);
         console.log(`[WEBHOOK] New subscription ID: ${session.subscription}`);
 
+        // CRITICAL: Cancel the old subscription BEFORE updating to the new one.
+        // This prevents any billing issues and ensures clean transition.
+        // Only cancel if there's an old subscription and it's different from the new one.
+        const newSubId = session.subscription as string;
+        if (oldSubId && oldSubId !== newSubId) {
+          console.log(`[WEBHOOK] Cancelling old subscription ${oldSubId} before activating new plan`);
+          try {
+            await stripe.subscriptions.cancel(oldSubId, {
+              prorate: true, // Credit any unused time
+            });
+            console.log(`[WEBHOOK] Successfully cancelled previous subscription ${oldSubId}`);
+          } catch (err: any) {
+            // Log but don't fail the webhook — we need to activate the new plan.
+            console.error(`[WEBHOOK] Failed to cancel old subscription ${oldSubId}:`, err?.message || err);
+          }
+        }
+
+        // Now activate the new subscription plan
         await subscriptionService.updateSubscriptionPlan(
           userId,
           plan,
@@ -79,22 +97,6 @@ app.post("/api/webhooks/stripe", async (req: any, res) => {
           await subscriptionService.clearPendingPlan(userId);
         } catch (err) {
           console.warn("Could not clear pending plan:", err);
-        }
-
-        // If there was a different active Stripe subscription for this user,
-        // cancel it to avoid the user being billed for two overlapping plans.
-        // NOTE: This is a safety net. The create-checkout endpoint should have
-        // already cancelled the old subscription BEFORE creating the checkout session.
-        const newSubId = session.subscription as string;
-        if (oldSubId && oldSubId !== newSubId) {
-          console.log(`[WEBHOOK] Attempting to cancel old subscription ${oldSubId}`);
-          try {
-            await stripe.subscriptions.cancel(oldSubId);
-            console.log(`[WEBHOOK] Successfully cancelled previous subscription ${oldSubId}`);
-          } catch (err: any) {
-            // Log but don't fail the webhook — we already assigned the new plan.
-            console.error(`[WEBHOOK] Failed to cancel old subscription ${oldSubId}:`, err?.message || err);
-          }
         }
 
         break;

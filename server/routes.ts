@@ -2646,21 +2646,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // CRITICAL: If user has an active subscription and is upgrading/changing plans,
-      // we MUST cancel the old subscription immediately to prevent having two active
-      // subscriptions. This happens BEFORE creating the checkout session.
-      if (requestedRank >= currentRank && subscription.stripeSubscriptionId && currentPlan !== "free") {
-        console.log(`[CREATE CHECKOUT] Cancelling existing subscription ${subscription.stripeSubscriptionId} before upgrade`);
-        try {
-          await stripe.subscriptions.cancel(subscription.stripeSubscriptionId, {
-            prorate: true, // Credit any unused time
-          });
-          console.log(`[CREATE CHECKOUT] Successfully cancelled previous subscription`);
-        } catch (cancelErr: any) {
-          console.error("[CREATE CHECKOUT] Error cancelling previous subscription:", cancelErr);
-          // Continue anyway - better to have duplicate than block upgrade
-        }
-      }
+      // DO NOT cancel the old subscription here! We need to keep the user's current
+      // subscription active until the payment for the new plan is confirmed.
+      // The webhook (checkout.session.completed) will handle cancelling the old
+      // subscription AFTER the new payment succeeds. This prevents users from
+      // losing their active plan if they don't complete the checkout process.
 
       const currency = getCurrencyFromRequest(req);
       let priceId: string;
